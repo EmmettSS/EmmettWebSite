@@ -1,19 +1,118 @@
-# EMMETT GROUP — PROMPT PACK
+# EMMETT — بسته پرامپت نسخهٔ ۲
+## سایت به‌مثابهٔ محصول
 
-The complete, copy-paste-ready program to take this repository to a commercial launch:
-Django backend from scratch + React frontend completion, Persian-first bilingual,
-cPanel-hostable, fully documented.
+> **نسخهٔ ۲ (۲۰۲۶-۰۹-۲۳) جایگزین کامل بستهٔ v1 است.**
+> نسخهٔ قدیمی با برچسب DEPRECATED در `v1-archive/` نگه داشته شده — **اجرا نکنید.**
 
-| Read this | For |
-|-----------|-----|
-| [`00-MASTER.md`](00-MASTER.md) | **Start here.** Program definition: mission, golden rules, architecture decisions, phase map, required inputs (B1–B10), quality gates, Definition of Done. |
-| [`01-FOUNDATION.md`](01-FOUNDATION.md) | Phase 1 — audit/cleanup, monorepo, CI, i18n architecture (fa-first, Jalali, Toman), design tokens + creative direction, SEO skeleton, ADRs. |
-| [`02-BACKEND.md`](02-BACKEND.md) | Phase 2 — full Django backend: models, REST API, admin-as-CMS, email, Static Bridge (SEO), seed data, cPanel packaging, test suite. |
-| [`03-FRONTEND.md`](03-FRONTEND.md) | Phase 3 — design system execution, every page × fa × en, real API wiring, creative features, SEO layer, WCAG 2.1 AA, performance budgets, e2e. |
-| [`04-LAUNCH.md`](04-LAUNCH.md) | Phase 4 — production content, SEO audit, Matomo/monitoring/backups, security hardening, executed deployment, runbooks, final docs, launch report. |
+---
 
-**Protocol:** fill the inputs table in the master (B1–B10) → run phases in order, one
-agent session per phase prompt → verify each phase's exit gates → tag `phase-1…4` →
-finish with the Definition of Done verified in `docs/LAUNCH-REPORT.md`.
+## چرا نسخهٔ ۲؟
 
-Each phase prompt is self-contained: it can be pasted into an agent session on its own.
+بستهٔ v1 یک **برنامهٔ تحویل** بود: سایت بالا برود، فرم‌ها کار کنند، Lighthouse خوب باشد،
+مستندات کامل شود. همه درست — ولی **هیچ دلیلی برای دیده شدن نداشت.**
+خلاقیت به یک ضمیمهٔ اختیاری با عنوان «never flashy» تنزل داده شده بود،
+بیوتکنولوژی **کاملاً غایب** بود، و هوش مصنوعی فقط یک کلمه بود نه یک فیچر.
+
+نسخهٔ ۲ یک **برنامهٔ محصول** است:
+
+> ### سایتِ امت یک بروشور نیست. **خودِ سایت، محصول است.**
+> هر بخش، به‌جای گفتنِ «ما چه کاره‌ایم»، ابزاری است که همان‌جا کار می‌کند.
+
+تحلیل کامل و راستی‌آزمایی‌شدهٔ v1 + کاتالوگ ۳۱ ایده: **[`IDEAS-2.0.md`](IDEAS-2.0.md)**
+
+---
+
+## تصمیم‌های تیم (پایهٔ کل بسته)
+
+| ورودی | تصمیم |
+|---|---|
+| زیرساخت | **cPanel اشتراکی، بدون استثنا** |
+| جسارت بصری | **جسور و آزمایشی** |
+| AI و بیوتک | **AI کامل (بک‌اند واقعی)** · **بیوتک در حد ویترین** |
+| هدف شمارهٔ یک | **اعتبار فنی و برند در بازار** |
+
+این چهار تصمیم، سه تنش فنی واقعی می‌سازند (cPanel در برابر AI زنده؛ جسارت در برابر Lighthouse؛
+هزینهٔ AI در برابر دسترسی از ایران). بستهٔ v2 این تنش‌ها را با **الگوهای مهندسی مشخص** حل می‌کند —
+بخش §۵.۳ و §۵.۵ از `00-MASTER.md` را بخوانید؛ آنجا مهم‌ترین بخش فنی کل بسته است.
+
+---
+
+## فایل‌ها — به این ترتیب بخوانید
+
+| # | فایل | برای چه |
+|---|---|---|
+| — | **[`IDEAS-2.0.md`](IDEAS-2.0.md)** | **اول این.** ممیزی راستی‌آزمایی‌شدهٔ v1 + کاتالوگ ۳۱ ایده + منطق انتخاب‌ها |
+| 0 | **[`00-MASTER.md`](00-MASTER.md)** | **مرجع بلامنازع.** مأموریت، ۱۰ قانون طلایی، معماری، تصمیم‌های قفل‌شده، نقشهٔ فازها، گیت‌ها، تعریف انجام |
+| — | **[`01-FEATURE-CARDS.md`](01-FEATURE-CARDS.md)** | مشخصات اجرایی ۱۹ فیچر: فرضیه، UI، API، cPanel، نگهبان‌ها، تست پذیرش، KPI |
+| 1 | [`02-PHASE-0-PLATFORM.md`](02-PHASE-0-PLATFORM.md) | فاز ۰ — ساختار، CI، توکن‌ها، Device Tier Engine، رفع باگ‌ها |
+| 2 | [`03-PHASE-1-BACKEND.md`](03-PHASE-1-BACKEND.md) | فاز ۱ — بک‌اند Django + الگوهای cPanel (موتور job، chunked polling) |
+| 3 | [`04-PHASE-2-SHELL-TOOLS.md`](04-PHASE-2-SHELL-TOOLS.md) | فاز ۲ — Command Palette + ترمینال واقعی + ۵ ابزار |
+| 4 | [`05-PHASE-3-SECURITY-AI.md`](05-PHASE-3-SECURITY-AI.md) | فاز ۳ — اسکنر امنیتی passive + دستیار RAG (⚠️ پریسک‌ترین فاز) |
+| 5 | [`06-PHASE-4-BIO-VISUAL.md`](06-PHASE-4-BIO-VISUAL.md) | فاز ۴ — میز کار بیوانفورماتیک + لایهٔ بصری جسور |
+| 6 | [`07-PHASE-5-LAUNCH.md`](07-PHASE-5-LAUNCH.md) | فاز ۵ — محتوا، P1، SEO، ops، استقرار، گزارش لانچ |
+| — | `v1-archive/` | بستهٔ قدیمی — فقط برای ردیابی |
+
+---
+
+## ۹ فیچر P0 — ویترین پنج توان
+
+| توان تیم | فیچرها |
+|---|---|
+| **فرانت‌اند** | F-03 تومان · F-04 نرمال‌ساز متن · F-07 پوستهٔ تعاملی |
+| **بک‌اند** | F-02 کد ملی · F-07 ترمینال (کلاینت واقعی API) |
+| **امنیت سایبری** | F-05 JWT Debugger · F-06 چک‌آپ امنیتی دامنه |
+| **هوش مصنوعی** | F-08 دستیار RAG با ارجاع به منبع |
+| **بیوتکنولوژی** | F-09 میز کار بیوانفورماتیک |
+
+| ID | فیچر | فاز |
+|---|---|---|
+| F-01 | محاسبات تاریخ شمسی | ۲ |
+| F-02 | اعتبارسنج کد ملی / شناسهٔ ملی | ۲ |
+| F-03 | فرمت‌کنندهٔ تومان + حروف‌نویسی چک | ۲ |
+| F-04 | نرمال‌ساز متن فارسی | ۲ |
+| F-05 | JWT Debugger با تحلیل امنیتی | ۲ |
+| F-06 | چک‌آپ امنیتی دامنه (passive) | ۳ |
+| F-07 | Command Palette + ترمینال واقعی | ۲ |
+| F-08 | دستیار امت (RAG) | ۳ |
+| F-09 | میز کار بیوانفورماتیک | ۴ |
+
+۱۰ فیچر دیگر (P1 و backlog) در `01-FEATURE-CARDS.md` مشخصات دارند.
+
+---
+
+## سه قانون طلایی که همه‌چیز از آن‌ها می‌آید
+
+**G1 — Show, Don't Tell.** هیچ ادعایی بدون artifact زنده مجاز نیست.
+«ما در امنیت قوی‌ایم» ❌ → چک‌آپ زندهٔ دامنه ✅. گیت CI هم دارد.
+
+**G2 — جسور، با کمربند ایمنی.** جاه‌طلبی بصری آزاد است، با چهار شرط اجباری:
+تشخیص توان دستگاه (سه سطح) · بودجهٔ پرفورمنس در CI · fallback کامل · `prefers-reduced-motion`.
+
+**G3 — هر فیچر باید موتور باشد.** صفحهٔ SEO مستقل · خروجی قابل اشتراک · قیف لید · ابزار جذب نیرو.
+فیچری که هیچ‌کدام نیست، ساخته نمی‌شود.
+
+---
+
+## پروتکل اجرا
+
+1. **`prompts/00-MASTER.md` §۱۱** را بخوانید و ورودی‌های `B1`–`B12` را پر کنید.
+   ⚠️ `B2` (دسترسی cPanel) و `B7` (دسترسی LLM) می‌توانند فاز را متوقف کنند.
+2. فازها را **به ترتیب** اجرا کنید — **یک فاز در هر نشست ایجنت**، با paste کردن پرامپت همان فاز.
+   هر پرامپت خودکفاست، پس پس از شکست هم می‌توان مستقل بازش اجرا کرد.
+3. بعد از هر فاز، **گیت‌های خروج را بند به بند** راستی‌آزمایی کنید. تا همه سبز نشده‌اند، فاز بعد را شروع نکنید.
+4. کامیت و تگ بزنید: `phase-0` … `phase-5`.
+5. در پایان فاز ۵، **§۱۰ از MASTER (تعریف انجام)** را بند به بند با **شاهد** راستی‌آزمایی کنید.
+6. هر تغییر در یک تصمیم قفل‌شده → **ADR جدید**. هرگز بی‌صدا.
+
+---
+
+## یک هشدار جدی
+
+> **بزرگ‌ترین ریسک این پروژه این نیست که ایده‌ها بد باشند — این است که ۱۹ فیچر نیمه‌کاره بسازیم.**
+
+قانون G10: **۵ فیچر P0 در سطح عالی، بهتر از ۱۵ فیچر متوسط.**
+فیچری که کارت کامل ندارد ساخته نمی‌شود. فاز P1 فقط بعد از سبز شدن همهٔ گیت‌های P0.
+
+---
+
+*نسخهٔ ۲ · ۲۰۲۶-۰۹-۲۳ · بر پایهٔ تصمیم‌های تیم در همان تاریخ*

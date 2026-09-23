@@ -1,287 +1,452 @@
-# EMMETT GROUP — MASTER PROMPT
-### Commercial Website Program: Backend from Scratch + Frontend Completion, Persian/English (Persian-First)
+# EMMETT — پرامپت اصلی (v2)
+## سایت به‌مثابهٔ محصول: ویترین زندهٔ پنج توان مهندسی
 
-> **How to use this pack.** This folder contains one master prompt (this file) and four
-> independent phase prompts:
+> **این فایل مرجعِ بلامنازع برنامه است.** هر پرامپت فاز به این فایل ارجاع می‌دهد و در
+> صورت تضاد، **این فایل برنده است.** هر تغییر در تصمیم‌های قفل‌شدهٔ §۵ فقط با ADR جدید.
 >
-> | # | File | Phase |
-> |---|------|-------|
-> | 0 | `prompts/00-MASTER.md` | **This file** — program definition, architecture, gates, inputs |
-> | 1 | `prompts/01-FOUNDATION.md` | Phase 1 — Audit, monorepo, tooling, i18n architecture, design tokens, SEO skeleton |
-> | 2 | `prompts/02-BACKEND.md` | Phase 2 — Django backend: API, admin, email, static-bridge SEO, cPanel packaging, tests |
-> | 3 | `prompts/03-FRONTEND.md` | Phase 3 — Frontend completion: design system execution, all pages, API wiring, SEO, a11y, perf |
-> | 4 | `prompts/04-LAUNCH.md` | Phase 4 — Content, SEO final, analytics/monitoring, security hardening, runbook, final docs |
+> **تصمیم‌های ورودی تیم (۲۰۲۶-۰۹-۲۳) — پایهٔ کل طراحی:**
 >
-> **Execution protocol**
-> 1. Fill in the **Inputs** table (§6) with real values before Phase 1 starts.
-> 2. Execute phases **in order**, one phase per agent session. Paste the phase prompt as the
->    session's first message. Each phase prompt is **self-contained**: it repeats the project
->    context and invariants it needs, so it can also be re-run standalone after failures.
-> 3. After each phase, verify its **Exit Gates** checklist item-by-item. Do not start the next
->    phase until every gate is green. Commit and tag: `phase-1`, `phase-2`, `phase-3`, `phase-4`.
-> 4. At the end of Phase 4, verify the **Definition of Done** (§9) line-by-line.
-> 5. Anything that changes a decision recorded here or in an ADR must go through a new ADR —
->    never silently.
+> | ورودی | تصمیم تیم | پیامد طراحی |
+> |---|---|---|
+> | **زیرساخت** | cPanel اشتراکی، **بدون استثنا** | §۵.۳ — الگوهای جایگزین اجباری |
+> | **جسارت بصری** | **جسور و آزمایشی** | §۵.۴ — جسارت با بودجهٔ سخت |
+> | **AI و بیوتک** | AI کامل (بک‌اند واقعی) · بیوتک در حد ویترین | §۵.۵ + کارت‌های C1، D1 |
+> | **هدف شمارهٔ یک** | **اعتبار فنی و برند در بازار** | متریک‌ها در §۸ بر همین اساس‌اند |
 
 ---
 
-## 1. Mission
+## ۱. مأموریت
 
-Transform this repository from a partially-built, Figma-exported marketing SPA into a
-**commercial-grade, bilingual (Persian-first / English) website for Emmett**, an independent
-software-engineering studio, with:
+سایت امت یک بروشور شرکتی نیست. **خودِ سایت، محصول است.**
 
-- A **complete backend written from scratch** on Django (leads, newsletter, waitlists,
-  blog/case-studies, team, testimonials — all admin-manageable, all API-served, all tested).
-- A **completed, production-ready frontend** that reuses the existing React/TypeScript codebase
-  (no un-justified full rewrite), fully bilingual with **Persian as the default**, Jalali dates,
-  Toman currency, RTL done properly, and a professionally re-directed visual identity.
-- **Full documentation** — architecture, API, design, content, deployment, runbook, security —
-  delivered as the final handoff.
+هر بخش از سایت باید به‌جای *گفتنِ* «ما چه کاره‌ایم»، **ابزاری باشد که همان‌جا کار می‌کند.**
+بازدیدکننده باید در همان ۶۰ ثانیهٔ اول چیزی را **استفاده کند**، نه اینکه فقط بخواند.
 
-The result must be deployable on the team's **shared Linux hosting with cPanel** and must work
-reliably for users **in Iran** (no hard dependency on services commonly blocked or degraded
-inside Iran: no Google-Fonts CDN, no Google-Analytics-only stack).
+ما پنج توان داریم: **فرانت‌اند · بک‌اند · امنیت سایبری · هوش مصنوعی · بیوتکنولوژی.**
+سایت باید هر پنج را **با یک artifact زنده** اثبات کند، نه با یک جمله در صفحهٔ «درباره ما».
 
-## 2. Who Emmett is (narrative context — use it when writing copy)
+### روایت چهار مرحله‌ای (ساختار کل تجربه)
 
-- **Name:** "Emmett" (EN). Persian working name: "امت" — see Input B4 for final confirmation.
-- **Positioning:** an independent engineering studio / engineering collective — not an agency,
-  not a SaaS vendor. It turns difficult operational problems into secure, well-crafted products.
-  Tagline direction (existing): *"We engineer intelligent systems."*
-- **Services (divisions):** software/product engineering, AI/ML, cybersecurity,
-  cloud/infrastructure, product rescue.
-- **Products:**
-  - **PenTestor** — an automated/AI-assisted security testing product (security-scanning angle).
-  - **Emmett CRM** — a relationship/sales-intelligence CRM.
-  Both are **early-stage** → the site must support **waitlists** for both, not pricing pages.
-- **Content assets:** "Field Library" (playbooks, research notes, whitepapers — some should be
-  lead-gated), **Selected Work** (case studies with architecture, metrics, process),
-  **Academy** (talent development programs), **Team** (real people), **Careers**.
-- **Market:** Iran-first (Tehran), international ambition. All money is **Toman**.
-- **Tone:** confident, technical, editorial. Never hyped, never generic-SaaS, never
-  "AI-cliché" (neon gradients, glowing orbs, stock neural nets). The site must *look* like it
-  was built by the kind of engineers it says it is.
+```
+۱. می‌بینی       → طراحی در سطحی که خودش ادعای فرانت‌اند است
+۲. استفاده می‌کنی  → ابزارهای واقعی که همان‌جا اجرا می‌شوند
+۳. می‌فهمی       → کد و معماری پشت هر ابزار را می‌بینی (Show Your Work)
+۴. می‌سازی       → مسیر تبدیل‌شدن به مشتری یا هم‌تیمی
+```
 
-## 3. Non-negotiable invariants (Golden Rules)
+### معیار موفقیت (هدف: اعتبار فنی)
 
-1. **Persian-first bilingual.** Persian (`fa`) is the default language: `/` redirects to `/fa`.
-   English lives at `/en`. Every user-visible string, page, doc page, email, form label, error,
-   OG tag and sitemap entry exists in **both** languages. Persian copy must be a **proper
-   rewrite** (idiomatic, natural Persian), never a literal translation of the English.
-   A machine-checkable **bilingual parity gate** must fail CI when keys are missing in either
-   language.
-2. **Iran-first conventions.** Jalali (Solar Hijri) calendar for all displayed dates;
-   **Toman (IRT)** for all money; Persian digits in the `fa` UI; timezone `Asia/Tehran`;
-   phone formats `+98`; RTL done with logical properties (no manual left/right hacks).
-   Date-bearing URLs stay ASCII/Gregorian-stable for compatibility — Jalali is for display.
-   Slugs: primary `slug` is ASCII; an optional Persian `slug_fa` may be added per
-   ADR-002 for SEO, never replacing the ASCII one.
-3. **Django is the core backend.** Python 3.12, Django 5.2 LTS, Django REST Framework.
-   No other backend framework. The backend is a real product: models, migrations, admin,
-   API docs, tests — not throwaway endpoint glue.
-4. **Hosting reality: shared Linux hosting with cPanel.** No Docker at runtime, no Node.js
-   runtime on the server, no Kubernetes. The backend runs as a cPanel "Python App" (WSGI).
-   Database: **MariaDB/MySQL** (PostgreSQL-compatible decisions are acceptable, but MariaDB is
-   the default target). Cron jobs via cPanel. SMTP via cPanel or a configured provider.
-   Static assets served by Django (whitenoise) + Apache. Every deployment artifact must work
-   inside this envelope.
-5. **No dependency on services degraded/blocked in Iran.** Fonts are **self-hosted**
-   (`@fontsource`, woff2, subset). Analytics: **Matomo self-hosted on the same cPanel account**
-   (cookieless config). Captcha: **honeypot + server rate limiting**, not a third-party widget.
-   If a third party is unavoidable, it must be optional and behind a config flag with a
-   no-dependency fallback.
-6. **The existing frontend is the base.** Vite + React 18 + TypeScript + Tailwind 4 +
-   react-router + motion/react stay. A full rewrite is only allowed if justified in an ADR.
-   Unused Figma-Make leftovers must be deleted, not carried forward.
-7. **Commercial-grade quality bar.** WCAG 2.1 AA accessibility; Lighthouse ≥ 90 (mobile)
-   for Performance/Accessibility/Best-Practices/SEO on the top routes in **both** languages;
-   security checklist (OWASP) applied; backups with a documented restore test; monitoring;
-   legal pages (privacy, terms) in both languages; honest, working forms — no fake submits.
-8. **Document as you build.** Every architectural decision → ADR. Every phase ends with updated
-   docs. The final doc tree (§8) is part of the Definition of Done.
-9. **No secrets in the repo.** All configuration via environment variables; `.env.example`
-   committed; credential-free CI; commit hygiene (conventional commits, CHANGELOG).
-10. **Nothing ships untested.** Backend: pytest with ≥ 80% coverage on business logic.
-    Frontend: unit (vitest) + e2e smoke (Playwright) in both languages + content parity check.
+| متریک | هدف ۶ ماه پس از لانچ |
+|---|---|
+| ترافیک ارگانیک ماهانه از ابزارها | ≥ ۱۰٬۰۰۰ بازدید |
+| تعداد صفحه‌های ایندکس‌شدهٔ مستقل | ≥ ۴۰ |
+| ارجاع/اشتراک از جامعهٔ توسعه‌دهندهٔ ایران | قابل اندازه‌گیری (UTM + Matomo) |
+| نرخ تکمیل یک ابزار تا پایان | ≥ ۳۵٪ |
+| زمان ماندگاری در `/tools/*` | ≥ ۳ دقیقه |
 
-## 4. Target architecture (decisions — locked unless re-decided via ADR)
+---
+
+## ۲. قوانین طلایی (Golden Rules)
+
+این ده قانون بر هر پرامپت فاز، بر هر ADR و بر هر خط کد حاکم‌اند.
+
+### G1 — Show, Don't Tell ⭐
+**هیچ ادعایی در سایت بدون یک artifact زندهٔ متصل به آن مجاز نیست.**
+
+| ممنوع ❌ | جایگزین ✅ |
+|---|---|
+| «ما در امنیت سایبری متخصصیم» | چک‌آپ زندهٔ دامنه + گرید A–F |
+| «تیم ما AI کار می‌کند» | دستیار RAG که روی محتوای خودمان جواب می‌دهد، با ارجاع |
+| «فرانت‌اند قوی» | سایتی که Performance Lab خودش را زنده نشان می‌دهد |
+| «دانش بیوتکنولوژی» | تحلیل‌گر FASTA که در مرورگر کار می‌کند |
+
+**گیت CI:** هر `capability` در محتوای سایت باید یک `evidenceUrl` داشته باشد. بدون آن، build شکست می‌خورد.
+
+### G2 — جسور، با کمربند ایمنی
+جاه‌طلبی بصری **آزاد** است — WebGL، انیمیشن سنگین، صحنه‌های سه‌بعدی معنادار. اما **همه** با این چهار شرط، بدون استثنا:
+1. **تشخیص توان دستگاه** → سه سطح `full` / `balanced` / `low-power` (§۵.۴)
+2. **بودجهٔ پرفورمنس در CI**، نه تست دستی یک‌باره
+3. **Fallback کامل** برای هر جلوه (SVG ثابت، تصویر از پیش رندرشده در CI)
+4. **احترام به `prefers-reduced-motion`** و یک کلید سراسری Low-Power در navbar
+
+### G3 — هر فیچر باید موتور باشد
+فیچری ساخته نمی‌شود مگر حداقل یکی از این چهار باشد:
+**صفحهٔ SEO مستقل** · **خروجی قابل اشتراک** · **قیف لید** · **ابزار جذب نیرو**.
+
+### G4 — فارسی‌اول، واقعاً
+- `/` → `/fa`. **نه `/en`.** (کد فعلی در `src/app/App.tsx:85` به `/en` می‌رود — این یک باگ است و باید اصلاح شود.)
+- متن فارسی **بازنویسی بومی** است، نه ترجمهٔ لفظی انگلیسی.
+- تاریخ شمسی، مبلغ تومان، ارقام فارسی در UI فارسی، منطقهٔ زمانی `Asia/Tehran`.
+- RTL با **logical properties** (`margin-inline-start`)، هرگز `left`/`right` دستی.
+- **گیت برابری دوزبانه در CI:** هر کلید `fa` باید `en` داشته باشد و برعکس.
+
+### G5 — پاکت cPanel مقدس است
+بدون Docker، بدون Node runtime، بدون Redis، بدون Celery، بدون WebSocket، بدون پروسهٔ بلندمدت.
+**تنها سه استثنا** در §۵.۵ مجاز است. هر فیچر قبل از ساخت باید ثابت کند در این پاکت جا می‌شود
+(بخش «cPanel» در کارت فیچر). اگر جا نمی‌شود، **الگوی جایگزین §۵.۳** اعمال می‌شود یا فیچر حذف می‌شود.
+
+### G6 — هیچ وابستگیِ مسدود/مختل در ایران
+فونت self-host (`@fontsource`، woff2 subset) · Matomo به‌جای Google Analytics ·
+هانی‌پات + rate limit به‌جای reCAPTCHA · هیچ CDN یا سرویس ثالثی در مسیر بحرانی رندر.
+اگر سرویس ثالثی اجتناب‌ناپذیر است: **پشت پرچم پیکربندی + fallback بدون وابستگی.**
+
+### G7 — کد مرده ممنوع
+کامپوننتی که import نشده، حذف می‌شود. همین حالا پنج مورد وجود دارد:
+`ParticleField`, `SignalRouting`, `ResearchLab`, `Dashboard`, `Manifesto` (بررسی با grep: used-in=0).
+در فاز ۰ تصمیم بگیرید: **احیا با هدف مشخص، یا حذف.** حالت سوم (ماندن «شاید لازم شد») ممنوع است.
+
+### G8 — هیچ چیز بدون تست ship نمی‌شود
+بک‌اند: pytest، پوشش ≥ ۸۰٪ روی منطق کسب‌وکار. فرانت‌اند: vitest + Playwright (fa و en).
+**هر فیچر باید حداقل ۳ تست پذیرش داشته باشد که در کارت فیچر تعریف شده‌اند.**
+
+### G9 — مستندسازی همزمان
+هر تصمیم معماری → ADR. هر فاز → گزارش فاز + به‌روزرسانی `docs/`. مستندسازی مرحلهٔ آخر نیست.
+
+### G10 — انضباط دامنه
+> **بزرگ‌ترین ریسک این پروژه این نیست که ایده‌ها بد باشند — این است که ۱۵ فیچر نیمه‌کاره بسازیم.**
+
+- **۵ فیچر P0 در سطح عالی، بهتر از ۱۵ فیچر متوسط.**
+- فاز P1 فقط وقتی شروع می‌شود که همهٔ گیت‌های P0 سبز باشند.
+- هر فیچر قبل از ساخت باید **کارت فیچر** کامل داشته باشد (`01-FEATURE-CARDS.md`).
+- فیچری که کارت ندارد، ساخته نمی‌شود. نقطه.
+
+---
+
+## ۳. ممیزی وضعیت فعلی (راستی‌آزمایی‌شده، ۲۰۲۶-۰۹-۲۳)
+
+### آنچه هست
+- **فرانت‌اند:** Vite 6.3.5 + React 18.3.1 + TS + Tailwind 4.1.12 + react-router 7.13 + motion 12.23.
+- **۱۲ روت فعال** (`src/app/App.tsx:52-69`)، ۴۹ کامپوننت shadcn/Radix.
+- **three 0.184 + @react-three/fiber + drei نصب‌شده** — فقط `NeuralNetwork3D` در `Hero.tsx` استفاده می‌شود.
+- `cmdk` (برای Command Palette) و `react-hook-form` **از قبل در `package.json` هستند** — استفاده نشده.
+- **بک‌اند: صفر.** `ls -d api web server` → هیچ‌کدام وجود ندارد. بستهٔ v1 هرگز اجرا نشده.
+
+### باگ‌ها و بدهی‌های فوری
+| # | مورد | شواهد | اقدام |
+|---|---|---|---|
+| 1 | `/` به `/en` می‌رود، نه `/fa` | `src/app/App.tsx:85,87` + `README.md` | فاز ۰ |
+| 2 | پنج کامپوننت مرده | grep: used-in=0 | فاز ۰ (G7) |
+| 3 | `three` در روت اصلی لود می‌شود | `Hero.tsx` → `NeuralNetwork3D` | فاز ۵ (G2) |
+| 4 | `package.json` هنوز `@figma/my-make-file` است | `package.json:2` | فاز ۰ |
+| 5 | MUI + Emotion + react-popper نصب ولی سایت shadcn است | `package.json` | فاز ۰ — حذف یا توجیه در ADR |
+| 6 | تناقض هویتی: v1 می‌گوید «never flashy»، اسپک قدیمی می‌گوید «Futuristic» | `v1-archive/00-MASTER.md:47` در برابر `src/imports/pasted_text/emmett-group-redesign.md` | **حل شد:** G2 = جسور با کمربند ایمنی |
+
+### آنچه از v1 حفظ می‌شود (این‌ها مهندسیِ خوب‌اند)
+1. **Static Bridge** — راه‌حل SEO بدون SSR روی هاست اشتراکی. در §۵.۳ بازتعریف شده.
+2. **گیت برابری دوزبانه در CI** — در G4.
+3. **تولید تایپ‌های TS از OpenAPI** — یک قرارداد، بدون مدل تکراری.
+4. **قیدهای ایران‌محور** — در G4 و G6.
+5. **بودجهٔ پرفورمنس در CI** — در §۵.۴، بازتعریف‌شده به‌صورت لایه‌ای.
+
+---
+
+## ۴. معماری هدف
 
 ```
 emmett/
-├── web/                      # React SPA (existing frontend, moved here in Phase 1)
-│   ├── src/content/          # fa-first typed content module — single source of truth for
-│   │                         #   marketing-page copy (UI strings, sections, CTAs)
-│   ├── src/i18n/             # language context, t() helper, parity types
-│   ├── src/lib/              # jalali dates, toman formatting, api client, seo hooks
-│   └── ...                   # existing components/pages, restructured and completed
-├── api/                      # Django project (created in Phase 2)
-│   ├── manage.py
-│   ├── emmett/               # settings split base/dev/prod, urls, wsgi
+├── web/                     # React SPA (از src/ منتقل می‌شود)
+│   ├── src/features/        # ⭐ هر فیچر یک ماژول مستقل و code-split
+│   │   ├── toolbox/         # F-01..F-05
+│   │   ├── scanner/         # F-06
+│   │   ├── shell/           # F-07 (palette + terminal)
+│   │   ├── assistant/       # F-08
+│   │   └── biolab/          # F-09
+│   ├── src/content/         # محتوای fa-first تایپ‌شده (منبع حقیقت copy)
+│   ├── src/i18n/            # LanguageProvider + parity types
+│   ├── src/lib/             # jalali, toman, api-client, seo, device-tier
+│   └── src/visuals/         # ⭐ لایهٔ جسور: صحنه‌های WebGL، همه lazy
+├── api/                     # Django 5.2 LTS + DRF
 │   └── apps/
-│       ├── core/             # health, sitemaps, RSS, static-bridge rendering, SEO views
-│       ├── leads/            # ContactLead, NewsletterSubscriber, WaitlistSignup
-│       └── content/          # Post, Category, CaseStudy, TeamMember, Testimonial, JobOpening
-├── docs/                     # ALL documentation (tree in §8) + references/design-history/
-├── deploy/                   # cPanel packaging: wsgi, requirements pinning, cron lines,
-│                             #   step-by-step fa+en deployment guide assets
-├── prompts/                  # this prompt pack (kept for traceability)
-└── .github/workflows/        # CI: lint/typecheck/test/build + content parity + LHCI gate
+│       ├── core/            # health, sitemaps, RSS, Static Bridge, SiteConfig
+│       ├── leads/           # ContactLead, Newsletter, Waitlist
+│       ├── tools/           # ⭐ لاگ ابزارها، آمار استفاده، خروجی اشتراکی
+│       ├── scanner/         # ⭐ صف اسکن (cron)، نتایج، نگهبان‌های abuse
+│       ├── assistant/       # ⭐ RAG: chunks، embeddings، جلسات، rate limit
+│       └── content/         # Post, CaseStudy, TeamMember, Testimonial, JobOpening
+├── docs/                    # همهٔ مستندات (§۹)
+├── deploy/                  # بسته‌بندی cPanel
+├── prompts/                 # همین بسته
+└── .github/workflows/       # CI
 ```
 
-**Key architectural patterns (each formalized as an ADR in Phase 1):**
+### الگوهای معماری کلیدی (هرکدام یک ADR)
 
-- **ADR-001 — Django core + React SPA split.** React SPA for UX; Django REST API for all
-  dynamic data (leads, content, waitlists). API versioned under `/api/v1/`, OpenAPI-published
-  via drf-spectacular; frontend types **generated from the OpenAPI spec** (single contract,
-  no duplicated models in TS).
-- **ADR-002 — i18n model.** URL-based locale (`/fa/...`, `/en/...`), `fa` default +
-  `x-default`. Two content channels: (a) marketing copy in `web/src/content/` (dev-owned,
-  versioned, fa-first source of truth); (b) operational content in the DB (admin-owned:
-  posts, case studies, team, testimonials, jobs) with dual-language fields
-  (`*_fa` / `*_en`) and per-language slugs (`slug` ASCII + `slug_fa` Persian, optional).
-  API resolves language from the request path/param; every response in both languages where
-  applicable. `hreflang` + localized sitemaps for both.
-- **ADR-003 — Static Bridge (SEO without SSR on shared hosting).** Crawlable entry HTML for
-  **every** route: marketing routes are **prerendered at CI build time** (headless-browser
-  pass over the built SPA, committed to the build artifact); dynamic content routes
-  (`/blog/...`, case-study details) are rendered **server-side by a Django management command**
-  `render_public_html` (nightly cron + on-publish) into static HTML files with full meta/OG/
-  JSON-LD and the complete article body (works without JS). The SPA hydrates over these
-  documents. Result: Google crawlers, social scrapers, `<noscript>` users and link previews
-  always see real content — with zero SSR infrastructure on shared hosting.
-- **ADR-004 — Hosting envelope.** One cPanel Python App (Django, WSGI) serves API + static +
-  built SPA (whitenoise). MariaDB via cPanel MySQL. cPanel cron for: static-bridge render,
-  DB dump backup, newsletter digest (monthly, configurable). Build happens in CI
-  (GitHub Actions) — the shared host never runs Node.
+- **ADR-001 — Django core + React SPA.** API زیر `/api/v1/`، OpenAPI با drf-spectacular،
+  **تایپ‌های TS از OpenAPI تولید می‌شوند** (حفظ از v1).
+- **ADR-002 — مدل i18n.** locale از مسیر (`/fa/...`، `/en/...`)، `fa` پیش‌فرض + `x-default`.
+  دو کانال محتوا: copy بازاریابی در `web/src/content/` (dev-owned) و محتوای عملیاتی در DB
+  با فیلدهای `*_fa`/`*_en`. slug اصلی ASCII؛ `slug_fa` اختیاری.
+- **ADR-003 — Static Bridge (SEO بدون SSR).** جزئیات در §۵.۳.
+- **ADR-004 — پاکت cPanel + سه استثنا.** §۵.۳ و §۵.۵.
+- **ADR-005 — Feature-as-Module.** هر فیچر یک دایرکتوری مستقل در `web/src/features/` با
+  route، componentها، hookها و تست‌های خودش. **هیچ فیچری در bundle اولیه نیست.**
+- **ADR-006 — Device Tier Engine.** §۵.۴. یک منبع حقیقت برای «چقدر جلوه نشان بدهیم».
+- **ADR-007 — Provider Abstraction برای LLM.** §۵.۵.
+- **ADR-008 — Chunked Polling به‌جای WebSocket.** §۵.۳.
 
-**Data-flow summary:** visitor → Apache → Django catch-all → (crawlable entry HTML) →
-browser → React hydrates → API calls for dynamic data → POSTs (contact/waitlist/newsletter) →
-Django validates + throttles + stores → SMTP email + admin dashboard + lead export.
+---
 
-## 5. Phase map
+## ۵. تصمیم‌های قفل‌شده
 
-| Phase | File | Goal | Key outputs | Exit gate summary |
-|-------|------|------|-------------|-------------------|
-| 1 | `01-FOUNDATION.md` | Clean, structured, toolable codebase with i18n + design + SEO architecture | Monorepo layout, CI green, i18n content system, token system, ADRs, docs skeleton | CI green, build clean, parity gate working, ADRs committed |
-| 2 | `02-BACKEND.md` | Complete Django backend + cPanel packaging | API + admin + email + static bridge + tests + deploy guide | All tests green, OpenAPI live, cPanel guide step-verified |
-| 3 | `03-FRONTEND.md` | Completed frontend, both languages, wired to API, at quality bar | All pages, new design system, SEO layer, a11y, perf budget, e2e | Lighthouse budgets met in fa+en, e2e green, parity green |
-| 4 | `04-LAUNCH.md` | Content, SEO final, ops, hardening, launch | Final content, analytics, monitoring, runbook, full doc tree, launch report | Definition of Done (§9) verified item-by-item |
+### ۵.۱ هدف: اعتبار فنی
+متریک‌ها در §۱. پیامد عملی: **هر فیچر باید یک سطح SEO مستقل و یک خروجی قابل اشتراک داشته باشد.**
+لید B2B و استخدام اهداف ثانویه‌اند و از مسیر اعتبار می‌آیند، نه برعکس.
 
-**Handoff artifacts** (what each phase must leave in the repo for the next):
-- Phase 1 → monorepo layout, CI, content system, tokens, ADR-001…004, docs skeleton.
-- Phase 2 → working API (dev), OpenAPI spec, seed commands, `render_public_html`,
-  `deploy/` package, `docs/API.md`, `docs/DEPLOYMENT.md` (draft).
-- Phase 3 → completed site on `main`, e2e/parity/LHCI in CI, `docs/DESIGN.md`, updated README.
-- Phase 4 → final content, analytics, runbook, `docs/LAUNCH-REPORT.md`, complete §8 tree.
+### ۵.۲ استراتژی محتوا: ابزار = صفحه
+هر ابزار یک روت مستقل با:
+- URL پایدار (`/fa/tools/kod-meli/`) + `slug_fa` برای SEO فارسی
+- JSON-LD `SoftwareApplication` + `HowTo`
+- OG image با تایپوگرافی فارسی درست
+- خروجی قابل اشتراک (کارت نتیجه + لینک دائمی)
+- بخش «چطور کار می‌کند» با **کد واقعی** (نه توضیح دست‌دوم)
 
-## 6. Inputs required from the team (fill before Phase 1; placeholders allowed with `[INPUT]` markers)
+### ۵.۳ پاکت cPanel — و الگوهای جایگزین اجباری ⭐
 
-| ID | Input | Example / notes |
-|----|-------|-----------------|
-| B1 | Primary domain + staging subdomain | `emmett.example` / `staging.emmett.example` (or `.ir` domain — state which DNS you control) |
-| B2 | cPanel access: host, username, panel URL (credentials only in CI secrets / server, never in repo) | Python version available (target 3.12), MySQL version |
-| B3 | SMTP: host/port/user or provider; team inbox address (e.g. `hello@domain`) | cPanel SMTP or external (state TLS requirement) |
-| B4 | **Final brand names:** EN (Emmett vs "Emmett Group") and FA (امت ?) + logo files (SVG preferred) | Working defaults: EN "Emmett", FA "امت" |
-| B5 | Contact block: email, phone (+98), address (Tehran), working hours, socials (Instagram/LinkedIn/GitHub/Telegram) | Drives footer, contact page, JSON-LD |
-| B6 | Real content availability: team roster, case studies, testimonials — or approval to use high-quality placeholders marked for replacement | Drives Phase 4 content work |
-| B7 | Budget ranges in Toman for the contact form (working proposal: < 500M · 500M–1.5B · 1.5B–3.75B · 3.75B+ Toman — approve/adjust) | Replaces the current EUR ranges |
-| B8 | Analytics confirmation (Matomo, cookieless, self-hosted) + any existing analytics to migrate | |
-| B9 | Legal text: approved privacy policy & terms (fa/en), or approval to draft for legal review | Required before launch, can be drafted earlier |
-| B10 | Any mandatory internal constraints (brand book, existing contracts, existing DNS/SSL setup) | cPanel typically owns SSL via AutoSSL — confirm |
+**این مهم‌ترین بخش فنی کل بسته است.** cPanel اشتراکی این‌ها را **ندارد**:
+Docker · Node runtime · Redis · Celery · WebSocket · پروسهٔ بلندمدت · headless browser · PostgreSQL.
 
-If an input is missing during a phase: proceed with a clearly-marked placeholder
-(`[INPUT Bx]`), record it in `docs/OPEN-ITEMS.md`, and surface it in the phase report.
-Never block the whole phase on a missing input unless it is B2/B3 (deploy-critical).
+**پس برای هر نیاز ممنوعه، این الگو الزامی است:**
 
-## 7. Global quality gates (applied at every phase boundary, final-enforced in Phase 4)
+| نیاز | الگوی اجباری | توضیح |
+|---|---|---|
+| **Streaming پاسخ AI** | **Chunked Polling (ADR-008)** | کلاینت `POST /assistant/ask/` → `job_id`. سپس `GET /assistant/ask/<id>/poll/?offset=n` هر ۷۰۰ms تا `done`. هر پاسخ ≤ ۲ ثانیه. **هرگز** روی `Transfer-Encoding: chunked` در Apache/mod_wsgi حساب نکنید. |
+| **کار پس‌زمینه** (embedding، اسکن، OG image) | **cron + management command** | cPanel cron پشتیبانی می‌شود. صف = ردیف در DB با وضعیت (`pending`/`running`/`done`/`failed`) + claim با `select_for_update`. |
+| **جست‌وجوی برداری** | **numpy brute-force cosine** | کورپوس ما کوچک است (چند صد chunk). `pgvector` نیاز ندارد. embeddingها در MariaDB به‌صورت BLOB؛ بارگذاری در حافظه، محاسبهٔ شباهت با numpy. O(n) برای n≈1000 کاملاً قابل قبول است. |
+| **رندر سنگین** (prerender، OG image) | **در CI، نه روی سرور** | GitHub Actions با puppeteer → خروجی استاتیک → ship در dist. |
+| **اجرای کد کاربر** (چالش کدنویسی) | **Web Worker در مرورگر** | هرگز سمت سرور اجرا نشود. اگر سرور لازم شد، آن فیچر حذف می‌شود. |
+| **صف پیام/ایمیل انبوه** | **cron + جدول outbox** | الگوی transactional outbox روی MariaDB. |
+| **درخواست > ۳۰ ثانیه** | **تجزیه به چند درخواست کوتاه** | هیچ endpointی نباید > ۲۵ ثانیه طول بکشد. |
+| **فایل** | **filesystem + whitenoise** | آپلود با اعتبارسنجی نوع/اندازه؛ هرگز مسیر کاربر مستقیماً به `open()` نرسد. |
+| **کش** | **Django cache با LocMem + DB** | بدون Redis. برای کش پاسخ AI از جدول DB استفاده شود (پایداری بین رستارت‌ها). |
 
-- **Build/CI:** lint (eslint/ruff) + typecheck (tsc strict) + tests (pytest ≥ 80% business
-  logic; vitest unit; Playwright e2e fa+en) + `vite build` all green in CI.
-- **Bilingual parity:** `npm run content:check` green (every fa key has an en key and vice
-  versa, including UI strings, metadata, emails); both languages fully navigable.
-- **Performance (mobile, top-5 routes, both languages):** Lighthouse Perf ≥ 90, LCP < 2.5 s,
-  CLS < 0.1, INP < 200 ms; initial JS ≤ 250 KB gzip; no render-blocking third-party from
-  outside the origin; images AVIF/WebP with `sizes` + lazy; fonts self-hosted woff2 subset.
-- **Accessibility:** WCAG 2.1 AA — axe-core clean on all routes in both languages, keyboard
-  complete, `prefers-reduced-motion` honored, RTL focus order verified.
-- **SEO (final, Phase 4):** sitemap(s) valid (fa+en, hreflang-consistent), robots.txt,
-  JSON-LD validated (Organization, WebSite, BlogPosting, BreadcrumbList, Person),
-  OG images render for every route, canonicals correct, 0 indexable 404s, legacy routes
-  redirect-mapped.
-- **Security:** OWASP Top-10 mapping reviewed for every endpoint (validation, CSRF,
-  throttling, honeypot, header hygiene, upload validation), `npm audit`/`pip-audit` clean of
-  high/critical, secrets scan clean, CSP draft committed.
-- **Ops:** backup + **restore test** documented and executed once; uptime check on
-  `/api/v1/health/` and one page; error-log review procedure in runbook; deploy + rollback
-  procedure executed once on staging.
-- **Docs:** every doc in §8 exists, is current, and is linked from README; ADR index current.
+### ۵.۴ جسارت بصری + بودجهٔ سخت (G2)
 
-## 8. Final documentation deliverable (doc tree — must exist at the end of Phase 4)
+**Device Tier Engine (ADR-006)** — یک ماژول، یک منبع حقیقت:
 
 ```
-README.md                     # bilingual, Persian section FIRST: what it is, quickstart
-                              #   (dev), how to deploy (operator), how to manage content,
-                              #   links into docs/, status badges
+full      → hardwareConcurrency ≥ 8 و deviceMemory ≥ 8 و reduced-motion: no
+balanced  → hardwareConcurrency ≥ 4 و deviceMemory ≥ 4
+low-power → بقیه، یا reduced-motion: yes، یا کاربر کلید Low-Power را زده
+```
+
+| سطح | WebGL | ذرات | انیمیشن scroll | three.js |
+|---|---|---|---|---|
+| `full` | ✅ کامل، DPR تا ۲ | ✅ | ✅ کامل | ✅ |
+| `balanced` | ⚠️ با DPR=1 و cap فریم ۳۰ | ⚠️ نصف | ⚠️ ساده | ⚠️ فقط صحنهٔ اصلی |
+| `low-power` | ❌ → SVG ثابت | ❌ | ❌ → fade ساده | ❌ |
+
+**بودجهٔ پرفورمنس (لایه‌ای، در CI):**
+
+| دستهٔ روت | initial JS (gzip) | Lighthouse موبایل |
+|---|---|---|
+| **روت‌های اصلی** (خانه، خدمات، محصولات، تماس، درباره) | ≤ **200 KB** | Perf ≥ 90، A11y ≥ 95، BP ≥ 95، SEO ≥ 95 |
+| **روت‌های ابزار/دمو** (`/tools/*`، `/lab/*`) | ≤ **350 KB** بعد از code-split | Perf ≥ 80، A11y ≥ 95 |
+| **کل سایت** | LCP < 2.5s · CLS < 0.1 · INP < 200ms | فونت self-host woff2 subset، تصاویر AVIF/WebP |
+
+**قوانین سخت بصری:**
+- `three` + fiber + drei **هرگز** در bundle اولیه نیستند. فقط dynamic import در `src/visuals/`.
+- هر صحنهٔ WebGL یک **fallback از پیش رندرشده** دارد (SVG/PNG ساخته‌شده در CI).
+- هیچ صحنه‌ای قبل از ورود به viewport شروع نمی‌شود (IntersectionObserver) و خارج از viewport متوقف می‌شود.
+- DPR هرگز بیش از ۲ نشود؛ در `balanced` = ۱.
+- **هیچ انیمیشنی که `height`/`width` ظرف را تغییر دهد** (CLS).
+
+### ۵.۵ سه استثنای مجاز بر G5
+
+قاعدهٔ اصلی: **خودِ cPanel میزبان هیچ محاسبهٔ سنگینی نیست.** این سه مورد سرویس بیرونی‌اند،
+پشت پرچم پیکربندی، با fallback کامل:
+
+| # | استثنا | شکل مجاز | Fallback اجباری |
+|---|---|---|---|
+| **1** | **LLM Inference** | تماس HTTPS از Django به یک سرویس بیرونی. **به دلیل محدودیت پرداخت/دسترسی از ایران، provider باید از طریق یک لایهٔ انتزاعی (ADR-007) قابل تعویض باشد:** واسطهٔ داخلی، سرویس میزبان‌شده، یا self-hosted روی یک VPS کوچک. | وقتی provider در دسترس نیست: **جست‌وجوی کلیدواژه‌ای BM25 روی همان کورپوس** + پیام صادقانه «پاسخ هوشمند موقتاً در دسترس نیست، این نتایج مرتبط‌اند». هرگز spinner بی‌پایان. |
+| **2** | **SMTP** | cPanel SMTP یا سرویس بیرونی | dev = console backend؛ خطا در ارسال = صف outbox + تلاش مجدد با cron |
+| **3** | **Analytics** | Matomo self-hosted روی همان cPanel (cookieless) | اگر نبود، هیچ third-party جایگزین نمی‌شود؛ سایت بدون analytics کار می‌کند |
+
+**نگهبان‌های اجباری AI (بدون استثنا):**
+سقف هزینهٔ روزانه (پیکربندی) · کش پاسخ در DB · rate limit بر اساس IP (پیش‌فرض ۲۰/ساعت) ·
+حداکثر طول ورودی · **عدم لاگ کردن محتوای کاربر** مگر با رضایت صریح ·
+اعلام صریح «این پاسخ توسط مدل زبانی تولید شده» · ارجاع به منبع برای هر ادعا ·
+رفتار «نمی‌دانم» وقتی confidence پایین است.
+
+---
+
+## ۶. نقشهٔ فازها
+
+| فاز | فایل | هدف | خروجی کلیدی | گیت خروج |
+|---|---|---|---|---|
+| **۰** | `02-PHASE-0-PLATFORM.md` | پایه: ساختار، CI، توکن‌ها، هویت بصری جسور، رفع باگ‌ها | monorepo، CI سبز، Device Tier Engine، توکن‌ها، ADR-001..008 | CI سبز، build تمیز، `/`→`/fa`، کد مرده صفر |
+| **۱** | `03-PHASE-1-BACKEND.md` | بک‌اند کامل Django + الگوهای cPanel + API عمومی | API + admin + Static Bridge + outbox + تست‌ها | همهٔ تست‌ها سبز، OpenAPI زنده، راهنمای cPanel راستی‌آزمایی‌شده |
+| **۲** | `04-PHASE-2-SHELL-TOOLS.md` | پوستهٔ محصول + جعبه‌ابزار (۵ ابزار) | F-07 (palette+terminal)، F-01..F-05 | هر ۵ ابزار کار می‌کنند، تست‌دارند، SEO کامل دارند |
+| **۳** | `05-PHASE-3-SECURITY-AI.md` | اسکنر امنیتی + دستیار RAG | F-06، F-08 + نگهبان‌های امنیتی/هزینه | اسکنر با ۶ نگهبان، دستیار با fallback BM25 |
+| **۴** | `06-PHASE-4-BIO-VISUAL.md` | میز کار بیوانفورماتیک + هویت بصری جسور | F-09، لایهٔ `src/visuals/` | D1 در مرورگر کار می‌کند، بودجهٔ بصری در CI سبز |
+| **۵** | `07-PHASE-5-LAUNCH.md` | محتوا، SEO نهایی، ops، لانچ | محتوای واقعی، Matomo، runbook، گزارش لانچ | DoD (§۱۰) بند به بند |
+
+**قانون توالی (G10):** فاز n+1 فقط وقتی شروع می‌شود که **همهٔ گیت‌های فاز n سبز** باشند.
+بدون استثنا، بدون «بعداً درستش می‌کنیم».
+
+---
+
+## ۷. نقشهٔ فیچرها
+
+| ID | فیچر | دسته | اولویت | فاز | توانِ اثبات‌شده |
+|---|---|---|---|---|---|
+| **F-01** | محاسبات تاریخ شمسی | ابزار | **P0** | ۲ | دقت مهندسی |
+| **F-02** | اعتبارسنج کد ملی / شناسهٔ ملی | ابزار | **P0** | ۲ | بک‌اند + دقت |
+| **F-03** | فرمت‌کنندهٔ تومان + حروف‌نویسی چک | ابزار | **P0** | ۲ | فرانت‌اند |
+| **F-04** | نرمال‌ساز متن فارسی | ابزار | **P0** | ۲ | فرانت‌اند |
+| **F-05** | JWT Debugger با هشدار امنیتی | ابزار | **P0** | ۲ | امنیت |
+| **F-06** | چک‌آپ امنیتی دامنه (passive) | امنیت | **P0** | ۳ | امنیت + قیف PenTestor |
+| **F-07** | Command Palette + ترمینال واقعی | پوسته | **P0** | ۲ | فرانت‌اند + بک‌اند |
+| **F-08** | دستیار امت (RAG) | AI | **P0** | ۳ | هوش مصنوعی |
+| **F-09** | میز کار بیوانفورماتیک | بیوتک | **P0** | ۴ | بیوتکنولوژی |
+| **F-10** | Performance Lab (شفافیت رادیکال) | ویترین | P1 | ۵ | فرانت‌اند |
+| **F-11** | پیشنهاد معماری خودکار | کسب‌وکار | P1 | ۵ | بک‌اند + لید |
+| **F-12** | OWASP Top 10 زنده | امنیت | P1 | backlog | امنیت + SEO |
+| **F-13** | قیف تماس Telegram-first | کسب‌وکار | P1 | ۵ | تبدیل |
+| **F-14** | ماتریس توانمندی با شاهد زنده | ویترین | P1 | ۵ | اجرای G1 |
+| **F-15** | چالش استخدام زنده | استخدام | P2 | backlog | جذب نیرو |
+| **F-16** | Typography Lab فارسی + OG Generator | ویترین | P2 | backlog | فرانت‌اند + SEO |
+| **F-17** | صفحهٔ شفافیت (GitHub/uptime/incident) | اعتماد | P2 | backlog | اعتماد |
+| **F-18** | Persian LLM Benchmark عمومی | AI | P2 | backlog | AI + اعتبار |
+| **F-19** | JWT/OWASP/Bio — بقیهٔ ابزارهای A6, A7, A8 | ابزار | P2 | backlog | SEO |
+
+**منطق P0:** این ۹ فیچر، هر ۵ توان را پوشش می‌دهند و **هر ۹ یک سطح SEO یا خروجی قابل اشتراک دارند**
+(یعنی هدف «اعتبار فنی» را مستقیماً پیش می‌برند).
+
+**پوشش پنج توان با P0:**
+
+| توان | ویترین P0 |
+|---|---|
+| فرانت‌اند | F-03، F-04، F-07، F-10 |
+| بک‌اند | F-02، F-07 (ترمینال→API)، F-11 |
+| امنیت سایبری | F-05، F-06 |
+| هوش مصنوعی | F-08 |
+| بیوتکنولوژی | F-09 |
+
+---
+
+## ۸. گیت‌های کیفیت سراسری
+
+این گیت‌ها در **هر** مرز فاز بررسی می‌شوند، نه فقط در پایان.
+
+### CI (هر PR)
+```
+web:   pnpm install → eslint → tsc --noEmit --strict → vitest → content:check → vite build
+       → bundle-budget (لایه‌ای §۵.۴) → a11y (axe روی روت‌های اصلی)
+api:   ruff → mypy → pytest --cov (≥80% منطق کسب‌وکار) → makemigrations --check
+seo:   prerender همهٔ روت‌ها → اعتبار meta/OG/hreflang/JSON-LD → بررسی بودجهٔ title
+sec:   pip-audit + npm audit (high/critical = fail) → secrets scan
+```
+
+### برابری دوزبانه
+`pnpm content:check` باید سبز باشد: هر کلید `fa` یک `en` دارد و برعکس، شامل
+UI strings، metadata، ایمیل‌ها، و **متن ابزارها**. نقص = شکست CI.
+
+### دسترسی‌پذیری
+WCAG 2.1 AA · axe-core تمیز روی همهٔ روت‌ها در هر دو زبان · ناوبری کامل با کیبورد ·
+`prefers-reduced-motion` محترم · **ترتیب focus در RTL راستی‌آزمایی‌شده** ·
+هیچ سیگنالی که فقط با رنگ منتقل شود.
+
+### امنیت (بررسی برای هر endpoint)
+اعتبارسنجی ورودی · CSRF · throttling · هانی‌پات · هدرهای امنیتی · اعتبارسنجی آپلود ·
+**نگهبان‌های خاص فیچر** (۶ نگهبان F-06، نگهبان‌های AI در §۵.۵) ·
+هیچ endpointی کد کاربر را سمت سرور اجرا نمی‌کند.
+
+### Ops
+بکاپ + **تست restore اجرانشده** · مانیتورینگ uptime روی `/api/v1/health/` و `/` ·
+روش بازبینی لاگ خطا در runbook · deploy + rollback یک‌بار روی staging اجرانشده.
+
+---
+
+## ۹. درخت مستندات (تحویل نهایی)
+
+```
+README.md                    # دوزبانه، بخش فارسی اول
 docs/
-├── ARCHITECTURE.md           # system overview, data-flow diagrams (SVG/mermaid), ADR index
-├── ADRS/0001…n.md            # decisions (001 architecture, 002 i18n, 003 static bridge,
-│                             #   004 hosting envelope, + any new ones)
-├── API.md                    # generated OpenAPI + Persian quickstart (curl examples)
-├── DESIGN.md                 # creative direction, design tokens, component inventory,
-│                             #   motion vocabulary, typography (fa+en), 3D/canvas policy
-├── I18N.md                   # fa-first model, parity gate, Jalali/Toman rules, new-string workflow
-├── CONTENT_GUIDE.md          # Persian (primary): how to add/edit posts, team, testimonials,
-│                             #   jobs, waitlists via admin; media & image specs
-├── DEPLOYMENT.md             # fa+en: cPanel setup step-by-step, env vars, DNS, cron, SSL
-├── RUNBOOK.md                # Persian: daily/weekly ops, backups + restore, monitoring,
-│                             #   incident response, common failures
-├── SECURITY.md               # threat model summary, OWASP mapping, secrets policy,
-│                             #   vulnerability process
-├── OPEN-ITEMS.md             # all [INPUT Bx] placeholders + open questions (drain before launch)
-├── LAUNCH-REPORT.md          # final acceptance: Definition of Done checklist with evidence
-│                             #   (Lighthouse captures, parity output, test reports, restore test)
-└── references/design-history/  # former src/imports/pasted_text/* (moved, untouched)
+├── ARCHITECTURE.md          # نمای سیستم + دیاگرام mermaid + فهرست ADR
+├── ADRS/0001…0008.md        # §۴ — هشت ADR بنیادی
+├── API.md                   # OpenAPI تولیدشده + شروع سریع فارسی (curl)
+├── FEATURES.md              # ⭐ وضعیت هر ۱۹ فیچر: کارت، تست‌ها، متریک، وضعیت
+├── DESIGN.md                # جهت بصری جسور، توکن‌ها، Device Tier، واژگان حرکت
+├── I18N.md                  # مدل fa-first، گیت برابری، قواعد شمسی/تومان
+├── CPANEL-PATTERNS.md       # ⭐ الگوهای §۵.۳ با کد نمونه — راهنمای هر توسعه‌دهندهٔ بعدی
+├── AI-OPS.md                # ⭐ provider abstraction، سقف هزینه، fallback، runbook
+├── SECURITY.md              # مدل تهدید، نگهبان‌های F-06، OWASP، سیاست secrets
+├── CONTENT_GUIDE.md         # فارسی: افزودن/ویرایش محتوا از admin
+├── DEPLOYMENT.md            # cPanel قدم‌به‌قدم، env vars، DNS، cron، SSL
+├── RUNBOOK.md               # فارسی: ops روزانه، بکاپ/restore، مانیتورینگ، incident
+├── OPEN-ITEMS.md            # همهٔ [INPUT]ها
+└── LAUNCH-REPORT.md         # پذیرش نهایی با شواهد
 ```
 
-## 9. Definition of Done (whole project — verified at the end of Phase 4)
+---
 
-- [ ] Site is live (or demonstrably deployable) at the production domain on cPanel.
-- [ ] `/` serves **Persian, RTL, Jalali, Toman** by default; `/en` fully parallel.
-- [ ] Every marketing route has crawlable entry HTML (prerendered or Static-Bridge), correct
-      meta/OG/hreflang/JSON-LD, and a valid sitemap entry in both languages.
-- [ ] Contact form, waitlists (PenTestor, Emmett CRM), newsletter subscribe/unsubscribe,
-      job application: all real, API-backed, stored, email-confirmed, rate-limited, tested.
-- [ ] Django admin: bilingual content management works end-to-end (create post fa+en →
-      appears on site + sitemap + RSS within one cron cycle); leads exportable.
-- [ ] Matomo tracking (contact submit, waitlist, newsletter, whitepaper download) verified;
-      cookieless; no third-party pixels outside the origin.
-- [ ] Lighthouse (mobile) ≥ 90 on Perf/A11y/BP/SEO for top-5 routes in **both** languages;
-      budgets in §7 met.
-- [ ] E2E (fa+en), unit, contract, content-parity and Lighthouse CI all green on `main`.
-- [ ] Security checklist (§7) signed off; secrets scan + dependency audit clean.
-- [ ] Backup + restore executed and documented; uptime + log monitoring active.
-- [ ] Privacy policy & terms live in both languages; legal review noted in OPEN-ITEMS if pending.
-- [ ] Full doc tree (§8) committed; README (fa-first) correct; ADR index current.
-- [ ] `docs/LAUNCH-REPORT.md` contains evidence for every item above.
+## ۱۰. تعریف انجام (Definition of Done)
 
-## 10. Working rules for the executing agent (all phases)
+### لایهٔ محصول (جدید در v2) ⭐
+- [ ] `/` به **`/fa`** می‌رود؛ فارسی، RTL، شمسی، تومان پیش‌فرض است.
+- [ ] **هر ۹ فیچر P0 زنده، کارآمد و تست‌شده‌اند.** نه «نمایشی»، نه mock — واقعاً کار می‌کنند.
+- [ ] **هر ۵ توان یک artifact زنده دارند** (جدول §۷). اجرای G1 قابل اثبات است.
+- [ ] بازدیدکننده در ۶۰ ثانیهٔ اول می‌تواند **یک ابزار را واقعاً استفاده کند.**
+- [ ] هر ابزار یک صفحهٔ SEO مستقل با JSON-LD و OG فارسی دارد.
+- [ ] هر ابزار یک **خروجی قابل اشتراک** دارد (کارت نتیجه + لینک دائمی).
+- [ ] Command Palette همه‌چیز را پوشش می‌دهد؛ ترمینال به API **واقعی** متصل است.
+- [ ] دستیار RAG با ارجاع به منبع پاسخ می‌دهد و **fallback BM25 آن تست شده است.**
+- [ ] اسکنر F-06 هر ۶ نگهبان امنیتی/قانونی را دارد و تست شده‌اند.
+- [ ] Device Tier Engine کار می‌کند: در `low-power` هیچ WebGL لود نمی‌شود.
 
-1. Work on the current branch; small, conventional commits; update `CHANGELOG.md`
-   (Keep-a-Changelog) at every phase end.
-2. **Do not delete the `.git` directory or the repo root.** Prefer deleting unused *files*.
-3. Keep `prompts/` as-is (traceability). When a phase prompt conflicts with reality, follow
-   the ADRs and record the deviation in `docs/OPEN-ITEMS.md`.
-4. At the end of each phase produce a **phase report** (commit message + short section in
-   `CHANGELOG.md` + updated `docs/OPEN-ITEMS.md`) stating: gates passed (with evidence),
-   deviations, open items, and what the next phase can rely on.
-5. Never invent client names, metrics or awards that don't exist. Proof sections use the
-   team's actual data (Input B6) or clearly-labeled placeholders.
-6. When generating copy: write Persian first (as a native rewrite), then English; keep the
-   confident-engineering tone; no marketing hyperbole; no AI-cliché vocabulary
-   ("synergy", "next-gen", "unleash", neon-purple, glowing orbs).
-7. Treat performance as a feature: budget checks run in CI, not as a one-off.
-8. If an input (B1–B10) is missing, mark placeholders, continue, record in OPEN-ITEMS.
-9. Accessibility and RTL are not phases-4 concerns — they are verified at every phase boundary.
-10. The final site must be **embarrassing-free**: no lorem ipsum without `[INPUT]` markers,
-    no dead links, no console errors, no fake success states, no English leaking into `fa`.
+### لایهٔ فنی (حفظ از v1، سخت‌تر)
+- [ ] بودجهٔ لایه‌ای §۵.۴ در CI سبز — روت‌های اصلی ≤ 200 KB gzip.
+- [ ] Lighthouse موبایل در **هر دو زبان** برای روت‌های اصلی: Perf ≥ 90، A11y ≥ 95.
+- [ ] همهٔ تست‌ها (pytest، vitest، Playwright fa+en، content:check) سبز روی `main`.
+- [ ] Static Bridge: هر روت محتوای قابل crawl دارد بدون JS.
+- [ ] هیچ وابستگی مسدود در ایران در مسیر بحرانی نیست.
+- [ ] هیچ کد مرده‌ای نیست (G7). `package.json` نام درست دارد.
+- [ ] بکاپ + restore اجرانشده و مستندشده.
+- [ ] درخت مستندات §۹ کامل است؛ `docs/FEATURES.md` وضعیت همهٔ ۱۹ فیچر را دارد.
+- [ ] `docs/LAUNCH-REPORT.md` برای هر بند بالا **شاهد** دارد.
+
+### صفر‌های مطلق
+صفر lorem ipsum بدون مارکر `[INPUT]` · صفر لینک مرده · صفر خطای console ·
+صفر موفقیت جعلی در فرم‌ها · صفر نشت انگلیسی در `fa` · صفر secret در ریپو.
+
+---
+
+## ۱۱. ورودی‌های لازم از تیم
+
+| ID | ورودی | وضعیت | یادداشت |
+|---|---|---|---|
+| B1 | دامنهٔ اصلی + staging | `[INPUT B1]` | `.ir` یا `.com`؟ کدام DNS را کنترل می‌کنید؟ |
+| B2 | دسترسی cPanel: میزبان، کاربر، نسخهٔ Python/MySQL | `[INPUT B2]` | **بحرانی برای فاز ۱** |
+| B3 | SMTP + ایمیل تیم | `[INPUT B3]` | dev = console |
+| B4 | نام نهایی برند EN/FA + لوگو SVG | `[INPUT B4]` | پیش‌فرض: EN «Emmett»، FA «امت» |
+| B5 | بلوک تماس: ایمیل، تلفن +98، آدرس، ساعت کاری، شبکه‌ها | `[INPUT B5]` | **Telegram handle الزامی است** (F-13) |
+| B6 | محتوای واقعی: تیم، کیس‌استادی، توصیه‌نامه | `[INPUT B6]` | یا مجوز placeholder با مارکر |
+| B7 | **دسترسی LLM:** کدام provider/واسطه؟ کلید API؟ سقف بودجهٔ ماهانه؟ | `[INPUT B7]` | ⭐ **بحرانی برای F-08** — بدون این، fallback BM25 ship می‌شود |
+| B8 | تأیید Matomo (cookieless، self-hosted) | `[INPUT B8]` | |
+| B9 | متن حقوقی: حریم خصوصی و شرایط استفاده (fa/en) | `[INPUT B9]` | |
+| B10 | **دادهٔ بیوتک:** آیا توالی/دیتاست واقعی برای D1 دارید؟ یا نمونهٔ عمومی کافی است؟ | `[INPUT B10]` | ⭐ **جدید در v2** — برای F-09 |
+| B11 | **GitHub org عمومی** برای صفحهٔ شفافیت (F-17) | `[INPUT B11]` | ⭐ جدید در v2 |
+| B12 | **حداقل یک کیس‌استادی واقعی** با معماری و عدد | `[INPUT B12]` | ⭐ بدون این، G1 برای بک‌اند قابل اثبات نیست |
+
+**قاعده:** ورودی غایب → placeholder با مارکر `[INPUT Bx]` + ثبت در `docs/OPEN-ITEMS.md` +
+ادامهٔ کار. فقط **B2** و **B7** می‌توانند یک فاز را متوقف کنند.
+
+---
+
+## ۱۲. قواعد کار برای ایجنت مجری
+
+1. روی برنچ جاری کار کنید؛ کامیت‌های کوچک و conventional؛ `CHANGELOG.md` در پایان هر فاز.
+2. **هرگز `.git` یا ریشهٔ ریپو را حذف/منتقل نکنید.** فایل‌های اضافی را حذف کنید.
+3. در پایان هر فاز یک **گزارش فاز** بنویسید: گیت‌های گذشته (با شاهد) · انحراف‌ها · موارد باز · آنچه فاز بعد می‌تواند به آن تکیه کند.
+4. **هرگز نام مشتری، متریک یا جایزه‌ای که وجود ندارد نسازید.** (این هم‌راستا با G1 است: ادعای بی‌شاهد = نقض قانون.)
+5. متن را **فارسی‌اول** بنویسید (بازنویسی بومی)، سپس انگلیسی. لحن: مهندسِ مطمئن. بدون اغراق بازاریابی.
+6. **واژگان ممنوع:** synergy، next-gen، unleash، راه‌حل‌های نوآورانه، پیشرو در صنعت، neon-purple، glowing orbs، توپ‌های نورانی.
+7. **پرفورمنس یک فیچر است**، نه یک تسک پایانی. بودجه در CI اجرا می‌شود.
+8. دسترسی‌پذیری و RTL مربوط به فاز آخر نیستند — در **هر** مرز فاز راستی‌آزمایی می‌شوند.
+9. وقتی یک فیچر با پاکت cPanel (§۵.۳) جا نمی‌شود: **اول** الگوی جایگزین را امتحان کنید، **بعد** ADR بنویسید، **هرگز** بی‌صدا نادیده نگیرید.
+10. سایت نهایی باید **بدون شرم** باشد: هیچ ادعای بی‌شاهد، هیچ ابزار نیمه‌کاره، هیچ spinner بی‌پایان.
+
+---
+
+*نسخه ۲ · ۲۰۲۶-۰۹-۲۳ · جانشین کامل `prompts/v1-archive/`*
+*تحلیل و کاتالوگ کامل ایده‌ها: `prompts/IDEAS-2.0.md`*

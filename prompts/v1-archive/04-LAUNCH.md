@@ -1,3 +1,5 @@
+> **⚠️ DEPRECATED (v1) — 2026-09-23.** این فایل بخشی از بستهٔ v1 است و با بستهٔ جدید در `prompts/` جایگزین شده است. فقط برای ردیابی نگه داشته شده؛ اجرا نکنید. مبنای اجرا: `prompts/README.md`.
+
 # EMMETT GROUP — PHASE 4 PROMPT: CONTENT, SEO FINAL, OPS & LAUNCH
 ### Real Content, Analytics/Monitoring, Security Hardening, Runbook, Final Documentation, Launch
 
