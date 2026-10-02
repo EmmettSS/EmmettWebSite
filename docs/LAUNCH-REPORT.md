@@ -12,6 +12,18 @@
 | ✅ سنجیده‌شده (محلی + CI) | Lighthouse موبایل در پروفایل low-power روی ۶ روت ×۲ اجرا (Perf ۰٫۹۹، A11y ۱٫۰۰، CLS ≤ ۰٫۰۱، صفر خطای console) و axe روی ۲۵ روت ×۲ زبان (صفر violation) — جزئیات و روش بازتولید در همین سند |
 | ⏸ طولانی/راهبردی (خارج از دامنهٔ این انتشار) | اجرای end-to-end صف CRM، چند‌منطقه‌ای‌سازی، i18n بیش از دو زبان |
 
+### ✅ شاهد CI (اجرای واقعی روی GitHub Actions)
+
+| job | نتیجه | زمان |
+|---|---|---|
+| `web` (lint, typecheck, content/jalali/corpus/tool-contract, api:types, build, budget, unit tests, seo, Playwright+axe, شواهد تصویری) | ✅ pass | ۴m۴۴s |
+| `lighthouse` (build → staging → ۶ روت ×۲ اجرا با آستانه‌های Perf/A11y/CLS/console) | ✅ pass | ۳m۴۸s |
+| `api` (ruff, check, makemigrations --check, migrate, pytest + coverage ≥۸۰، spectacular --fail-on-warn) | ✅ pass | ۳۳s |
+| `security` (gitleaks) | ✅ pass | ۲۰s |
+| `queue-race` (تست همزمانی صف) | ✅ pass | ۴۴s |
+
+- **شاهد:** run [`37054435553`](https://github.com/EmmettSS/EmmettWebSite/actions/runs/37054435553) روی `eed5e60` (شاخهٔ همین PR؛ `gh pr checks 6` → هر پنج job `pass`). تا پیش از این دور، job لایت‌هاوس در CI هیچ‌وقت واقعاً اجرا نمی‌شد: مرورگری در آن job نصب نبود و LHCI هم مرورگر دانلود نمی‌کند، پس گیت قبل از جمع‌آوری داده خارج می‌شد و تنها ردّش «هیچ فایلی برای artifact پیدا نشد» بود — همان «سبز/قرمزِ بی‌دلیل» که این گزارش موظف است افشا کند. حالا همان Chromiumی که job وب نصب می‌کند با `CHROME_PATH` به LHCI داده می‌شود و شکست‌ها هم به‌صورت annotation خوانا گزارش می‌شوند.
+
 ---
 
 ## لایهٔ محصول
@@ -189,4 +201,4 @@
 ۲. **`B4` (آدرس Matomo):** با تنظیم `VITE_MATOMO_URL`/`VITE_MATOMO_SITE_ID` رویدادها بی‌درنگ فعال می‌شوند؛ **بدون آن هیچ ردیابی‌ای انجام نمی‌شود** (رفتار طراحی‌شده و در صفحهٔ حریم خصوصی اعلام‌شده).
 ۳. **`B5` (هندل تلگرام / ایمیل امنیتی):** CTA و VDP با وضعیت «پیکربندی‌نشده» و مارکر `[INPUT B5]` کار می‌کنند.
 ۴. **`B9`/`B15`:** بازبینی حقوقی، SLA و کانال گزارش آسیب‌پذیری — متن آماده و مارک‌دار است.
-۵. **CI:** همین سه گیت (Lighthouse/axe/Playwright) روی سرور CI هم اجرا می‌شوند تا اعداد محلیِ ثبت‌شده در بالا مستقل تأیید شوند؛ تنها تفاوت محیط، بیلد مرورگری است که CI خودش با `playwright install --with-deps chromium` نصب می‌کند.
+۵. **CI ✅ (انجام شد):** هر پنج job روی `eed5e60` سبزند (`gh pr checks 6` → همه `pass`)، از جمله `lighthouse` که قبلاً هرگز واقعاً اجرا نمی‌شد. به این ترتیب اعداد محلی این گزارش، مستقل هم تأیید شده‌اند.
