@@ -20,11 +20,11 @@ describe("F-09 · analysis runner", () => {
   it("runs a 1 MB sequence without freezing the event loop (chunked fallback path)", async () => {
     const sequence = bigSequence(1_000_000);
     const startedAt = Date.now();
-    let maxGap = 0;
+    const gaps: number[] = [];
     let last = Date.now();
     const heartbeat = setInterval(() => {
       const now = Date.now();
-      maxGap = Math.max(maxGap, now - last);
+      gaps.push(now - last);
       last = now;
     }, 5);
     const stages: string[] = [];
@@ -36,15 +36,27 @@ describe("F-09 · analysis runner", () => {
       onProgress: (progress) => stages.push(progress.stage),
     });
     clearInterval(heartbeat);
+    const total = Date.now() - startedAt;
+    const maxGap = Math.max(...gaps, 0);
+    const meanGap = gaps.length ? gaps.reduce((sum, gap) => sum + gap, 0) / gaps.length : 0;
     // Printed evidence: the phase report quotes these exact measurements (assert-with-measurement).
-    console.info(`F-09 responsiveness · 1 MB chunked: ${Date.now() - startedAt} ms total, worst main-thread gap ${maxGap} ms`);
+    console.info(
+      `F-09 responsiveness · 1 MB chunked: ${total} ms total, ${gaps.length} heartbeat ticks, ` +
+        `mean gap ${meanGap.toFixed(1)} ms, worst main-thread gap ${maxGap} ms`,
+    );
 
     expect(mode).toBe("chunked");
     expect(result.length).toBe(1_000_000);
     expect(stages).toEqual(["composition", "thermo", "gc", "orfs", "codons", "done"]);
-    // No single synchronous step may block the main thread for long: the browser must be able
-    // to fire timers between steps (INP budget). 250 ms is a conservative upper bound for CI.
+    // The event loop must keep firing throughout the run: many ticks, and no single step that
+    // blocks for an order of magnitude longer than the ticks of the same machine. The ratio is
+    // load-independent (a busy CI box stretches both numbers), unlike a bare millisecond cap.
+    expect(gaps.length).toBeGreaterThan(20);
+    // Absolute INP-style ceiling: no single main-thread step may exceed this (measured ~65 ms).
     expect(maxGap).toBeLessThan(250);
+    // Machine-relative guard: the worst gap must stay in the same order as the tick rhythm of
+    // the machine running the test, so a loaded CI box does not turn this into a flake.
+    expect(maxGap).toBeLessThan(meanGap * 12);
     expect(result.composition.counts.A + result.composition.counts.C + result.composition.counts.G + result.composition.counts.T).toBe(1_000_000);
   }, 60_000);
 

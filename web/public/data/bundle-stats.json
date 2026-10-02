@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-02T12:40:07.944Z",
+  "generatedAt": "2026-10-02T12:44:17.998Z",
   "source": "web/scripts/bundle-budget.ts (CI: pnpm build && pnpm budget --emit)",
   "budgets": {
     "initialKb": 200,
@@ -8,56 +8,56 @@
   "measurements": [
     {
       "id": "initial",
-      "kb": 142.2421875,
+      "kb": 142.2412109375,
       "budgetKb": 200
     },
     {
       "id": "route:assistant",
-      "kb": 173.6572265625,
+      "kb": 173.794921875,
       "budgetKb": 350
     },
     {
       "id": "route:biolab",
-      "kb": 186.8876953125,
+      "kb": 187.0263671875,
       "budgetKb": 350
     },
     {
       "id": "route:scanner",
-      "kb": 173.9326171875,
+      "kb": 174.072265625,
       "budgetKb": 350
     },
     {
       "id": "route:jalali",
-      "kb": 177.4169921875,
+      "kb": 177.5576171875,
       "budgetKb": 350
     },
     {
       "id": "route:jwt",
-      "kb": 175.83984375,
+      "kb": 175.98046875,
       "budgetKb": 350
     },
     {
       "id": "route:kod-meli",
-      "kb": 175.8134765625,
+      "kb": 175.953125,
       "budgetKb": 350
     },
     {
       "id": "route:matn-farsi",
-      "kb": 175.4599609375,
+      "kb": 175.599609375,
       "budgetKb": 350
     },
     {
       "id": "route:toman",
-      "kb": 175.2783203125,
+      "kb": 175.41796875,
       "budgetKb": 350
     }
   ],
   "history": [
     {
-      "at": "2026-10-02T12:40:07.944Z",
+      "at": "2026-10-02T12:44:17.998Z",
       "initialKb": 142.2,
       "worstRoute": "route:biolab"
     }
   ],
-  "digest": "6f01541f76bb5f0d"
+  "digest": "8b92c0bb9722f318"
 }

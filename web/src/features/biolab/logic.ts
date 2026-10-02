@@ -227,6 +227,21 @@ export function reverseComplement(sequence: string): string {
   return out;
 }
 
+/**
+ * Reverse complement that can be consumed in slices, so a 1 MB strand never blocks the main
+ * thread in one pass. Yields the pieces from the far end of the input (fastest first).
+ */
+export function* reverseComplementChunks(sequence: string, sliceSize = 100_000): Generator<string, void, void> {
+  for (let end = sequence.length; end > 0; end -= sliceSize) {
+    const start = Math.max(0, end - sliceSize);
+    let piece = "";
+    for (let index = end - 1; index >= start; index -= 1) {
+      piece += COMPLEMENT[sequence[index]] ?? "N";
+    }
+    yield piece;
+  }
+}
+
 /** DNA → RNA (T becomes U). The rest of the letters are untouched. */
 export function transcribe(sequence: string): string {
   return sequence.replace(/T/g, "U");
@@ -290,6 +305,55 @@ function orfFromRun(
   };
 }
 
+/** Codons scanned between two yields inside a single frame (keeps the worst gap small). */
+export const FRAME_CODONS_PER_YIELD = 20_000;
+
+/**
+ * Scans a single reading frame of one strand, yielding the ORFs found so far every
+ * `FRAME_CODONS_PER_YIELD` codons. Local state survives the yields, so a run that is opened
+ * here and closed at a stop codon many slices later is still reported whole — the only thing
+ * that changes is that the main thread gets a turn in between.
+ */
+export function* scanFrameChunks(
+  source: string,
+  frame: number,
+  strand: "forward" | "reverse",
+  sequenceLength: number,
+  minAa: number,
+  tableId: CodonTableId,
+): Generator<Orf[], void, void> {
+  const codonTable = CODON_TABLES[tableId].table;
+  const starts = CODON_TABLES[tableId].starts;
+  const orfs: Orf[] = [];
+  let emitted = 0;
+  let codons = 0;
+  let runStart = -1;
+  for (let index = frame; index + 2 < source.length; index += 3) {
+    const codon = source.slice(index, index + 3);
+    codons += 1;
+    if (runStart < 0) {
+      if (starts.includes(codon as never)) runStart = index;
+    } else if ((codonTable[codon] ?? "X") === "*") {
+      const lengthAa = (index + 3 - runStart) / 3 - 1;
+      if (lengthAa >= minAa) {
+        orfs.push(orfFromRun(source, runStart, index + 3, frame, strand, sequenceLength, tableId, true));
+      }
+      runStart = -1;
+    }
+    if (codons % FRAME_CODONS_PER_YIELD === 0) {
+      yield orfs.slice(emitted);
+      emitted = orfs.length;
+    }
+  }
+  if (runStart >= 0) {
+    const lengthAa = Math.floor((source.length - runStart) / 3);
+    if (lengthAa >= minAa) {
+      orfs.push(orfFromRun(source, runStart, runStart + lengthAa * 3, frame, strand, sequenceLength, tableId, false));
+    }
+  }
+  yield orfs.slice(emitted);
+}
+
 /** Scans a single reading frame of one strand; the run loop yields between frames. */
 export function scanFrame(
   source: string,
@@ -299,29 +363,9 @@ export function scanFrame(
   minAa: number,
   tableId: CodonTableId,
 ): Orf[] {
-  const codonTable = CODON_TABLES[tableId].table;
-  const starts = CODON_TABLES[tableId].starts;
   const orfs: Orf[] = [];
-  let runStart = -1;
-  for (let index = frame; index + 2 < source.length; index += 3) {
-    const codon = source.slice(index, index + 3);
-    if (runStart < 0) {
-      if (starts.includes(codon as never)) runStart = index;
-      continue;
-    }
-    if ((codonTable[codon] ?? "X") === "*") {
-      const lengthAa = (index + 3 - runStart) / 3 - 1;
-      if (lengthAa >= minAa) {
-        orfs.push(orfFromRun(source, runStart, index + 3, frame, strand, sequenceLength, tableId, true));
-      }
-      runStart = -1;
-    }
-  }
-  if (runStart >= 0) {
-    const lengthAa = Math.floor((source.length - runStart) / 3);
-    if (lengthAa >= minAa) {
-      orfs.push(orfFromRun(source, runStart, runStart + lengthAa * 3, frame, strand, sequenceLength, tableId, false));
-    }
+  for (const batch of scanFrameChunks(source, frame, strand, sequenceLength, minAa, tableId)) {
+    orfs.push(...batch);
   }
   return orfs;
 }
@@ -360,18 +404,6 @@ export function findOrfs(sequence: string, options: OrfOptions = {}): Orf[] {
 }
 
 /** The three frames of one strand, used by the generator-based run. */
-function scanAllFramesChunked(
-  source: string,
-  strand: "forward" | "reverse",
-  resolved: ResolvedAnalysisOptions,
-): Orf[] {
-  const orfs: Orf[] = [];
-  for (let frame = 0; frame < 3; frame += 1) {
-    orfs.push(...scanFrame(source, frame, strand, source.length, resolved.minOrfAa, resolved.table));
-  }
-  return orfs;
-}
-
 export type CodonUsageRow = { codon: string; amino: string; count: number; perThousand: number };
 
 /** Counts codons for a slice of codon indices; the analysis run calls this chunk by chunk. */
@@ -460,6 +492,29 @@ export function gcRichRegions(windows: GcWindow[], threshold = 60, minWindows = 
 }
 
 /** Down-samples the GC track so the canvas viewer can draw thousands of points cheaply. */
+/**
+ * GC track consumed in slices: the window means are computed one batch at a time so a long
+ * sequence never blocks the main thread in a single pass.
+ */
+export function* gcTrackChunks(sequence: string, buckets = 480, bucketsPerYield = 60): Generator<number[], void, void> {
+  if (!sequence.length) return;
+  const size = Math.max(1, Math.floor(sequence.length / buckets));
+  const batch: number[] = [];
+  for (let start = 0; start < sequence.length; start += size) {
+    const end = Math.min(start + size, sequence.length);
+    let gc = 0;
+    for (let index = start; index < end; index += 1) {
+      const code = sequence.charCodeAt(index);
+      if (code === 71 || code === 67) gc += 1;
+    }
+    batch.push(end > start ? (gc / (end - start)) * 100 : 0);
+    if (batch.length >= bucketsPerYield) {
+      yield batch.splice(0, batch.length);
+    }
+  }
+  if (batch.length) yield batch.splice(0, batch.length);
+}
+
 export function gcTrack(sequence: string, buckets = 480): number[] {
   if (!sequence.length) return [];
   const size = Math.max(1, Math.floor(sequence.length / buckets));
@@ -578,19 +633,37 @@ export function createAnalysisRun(sequence: string, options: AnalysisOptions = {
         }
         parts.gcRegions = gcRichRegions(windows, resolved.gcRichThreshold);
         yield;
-        parts.gcTrack = gcTrack(sequence, resolved.buckets);
+        const track: number[] = [];
+        for (const batch of gcTrackChunks(sequence, resolved.buckets)) {
+          track.push(...batch);
+          yield;
+        }
+        parts.gcTrack = track;
       },
     },
     {
       stage: "orfs",
       work: function* work() {
         const found: Orf[] = [];
-        found.push(...scanAllFramesChunked(sequence, "forward", resolved));
-        yield;
+        for (let frame = 0; frame < 3; frame += 1) {
+          for (const batch of scanFrameChunks(sequence, frame, "forward", sequence.length, resolved.minOrfAa, resolved.table)) {
+            found.push(...batch);
+            yield;
+          }
+        }
         if (resolved.bothStrands) {
-          const reverse = reverseComplement(sequence);
-          yield;
-          found.push(...scanAllFramesChunked(reverse, "reverse", resolved));
+          const pieces: string[] = [];
+          for (const piece of reverseComplementChunks(sequence)) {
+            pieces.push(piece);
+            yield;
+          }
+          const reverse = pieces.join("");
+          for (let frame = 0; frame < 3; frame += 1) {
+            for (const batch of scanFrameChunks(reverse, frame, "reverse", sequence.length, resolved.minOrfAa, resolved.table)) {
+              found.push(...batch);
+              yield;
+            }
+          }
         }
         found.sort((a, b) => b.lengthNt - a.lengthNt || a.start - b.start);
         parts.orfs = resolved.orfLimit ? found.slice(0, resolved.orfLimit) : found;

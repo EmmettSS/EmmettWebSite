@@ -40,6 +40,7 @@
 | هوش مصنوعی | F-08 دستیار RAG با استناد | `/{fa,en}/assistant/` | زنده (BM25؛ LLM در انتظار B7) | ۱۹ تست `test_assistant.py` |
 | بیوتک | F-09 میز کار بیوانفورماتیک | `/{fa,en}/biolab/` | زنده + نمونهٔ مرجع MN908947.3 | `logic/runner/ui` تست‌ها + ۱۱ تست API |
 
+- **شاهد responsiveness (F-09، الزام کارت):** اجرای مکرر `src/features/biolab/runner.test.ts` روی توالی ۱ مگابایتی در همین سندباکس: میانگین فاصلهٔ tick ≈ ۹ ms و **بدترین توقف main thread 55–94 ms** (پیش از این اصلاح ۲۵۰–۳۷۴ ms بود)؛ اسکن فریم‌ها اکنون هر ۲۰٬۰۰۰ کدون yield می‌دهد و معادل‌بودن نتیجه با مسیر همگام (`analyze`) تست شده است.
 - **صفحهٔ زندهٔ ماتریس:** `/{fa,en}/capabilities/` همین جدول را از `features/capabilities/matrix.ts` رندر می‌کند و گیت CI هر ردیف را به artifact + شاهد تست گره می‌زند (`data-live`, `data-evidence`).
 - **G1 (۶۰ ثانیه تا اولین استفادهٔ واقعی):** خانه → `/fa/tools/scanner/` یا جعبه‌ابزار؛ دو کلیک. مسیر در `docs/FEATURES.md` مستند است.
 
@@ -77,7 +78,7 @@
 ## لایهٔ فنی
 
 ### ✅ بودجهٔ لایه‌ای: روت‌های اصلی ≤ ۲۰۰ KB gzip
-- **شاهد (دستور):** `corepack pnpm --filter @emmett/web build && budget` → `Initial JS: 142.2 KB gzip (budget 200 KB)`؛ خروجی کامل ۹ اندازه‌گیری در `public/data/bundle-stats.json` (sha256: `6f01541f76bb5f0d`) که در صفحهٔ F-10 «آزمایشگاه کارایی» نمایش داده می‌شود. همهٔ روت‌های `/tools/*` و `/lab/*` زیر ۳۵۰ KB و ≥۸ روت code-split هستند.
+- **شاهد (دستور):** `corepack pnpm --filter @emmett/web build && budget` → `Initial JS: 142.2 KB gzip (budget 200 KB)`؛ خروجی کامل ۹ اندازه‌گیری در `public/data/bundle-stats.json` (sha256: `8b92c0bb9722f318`) که در صفحهٔ F-10 «آزمایشگاه کارایی» نمایش داده می‌شود. همهٔ روت‌های `/tools/*` و `/lab/*` زیر ۳۵۰ KB و ≥۸ روت code-split هستند.
 
 ### ⚠️ Lighthouse موبایل، هر دو زبان: Perf ≥ ۹۰ (در low-power) و A11y ≥ ۹۵، CLS < ۰٫۱
 - **وضعیت:** در CI اجرا می‌شود (`web/lighthouse/*.json` به‌عنوان artifact، job `lighthouse` با آستانهٔ Perf≥90/CLS<0.1 و پروفایل low-power). **در این سندباکس مرورگر وجود ندارد، پس عدد واقعی هنوز ثبت نشده است** → گیت تا اولین اجرای CI «سبز نشده» شمرده می‌شود.
