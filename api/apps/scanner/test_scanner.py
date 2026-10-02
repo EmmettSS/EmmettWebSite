@@ -14,7 +14,7 @@ from apps.jobs import runner
 from apps.jobs.models import Job
 
 from . import blocklist, engine, transport
-from .models import BlocklistEntry, ScanJob, ScanResult
+from .models import BlocklistEntry, ScanJob, ScanResult, new_result_id
 
 pytestmark = pytest.mark.django_db
 
@@ -314,3 +314,12 @@ def test_unknown_result_id_is_a_soft_404(api):
     response = api.get("/api/v1/scanner/results/does-not-exist/")
     assert response.status_code == 404
     assert "message_fa" in response.json()
+
+
+@pytest.mark.django_db
+def test_result_id_default_fits_the_column():
+    """MariaDB rejects a DDL default wider than the column (error 1067); the generated
+    default for ``result_id`` must always fit ``varchar(32)``."""
+    field = ScanResult._meta.get_field("result_id")
+    for _ in range(50):
+        assert len(new_result_id()) <= field.max_length

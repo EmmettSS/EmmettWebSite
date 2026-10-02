@@ -13,6 +13,17 @@ def result_expiry():
     return timezone.now() + timedelta(days=RESULT_TTL_DAYS)
 
 
+def new_result_id():
+    """22-char URL-safe id for ScanResult.result_id.
+
+    Keep it short enough for the ``varchar(32)`` column: MariaDB/MySQL refuse a DDL
+    default that does not fit the column ("1067 Invalid default value for 'result_id'"),
+    and Django does synthesise such a default when it adds a NOT NULL column to an
+    existing table (migration 0002 ran on MariaDB in CI and failed exactly that way).
+    """
+    return secrets.token_urlsafe(16)
+
+
 class ScanJob(models.Model):
     job = models.OneToOneField(Job, on_delete=models.CASCADE, related_name="scan")
     domain = models.CharField(max_length=253)
@@ -27,7 +38,7 @@ class ScanResult(models.Model):
     """Guard 5 — never attributable: random id, no IP, 7-day TTL, noindex page."""
 
     scan = models.ForeignKey(ScanJob, on_delete=models.CASCADE, related_name="results")
-    result_id = models.CharField(max_length=32, unique=True, db_index=True, default=secrets.token_urlsafe)
+    result_id = models.CharField(max_length=32, unique=True, db_index=True, default=new_result_id)
     grade = models.CharField(max_length=2, blank=True)
     score = models.PositiveSmallIntegerField(default=0)
     checks = models.JSONField(default=list)

@@ -32,19 +32,21 @@ jobs:
       - run: pnpm --filter @emmett/web exec playwright install --with-deps chromium
       - name: Run a11y (Playwright + axe)
         shell: bash
+        env:
+          FORCE_COLOR: '0'
+          NO_COLOR: '1'
+          PLAYWRIGHT_JSON_OUTPUT_NAME: /tmp/a11y.json
         run: |
           set -o pipefail
-          pnpm --filter @emmett/web a11y 2>&1 | tee /tmp/a11y.log
+          pnpm --filter @emmett/web exec playwright test --reporter=list,json 2>&1 | tee /tmp/a11y.log
       - name: Report a11y failures
         if: failure()
         shell: bash
         run: |
-          set -euo pipefail
-          [ -f /tmp/a11y.log ] || exit 0
-          { echo '### a11y log tail'; echo '```'; tail -n 120 /tmp/a11y.log; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
-          grep -aE '^\s*[0-9]+\) |✘|Error:|Timed out|strict mode|locator\(|"(id|impact|help|count)":' /tmp/a11y.log | head -80 | while IFS= read -r line; do
-            echo "::error::a11y: ${line}"
-          done
+          { echo '### a11y log tail'; echo '```'; tail -n 80 /tmp/a11y.log 2>/dev/null; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          node web/scripts/report-playwright-failures.mjs /tmp/a11y.json
+          tail -n 20 /tmp/a11y.log 2>/dev/null | while IFS= read -r line; do echo "::error::a11y-log: ${line:0:900}"; done
+          exit 0
   api:
     runs-on: ubuntu-latest
     defaults:
@@ -122,9 +124,7 @@ jobs:
         if: failure()
         shell: bash
         run: |
-          set -euo pipefail
-          [ -f /tmp/pytest.log ] || exit 0
-          { echo '### queue-race log tail'; echo '```'; tail -n 120 /tmp/pytest.log; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
-          grep -aE '^(FAILED|ERROR)|^E |>\s*assert|django\.|Error|OperationalError|Permission denied' /tmp/pytest.log | head -60 | while IFS= read -r line; do
-            echo "::error::queue-race: ${line}"
-          done
+          { echo '### queue-race log tail'; echo '```'; tail -n 80 /tmp/pytest.log 2>/dev/null; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          grep -aE '^(FAILED|ERROR|Traceback)|^E |sql = |OperationalError|ProgrammingError|Permission denied' /tmp/pytest.log 2>/dev/null | head -40 | while IFS= read -r line; do echo "::error::qr: ${line:0:900}"; done
+          tail -n 30 /tmp/pytest.log 2>/dev/null | while IFS= read -r line; do echo "::error::qr-log: ${line:0:900}"; done
+          exit 0
