@@ -16,6 +16,10 @@
 
 ## لایهٔ محصول
 
+### ✅ «الان چه می‌سازیم» فقط از `SiteConfig` می‌آید
+- **شاهد (کد):** نوار `building-now` در `HomeBilingual.tsx` مقدار `building_fa`/`building_en` را از `/api/v1/site-config/` می‌خواند و اگر خالی باشد صریح می‌گوید «در انتظار تأیید — [INPUT B6]»؛ سه حالت `configured`/`pending`/`unavailable` در DOM علامت خورده‌اند.
+- **شاهد (تست):** `src/app/pages/HomeBilingual.test.tsx` (۳ تست: نمایش متن پیکربندی‌شده، حالت در انتظار، و حالت API خاموش).
+
 ### ✅ `/` به `/fa` می‌رود؛ فارسی، RTL، شمسی، تومان پیش‌فرض است
 - **شاهد (کد):** `web/src/app/App.tsx` برای `/` و مسیر ناشناخته `Navigate` به `defaultLangTarget(readStoredLang())` دارد که پیش‌فرض آن `fa` است (`web/src/app/lang-preference.ts`)؛ `LanguageProvider` زبان را از URL می‌خواند و `document.documentElement.dir = "rtl"` را برای فارسی ست می‌کند.
 - **شاهد (تست):** `web/src/app/lang-preference.test.ts` (پیش‌فرض fa، احترام به انتخاب صریح en، زنده‌ماندن با storage مسدود)، `web/src/app/i18n.tsx` (`dir` روی `html` به‌ازای زبان).
@@ -30,6 +34,7 @@
 ### ✅ هر ۵ توان artifact زنده دارند (جدول §۷) و G1 قابل اثبات است
 - **شاهد:** `web/src/features/capabilities/matrix.ts` + صفحهٔ `/{fa|en}/capabilities/`؛ گیت CI `capability matrix` که هر توان را به artifact زنده و شاهد تست وصل می‌کند؛ `data-live="true"` روی هر ردیف.
 - **شاهد (تست):** `matrix.test.ts` — هر ۵ توان باید `live: true` و حداقل یک شاهد داشته باشند؛ در صورت نبود → `matrix-empty` و fail.
+- **شاهد (گیت محتوا):** `content:check` علاوه بر برابری دوزبانه، `evidenceUrl` هر سلول ماتریس را با فهرست روت‌های واقعی تطبیق می‌دهد؛ مسیر ناشناس → خطا. این گارد با یک شکست عمدی آزموده شد (`/fa/tools/does-not-exist/` → پیام خطا).
 - **جدول پنج توان × artifact (گیت فاز ۴، اثبات G1):**
 
 | توان | ابزار | artifact زنده | وضعیت | شاهد خودکار |
@@ -61,24 +66,26 @@
 ### ✅ دستیار RAG با ارجاع پاسخ می‌دهد و fallback BM25 تست شده است
 - **شاهد (کد):** `api/apps/assistant/answers.py` — آستانهٔ شباهت **پیش از** فراخوانی provider؛ پاسخ بدون ارجاع دور انداخته می‌شود؛ سقف هزینهٔ روزانه → بازگشت به BM25 با پیام صریح.
 - **شاهد (تست):** `api/apps/assistant/test_assistant.py` — ۱۹ تست: `test_unrelated_question_makes_no_llm_call`, `test_llm_path_is_used_when_a_provider_exists`, `test_cost_cap_reached_falls_back_to_bm25`, `test_answer_without_citation_is_discarded`, کش با کلید hash (بدون ذخیرهٔ متن پرسش).
-- **شاهد (اجرا):** `pytest -q` → `97 passed, 1 skipped`.
+- **شاهد (اجرا):** `pytest -q` → `99 passed, 1 skipped`.
 
 ### ✅ اسکنر F-06 هر ۶ نگهبان امنیتی/قانونی را دارد
+- **شاهد (پیش‌فرض امن، OWASP A01):** `REST_FRAMEWORK.DEFAULT_PERMISSION_CLASSES = IsAdminUser` — هر endpoint تازه به‌صورت پیش‌فرض ادمین‌محور است و سطح‌های عمومی `AllowAny` را صریح اعلام می‌کنند؛ جدول کامل OWASP در `docs/SECURITY.md`.
 - **شاهد (کد):** `api/apps/scanner/` — (۱) رضایت مالکیت اجباری، (۲) passive-only و مسدودسازی مسیرهای نفوذ، (۳) رد localhost/شبکهٔ داخلی، (۴) نتیجه با id تصادفی، (۵) بدون ذخیرهٔ IP، (۶) TTL هفت‌روزه + پاک‌سازی cron.
 - **شاهد (تست):** `apps/scanner/test_scanner.py` + `test_jobs.py` (شامل تست‌های consent/localhost/TTL).
+:- **شاهد (مانیتورینگ):** `GET /api/v1/ops/errors/` (فقط ادمین؛ ۴۰۳/۴۰۱ برای ناشناس) شمارندهٔ صف و خطا و هزینهٔ روز را می‌دهد — تست `test_core.py::TestOpsErrors`.
 - **شاهد (زنده):** `POST /api/v1/scanner/jobs/` بدون `consent=true` → ۴۰۰؛ با دامنهٔ `localhost` → ۴۰۰؛ مسیر مجاز → job واقعی (`grade C/75`, TTL ۷ روز).
 
 ### ✅ Device Tier Engine کار می‌کند: در `low-power` هیچ WebGL لود نمی‌شود
 - **شاهد (کد):** `web/src/lib/device-tier.tsx` + `web/src/visuals/TierScene.tsx` + eslint rule «هیچ scene بدون TierScene».
 - **شاهد (تست):** `src/visuals/visuals.dom.test.tsx` — با `hardwareConcurrency=2` هیچ `canvas` رندر نمی‌شود و کم‌مصرف به جدول محاسباتی می‌رود؛ با IntersectionObserver ماک‌شده هیچ scene پیش از ورود به viewport شروع نمی‌شود؛ DPR در `balanced` برابر ۱ و سقف کلی ۲ است؛ حلقهٔ رندر خارج از viewport متوقف می‌شود. قواعد ایستا (وجود fallback، فقط TierScene) در `src/visuals/visuals.static.test.ts`.
-- **شاهد (بودجه):** اسکریپت `budget` حضور `three`/WebGL در JS اولیه را ممنوع می‌کند → سبز (`142.2 KB`).
+- **شاهد (بودجه):** اسکریپت `budget` حضور `three`/WebGL در JS اولیه را ممنوع می‌کند → سبز (`142.5 KB`).
 
 ---
 
 ## لایهٔ فنی
 
 ### ✅ بودجهٔ لایه‌ای: روت‌های اصلی ≤ ۲۰۰ KB gzip
-- **شاهد (دستور):** `corepack pnpm --filter @emmett/web build && budget` → `Initial JS: 142.2 KB gzip (budget 200 KB)`؛ خروجی کامل ۹ اندازه‌گیری در `public/data/bundle-stats.json` (sha256: `8b92c0bb9722f318`) که در صفحهٔ F-10 «آزمایشگاه کارایی» نمایش داده می‌شود. همهٔ روت‌های `/tools/*` و `/lab/*` زیر ۳۵۰ KB و ≥۸ روت code-split هستند.
+- **شاهد (دستور):** `corepack pnpm --filter @emmett/web build && budget` → `Initial JS: 142.5 KB gzip (budget 200 KB)`؛ خروجی کامل ۹ اندازه‌گیری در `public/data/bundle-stats.json` (sha256: `d6f4c1bb4cd0f579`) که در صفحهٔ F-10 «آزمایشگاه کارایی» نمایش داده می‌شود. همهٔ روت‌های `/tools/*` و `/lab/*` زیر ۳۵۰ KB و ≥۸ روت code-split هستند.
 
 ### ⚠️ Lighthouse موبایل، هر دو زبان: Perf ≥ ۹۰ (در low-power) و A11y ≥ ۹۵، CLS < ۰٫۱
 - **وضعیت:** در CI اجرا می‌شود (`web/lighthouse/*.json` به‌عنوان artifact، job `lighthouse` با آستانهٔ Perf≥90/CLS<0.1 و پروفایل low-power). **در این سندباکس مرورگر وجود ندارد، پس عدد واقعی هنوز ثبت نشده است** → گیت تا اولین اجرای CI «سبز نشده» شمرده می‌شود.
@@ -86,7 +93,7 @@
 - **ثبت:** در `docs/OPEN-ITEMS.md` به‌عنوان «فقط CI».
 
 ### ✅ همهٔ تست‌ها سبز (pytest، vitest، Playwright fa+en، content:check)
-- **شاهد:** `pytest -q` → `97 passed, 1 skipped` · `vitest run` → `24 files / 154 tests passed` · `content:check` → `Bilingual content parity passed for all siteCopy, page content and UI keys` (+ self-test تشخیص ترجمهٔ غایب) · `corpus:check` → `corpus is in sync (7 pages, 8 tools, 10 FAQ)`.
+- **شاهد:** `pytest -q` → `99 passed, 1 skipped` · `vitest run` → `25 files / 157 tests passed` · `content:check` → `Bilingual content parity passed for all siteCopy, page content and UI keys` (+ self-test تشخیص ترجمهٔ غایب) · `corpus:check` → `corpus is in sync (7 pages, 8 tools, 10 FAQ)`.
 - **Playwright (fa+en):** ۷۲ تست در ۴ فایل (`web/tests/e2e/`)، شامل spec تازهٔ شواهد (`evidence.spec.ts`) که برای هر ۹ فیچر P0 در دو زبان **اسکرین‌شات** می‌گیرد و **صفر خطای console** را assert می‌کند؛ این spec در CI اجرا و به‌عنوان artifact `feature-evidence` آپلود می‌شود. در این سندباکس مرورگر نصب‌شدنی نیست (دانلود Chromium مسدود است)، پس اجرای واقعی‌اش در CI انجام می‌شود — در `OPEN-ITEMS` علامت خورده است.
 - **شاهد (نوع/لینت):** `tsc --noEmit` پاک، `eslint .` پاک.
 

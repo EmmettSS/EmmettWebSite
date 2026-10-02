@@ -165,7 +165,11 @@ for j in Job.objects.filter(state='failed')[:5]:
 ## ۶. مانیتورینگ
 
 - **Uptime خارجی** روی دو نشانی: `/api/v1/health/` (باید `status: ok`) و `/` (باید 200 با عنوان درست بدهد). سرویس‌های رایگان uptime کافی است؛ مهم این است که **از بیرون** باشد.
-- **شمارش خطا:** endpoint ادمین‌محور خطاها را می‌شمارد؛ هفتگی نگاه کنید و روند را در `docs/` ثبت کنید.
+- **شمارش خطا:** `GET /api/v1/ops/errors/` (فقط کاربر ادمین) — `jobs_pending`، `jobs_running`، `jobs_stuck` (بیش از ۱۵ دقیقه در صف)، `jobs_failed_window`، `failures_by_kind`، `oldest_pending_minutes` و `assistant_cost_today_usd`:
+  ```sh
+  curl -s -u <admin>:<pass> https://<domain>/api/v1/ops/errors/ | python3 -m json.tool
+  ```
+  هفتگی نگاه کنید و روند را در `docs/` ثبت کنید. اگر `jobs_stuck > 0` بود → بخش ۵.۱ (cron).
 - **قاعده:** هر incident یک پاراگراف post-mortem می‌گیرد؛ «درست شد» بدون علت، incident بعدی را تضمین می‌کند.
 
 ---

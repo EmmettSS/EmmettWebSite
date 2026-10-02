@@ -58,12 +58,40 @@ class Command(BaseCommand):
                         "alternate_url": url_en if locale == "fa" else url_fa,
                         "alternate_label": "English" if locale == "fa" else "فارسی",
                         "json_ld": json.dumps(
-                            {
-                                "@context": "https://schema.org",
-                                "@type": "Article",
-                                "headline": title,
-                                "inLanguage": locale,
-                            },
+                            [
+                                {
+                                    "@context": "https://schema.org",
+                                    "@type": "BlogPosting",
+                                    "headline": title,
+                                    "inLanguage": locale,
+                                    "url": url,
+                                    "mainEntityOfPage": url,
+                                    "datePublished": item.created_at.isoformat(),
+                                    "dateModified": item.updated_at.isoformat(),
+                                    # Honest authorship: the organization, never a fabricated person (B5/B6).
+                                    "author": {"@type": "Organization", "name": "Emmett"},
+                                    "publisher": {"@type": "Organization", "name": "Emmett"},
+                                },
+                                {
+                                    "@context": "https://schema.org",
+                                    "@type": "BreadcrumbList",
+                                    "itemListElement": [
+                                        {
+                                            "@type": "ListItem",
+                                            "position": 1,
+                                            "name": "خانه" if locale == "fa" else "Home",
+                                            "item": f"{base}/{locale}/",
+                                        },
+                                        {
+                                            "@type": "ListItem",
+                                            "position": 2,
+                                            "name": "نوشته‌ها" if locale == "fa" else "Posts",
+                                            "item": f"{base}/{locale}/posts/",
+                                        },
+                                        {"@type": "ListItem", "position": 3, "name": title, "item": url},
+                                    ],
+                                },
+                            ],
                             ensure_ascii=False,
                         ).replace("<", "\\u003c"),
                     }

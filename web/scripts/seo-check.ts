@@ -43,6 +43,43 @@ for (const meta of toolMetas) {
 const toolsIndex = await readFile(path.join(dist, "fa/tools/index.html"), "utf8");
 if (!toolsIndex.includes('"@type":"ItemList"')) throw new Error("tools index is missing ItemList JSON-LD");
 
+// Structured-data contract per route class (Phase 5 §4): the entities Google expects, and the
+// breadcrumbs that make the nested pages legible in results.
+const schemaContract: [string, string[]][] = [
+  ["fa/index.html", ["Organization", "WebSite"]],
+  ["en/index.html", ["Organization", "WebSite"]],
+  ["fa/tools/index.html", ["ItemList"]],
+  ["fa/capabilities/index.html", ["ItemList"]],
+  ["fa/lab/performance/index.html", ["WebPage", "BreadcrumbList"]],
+  ["fa/architect/index.html", ["WebPage", "BreadcrumbList"]],
+  ["fa/privacy/index.html", ["WebPage", "BreadcrumbList"]],
+  ["en/security/index.html", ["WebPage", "BreadcrumbList"]],
+];
+for (const [file, types] of schemaContract) {
+  const html = await readFile(path.join(dist, file), "utf8");
+  for (const type of types) {
+    if (!html.includes(`"@type":"${type}"`)) throw new Error(`${file} is missing ${type} JSON-LD`);
+  }
+}
+for (const meta of toolMetas) {
+  const html = await readFile(path.join(dist, `en/${routeFor(meta, "en")}/index.html`), "utf8");
+  for (const type of ["SoftwareApplication", "BreadcrumbList"]) {
+    if (!html.includes(`"@type":"${type}"`)) {
+      throw new Error(`en/${routeFor(meta, "en")} is missing ${type} JSON-LD`);
+    }
+  }
+}
+// hreflang must stay reciprocal and x-default must point at the Persian canonical (fa-first).
+for (const file of ["fa/tools/index.html", "en/tools/index.html"]) {
+  const html = await readFile(path.join(dist, file), "utf8");
+  const fa = html.match(/hreflang="fa" href="([^"]+)"/)?.[1];
+  const en = html.match(/hreflang="en" href="([^"]+)"/)?.[1];
+  const fallback = html.match(/hreflang="x-default" href="([^"]+)"/)?.[1];
+  if (!fa?.endsWith("/fa/tools/") || !en?.endsWith("/en/tools/") || fallback !== fa) {
+    throw new Error(`${file} has broken hreflang reciprocity (fa=${fa}, en=${en}, x-default=${fallback})`);
+  }
+}
+
 // Each tool page must show a real computed example in the crawlable HTML (not a placeholder).
 // The two API-backed surfaces (scanner, assistant) cannot be computed at build time, so for them
 // the guard pins the *live-surface* claim they make instead: the passive envelope and the

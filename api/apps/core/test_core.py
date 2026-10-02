@@ -1,5 +1,8 @@
+from datetime import timedelta
+
 import pytest
 from django.test import override_settings
+from django.utils import timezone
 from rest_framework.test import APIClient
 from apps.content.models import Post
 
@@ -50,3 +53,34 @@ def test_sitemap_and_rss_include_published_content_only():
         and b"published" in rss.content
         and b"draft" not in rss.content
     )
+
+
+class TestOpsErrors:
+    """Phase 5 §6: the admin-only error counter the runbook reads every day."""
+
+    def test_anonymous_callers_cannot_read_ops_counters(self):
+        assert APIClient().get("/api/v1/ops/errors/").status_code in (401, 403)
+
+    def test_admin_sees_queue_health_and_stuck_jobs(self):
+        from django.contrib.auth import get_user_model
+        from apps.jobs.models import Job
+
+        stuck = Job.objects.create(kind=Job.Kind.SCAN)
+        Job.objects.filter(pk=stuck.pk).update(
+            created_at=timezone.now() - timedelta(minutes=40)
+        )
+        Job.objects.create(kind=Job.Kind.EMBED, state=Job.State.FAILED, finished_at=timezone.now())
+
+        admin = get_user_model().objects.create_superuser(
+            username="ops", email="ops@example.test", password="x"
+        )
+        client = APIClient()
+        client.force_authenticate(user=admin)
+        body = client.get("/api/v1/ops/errors/").json()
+
+        assert body["jobs_pending"] == 1
+        assert body["jobs_stuck"] == 1
+        assert body["oldest_pending_minutes"] >= 39
+        assert body["jobs_failed_window"] == 1
+        assert body["failures_by_kind"] == {"embed": 1}
+        assert body["assistant_cost_today_usd"] == 0.0

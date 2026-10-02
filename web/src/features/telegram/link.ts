@@ -5,19 +5,6 @@
  * While B5 is open the API returns an empty string or the `[INPUT B5]` placeholder and the UI
  * shows an honest "not configured" state instead of a button that goes nowhere.
  */
-import { useCallback, useEffect, useState } from "react";
-import { apiGet } from "@/lib/api-client";
-
-export type SiteConfigResponse = {
-  brand_fa?: string;
-  brand_en?: string;
-  telegram_handle?: string;
-  building_fa?: string;
-  building_en?: string;
-  lab_samples_per_day?: number | null;
-  lab_turnaround_hours?: number | null;
-  lab_tests_per_sample?: number | null;
-};
 
 export type ContactSource =
   | "home"
@@ -62,27 +49,11 @@ export function buildTelegramLink(handle: string, source: ContactSource, lang: "
   return `https://t.me/${username}?text=${encodeURIComponent(text)}`;
 }
 
+export type { SiteConfigResponse } from "@/lib/site-config";
+import { useSiteConfig as useSharedSiteConfig } from "@/lib/site-config";
+
+/** F-13 keeps its old shape (the handle flattened) while the fetching lives in `@/lib/site-config`. */
 export function useSiteConfig() {
-  const [state, setState] = useState<{ status: "loading" | "ready" | "error"; config: SiteConfigResponse | null }>({
-    status: "loading",
-    config: null,
-  });
-
-  const load = useCallback(() => {
-    let cancelled = false;
-    apiGet<SiteConfigResponse>("/site-config/", { timeoutMs: 8000 })
-      .then((config) => {
-        if (!cancelled) setState({ status: "ready", config });
-      })
-      .catch(() => {
-        if (!cancelled) setState({ status: "error", config: null });
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  useEffect(() => load(), [load]);
-
+  const state = useSharedSiteConfig();
   return { ...state, telegramHandle: state.config?.telegram_handle ?? null };
 }

@@ -38,6 +38,13 @@ def test_static_bridge_renders_full_bilingual_html(tmp_path, monkeypatch):
     en = (tmp_path / "en/posts/sample/index.html").read_text()
     assert "مقاله" in fa and "متن فارسی" in fa and 'hreflang="en"' in fa
     assert "Post" in en and "English text" in en
+    # Phase 5 §4: a published post must carry BlogPosting + BreadcrumbList with real dates,
+    # and its author must be the organization — never an invented person.
+    for html in (fa, en):
+        assert '"@type": "BlogPosting"' in html
+        assert '"@type": "BreadcrumbList"' in html
+        assert '"datePublished"' in html and '"dateModified"' in html
+        assert '"@type": "Organization"' in html and '"@type": "Person"' not in html
 
 
 class TestSiteConfigLabThroughput:

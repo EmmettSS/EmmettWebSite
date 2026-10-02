@@ -71,7 +71,44 @@ if (!configuredBase) throw new Error("PUBLIC_SITE_URL is required to emit canoni
 const base = new URL(configuredBase).origin;
 
 type Localized = { title: string; description: string; body: string };
-type Route = { slug: { fa: string; en: string }; fa: Localized; en: Localized; schema: (locale: "fa" | "en", canonical: string) => Record<string, unknown> };
+/** A route emits one or more JSON-LD objects; each becomes its own <script type="application/ld+json">. */
+type Schema = Record<string, unknown>;
+type Route = {
+  slug: { fa: string; en: string };
+  fa: Localized;
+  en: Localized;
+  schema: (locale: "fa" | "en", canonical: string) => Schema | Schema[];
+};
+
+const websiteSchema = (locale: "fa" | "en", canonical: string) => ({
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: locale === "fa" ? "امت" : "Emmett",
+  url: canonical,
+  inLanguage: [...(locale === "fa" ? ["fa-IR"] : ["en"]), "fa-IR", "en"],
+});
+
+/** Home and the top-level marketing routes carry both the organization and the site entity. */
+const homeSchema = (locale: "fa" | "en", canonical: string): Schema[] => [
+  organizationSchema(locale, canonical),
+  websiteSchema(locale, canonical),
+];
+
+/** Breadcrumbs for a nested page, as Google expects them (position starts at 1). */
+const breadcrumbSchema = (locale: "fa" | "en", canonical: string, trail: { name: string; path: string }[]): Schema => ({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: trail.map((crumb, index) => ({
+    "@type": "ListItem",
+    position: index + 1,
+    name: crumb.name,
+    item: `${base}${crumb.path}`,
+  })),
+  url: canonical,
+});
+
+const homeCrumb = (locale: "fa" | "en") => ({ name: locale === "fa" ? "خانه" : "Home", path: `/${locale}/` });
+const toolsCrumb = (locale: "fa" | "en") => ({ name: locale === "fa" ? "ابزارها" : "Tools", path: `/${locale}/tools/` });
 
 const organizationSchema = (locale: "fa" | "en", canonical: string) => ({
   "@context": "https://schema.org",
@@ -86,7 +123,7 @@ const routes: Route[] = [
     slug: { fa: "", en: "" },
     fa: { title: "امت | مهندسی نرم‌افزار و هوش مصنوعی", description: "امت سامانه‌های نرم‌افزاری، هوش مصنوعی و امنیت را برای مسائل واقعی مهندسی می‌کند.", body: "مهندسی سامانه‌های نرم‌افزاری، هوش مصنوعی و امنیت برای مسائل واقعی." },
     en: { title: "Emmett | Software and AI Engineering", description: "Emmett engineers software, AI and security systems for real-world problems.", body: "Software, AI and security engineering for real-world problems." },
-    schema: organizationSchema,
+    schema: homeSchema,
   },
   {
     slug: { fa: "services", en: "services" },
@@ -143,13 +180,16 @@ const routes: Route[] = [
       description: "The five team capabilities as a matrix generated from the site registry: every cell links to a live artifact, and a capability without evidence stays grey.",
       body: "The capability matrix is generated from the site's own registry: frontend, backend, security, AI and biotech. Every cell links to a live artifact (browser tools, the passive security check-up, the assistant and the bioinformatics workbench); a capability without evidence renders disabled and grey.",
     },
-    schema: (locale, canonical) => ({
-      "@context": "https://schema.org",
-      "@type": "ItemList",
-      url: canonical,
-      name: locale === "fa" ? "ماتریس توانمندی امت" : "Emmett capability matrix",
-      numberOfItems: 5,
-    }),
+    schema: (locale, canonical) => [
+      {
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        url: canonical,
+        name: locale === "fa" ? "ماتریس توانمندی امت" : "Emmett capability matrix",
+        numberOfItems: 5,
+      },
+      breadcrumbSchema(locale, canonical, [homeCrumb(locale), { name: locale === "fa" ? "توانمندی‌ها" : "Capabilities", path: `/${locale}/capabilities/` }]),
+    ],
   },
   {
     slug: { fa: "lab/performance", en: "lab/performance" },
@@ -163,12 +203,15 @@ const routes: Route[] = [
       description: "Live FPS, this visitor's Core Web Vitals, real bundle sizes from CI and the current device tier — measured, never invented.",
       body: "The performance lab shows what is actually measured: per-route bundle size from the build output, this visitor's Core Web Vitals from PerformanceObserver, live FPS (full tier only) and the device tier with its reason. In low-power mode the FPS chart is disabled and the same numbers are shown as a table.",
     },
-    schema: (locale, canonical) => ({
-      "@context": "https://schema.org",
-      "@type": "WebPage",
-      url: canonical,
-      name: locale === "fa" ? "آزمایشگاه کارایی" : "Performance lab",
-    }),
+    schema: (locale, canonical) => [
+      {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        url: canonical,
+        name: locale === "fa" ? "آزمایشگاه کارایی" : "Performance lab",
+      },
+      breadcrumbSchema(locale, canonical, [homeCrumb(locale), { name: locale === "fa" ? "آزمایشگاه" : "Lab", path: `/${locale}/lab/` }, { name: locale === "fa" ? "کارایی" : "Performance", path: `/${locale}/lab/performance/` }]),
+    ],
   },
   {
     slug: { fa: "architect", en: "architect" },
@@ -182,36 +225,47 @@ const routes: Route[] = [
       description: "Three questions produce a diagram genuinely generated from a rules graph, a recommended stack with reasons, and time/cost ranges with stated assumptions.",
       body: "Three questions about system type, scale and constraints generate an architecture diagram from a rules graph (not a fixed template), plus a recommended stack with reasons and time and Toman cost ranges from a versioned configuration table. Ranges are estimates with stated assumptions, not a firm proposal.",
     },
-    schema: (locale, canonical) => ({
-      "@context": "https://schema.org",
-      "@type": "WebPage",
-      url: canonical,
-      name: locale === "fa" ? "پیشنهاد معماری" : "Architecture advisor",
-    }),
+    schema: (locale, canonical) => [
+      {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        url: canonical,
+        name: locale === "fa" ? "پیشنهاد معماری" : "Architecture advisor",
+      },
+      breadcrumbSchema(locale, canonical, [homeCrumb(locale), { name: locale === "fa" ? "خدمات" : "Services", path: `/${locale}/services/` }, { name: locale === "fa" ? "پیشنهاد معماری" : "Architecture advisor", path: `/${locale}/architect/` }])],
   },
   {
     slug: { fa: "privacy", en: "privacy" },
     fa: { title: "سیاست حریم خصوصی | امت", description: "چه چیزی جمع می‌شود، چه چیزی هرگز جمع نمی‌شود و حق شما چیست.", body: "ابزارها در مرورگر اجرا می‌شوند و ورودی شما به سرور نمی‌رود؛ دستیار متن پرسش را ذخیره نمی‌کند؛ نتیجهٔ اسکنر پس از هفت روز پاک می‌شود؛ آمار بازدید به‌صورت پیش‌فرض خاموش است." },
     en: { title: "Privacy policy — Emmett", description: "What is collected, what is never collected and what your rights are.", body: "Tools run in your browser and your input is not sent to our servers; the assistant stores no question text; scanner results are removed after seven days; analytics is off by default." },
-    schema: (locale, canonical) => ({ "@context": "https://schema.org", "@type": "WebPage", url: canonical, name: locale === "fa" ? "حریم خصوصی" : "Privacy policy" }),
+    schema: (locale, canonical) => [
+      { "@context": "https://schema.org", "@type": "WebPage", url: canonical, name: locale === "fa" ? "حریم خصوصی" : "Privacy policy" },
+      breadcrumbSchema(locale, canonical, [homeCrumb(locale), { name: locale === "fa" ? "حریم خصوصی" : "Privacy policy", path: `/${locale}/privacy/` }]),
+    ],
   },
   {
     slug: { fa: "terms", en: "terms" },
     fa: { title: "شرایط استفاده | امت", description: "شرط‌های استفاده از ابزارهای عمومی، از جمله قواعد اسکن passive.", body: "ابزارها بدون ضمانت ارائه می‌شوند؛ اسکن فقط با تأیید مالکیت و به‌صورت passive انجام می‌شود؛ شرایط پروژه‌های سفارشی در قرارداد جداگانه تعیین می‌شود." },
     en: { title: "Terms of use — Emmett", description: "Conditions for the public tools, including the passive-scanning rules.", body: "Tools are provided as is; scanning requires ownership confirmation and is passive only; custom engagements are governed by a separate contract." },
-    schema: (locale, canonical) => ({ "@context": "https://schema.org", "@type": "WebPage", url: canonical, name: locale === "fa" ? "شرایط استفاده" : "Terms of use" }),
+    schema: (locale, canonical) => [
+      { "@context": "https://schema.org", "@type": "WebPage", url: canonical, name: locale === "fa" ? "شرایط استفاده" : "Terms of use" },
+      breadcrumbSchema(locale, canonical, [homeCrumb(locale), { name: locale === "fa" ? "شرایط استفاده" : "Terms of use", path: `/${locale}/terms/` }]),
+    ],
   },
   {
     slug: { fa: "security", en: "security" },
     fa: { title: "افشای آسیب‌پذیری | امت", description: "مسیر گزارش آسیب‌پذیری، تعهد ما و موارد خارج از دامنه.", body: "آسیب‌پذیری‌ها را با شرح و مسیر بازتولید گزارش کنید؛ در نخستین فرصت پاسخ می‌دهیم؛ تست نفوذ و پورت‌اسکن خارج از دامنه است و پیگیری می‌شود." },
     en: { title: "Vulnerability disclosure — Emmett", description: "How to report a vulnerability, our commitment, and what is out of scope.", body: "Report vulnerabilities with a description and reproduction steps; we reply at the first working opportunity; penetration testing and port scanning are out of scope and will be acted on." },
-    schema: (locale, canonical) => ({ "@context": "https://schema.org", "@type": "WebPage", url: canonical, name: locale === "fa" ? "افشای آسیب‌پذیری" : "Vulnerability disclosure" }),
+    schema: (locale, canonical) => [
+      { "@context": "https://schema.org", "@type": "WebPage", url: canonical, name: locale === "fa" ? "افشای آسیب‌پذیری" : "Vulnerability disclosure" },
+      breadcrumbSchema(locale, canonical, [homeCrumb(locale), { name: locale === "fa" ? "افشای آسیب‌پذیری" : "Vulnerability disclosure", path: `/${locale}/security/` }]),
+    ],
   },
   ...toolMetas.map((meta): Route => ({
     slug: { fa: routeFor(meta, "fa"), en: routeFor(meta, "en") },
     fa: { title: `ابزار ${meta.title.fa} | امت`, description: meta.description.fa, body: `${meta.title.fa}: ${meta.description.fa} ${realExample(meta.id, "fa")}` },
     en: { title: `${meta.title.en} — Emmett`, description: meta.description.en, body: `${meta.title.en}: ${meta.description.en} ${realExample(meta.id, "en")}` },
-    schema: (locale, canonical) => ({
+    schema: (locale, canonical) => [{
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
       name: meta.title[locale],
@@ -230,7 +284,7 @@ const routes: Route[] = [
             },
           }
         : {}),
-    }),
+    }, breadcrumbSchema(locale, canonical, [homeCrumb(locale), toolsCrumb(locale), { name: meta.title[locale], path: `/${locale}/${routeFor(meta, locale)}/` }])],
   })),
 ];
 
@@ -244,13 +298,16 @@ for (const route of routes) {
     const canonical = `${base}${pathFor(locale)}`;
     const faCanonical = `${base}${pathFor("fa")}`;
     const enCanonical = `${base}${pathFor("en")}`;
-    const schema = route.schema(locale, canonical);
+    const schemas = route.schema(locale, canonical);
+    const schemaTags = (Array.isArray(schemas) ? schemas : [schemas])
+      .map((schema) => `<script type="application/ld+json">${JSON.stringify(schema).replace(/</g, "\\u003c")}</script>`)
+      .join("");
     const html = template
       .replace(/<html[^>]*>/, `<html lang="${locale}" dir="${dir}">`)
       .replace(/<title>[^<]*<\/title>/, `<title>${escapeHtml(copy.title)}</title>`)
       .replace(/<meta name="description"[^>]*>/, `<meta name="description" content="${escapeHtml(copy.description)}">`)
       .replace(/<meta name="robots"[^>]*>/, `<meta name="robots" content="index,follow">`)
-      .replace("</head>", `<link rel="canonical" href="${escapeHtml(canonical)}"><link rel="alternate" hreflang="fa" href="${escapeHtml(faCanonical)}"><link rel="alternate" hreflang="en" href="${escapeHtml(enCanonical)}"><link rel="alternate" hreflang="x-default" href="${escapeHtml(faCanonical)}"><script type="application/ld+json">${JSON.stringify(schema).replace(/</g, "\\u003c")}</script></head>`)
+      .replace("</head>", `<link rel="canonical" href="${escapeHtml(canonical)}"><link rel="alternate" hreflang="fa" href="${escapeHtml(faCanonical)}"><link rel="alternate" hreflang="en" href="${escapeHtml(enCanonical)}"><link rel="alternate" hreflang="x-default" href="${escapeHtml(faCanonical)}">${schemaTags}</head>`)
       .replace('<div id="root"></div>', `<div id="root"><main><h1>${escapeHtml(copy.title)}</h1><p>${escapeHtml(copy.body)}</p></main></div>`);
     const target = path.join(dist, locale, ...route.slug[locale].split("/").filter(Boolean), "index.html");
     await mkdir(path.dirname(target), { recursive: true });
