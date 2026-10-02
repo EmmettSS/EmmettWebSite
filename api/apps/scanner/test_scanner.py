@@ -323,3 +323,14 @@ def test_result_id_default_fits_the_column():
     field = ScanResult._meta.get_field("result_id")
     for _ in range(50):
         assert len(new_result_id()) <= field.max_length
+
+
+def test_blocklist_seed_patterns_are_clean():
+    """A padded pattern is silently dropped by the seeder (suffix.strip()), which turns an
+    intended block into a no-op — keep the source tuples clean."""
+    patterns = list(blocklist.GOV_SUFFIXES) + list(blocklist.PRIVATE_SUFFIXES)
+    assert patterns, "the seed must not be empty"
+    for pattern in patterns:
+        assert pattern == pattern.strip(), f"padded pattern: {pattern!r}"
+        assert pattern == pattern.lower(), f"pattern must be lowercase: {pattern!r}"
+    assert len(patterns) == len(set(patterns)), "duplicate blocklist pattern"
