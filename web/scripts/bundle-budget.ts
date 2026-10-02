@@ -49,9 +49,9 @@ for (const file of initial.files) {
 }
 
 // §5.4: every tool route must stay within its own budget after code-splitting (ADR-005).
-const toolDirs = ["src/features/toolbox/", "src/features/scanner/", "src/features/assistant/"];
+const toolDirs = ["src/features/toolbox/", "src/features/scanner/", "src/features/assistant/", "src/features/biolab/"];
 const toolKeys = Object.keys(manifest).filter((key) => key.endsWith("/index.tsx") && toolDirs.some((dir) => key.startsWith(dir)));
-if (toolKeys.length < 7) throw new Error(`Expected at least seven code-split tool/page routes, found ${toolKeys.length}`);
+if (toolKeys.length < 8) throw new Error(`Expected at least eight code-split tool/page routes, found ${toolKeys.length}`);
 for (const key of toolKeys.sort()) {
   const id = key.split("/").slice(0, -1).pop() ?? key;
   const route = await closureKb(key);

@@ -20,6 +20,10 @@ const ToolsIndex = lazy(() => import("@/features/toolbox/ToolsIndex"));
 const ToolRouter = lazy(() => import("@/features/toolbox/ToolRouter"));
 const SharePage = lazy(() => import("@/features/toolbox/SharePage"));
 const AssistantPage = lazy(() => import("@/features/assistant"));
+const BiolabPage = lazy(() => import("@/features/biolab"));
+const CapabilitiesPage = lazy(() => import("@/features/capabilities"));
+const PerformanceLabPage = lazy(() => import("@/features/lab/performance"));
+const ArchitectPage = lazy(() => import("@/features/architect"));
 const AssistantWidget = lazy(() => import("@/features/assistant/AssistantWidget").then((module) => ({ default: module.AssistantWidget })));
 const ShellRoot = lazy(() => import("@/features/shell/ShellRoot").then((module) => ({ default: module.ShellRoot })));
 
@@ -94,6 +98,38 @@ function Site() {
               element={
                 <Suspense fallback={<div className="min-h-[60vh]" />}>
                   <AssistantPage />
+                </Suspense>
+              }
+            />
+            <Route
+              path="capabilities"
+              element={
+                <Suspense fallback={<div className="min-h-[60vh]" />}>
+                  <CapabilitiesPage />
+                </Suspense>
+              }
+            />
+            <Route
+              path="lab/performance"
+              element={
+                <Suspense fallback={<div className="min-h-[60vh]" />}>
+                  <PerformanceLabPage />
+                </Suspense>
+              }
+            />
+            <Route
+              path="architect"
+              element={
+                <Suspense fallback={<div className="min-h-[60vh]" />}>
+                  <ArchitectPage />
+                </Suspense>
+              }
+            />
+            <Route
+              path="biolab"
+              element={
+                <Suspense fallback={<div className="min-h-[60vh]" />}>
+                  <BiolabPage />
                 </Suspense>
               }
             />

@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "apps.scanner",
     "apps.assistant",
     "apps.content",
+    "apps.biolab",
 ]
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

@@ -5,6 +5,11 @@ export type Localized<T> = { fa: T; en: T };
 export type ToolMeta = {
   id: string;
   slug: Localized<string>;
+  /**
+   * Canonical route without the locale prefix. Defaults to `tools/<slug>`; feature cards may
+   * place a tool outside /tools/* (F-09 lives at /biolab/, later P1 features at /lab/*).
+   */
+  route?: Localized<string>;
   title: Localized<string>;
   subtitle: Localized<string>;
   description: Localized<string>;

@@ -39,13 +39,20 @@ export function Page({ kind }: { kind: PageKey }) {
           </div>
         </motion.div>
         <div className="mt-24 grid gap-px overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--line)] md:grid-cols-3">
-          {d.metrics.map(([v, l], i) => (
-            <Reveal delay={i * 0.1} key={l} className="bg-[#081a12]/95 p-7">
-              <b className="text-4xl font-medium text-[var(--bright)]">{v}</b>
-              <div className="mt-2 text-xs text-white/55">{l}</div>
+          {d.signals.map((signal, i) => (
+            <Reveal delay={i * 0.1} key={signal.label} className="bg-[#081a12]/95 p-7">
+              <b className="text-lg font-medium text-[var(--bright)]">{signal.label}</b>
+              <div className="mt-2 text-xs leading-6 text-white/55">{signal.note}</div>
             </Reveal>
           ))}
         </div>
+        {d.pending ? (
+          <div className="mt-10 rounded-2xl border border-amber-400/40 bg-amber-400/10 p-6" data-testid="page-pending">
+            <p className="font-mono text-[11px] text-amber-200">{d.pending.marker}</p>
+            <h2 className="mt-2 text-lg text-amber-100">{d.pending.title}</h2>
+            <p className="mt-2 max-w-3xl text-xs leading-6 text-amber-100/80">{d.pending.note}</p>
+          </div>
+        ) : null}
       </section>
       <section
         id="explore"

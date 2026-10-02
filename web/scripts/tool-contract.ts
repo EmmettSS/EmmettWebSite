@@ -8,7 +8,7 @@
  * requires HTTP 200 + SoftwareApplication JSON-LD in the returned HTML.
  */
 import { toolEntries } from "../src/features/registry";
-import { toolIdFromSlug, toolMeta } from "../src/features/toolbox/metas";
+import { routeFor, toolIdFromSlug, toolMeta } from "../src/features/toolbox/metas";
 import { COMMANDS } from "../src/features/shell/terminal/commands";
 
 const errors: string[] = [];
@@ -42,8 +42,11 @@ for (const entry of toolEntries) {
     if (meta.slug[lang] !== slug) {
       errors.push(`${label}: registry ${lang} slug “${slug}” ≠ meta slug “${meta.slug[lang]}”`);
     }
-    if (entry.evidenceUrl[lang] !== `/${lang}/tools/${slug}/`) {
-      errors.push(`${label}: evidenceUrl.${lang} “${entry.evidenceUrl[lang]}” must equal “/${lang}/tools/${slug}/”`);
+    // The evidence URL must be the tool's own canonical page: /tools/<slug>/ by default, or the
+    // route override a feature card specifies (F-09 → /biolab/, later P1 features → /lab/*).
+    const expected = `/${lang}/${routeFor(meta, lang)}/`;
+    if (entry.evidenceUrl[lang] !== expected) {
+      errors.push(`${label}: evidenceUrl.${lang} “${entry.evidenceUrl[lang]}” must equal “${expected}”`);
     }
   }
 }

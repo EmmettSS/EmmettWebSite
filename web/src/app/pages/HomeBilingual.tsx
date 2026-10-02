@@ -9,6 +9,21 @@ import { Link } from "react-router";
 import { useI18n } from "../i18n";
 import { GlowCard, Reveal } from "../components/MotionKit";
 import { Footer } from "../components/Footer";
+import { TierScene } from "@/visuals/TierScene";
+import { HeroSystemStatic } from "@/visuals/fallbacks/HeroSystemStatic";
+
+const capabilityCopy = {
+  fa: {
+    title: "پنج توان، پنج شاهد زنده",
+    note: "هر گره این شبکه یک توان تیم است و به artifact زندهٔ همان توان باز می‌شود؛ روی گره‌ها بروید و خودتان بررسی کنید.",
+    label: "شبکهٔ توان‌های تیم امت",
+  },
+  en: {
+    title: "Five capabilities, five live proofs",
+    note: "Each node is one team capability and opens the live artifact that proves it — hover, click and check for yourself.",
+    label: "The Emmett capability network",
+  },
+} as const;
 
 const copy = {
   en: {
@@ -16,7 +31,7 @@ const copy = {
     title: "We engineer",
     accent: "intelligent systems.",
     intro:
-      "Emmett turns difficult operational problems into secure, beautifully crafted products powered by AI.",
+      "Emmett turns difficult operational problems into secure, maintainable products — and shows the work instead of describing it.",
     start: "Start a project",
     work: "Explore our work",
     sections: [
@@ -36,7 +51,7 @@ const copy = {
       ],
       [
         "Selected systems",
-        "Real products, real users and measurable operational change.",
+        "Live tools and products, built and maintained by the same team.",
       ],
       [
         "The Field Library",
@@ -108,6 +123,15 @@ export function HomeBilingual() {
               {t.work}
             </Link>
           </div>
+        </div>
+      </section>
+      <section className="relative mx-auto max-w-[1280px] px-6 pb-14 lg:px-12" aria-labelledby="capability-map">
+        <h2 id="capability-map" className="text-2xl text-white/90">
+          {capabilityCopy[lang].title}
+        </h2>
+        <p className="mt-3 max-w-3xl text-sm leading-7 text-white/50">{capabilityCopy[lang].note}</p>
+        <div className="mt-7">
+          <TierScene scene="HeroSystem" height={340} fallback={<HeroSystemStatic />} label={capabilityCopy[lang].label} />
         </div>
       </section>
       <section className="relative mx-auto max-w-[1280px] px-6 pb-28 lg:px-12">

@@ -1,4 +1,4 @@
-# وضعیت فیچرها — پس از فاز ۳
+# وضعیت فیچرها — پس از فاز ۴
 
 **قاعده:** scaffold/contract به معنی محصول زنده نیست. تا تست پذیرش فیچر پیاده و پاس نشده، وضعیت «نساخته» می‌ماند.
 
@@ -12,7 +12,7 @@
 | F-06 | Passive scanner | ۳ | **زنده** — `/fa/tools/check-security/`، شش بخش و گرید A–F، موتور روی صف cron، دو serializer (عمومی mask‌شده)، لینک دائمی `noindex` با TTL ۷ روز، CTA به PenTestor با رویداد Matomo | ۲۸ تست API شامل چهار تست سخت‌گیر نگهبان (پورت ۸۰/۴۴۳، blocklist پیش از job، ماسک، noindex) |
 | F-07 | Palette + terminal | ۲ | **زنده** — registry واحد، ⌘K/Ctrl+K، راهنمای `?`، ترمینال allow-list با `kod/toman/jalali/normalize/tools/team/projects/status/theme/lang/open/help`، تست `eval(\"alert(1)\")` |
 | F-08 | دستیار RAG | ۳ | **زنده با BM25** — کورپوس ۱۳۸ chunk از محتوای همین مخزن، lookup+استناد، آستانه پیش از LLM، کش پرسش، فیلتر «بدون استناد نمایش نده»، صفحهٔ `/fa/assistant/` + ویجت شناور، اتصال به ترمینال (`ask`). provider مدل زبانی: `NullProvider` تا ورود B7 | ۲۰ تست API (شامل «هیچ تماسی با LLM») + ۱۰ تست قرارداد/کپی؛ `docs/AI-OPS.md` |
-| F-09 | Biolab | ۴ | ساختار خالی + مدل‌های آزمایشگاه/محتوا پایه | الگوریتم FASTA و UI/Web Worker بعداً |
+| F-09 | Biolab (میز کار بیوانفورماتیک) | ۴ | **زنده** — `/fa/biolab/` و `/en/biolab/`؛ چهار تب (تحلیل، تبدیل، خط لوله، FHIR نمونه)؛ منطق خالص در `logic.ts` + Web Worker با مسیر chunked؛ سه حالت نمایشگر (تعاملی/ساده/جدول)؛ نمونهٔ مرجع عمومی MN908947.3؛ اعداد خط لوله فقط از `SiteConfig` | ۱۷ تست منطق + ۳ تست runner (توالی ۱ مگابایتی با اندازه‌گیری) + jsdom برای نگهبان‌ها + ۱۱ تست API؛ `docs/PHASE-4-REPORT.md` |
 | F-10 | Performance Lab | ۵ | نساخته | نیاز به دادهٔ واقعی build/observer |
 | F-11 | پیشنهاد معماری | ۵ | نساخته | کارت F-11 |
 | F-12 | OWASP Top 10 زنده | backlog | نساخته | sandbox ایزوله و اثبات تقاضا |

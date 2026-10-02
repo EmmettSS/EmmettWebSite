@@ -1,5 +1,83 @@
-import { Github, Linkedin } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router";
+import { apiGet } from "@/lib/api-client";
 import { ui } from "../content";
 import { useI18n } from "../i18n";
-export function Footer(){const {lang,path}=useI18n();const t=ui[lang];const groups=lang==="fa"?[["شرکت",[["درباره ما","about"],["تماس","contact"]]],["فعالیت",[["خدمات","services"],["محصولات","products"],["پروژه‌ها","projects"]]],["یادگیری",[["منابع","resources"],["آکادمی","academy"]]]]:[["Company",[["About","about"],["Contact","contact"]]],["Work",[["Services","services"],["Products","products"],["Projects","projects"]]],["Learn",[["Resources","resources"],["Academy","academy"]]]];return <footer className="relative overflow-hidden border-t border-[var(--line)] bg-[#05110c]"><div className="mx-auto max-w-[1280px] px-6 pb-8 pt-20 lg:px-12"><div className="grid grid-cols-2 gap-10 md:grid-cols-3">{groups.map(([h,links]:any)=><div key={h}><p className="mb-5 text-xs text-white/55">{h}</p><div className="space-y-3">{links.map(([a,b]:string[])=><Link key={a} className="block text-sm text-white/55 hover:text-[var(--bright)]" to={path(b)}>{a}</Link>)}</div></div>)}</div><div className="mt-20 flex flex-wrap items-center justify-between gap-5 border-t border-[var(--line)] pt-7 text-xs text-white/55"><span className="flex items-center gap-2"><i className="h-1.5 w-1.5 animate-pulse rounded-full bg-[var(--bright)]"/>{t.operational}</span><span>© 2026 Emmett Group</span><span className="flex gap-2"><Github className="h-4 w-4"/><Linkedin className="h-4 w-4"/></span></div><div className="footer-wordmark mt-12" aria-hidden="true" /></div></footer>}
+
+type Health = { status?: string };
+
+/**
+ * Real service status: the badge reflects an actual `/health/` call, never a decorative
+ * green dot. When the API cannot be reached the footer says so instead of claiming uptime.
+ */
+function ServiceStatus({ lang }: { lang: "fa" | "en" }) {
+  const t = ui[lang];
+  const [state, setState] = useState<"checking" | "online" | "offline">("checking");
+
+  useEffect(() => {
+    let cancelled = false;
+    apiGet<Health>("/health/", { timeoutMs: 6000 })
+      .then((data) => {
+        if (!cancelled) setState(data?.status === "ok" || data?.status === "degraded" ? "online" : "offline");
+      })
+      .catch(() => {
+        if (!cancelled) setState("offline");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const label = state === "checking" ? t.statusChecking : state === "online" ? t.statusOnline : t.statusOffline;
+  const tone = state === "online" ? "bg-[var(--bright)]" : state === "checking" ? "bg-white/40" : "bg-amber-400";
+
+  return (
+    <span className="flex items-center gap-2" data-testid="service-status" data-status={state}>
+      <i className={`h-1.5 w-1.5 rounded-full ${tone} ${state === "online" ? "animate-pulse" : ""}`} />
+      {label}
+    </span>
+  );
+}
+
+export function Footer() {
+  const { lang, path } = useI18n();
+  const groups: [string, [string, string][]][] =
+    lang === "fa"
+      ? [
+          ["شرکت", [["درباره ما", "about"], ["تماس", "contact"]]],
+          ["فعالیت", [["خدمات", "services"], ["محصولات", "products"], ["پروژه‌ها", "projects"]]],
+          ["یادگیری", [["منابع", "resources"], ["آکادمی", "academy"], ["ابزارها", "tools"]]],
+        ]
+      : [
+          ["Company", [["About", "about"], ["Contact", "contact"]]],
+          ["Work", [["Services", "services"], ["Products", "products"], ["Projects", "projects"]]],
+          ["Learn", [["Resources", "resources"], ["Academy", "academy"], ["Tools", "tools"]]],
+        ];
+
+  return (
+    <footer className="relative overflow-hidden border-t border-[var(--line)] bg-[#05110c]">
+      <div className="mx-auto max-w-[1280px] px-6 pb-8 pt-20 lg:px-12">
+        <div className="grid grid-cols-2 gap-10 md:grid-cols-3">
+          {groups.map(([heading, links]) => (
+            <div key={heading}>
+              <p className="mb-5 text-xs text-white/55">{heading}</p>
+              <div className="space-y-3">
+                {links.map(([label, target]) => (
+                  <Link key={label} className="block text-sm text-white/55 hover:text-[var(--bright)]" to={path(target)}>
+                    {label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="mt-20 flex flex-wrap items-center justify-between gap-5 border-t border-[var(--line)] pt-7 text-xs text-white/55">
+          <ServiceStatus lang={lang} />
+          <span>© {new Date().getFullYear()} Emmett</span>
+          {/* Social links stay out until the real profiles arrive ([INPUT B11]); no dead icons. */}
+        </div>
+        <div className="footer-wordmark mt-12" aria-hidden="true" />
+      </div>
+    </footer>
+  );
+}

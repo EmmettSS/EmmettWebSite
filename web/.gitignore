@@ -1,0 +1,6 @@
+# Generated at build time (scripts/render-assets.ts) — never committed.
+/public/og/
+/public/visuals/
+
+# Lighthouse CI reports
+/lhci-reports/

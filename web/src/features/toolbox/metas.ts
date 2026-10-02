@@ -1,5 +1,6 @@
 import type { ToolMeta } from "./types";
 import { meta as assistant } from "@/features/assistant/meta";
+import { meta as biolab } from "@/features/biolab/meta";
 import { meta as scanner } from "@/features/scanner/meta";
 import { meta as jalali } from "./jalali/meta";
 import { meta as jwt } from "./jwt/meta";
@@ -8,7 +9,7 @@ import { meta as matnFarsi } from "./matn-farsi/meta";
 import { meta as toman } from "./toman/meta";
 
 /** All tool metadata is tiny and needed for SEO, the palette and cross-linking. */
-export const toolMetas: ToolMeta[] = [jalali, kodMeli, toman, matnFarsi, jwt, scanner, assistant];
+export const toolMetas: ToolMeta[] = [jalali, kodMeli, toman, matnFarsi, jwt, scanner, assistant, biolab];
 
 const byId = new Map(toolMetas.map((meta) => [meta.id, meta]));
 
@@ -33,6 +34,11 @@ export function toolIdFromSlug(slug: string): string | undefined {
   const match = toolMetas.find((meta) => meta.slug.fa === slug || meta.slug.en === slug);
   if (match) return match.id;
   return SLUG_ALIASES[slug];
+}
+
+/** Canonical route (no locale prefix) for a tool, honouring a per-tool route override. */
+export function routeFor(meta: ToolMeta, lang: "fa" | "en"): string {
+  return meta.route?.[lang] ?? `tools/${meta.slug[lang]}`;
 }
 
 export function slugFor(id: string, lang: "fa" | "en"): string {

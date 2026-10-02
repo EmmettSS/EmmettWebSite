@@ -27,7 +27,7 @@ jobs:
       - run: pnpm --filter @emmett/web budget -- --self-test
       - run: pnpm --filter @emmett/web seo:render
         env:
-          PUBLIC_SITE_URL: https://example.invalid
+          PUBLIC_SITE_URL: https://ci.example.invalid
       - run: pnpm --filter @emmett/web seo:check
       - run: pnpm --filter @emmett/web exec playwright install --with-deps chromium
       - name: Run a11y (Playwright + axe)
@@ -48,6 +48,28 @@ jobs:
           { echo '### a11y log tail'; echo '```'; tail -n 80 /tmp/a11y.log 2>/dev/null; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
           node web/scripts/report-playwright-failures.mjs /tmp/a11y.json /tmp/axe-violations.json
           exit 0
+  lighthouse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 9.15.9 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @emmett/web build
+      - run: pnpm --filter @emmett/web seo:render
+        env:
+          PUBLIC_SITE_URL: https://ci.example.invalid
+      - name: Lighthouse mobile, low-power tier (Perf >= 90, CLS < 0.1)
+        run: npx --yes @lhci/cli@0.14.0 autorun
+        working-directory: web
+      - name: Upload Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports
+          path: web/lhci-reports
   api:
     runs-on: ubuntu-latest
     defaults:

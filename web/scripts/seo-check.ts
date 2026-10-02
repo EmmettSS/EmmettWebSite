@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { toolMetas } from "../src/features/toolbox/metas";
+import { routeFor, toolIdFromSlug, toolMeta, toolMetas } from "../src/features/toolbox/metas";
 
 const dist = path.resolve("dist");
 const expected = [
@@ -14,7 +14,13 @@ const expected = [
   "en/tools/index.html",
   "fa/assistant/index.html",
   "en/assistant/index.html",
-  ...toolMetas.flatMap((meta) => [`fa/tools/${meta.slug.fa}/index.html`, `en/tools/${meta.slug.en}/index.html`]),
+  "fa/capabilities/index.html",
+  "en/capabilities/index.html",
+  "fa/lab/performance/index.html",
+  "en/lab/performance/index.html",
+  "fa/architect/index.html",
+  "en/architect/index.html",
+  ...toolMetas.flatMap((meta) => [`fa/${routeFor(meta, "fa")}/index.html`, `en/${routeFor(meta, "en")}/index.html`]),
 ];
 for (const file of expected) {
   const html = await readFile(path.join(dist, file), "utf8");
@@ -25,8 +31,8 @@ for (const file of expected) {
 
 // Every tool page must carry SoftwareApplication structured data, and the tools index an ItemList.
 for (const meta of toolMetas) {
-  const html = await readFile(path.join(dist, `fa/tools/${meta.slug.fa}/index.html`), "utf8");
-  if (!html.includes('"@type":"SoftwareApplication"')) throw new Error(`fa/tools/${meta.slug.fa} is missing SoftwareApplication JSON-LD`);
+  const html = await readFile(path.join(dist, `fa/${routeFor(meta, "fa")}/index.html`), "utf8");
+  if (!html.includes('"@type":"SoftwareApplication"')) throw new Error(`fa/${routeFor(meta, "fa")} is missing SoftwareApplication JSON-LD`);
 }
 const toolsIndex = await readFile(path.join(dist, "fa/tools/index.html"), "utf8");
 if (!toolsIndex.includes('"@type":"ItemList"')) throw new Error("tools index is missing ItemList JSON-LD");
@@ -43,10 +49,16 @@ const computedExamples: [string, string][] = [
   ["jwt", "CWE-347"],
   ["check-security", "هیچ پورت‌اسکن یا تلاش نفوذی انجام نمی‌شود"],
   ["assistant", "پیدا نکردم"],
+  ["biolab", "M F V F L V L L P L V S S Q C V N L T T"],
 ];
 for (const [slug, needle] of computedExamples) {
-  const html = await readFile(path.join(dist, `fa/tools/${slug}/index.html`), "utf8");
-  if (!html.includes(needle)) throw new Error(`fa/tools/${slug} does not contain its computed example (${needle})`);
+  // Feature cards may override the canonical route (F-09 → /biolab/), so the check follows
+  // `routeFor` instead of assuming `/tools/<slug>/`.
+  const meta = toolMeta(toolIdFromSlug(slug) ?? slug);
+  if (!meta) throw new Error(`no tool meta resolves for computed-example slug “${slug}”`);
+  const file = `fa/${routeFor(meta, "fa")}/index.html`;
+  const html = await readFile(path.join(dist, file), "utf8");
+  if (!html.includes(needle)) throw new Error(`${file} does not contain its computed example (${needle})`);
 }
 {
   const assistant = await readFile(path.join(dist, "fa/assistant/index.html"), "utf8");

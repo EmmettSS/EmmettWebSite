@@ -1,11 +1,13 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { toolMetas } from "../src/features/toolbox/metas";
+import { routeFor, toolMetas } from "../src/features/toolbox/metas";
 import { convertJalali, formatGregorian } from "../src/features/toolbox/jalali/logic";
 import { validateNationalId } from "../src/features/toolbox/kod-meli/logic";
 import { formatTomanFa, parseAmount, tomanToWords } from "../src/features/toolbox/toman/logic";
 import { normalizePersian } from "../src/features/toolbox/matn-farsi/logic";
 import { decodeJwt } from "../src/features/toolbox/jwt/logic";
+import { composition, parseFasta, sanitizeInput, translate } from "../src/features/biolab/logic";
+import { REFERENCE_SAMPLE } from "../src/features/biolab/data/reference";
 
 /**
  * Every tool page must ship a *real* computed example in the static HTML (SEO + G1):
@@ -46,6 +48,16 @@ function realExample(toolId: string, lang: "fa" | "en"): string {
       return lang === "fa"
         ? `توکن نمونه (alg: none) → ${result.warnings.length} هشدار امنیتی، اولین مورد: ${result.warnings[0]?.cwe ?? "—"}`
         : `Sample token (alg: none) → ${result.warnings.length} security warning(s), first: ${result.warnings[0]?.cwe ?? "—"}`;
+    }
+    case "biolab": {
+      const record = parseFasta(REFERENCE_SAMPLE.fasta)[0];
+      const cleaned = sanitizeInput(record.sequence);
+      if (cleaned.error) return "";
+      const stats = composition(cleaned.sequence);
+      const protein = translate(cleaned.sequence).slice(0, 30).split("").join(" ");
+      return lang === "fa"
+        ? `نمونهٔ مرجع عمومی MN908947.3: طول ${cleaned.sequence.length}، GC ${stats.gcPercent.toFixed(2)}٪، پروتئین: ${protein}…`
+        : `Public reference sample MN908947.3: ${cleaned.sequence.length} nt, GC ${stats.gcPercent.toFixed(2)}%, protein: ${protein}…`;
     }
     default:
       return "";
@@ -115,12 +127,70 @@ const routes: Route[] = [
         "@type": "ListItem",
         position: index + 1,
         name: meta.title[locale],
-        url: `${base}/${locale}/tools/${meta.slug[locale]}/`,
+        url: `${base}/${locale}/${routeFor(meta, locale)}/`,
       })),
     }),
   },
+  {
+    slug: { fa: "capabilities", en: "capabilities" },
+    fa: {
+      title: "ماتریس توانمندی امت | هر خانه یک شاهد زنده",
+      description: "پنج توان تیم در یک ماتریس که از رجیستری سایت ساخته می‌شود؛ هر خانه به artifact زنده لینک دارد و خانهٔ بی‌شاهد خاکستری می‌ماند.",
+      body: "ماتریس توانمندی از رجیستری خود سایت ساخته می‌شود: فرانت‌اند، بک‌اند، امنیت، هوش مصنوعی و بیوتکنولوژی؛ هر خانه به یک artifact زنده لینک دارد (ابزارهای محلی، چک‌آپ امنیتی، دستیار و میز کار بیوانفورماتیک) و توان بدون شاهد غیرفعال و خاکستری رندر می‌شود.",
+    },
+    en: {
+      title: "Emmett capability matrix — every cell is live proof",
+      description: "The five team capabilities as a matrix generated from the site registry: every cell links to a live artifact, and a capability without evidence stays grey.",
+      body: "The capability matrix is generated from the site's own registry: frontend, backend, security, AI and biotech. Every cell links to a live artifact (browser tools, the passive security check-up, the assistant and the bioinformatics workbench); a capability without evidence renders disabled and grey.",
+    },
+    schema: (locale, canonical) => ({
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      url: canonical,
+      name: locale === "fa" ? "ماتریس توانمندی امت" : "Emmett capability matrix",
+      numberOfItems: 5,
+    }),
+  },
+  {
+    slug: { fa: "lab/performance", en: "lab/performance" },
+    fa: {
+      title: "آزمایشگاه کارایی امت | اعداد واقعی همین سایت",
+      description: "FPS زنده، Core Web Vitals همین بازدیدکننده، حجم واقعی باندل از CI و سطح دستگاه — همه Measured، بدون عدد ساختگی.",
+      body: "آزمایشگاه کارایی همان چیزی را نشان می‌دهد که اندازه‌گیری می‌شود: حجم واقعی باندل هر روت از خروجی build، Core Web Vitals همین بازدیدکننده از PerformanceObserver، FPS زنده (فقط در حالت تمام) و سطح دستگاه با دلیل انتخابش. در حالت کم‌مصرف، نمودار FPS غیرفعال می‌ماند و همان اعداد به‌صورت جدول می‌آیند.",
+    },
+    en: {
+      title: "Emmett performance lab — this site's real numbers",
+      description: "Live FPS, this visitor's Core Web Vitals, real bundle sizes from CI and the current device tier — measured, never invented.",
+      body: "The performance lab shows what is actually measured: per-route bundle size from the build output, this visitor's Core Web Vitals from PerformanceObserver, live FPS (full tier only) and the device tier with its reason. In low-power mode the FPS chart is disabled and the same numbers are shown as a table.",
+    },
+    schema: (locale, canonical) => ({
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      url: canonical,
+      name: locale === "fa" ? "آزمایشگاه کارایی" : "Performance lab",
+    }),
+  },
+  {
+    slug: { fa: "architect", en: "architect" },
+    fa: {
+      title: "پیشنهاد معماری | امت",
+      description: "سه پرسش، یک دیاگرام واقعاً تولیدشده از گراف قواعد، پشتهٔ پیشنهادی با دلیل و بازهٔ زمان/هزینه با فرض‌های اعلام‌شده.",
+      body: "با سه پرسش دربارهٔ نوع سامانه، مقیاس و قیدها، یک دیاگرام معماری از گراف قواعد ساخته می‌شود (نه قالب ثابت) و پشتهٔ پیشنهادی همراه با دلیل، بازهٔ زمان و بازهٔ هزینهٔ تومان بر پایهٔ جدول نسخه‌دار ارائه می‌شود. بازه‌ها تخمینی و با فرض‌های اعلام‌شده هستند و پیشنهاد قطعی نیستند.",
+    },
+    en: {
+      title: "Architecture advisor — Emmett",
+      description: "Three questions produce a diagram genuinely generated from a rules graph, a recommended stack with reasons, and time/cost ranges with stated assumptions.",
+      body: "Three questions about system type, scale and constraints generate an architecture diagram from a rules graph (not a fixed template), plus a recommended stack with reasons and time and Toman cost ranges from a versioned configuration table. Ranges are estimates with stated assumptions, not a firm proposal.",
+    },
+    schema: (locale, canonical) => ({
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      url: canonical,
+      name: locale === "fa" ? "پیشنهاد معماری" : "Architecture advisor",
+    }),
+  },
   ...toolMetas.map((meta): Route => ({
-    slug: { fa: `tools/${meta.slug.fa}`, en: `tools/${meta.slug.en}` },
+    slug: { fa: routeFor(meta, "fa"), en: routeFor(meta, "en") },
     fa: { title: `ابزار ${meta.title.fa} | امت`, description: meta.description.fa, body: `${meta.title.fa}: ${meta.description.fa} ${realExample(meta.id, "fa")}` },
     en: { title: `${meta.title.en} — Emmett`, description: meta.description.en, body: `${meta.title.en}: ${meta.description.en} ${realExample(meta.id, "en")}` },
     schema: (locale, canonical) => ({

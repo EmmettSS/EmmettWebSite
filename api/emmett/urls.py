@@ -17,4 +17,5 @@ urlpatterns = [
     path("api/v1/", include("apps.content.urls")),
     path("api/v1/", include("apps.scanner.urls")),
     path("api/v1/", include("apps.assistant.urls")),
+    path("api/v1/", include("apps.biolab.urls")),
 ]
