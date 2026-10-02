@@ -27,8 +27,8 @@ class Command(BaseCommand):
             Post.objects.get_or_create(
                 slug=f"sample-note-{index}",
                 defaults={
-                    "title_fa": f"[SAMPLE] یادداشت {index}",
-                    "title_en": f"[SAMPLE] Note {index}",
+                    "title_fa": f"یادداشت نمونهٔ {index} — منتشرنشده",
+                    "title_en": f"Unpublished sample note {index}",
                     "body_fa": "این محتوای نمونهٔ توسعه است و ادعای تجربهٔ واقعی نیست.",
                     "body_en": "Development sample content; this does not claim real client work.",
                     "status": "draft",
@@ -38,8 +38,8 @@ class Command(BaseCommand):
             CaseStudy.objects.get_or_create(
                 slug=f"sample-case-{index}",
                 defaults={
-                    "title_fa": f"[SAMPLE] مطالعهٔ موردی {index}",
-                    "title_en": f"[SAMPLE] Case study {index}",
+                    "title_fa": f"مطالعهٔ موردی نمونهٔ {index} — بدون ادعای واقعی",
+                    "title_en": f"Sample case study {index} — no real claims",
                     "body_fa": "نمونهٔ محلی؛ تا زمان تأیید مالک داده منتشر نشود.",
                     "body_en": "Local sample; do not publish before data-owner approval.",
                     "status": "draft",
@@ -47,7 +47,7 @@ class Command(BaseCommand):
             )
         for index in range(1, 5):
             TeamMember.objects.get_or_create(
-                name_en=f"[SAMPLE] Team member {index}",
+                name_en=f"Sample team member {index} (not a real person)",
                 defaults={
                     "name_fa": f"[نمونه] عضو تیم {index}",
                     "role_fa": "نقش نمونه",
@@ -59,8 +59,8 @@ class Command(BaseCommand):
             JobOpening.objects.get_or_create(
                 slug=f"sample-role-{index}",
                 defaults={
-                    "title_fa": f"[SAMPLE] موقعیت شغلی {index}",
-                    "title_en": f"[SAMPLE] Role {index}",
+                    "title_fa": f"موقعیت شغلی نمونهٔ {index}",
+                    "title_en": f"Sample role {index}",
                     "body_fa": "موقعیت نمونهٔ توسعه؛ منتشر نشود.",
                     "body_en": "Development sample role; do not publish.",
                     "status": "draft",
@@ -68,6 +68,6 @@ class Command(BaseCommand):
             )
         self.stdout.write(
             self.style.SUCCESS(
-                "Demo seed complete; sample content stays draft and marked [SAMPLE]."
+                "Demo seed complete: every seeded record stays a draft and is labelled as a sample — nothing is presented as real."
             )
         )

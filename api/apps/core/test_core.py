@@ -84,3 +84,18 @@ class TestOpsErrors:
         assert body["jobs_failed_window"] == 1
         assert body["failures_by_kind"] == {"embed": 1}
         assert body["assistant_cost_today_usd"] == 0.0
+
+
+def test_wsgi_entry_points_resolve():
+    """A host loads `passenger_wsgi.application`; a broken reference only shows up at deploy time."""
+    from django.conf import settings
+    from django.utils.module_loading import import_string
+
+    app = import_string(settings.WSGI_APPLICATION)
+    assert callable(app)
+
+    # Both entry points must exist and expose the same callable as settings.WSGI_APPLICATION.
+    import passenger_wsgi
+    import emmett.wsgi
+
+    assert passenger_wsgi.application is emmett.wsgi.application is app

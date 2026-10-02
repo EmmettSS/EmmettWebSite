@@ -31,7 +31,7 @@
 | مورد | یافته | اقدام لازم (وابسته به B2/B1) |
 |---|---|---|
 | MySQL/MariaDB | dry-run روی SQLite بود؛ مهاجرت‌ها DB-agnostic نوشته شده‌اند اما روی MySQL اجرا نشده‌اند | اجرای `migrate` روی MariaDB و بررسی اینتریکس/`utf8mb4` |
-| Passenger | `deploy/passenger_wsgi.py` آماده است ولی روی میزبان اجرا نشده | ثبت Python App و مقداردهی `DJANGO_SETTINGS_MODULE`/env در پنل |
+| Passenger | نقص واقعی پیدا و رفع شد: `api/emmett/wsgi.py` وجود نداشت و `passenger_wsgi.py` خطا می‌داد؛ اکنون entry point ساخته شد و تست دارد. روی میزبان واقعی هنوز اجرا نشده | ثبت Python App و مقداردهی `DJANGO_SETTINGS_MODULE`/env در پنل، سپس `python -c "import passenger_wsgi; print(passenger_wsgi.application)"` |
 | cron واقعی | اسکریپت‌ها با env فایل واقعی اجرا شدند؛ خطوط `deploy/crontab.txt` هنوز در پنل ثبت نشده | افزودن ۹ خط cron پنل و بررسی لاگ اولین اجراها |
 | static/DNS | توانایی سرو `web/dist` + `.well-known/security.txt` از پنل تأیید نشده | تنظیم MIME `.well-known`، انتقال `dist` و تست crawl |
 | SMTP | outbox پر می‌شود اما بدون SMTP ایمیلی ارسال نمی‌شود | مقداردهی B3 و تست ارسال واقعی |

@@ -66,6 +66,9 @@ cd ~/APP && git pull --ff-only
 cd api && ~/.virtualenvs/emmett/bin/python manage.py migrate --noinput
 ~/.virtualenvs/emmett/bin/python manage.py collectstatic --noinput
 
+# ۴٫۵) بررسی entry point پیش از ری‌استارت (نقص WSGI فقط در همین لحظه خودش را نشان می‌دهد)
+~/.virtualenvs/emmett/bin/python -c "import passenger_wsgi; print(passenger_wsgi.application)"
+
 # ۵) Static Bridge برای محتوای منتشرشده (بدون نیاز به JS)
 STATIC_BRIDGE_DIR=~/APP/web/dist PUBLIC_SITE_URL=https://<domain> \
   ~/.virtualenvs/emmett/bin/python manage.py render_public_html

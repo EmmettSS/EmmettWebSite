@@ -27,7 +27,7 @@
 | سنجه | مقدار |
 |---|---|
 | تست‌های وب (vitest) | **۲۵ فایل / ۱۵۷ تست، همه سبز** |
-| تست‌های API (pytest) | **۹۹ passed, 1 skipped** |
+| تست‌های API (pytest) | **۱۰۰ passed, 1 skipped** |
 | بودجهٔ JS اولیه | **۱۴۲.۵ KB gzip** (سقف ۲۰۰)؛ artifact: `public/data/bundle-stats.json` (sha256 `d6f4c1bb4cd0f579`) |
 | صفحه‌های Static Bridge | **۳۸ صفحهٔ دوزبانه** + sitemap + robots + security.txt |
 | قرارداد ابزار | ۷ ابزار زنده با شاهد قابل‌حل |
@@ -38,6 +38,13 @@
 
 `migrate` → `collectstatic` (۱۵۴ فایل) → `seed_demo` → `db_backup` → تغییر مقدار → `db_restore --confirm` (بازگشت تأییدشده) → `render_public_html` (پل استاتیک پست منتشرشده) → cron: `scan-jobs`، `embed-jobs`، `render-public-html`، `purge-results`، `db-backup` (همه کد خروج ۰) → اسکن واقعی از API: `grade C`, `score 75`, `ttl 7`.
 گاردها: بدون رضایت → ۴۰۰، دامنهٔ داخلی/localhost → ۴۰۰.
+
+### نقصی که dry-run اولیه ندید و در این دور پیدا و رفع شد
+`runserver`/Passenger بالا نمی‌آمد چون `api/emmett/wsgi.py` وجود نداشت و هر دو ارجاع (`WSGI_APPLICATION` و `api/passenger_wsgi.py`) به آن اشاره می‌کردند. dry-run قبلی فقط دستورهای مدیریتی را اجرا کرده بود و این مسیر را لمس نکرده بود. اکنون:
+- `api/emmett/wsgi.py` + `api/emmett/__init__.py` ساخته شد؛
+- `api/passenger_wsgi.py` به یک re-export نازک تبدیل شد (تا با `deploy/passenger_wsgi.py` یکی بماند)؛
+- تست `test_wsgi_entry_points_resolve` هر سه مسیر (settings → emmett.wsgi → passenger_wsgi) را یکسان بودن application بررسی می‌کند؛
+- در همین جلسه API و وب هر دو بالا آمدند و `/api/v1/health/`، `/api/v1/site-config/` و `/fa/tools/` پاسخ ۲۰۰ دادند.
 
 ## ۴. چه چیزی باز مانده (و چرا)
 

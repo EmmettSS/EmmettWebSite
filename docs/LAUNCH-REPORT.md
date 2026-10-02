@@ -66,7 +66,7 @@
 ### ✅ دستیار RAG با ارجاع پاسخ می‌دهد و fallback BM25 تست شده است
 - **شاهد (کد):** `api/apps/assistant/answers.py` — آستانهٔ شباهت **پیش از** فراخوانی provider؛ پاسخ بدون ارجاع دور انداخته می‌شود؛ سقف هزینهٔ روزانه → بازگشت به BM25 با پیام صریح.
 - **شاهد (تست):** `api/apps/assistant/test_assistant.py` — ۱۹ تست: `test_unrelated_question_makes_no_llm_call`, `test_llm_path_is_used_when_a_provider_exists`, `test_cost_cap_reached_falls_back_to_bm25`, `test_answer_without_citation_is_discarded`, کش با کلید hash (بدون ذخیرهٔ متن پرسش).
-- **شاهد (اجرا):** `pytest -q` → `99 passed, 1 skipped`.
+- **شاهد (اجرا):** `pytest -q` → `100 passed, 1 skipped`.
 
 ### ✅ اسکنر F-06 هر ۶ نگهبان امنیتی/قانونی را دارد
 - **شاهد (پیش‌فرض امن، OWASP A01):** `REST_FRAMEWORK.DEFAULT_PERMISSION_CLASSES = IsAdminUser` — هر endpoint تازه به‌صورت پیش‌فرض ادمین‌محور است و سطح‌های عمومی `AllowAny` را صریح اعلام می‌کنند؛ جدول کامل OWASP در `docs/SECURITY.md`.
@@ -93,7 +93,7 @@
 - **ثبت:** در `docs/OPEN-ITEMS.md` به‌عنوان «فقط CI».
 
 ### ✅ همهٔ تست‌ها سبز (pytest، vitest، Playwright fa+en، content:check)
-- **شاهد:** `pytest -q` → `99 passed, 1 skipped` · `vitest run` → `25 files / 157 tests passed` · `content:check` → `Bilingual content parity passed for all siteCopy, page content and UI keys` (+ self-test تشخیص ترجمهٔ غایب) · `corpus:check` → `corpus is in sync (7 pages, 8 tools, 10 FAQ)`.
+- **شاهد:** `pytest -q` → `100 passed, 1 skipped` · `vitest run` → `25 files / 157 tests passed` · `content:check` → `Bilingual content parity passed for all siteCopy, page content and UI keys` (+ self-test تشخیص ترجمهٔ غایب) · `corpus:check` → `corpus is in sync (7 pages, 8 tools, 10 FAQ)`.
 - **Playwright (fa+en):** ۷۲ تست در ۴ فایل (`web/tests/e2e/`)، شامل spec تازهٔ شواهد (`evidence.spec.ts`) که برای هر ۹ فیچر P0 در دو زبان **اسکرین‌شات** می‌گیرد و **صفر خطای console** را assert می‌کند؛ این spec در CI اجرا و به‌عنوان artifact `feature-evidence` آپلود می‌شود. در این سندباکس مرورگر نصب‌شدنی نیست (دانلود Chromium مسدود است)، پس اجرای واقعی‌اش در CI انجام می‌شود — در `OPEN-ITEMS` علامت خورده است.
 - **شاهد (نوع/لینت):** `tsc --noEmit` پاک، `eslint .` پاک.
 
