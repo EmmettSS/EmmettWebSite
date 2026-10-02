@@ -4,4 +4,5 @@
 */5 * * * * EMMETT_CRON_ENV_FILE=/home/ACCOUNT/private/EMMETT-cron.env /home/ACCOUNT/APP/deploy/scripts/run-cron.sh embed-jobs
 */10 * * * * EMMETT_CRON_ENV_FILE=/home/ACCOUNT/private/EMMETT-cron.env /home/ACCOUNT/APP/deploy/scripts/run-cron.sh send-outbox
 */10 * * * * EMMETT_CRON_ENV_FILE=/home/ACCOUNT/private/EMMETT-cron.env /home/ACCOUNT/APP/deploy/scripts/run-cron.sh render-public-html
+30 4 * * * EMMETT_CRON_ENV_FILE=/home/ACCOUNT/private/EMMETT-cron.env /home/ACCOUNT/APP/deploy/scripts/run-cron.sh purge-results
 30 3 * * * EMMETT_CRON_ENV_FILE=/home/ACCOUNT/private/EMMETT-cron.env /home/ACCOUNT/APP/deploy/scripts/run-cron.sh db-backup
