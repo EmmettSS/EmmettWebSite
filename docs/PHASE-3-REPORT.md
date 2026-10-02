@@ -68,7 +68,7 @@
 
 ## شواهد عددی
 
-- `pytest` → **۸۱ passed، ۱ skipped** (۲۸ اسکنر + ۲۰ دستیار + بقیه)
+- `pytest` → **۸۱ passed، ۱ skipped** (۲۸ اسکنر + ۱۹ دستیار + بقیه)
 - `vitest` → **۸۴ passed** در ۱۲ فایل (شامل `scanner/logic.test.ts` و `assistant/logic.test.ts`)
 - `tsc --noEmit` → clean · `ruff check apps emmett manage.py` → clean
 - `content:check` + `corpus:check` + `jalali:check` + `tool:contract` → pass

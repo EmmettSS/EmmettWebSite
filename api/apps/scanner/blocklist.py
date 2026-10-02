@@ -22,7 +22,7 @@ GOV_SUFFIXES = (
     "ac.ir",
     "police.ir",
     "mfa.ir",
-    " judiciary.ir",
+    "judiciary.ir",
 )
 PRIVATE_SUFFIXES = (
     "localhost",
