@@ -6,6 +6,7 @@ import { useTier } from "@/lib/device-tier";
 import { apiGet, apiPost } from "@/lib/api-client";
 import { completeCommand, executeCommand, type CommandResponse } from "./terminal/commands";
 import { pushHistory, type HistoryEntry } from "./terminal/logic";
+import { emit } from "@/lib/events";
 
 const HISTORY_LIMIT = 80;
 
@@ -42,6 +43,7 @@ export function TerminalDock({ open, onClose }: { open: boolean; onClose: () => 
       setInput("");
       let response: CommandResponse;
       try {
+        emit("terminal_command", { command: command.trim().split(/\s+/)[0] ?? "" });
         response = await executeCommand(command, context());
       } catch (error) {
         response = { kind: "error", text: error instanceof Error ? error.message : String(error) };

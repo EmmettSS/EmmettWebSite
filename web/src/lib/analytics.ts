@@ -5,6 +5,14 @@ declare global {
   }
 }
 
+/**
+ * Named event with a value, used by the Phase-5 event list (`scan_run`, `palette_open`, …).
+ * Same contract as `trackGoal`: silent no-op without a Matomo tag.
+ */
+export function trackEvent(name: string, value?: string) {
+  trackGoal(name, value);
+}
+
 export function trackGoal(name: string, value?: string) {
   if (typeof window === "undefined") return;
   try {

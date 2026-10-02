@@ -10,7 +10,14 @@ const REPORT = (process.env.A11Y_REPORT ?? '/tmp/axe-violations.json').replace(
   /\.json$/,
   `.w${process.env.TEST_WORKER_INDEX ?? '0'}.json`,
 )
-const routes = ['', '/services', '/products', '/about', '/contact', '/tools', '/tools/tarikh-shamsi', '/tools/kod-meli', '/tools/toman', '/tools/matn-farsi', '/tools/jwt', '/tools/check-security', '/assistant']
+// Every public route of the launch shape, both languages. The Phase 4/5 pages (capabilities,
+// lab, architect, biolab) are included on purpose: they are the ones new visitors land on.
+const routes = [
+  '', '/services', '/products', '/products/pentestor', '/products/crm', '/projects', '/resources',
+  '/academy', '/about', '/contact', '/privacy', '/terms', '/security', '/tools',
+  '/tools/tarikh-shamsi', '/tools/kod-meli', '/tools/toman', '/tools/matn-farsi', '/tools/jwt',
+  '/tools/check-security', '/assistant', '/capabilities', '/lab/performance', '/architect', '/biolab',
+]
 for (const lang of ['fa', 'en']) for (const route of routes) {
   test(`${lang} ${route || '/'} has no serious axe violations`, async ({ page }) => {
     await page.goto(`/${lang}${route}`)

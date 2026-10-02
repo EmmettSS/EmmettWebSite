@@ -1,0 +1,12 @@
+# Generated at build time (scripts/render-assets.ts) — never committed.
+/public/og/
+/public/visuals/
+
+# Lighthouse CI reports
+/lhci-reports/
+
+# Staged measurement copy (dist + pre-launch API stand-in) — scripts/stage-lighthouse-dist.mjs
+/dist-measure/
+
+# Lighthouse CI internal run directory (flags + raw LHRs; reports go to /lhci-reports/)
+/.lighthouseci/

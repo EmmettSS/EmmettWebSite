@@ -6,6 +6,7 @@
  * There is no `eval`, no `new Function`, no dynamic import of user strings.
  */
 import { registry, toolEntries } from "@/features/registry";
+import { composition, findOrfs, reverseComplement, sanitizeInput, translate } from "@/features/biolab/logic";
 
 export type CommandResponse =
   | { kind: "text"; text: string }
@@ -311,10 +312,31 @@ export const COMMANDS: Record<string, CommandSpec> = {
   bio: {
     name: "bio",
     usage: "bio <sequence>",
-    descriptionFa: "تحلیل توالی (فاز ۴)",
-    descriptionEn: "Sequence analysis (Phase 4)",
-    local: false,
-    run: async () => ({ kind: "error", text: "دستور bio در فاز ۴ فعال می‌شود." }),
+    descriptionFa: "تحلیل توالی DNA در همان لحظه (بدون ارسال به سرور)",
+    descriptionEn: "Instant DNA sequence analysis (nothing leaves the browser)",
+    local: true,
+    run: (args, ctx) => {
+      const raw = args.join("");
+      const cleaned = sanitizeInput(raw);
+      if (cleaned.error) return { kind: "error", text: cleaned.error[ctx.lang] };
+      const comp = composition(cleaned.sequence);
+      const orfs = findOrfs(cleaned.sequence, { minAa: 10, limit: 5 });
+      const longest = orfs[0];
+      const fa = ctx.lang === "fa";
+      return {
+        kind: "table",
+        caption: fa ? "تحلیل محلی توالی (هیچ داده‌ای ارسال نشد)" : "Local sequence analysis (nothing was uploaded)",
+        columns: fa ? ["شاخص", "مقدار"] : ["Metric", "Value"],
+        rows: [
+          [fa ? "طول" : "Length", `${cleaned.sequence.length} nt`],
+          [fa ? "محتوای GC" : "GC content", `${comp.gcPercent.toFixed(2)}%`],
+          ["A/C/G/T", `${comp.counts.A}/${comp.counts.C}/${comp.counts.G}/${comp.counts.T}`],
+          [fa ? "مکمل معکوس" : "Reverse complement", reverseComplement(cleaned.sequence).slice(0, 40)],
+          [fa ? "طولانی‌ترین ORF" : "Longest ORF", longest ? `${longest.start}-${longest.end} (${longest.lengthAa} aa, ${longest.strand})` : "—"],
+          [fa ? "پیش‌نمایش پروتئین" : "Protein preview", longest ? longest.protein.slice(0, 40) : translate(cleaned.sequence).slice(0, 40)],
+        ],
+      };
+    },
   },
 };
 

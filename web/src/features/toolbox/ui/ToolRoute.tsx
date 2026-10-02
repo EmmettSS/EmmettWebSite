@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { useLocation } from "react-router";
 import { useI18n } from "@/app/i18n";
 import { useSEO } from "@/lib/seo";
+import { routeFor } from "../metas";
 import { ToolShell, siteOrigin } from "./ToolShell";
 import type { ToolMeta } from "../types";
 
@@ -21,7 +22,7 @@ export function ToolRoute({ meta, children, noindex = false }: { meta: ToolMeta;
   const params = new URLSearchParams(search);
   const hasResult = RESULT_PARAMS.some((key) => params.has(key));
   const isNoindex = noindex || hasResult;
-  const canonical = `${siteOrigin()}/${lang}/tools/${meta.slug[lang]}/`;
+  const canonical = `${siteOrigin()}/${lang}/${routeFor(meta, lang)}/`;
   useSEO({
     title: lang === "fa" ? `ابزار ${meta.title.fa} | امت` : `${meta.title.en} — Emmett`,
     description: meta.description[lang],

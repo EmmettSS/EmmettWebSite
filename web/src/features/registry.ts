@@ -47,10 +47,26 @@ const pages: RegistryEntry[] = [
   pageEntry("academy", { fa: "آکادمی", en: "Academy" }, "/academy", ["آکادمی", "آموزش"], ["academy", "training"], "frontend"),
   pageEntry("about", { fa: "دربارهٔ ما", en: "About" }, "/about", ["درباره", "تیم"], ["about", "team"], "frontend"),
   pageEntry("contact", { fa: "تماس", en: "Contact" }, "/contact", ["تماس", "ارتباط"], ["contact", "talk"], "frontend"),
-  pageEntry("assistant", { fa: "دستیار امت", en: "Emmett assistant" }, "/assistant", ["دستیار", "هوش مصنوعی", "پرسش", "ai"], ["assistant", "ai", "rag", "ask"], "ai"),
+  pageEntry(
+    "assistant",
+    { fa: "دستیار امت", en: "Emmett assistant" },
+    "/assistant",
+    ["دستیار", "هوش مصنوعی", "پرسش", "ai"],
+    ["assistant", "ai", "rag", "ask"],
+    "ai",
+    { fa: "/fa/assistant/", en: "/en/assistant/" },
+  ),
 ];
 
-function pageEntry(id: string, title: { fa: string; en: string }, path: string, keywordsFa: string[], keywordsEn: string[], capability: Capability): RegistryEntry {
+function pageEntry(
+  id: string,
+  title: { fa: string; en: string },
+  path: string,
+  keywordsFa: string[],
+  keywordsEn: string[],
+  capability: Capability,
+  evidenceUrl?: { fa: string; en: string },
+): RegistryEntry {
   return {
     id: `page.${id}`,
     kind: "page",
@@ -60,6 +76,7 @@ function pageEntry(id: string, title: { fa: string; en: string }, path: string, 
     path: { fa: path, en: path },
     keywords: { fa: keywordsFa, en: keywordsEn },
     status: "live",
+    ...(evidenceUrl ? { evidenceUrl } : {}),
   };
 }
 
@@ -150,6 +167,23 @@ export const toolEntries: RegistryEntry[] = [
     updatedFa: "۱۴۰۵/۰۷/۱۰",
   },
   {
+    id: "tool.biolab",
+    kind: "tool",
+    capability: "biotech",
+    title: { fa: "میز کار بیوانفورماتیک", en: "Bioinformatics workbench" },
+    description: { fa: "تحلیل توالی، تبدیل‌ها، خط لولهٔ آزمایشگاه و نمونهٔ FHIR — کاملاً در مرورگر.", en: "Sequence analysis, conversions, a lab pipeline and FHIR samples — entirely in the browser." },
+    path: { fa: "/biolab", en: "/biolab" },
+    keywords: {
+      fa: ["بیوانفورماتیک", "توالی", "دی‌ان‌ای", "فستا", "gc", "orf", "کدون", "تبدیل", "آزمایشگاه", "fhir"],
+      en: ["bioinformatics", "sequence", "dna", "fasta", "gc", "orf", "codon", "translate", "lab", "fhir"],
+    },
+    status: "live",
+    evidenceUrl: { fa: "/fa/biolab/", en: "/en/biolab/" },
+    command: { name: "bio", example: "bio ATGCGTACGTTAGCTAGCTAGC" },
+    version: "1.0.0",
+    updatedFa: "۱۴۰۵/۰۷/۱۰",
+  },
+  {
     id: "tool.jwt",
     kind: "tool",
     capability: "security",
@@ -190,6 +224,15 @@ function commandEntry(id: string, title: { fa: string; en: string }, keywordsFa:
 }
 
 export const registry: RegistryEntry[] = [...pages, ...toolEntries, ...commandEntries];
+
+/** Live artifacts that prove a capability (F-14 matrix). Pages count only with an evidenceUrl. */
+export function liveArtifactsFor(capability: Capability): RegistryEntry[] {
+  return registry.filter(
+    (entry) => entry.capability === capability && entry.status === "live" && Boolean(entry.evidenceUrl?.fa && entry.evidenceUrl?.en),
+  );
+}
+
+export const CAPABILITIES: Capability[] = ["frontend", "backend", "security", "ai", "biotech"];
 
 /* ------------------------------------------------------------------ *
  * Bilingual fuzzy search

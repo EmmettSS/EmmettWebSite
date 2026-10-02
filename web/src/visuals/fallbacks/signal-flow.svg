@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300" role="img" aria-label="Request signal flow">
+  <rect width="1200" height="300" fill="#06120c"/>
+  <path d="M80 150 H1120" stroke="#20b8a8" stroke-opacity="0.4" stroke-width="3"/>
+  <g fill="#06120c" stroke-width="3">
+    <circle cx="80" cy="150" r="22" stroke="#25c779"/>
+    <circle cx="340" cy="150" r="22" stroke="#25c779"/>
+    <circle cx="600" cy="150" r="22" stroke="#20b8a8"/>
+    <circle cx="860" cy="150" r="22" stroke="#9a83d7"/>
+    <circle cx="1120" cy="150" r="22" stroke="#9a83d7"/>
+  </g>
+  <g fill="#3fd0a0">
+    <circle cx="80" cy="150" r="6"/><circle cx="340" cy="150" r="6"/><circle cx="600" cy="150" r="6"/>
+    <circle cx="860" cy="150" r="6"/><circle cx="1120" cy="150" r="6"/>
+  </g>
+</svg>

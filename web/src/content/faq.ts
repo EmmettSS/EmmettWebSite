@@ -3,7 +3,7 @@
  *
  * Rules:
  *  - every claim must be checkable inside this repository or on a page of this site;
- *  - anything that needs a business decision carries an explicit `[INPUT]` marker: the assistant
+ *  - anything that needs a business decision carries an explicit pending marker: the assistant
  *    repeats that marker instead of inventing a number, a client or a promise.
  */
 export type FaqEntry = {

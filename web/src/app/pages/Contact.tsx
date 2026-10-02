@@ -1,8 +1,11 @@
 import { useState, type FormEvent } from "react";
+import { apiPost } from "@/lib/api-client";
+import { emit } from "@/lib/events";
 import { CheckCircle2, LoaderCircle, Send } from "lucide-react";
 import { motion } from "motion/react";
 import { Reveal } from "../components/MotionKit";
 import { useI18n } from "../i18n";
+import { TelegramCta } from "@/features/telegram/TelegramCta";
 import { Footer } from "../components/Footer";
 const copy = {
   en: {
@@ -40,6 +43,7 @@ const copy = {
     successCopy:
       "We will review the context and get back to you within 48 hours.",
     error: "Please complete the required fields with a valid email.",
+    sendFailed: "The message could not be sent right now. Please try again, or use Telegram above.",
   },
   fa: {
     eyebrow: "شروع همکاری با امت",
@@ -76,27 +80,33 @@ const copy = {
     successCopy:
       "زمینه پروژه را بررسی می‌کنیم و حداکثر تا 48 ساعت آینده پاسخ می‌دهیم.",
     error: "لطفاً فیلدهای ضروری و یک ایمیل معتبر وارد کنید.",
+    sendFailed: "پیام همین حالا ارسال نشد. لطفاً دوباره تلاش کنید یا از تلگرام بالای صفحه استفاده کنید.",
   },
 };
 export function Contact() {
   const { lang } = useI18n();
   const t = copy[lang];
-  const [state, setState] = useState<"idle" | "loading" | "success" | "error">(
-    "idle",
-  );
-  const submit = (e: FormEvent<HTMLFormElement>) => {
+  const [state, setState] = useState<"idle" | "loading" | "success" | "error" | "failed">("idle");
+  const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const f = new FormData(e.currentTarget);
-    if (
-      !String(f.get("name") || "").trim() ||
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(f.get("email") || "")) ||
-      !String(f.get("message") || "").trim()
-    ) {
+    const name = String(f.get("name") || "").trim();
+    const email = String(f.get("email") || "").trim();
+    const message = String(f.get("message") || "").trim();
+    if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !message) {
       setState("error");
       return;
     }
     setState("loading");
-    setTimeout(() => setState("success"), 900);
+    try {
+      // Real lead capture: the API stores the lead and enqueues the acknowledgement email.
+      // The success screen appears only after the server accepted it — no fake success.
+      await apiPost("/leads/contact/", { name, email, message, locale: lang });
+      emit("contact_submit", { source: "contact-form" });
+      setState("success");
+    } catch {
+      setState("failed");
+    }
   };
   return (
     <main className="relative min-h-screen bg-[var(--deep)]/92 pt-16 text-[var(--text)]">
@@ -113,6 +123,9 @@ export function Contact() {
               <em>{t.accent}</em>
             </h1>
             <p className="hero-copy">{t.intro}</p>
+            <div className="mt-9 flex flex-wrap items-center gap-4">
+              <TelegramCta source="contact" />
+            </div>
           </div>
           <Reveal>
             {state === "success" ? (
@@ -177,9 +190,9 @@ export function Contact() {
                     className="field resize-none"
                   />
                 </label>
-                {state === "error" && (
+                {(state === "error" || state === "failed") && (
                   <p role="alert" className="mt-4 text-sm text-red-300">
-                    {t.error}
+                    {state === "failed" ? t.sendFailed : t.error}
                   </p>
                 )}
                 <button

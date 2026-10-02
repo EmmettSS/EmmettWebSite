@@ -1,11 +1,14 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { toolMetas } from "../src/features/toolbox/metas";
+import { routeFor, toolMetas } from "../src/features/toolbox/metas";
 import { convertJalali, formatGregorian } from "../src/features/toolbox/jalali/logic";
 import { validateNationalId } from "../src/features/toolbox/kod-meli/logic";
 import { formatTomanFa, parseAmount, tomanToWords } from "../src/features/toolbox/toman/logic";
 import { normalizePersian } from "../src/features/toolbox/matn-farsi/logic";
 import { decodeJwt } from "../src/features/toolbox/jwt/logic";
+import { composition, parseFasta, sanitizeInput, translate } from "../src/features/biolab/logic";
+import { REFERENCE_SAMPLE } from "../src/features/biolab/data/reference";
+import { ogImageFor } from "./og-routes";
 
 /**
  * Every tool page must ship a *real* computed example in the static HTML (SEO + G1):
@@ -47,6 +50,16 @@ function realExample(toolId: string, lang: "fa" | "en"): string {
         ? `توکن نمونه (alg: none) → ${result.warnings.length} هشدار امنیتی، اولین مورد: ${result.warnings[0]?.cwe ?? "—"}`
         : `Sample token (alg: none) → ${result.warnings.length} security warning(s), first: ${result.warnings[0]?.cwe ?? "—"}`;
     }
+    case "biolab": {
+      const record = parseFasta(REFERENCE_SAMPLE.fasta)[0];
+      const cleaned = sanitizeInput(record.sequence);
+      if (cleaned.error) return "";
+      const stats = composition(cleaned.sequence);
+      const protein = translate(cleaned.sequence).slice(0, 30).split("").join(" ");
+      return lang === "fa"
+        ? `نمونهٔ مرجع عمومی MN908947.3: طول ${cleaned.sequence.length}، GC ${stats.gcPercent.toFixed(2)}٪، پروتئین: ${protein}…`
+        : `Public reference sample MN908947.3: ${cleaned.sequence.length} nt, GC ${stats.gcPercent.toFixed(2)}%, protein: ${protein}…`;
+    }
     default:
       return "";
   }
@@ -59,7 +72,44 @@ if (!configuredBase) throw new Error("PUBLIC_SITE_URL is required to emit canoni
 const base = new URL(configuredBase).origin;
 
 type Localized = { title: string; description: string; body: string };
-type Route = { slug: { fa: string; en: string }; fa: Localized; en: Localized; schema: (locale: "fa" | "en", canonical: string) => Record<string, unknown> };
+/** A route emits one or more JSON-LD objects; each becomes its own <script type="application/ld+json">. */
+type Schema = Record<string, unknown>;
+type Route = {
+  slug: { fa: string; en: string };
+  fa: Localized;
+  en: Localized;
+  schema: (locale: "fa" | "en", canonical: string) => Schema | Schema[];
+};
+
+const websiteSchema = (locale: "fa" | "en", canonical: string) => ({
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: locale === "fa" ? "امت" : "Emmett",
+  url: canonical,
+  inLanguage: [...(locale === "fa" ? ["fa-IR"] : ["en"]), "fa-IR", "en"],
+});
+
+/** Home and the top-level marketing routes carry both the organization and the site entity. */
+const homeSchema = (locale: "fa" | "en", canonical: string): Schema[] => [
+  organizationSchema(locale, canonical),
+  websiteSchema(locale, canonical),
+];
+
+/** Breadcrumbs for a nested page, as Google expects them (position starts at 1). */
+const breadcrumbSchema = (locale: "fa" | "en", canonical: string, trail: { name: string; path: string }[]): Schema => ({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: trail.map((crumb, index) => ({
+    "@type": "ListItem",
+    position: index + 1,
+    name: crumb.name,
+    item: `${base}${crumb.path}`,
+  })),
+  url: canonical,
+});
+
+const homeCrumb = (locale: "fa" | "en") => ({ name: locale === "fa" ? "خانه" : "Home", path: `/${locale}/` });
+const toolsCrumb = (locale: "fa" | "en") => ({ name: locale === "fa" ? "ابزارها" : "Tools", path: `/${locale}/tools/` });
 
 const organizationSchema = (locale: "fa" | "en", canonical: string) => ({
   "@context": "https://schema.org",
@@ -74,7 +124,7 @@ const routes: Route[] = [
     slug: { fa: "", en: "" },
     fa: { title: "امت | مهندسی نرم‌افزار و هوش مصنوعی", description: "امت سامانه‌های نرم‌افزاری، هوش مصنوعی و امنیت را برای مسائل واقعی مهندسی می‌کند.", body: "مهندسی سامانه‌های نرم‌افزاری، هوش مصنوعی و امنیت برای مسائل واقعی." },
     en: { title: "Emmett | Software and AI Engineering", description: "Emmett engineers software, AI and security systems for real-world problems.", body: "Software, AI and security engineering for real-world problems." },
-    schema: organizationSchema,
+    schema: homeSchema,
   },
   {
     slug: { fa: "services", en: "services" },
@@ -115,15 +165,108 @@ const routes: Route[] = [
         "@type": "ListItem",
         position: index + 1,
         name: meta.title[locale],
-        url: `${base}/${locale}/tools/${meta.slug[locale]}/`,
+        url: `${base}/${locale}/${routeFor(meta, locale)}/`,
       })),
     }),
   },
+  {
+    slug: { fa: "capabilities", en: "capabilities" },
+    fa: {
+      title: "ماتریس توانمندی امت | هر خانه یک شاهد زنده",
+      description: "پنج توان تیم در یک ماتریس که از رجیستری سایت ساخته می‌شود؛ هر خانه به artifact زنده لینک دارد و خانهٔ بی‌شاهد خاکستری می‌ماند.",
+      body: "ماتریس توانمندی از رجیستری خود سایت ساخته می‌شود: فرانت‌اند، بک‌اند، امنیت، هوش مصنوعی و بیوتکنولوژی؛ هر خانه به یک artifact زنده لینک دارد (ابزارهای محلی، چک‌آپ امنیتی، دستیار و میز کار بیوانفورماتیک) و توان بدون شاهد غیرفعال و خاکستری رندر می‌شود.",
+    },
+    en: {
+      title: "Emmett capability matrix — every cell is live proof",
+      description: "The five team capabilities as a matrix generated from the site registry: every cell links to a live artifact, and a capability without evidence stays grey.",
+      body: "The capability matrix is generated from the site's own registry: frontend, backend, security, AI and biotech. Every cell links to a live artifact (browser tools, the passive security check-up, the assistant and the bioinformatics workbench); a capability without evidence renders disabled and grey.",
+    },
+    schema: (locale, canonical) => [
+      {
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        url: canonical,
+        name: locale === "fa" ? "ماتریس توانمندی امت" : "Emmett capability matrix",
+        numberOfItems: 5,
+      },
+      breadcrumbSchema(locale, canonical, [homeCrumb(locale), { name: locale === "fa" ? "توانمندی‌ها" : "Capabilities", path: `/${locale}/capabilities/` }]),
+    ],
+  },
+  {
+    slug: { fa: "lab/performance", en: "lab/performance" },
+    fa: {
+      title: "آزمایشگاه کارایی امت | اعداد واقعی همین سایت",
+      description: "FPS زنده، Core Web Vitals همین بازدیدکننده، حجم واقعی باندل از CI و سطح دستگاه — همه Measured، بدون عدد ساختگی.",
+      body: "آزمایشگاه کارایی همان چیزی را نشان می‌دهد که اندازه‌گیری می‌شود: حجم واقعی باندل هر روت از خروجی build، Core Web Vitals همین بازدیدکننده از PerformanceObserver، FPS زنده (فقط در حالت تمام) و سطح دستگاه با دلیل انتخابش. در حالت کم‌مصرف، نمودار FPS غیرفعال می‌ماند و همان اعداد به‌صورت جدول می‌آیند.",
+    },
+    en: {
+      title: "Emmett performance lab — this site's real numbers",
+      description: "Live FPS, this visitor's Core Web Vitals, real bundle sizes from CI and the current device tier — measured, never invented.",
+      body: "The performance lab shows what is actually measured: per-route bundle size from the build output, this visitor's Core Web Vitals from PerformanceObserver, live FPS (full tier only) and the device tier with its reason. In low-power mode the FPS chart is disabled and the same numbers are shown as a table.",
+    },
+    schema: (locale, canonical) => [
+      {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        url: canonical,
+        name: locale === "fa" ? "آزمایشگاه کارایی" : "Performance lab",
+      },
+      breadcrumbSchema(locale, canonical, [homeCrumb(locale), { name: locale === "fa" ? "آزمایشگاه" : "Lab", path: `/${locale}/lab/` }, { name: locale === "fa" ? "کارایی" : "Performance", path: `/${locale}/lab/performance/` }]),
+    ],
+  },
+  {
+    slug: { fa: "architect", en: "architect" },
+    fa: {
+      title: "پیشنهاد معماری | امت",
+      description: "سه پرسش، یک دیاگرام واقعاً تولیدشده از گراف قواعد، پشتهٔ پیشنهادی با دلیل و بازهٔ زمان/هزینه با فرض‌های اعلام‌شده.",
+      body: "با سه پرسش دربارهٔ نوع سامانه، مقیاس و قیدها، یک دیاگرام معماری از گراف قواعد ساخته می‌شود (نه قالب ثابت) و پشتهٔ پیشنهادی همراه با دلیل، بازهٔ زمان و بازهٔ هزینهٔ تومان بر پایهٔ جدول نسخه‌دار ارائه می‌شود. بازه‌ها تخمینی و با فرض‌های اعلام‌شده هستند و پیشنهاد قطعی نیستند.",
+    },
+    en: {
+      title: "Architecture advisor — Emmett",
+      description: "Three questions produce a diagram genuinely generated from a rules graph, a recommended stack with reasons, and time/cost ranges with stated assumptions.",
+      body: "Three questions about system type, scale and constraints generate an architecture diagram from a rules graph (not a fixed template), plus a recommended stack with reasons and time and Toman cost ranges from a versioned configuration table. Ranges are estimates with stated assumptions, not a firm proposal.",
+    },
+    schema: (locale, canonical) => [
+      {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        url: canonical,
+        name: locale === "fa" ? "پیشنهاد معماری" : "Architecture advisor",
+      },
+      breadcrumbSchema(locale, canonical, [homeCrumb(locale), { name: locale === "fa" ? "خدمات" : "Services", path: `/${locale}/services/` }, { name: locale === "fa" ? "پیشنهاد معماری" : "Architecture advisor", path: `/${locale}/architect/` }])],
+  },
+  {
+    slug: { fa: "privacy", en: "privacy" },
+    fa: { title: "سیاست حریم خصوصی | امت", description: "چه چیزی جمع می‌شود، چه چیزی هرگز جمع نمی‌شود و حق شما چیست.", body: "ابزارها در مرورگر اجرا می‌شوند و ورودی شما به سرور نمی‌رود؛ دستیار متن پرسش را ذخیره نمی‌کند؛ نتیجهٔ اسکنر پس از هفت روز پاک می‌شود؛ آمار بازدید به‌صورت پیش‌فرض خاموش است." },
+    en: { title: "Privacy policy — Emmett", description: "What is collected, what is never collected and what your rights are.", body: "Tools run in your browser and your input is not sent to our servers; the assistant stores no question text; scanner results are removed after seven days; analytics is off by default." },
+    schema: (locale, canonical) => [
+      { "@context": "https://schema.org", "@type": "WebPage", url: canonical, name: locale === "fa" ? "حریم خصوصی" : "Privacy policy" },
+      breadcrumbSchema(locale, canonical, [homeCrumb(locale), { name: locale === "fa" ? "حریم خصوصی" : "Privacy policy", path: `/${locale}/privacy/` }]),
+    ],
+  },
+  {
+    slug: { fa: "terms", en: "terms" },
+    fa: { title: "شرایط استفاده | امت", description: "شرط‌های استفاده از ابزارهای عمومی، از جمله قواعد اسکن passive.", body: "ابزارها بدون ضمانت ارائه می‌شوند؛ اسکن فقط با تأیید مالکیت و به‌صورت passive انجام می‌شود؛ شرایط پروژه‌های سفارشی در قرارداد جداگانه تعیین می‌شود." },
+    en: { title: "Terms of use — Emmett", description: "Conditions for the public tools, including the passive-scanning rules.", body: "Tools are provided as is; scanning requires ownership confirmation and is passive only; custom engagements are governed by a separate contract." },
+    schema: (locale, canonical) => [
+      { "@context": "https://schema.org", "@type": "WebPage", url: canonical, name: locale === "fa" ? "شرایط استفاده" : "Terms of use" },
+      breadcrumbSchema(locale, canonical, [homeCrumb(locale), { name: locale === "fa" ? "شرایط استفاده" : "Terms of use", path: `/${locale}/terms/` }]),
+    ],
+  },
+  {
+    slug: { fa: "security", en: "security" },
+    fa: { title: "افشای آسیب‌پذیری | امت", description: "مسیر گزارش آسیب‌پذیری، تعهد ما و موارد خارج از دامنه.", body: "آسیب‌پذیری‌ها را با شرح و مسیر بازتولید گزارش کنید؛ در نخستین فرصت پاسخ می‌دهیم؛ تست نفوذ و پورت‌اسکن خارج از دامنه است و پیگیری می‌شود." },
+    en: { title: "Vulnerability disclosure — Emmett", description: "How to report a vulnerability, our commitment, and what is out of scope.", body: "Report vulnerabilities with a description and reproduction steps; we reply at the first working opportunity; penetration testing and port scanning are out of scope and will be acted on." },
+    schema: (locale, canonical) => [
+      { "@context": "https://schema.org", "@type": "WebPage", url: canonical, name: locale === "fa" ? "افشای آسیب‌پذیری" : "Vulnerability disclosure" },
+      breadcrumbSchema(locale, canonical, [homeCrumb(locale), { name: locale === "fa" ? "افشای آسیب‌پذیری" : "Vulnerability disclosure", path: `/${locale}/security/` }]),
+    ],
+  },
   ...toolMetas.map((meta): Route => ({
-    slug: { fa: `tools/${meta.slug.fa}`, en: `tools/${meta.slug.en}` },
+    slug: { fa: routeFor(meta, "fa"), en: routeFor(meta, "en") },
     fa: { title: `ابزار ${meta.title.fa} | امت`, description: meta.description.fa, body: `${meta.title.fa}: ${meta.description.fa} ${realExample(meta.id, "fa")}` },
     en: { title: `${meta.title.en} — Emmett`, description: meta.description.en, body: `${meta.title.en}: ${meta.description.en} ${realExample(meta.id, "en")}` },
-    schema: (locale, canonical) => ({
+    schema: (locale, canonical) => [{
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
       name: meta.title[locale],
@@ -142,9 +285,51 @@ const routes: Route[] = [
             },
           }
         : {}),
-    }),
+    }, breadcrumbSchema(locale, canonical, [homeCrumb(locale), toolsCrumb(locale), { name: meta.title[locale], path: `/${locale}/${routeFor(meta, locale)}/` }])],
   })),
 ];
+
+/**
+ * Replaces the marked OG block in the template with per-route tags. The markers must exist in
+ * index.html — a silent miss would ship a page whose social card is the home page or none.
+ */
+function withOgTags(html: string, tags: string): string {
+  const start = html.indexOf("<!-- og:start");
+  const end = html.indexOf("<!-- og:end -->");
+  if (start < 0 || end < 0) {
+    throw new Error("index.html is missing the og:start/og:end markers required by the static bridge");
+  }
+  return `${html.slice(0, start)}${tags}${html.slice(end + "<!-- og:end -->".length)}`;
+}
+
+function ogTags(input: {
+  locale: "fa" | "en";
+  canonical: string;
+  title: string;
+  description: string;
+  image: string;
+  siteName: string;
+  type: "website" | "article";
+}): string {
+  const escaped = { ...input, canonical: escapeHtml(input.canonical), image: escapeHtml(input.image) };
+  return [
+    `<!-- og:start — generated by render-public-html.ts for ${escaped.locale}/ -->`,
+    `<meta property="og:type" content="${input.type}" />`,
+    `<meta property="og:site_name" content="${escapeHtml(input.siteName)}" />`,
+    `<meta property="og:title" content="${escapeHtml(input.title)}" />`,
+    `<meta property="og:description" content="${escapeHtml(input.description)}" />`,
+    `<meta property="og:locale" content="${input.locale === "fa" ? "fa_IR" : "en_US"}" />`,
+    `<meta property="og:url" content="${escaped.canonical}" />`,
+    `<meta property="og:image" content="${escaped.image}" />`,
+    `<meta property="og:image:width" content="1200" />`,
+    `<meta property="og:image:height" content="630" />`,
+    `<meta name="twitter:card" content="summary_large_image" />`,
+    `<meta name="twitter:title" content="${escapeHtml(input.title)}" />`,
+    `<meta name="twitter:description" content="${escapeHtml(input.description)}" />`,
+    `<meta name="twitter:image" content="${escaped.image}" />`,
+    `<!-- og:end -->`,
+  ].join("");
+}
 
 const escapeHtml = (value: string) => value.replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]!);
 
@@ -156,13 +341,26 @@ for (const route of routes) {
     const canonical = `${base}${pathFor(locale)}`;
     const faCanonical = `${base}${pathFor("fa")}`;
     const enCanonical = `${base}${pathFor("en")}`;
-    const schema = route.schema(locale, canonical);
-    const html = template
+    const schemas = route.schema(locale, canonical);
+    const schemaTags = (Array.isArray(schemas) ? schemas : [schemas])
+      .map((schema) => `<script type="application/ld+json">${JSON.stringify(schema).replace(/</g, "\\u003c")}</script>`)
+      .join("");
+    // Cards are registered by the Persian slug (the canonical identity); the file name carries the locale.
+    const ogImage = `${base}${ogImageFor(route.slug.fa, locale)}`;
+    const html = withOgTags(template, ogTags({
+      locale,
+      canonical,
+      title: copy.title,
+      description: copy.description,
+      image: ogImage,
+      siteName: locale === "fa" ? "امت" : "Emmett",
+      type: "website",
+    }))
       .replace(/<html[^>]*>/, `<html lang="${locale}" dir="${dir}">`)
       .replace(/<title>[^<]*<\/title>/, `<title>${escapeHtml(copy.title)}</title>`)
       .replace(/<meta name="description"[^>]*>/, `<meta name="description" content="${escapeHtml(copy.description)}">`)
       .replace(/<meta name="robots"[^>]*>/, `<meta name="robots" content="index,follow">`)
-      .replace("</head>", `<link rel="canonical" href="${escapeHtml(canonical)}"><link rel="alternate" hreflang="fa" href="${escapeHtml(faCanonical)}"><link rel="alternate" hreflang="en" href="${escapeHtml(enCanonical)}"><link rel="alternate" hreflang="x-default" href="${escapeHtml(faCanonical)}"><script type="application/ld+json">${JSON.stringify(schema).replace(/</g, "\\u003c")}</script></head>`)
+      .replace("</head>", `<link rel="canonical" href="${escapeHtml(canonical)}"><link rel="alternate" hreflang="fa" href="${escapeHtml(faCanonical)}"><link rel="alternate" hreflang="en" href="${escapeHtml(enCanonical)}"><link rel="alternate" hreflang="x-default" href="${escapeHtml(faCanonical)}">${schemaTags}</head>`)
       .replace('<div id="root"></div>', `<div id="root"><main><h1>${escapeHtml(copy.title)}</h1><p>${escapeHtml(copy.body)}</p></main></div>`);
     const target = path.join(dist, locale, ...route.slug[locale].split("/").filter(Boolean), "index.html");
     await mkdir(path.dirname(target), { recursive: true });
@@ -171,6 +369,19 @@ for (const route of routes) {
 }
 
 await writeFile(path.join(dist, "robots.txt"), "User-agent: *\nAllow: /\nSitemap: /sitemap.xml\n");
+
+// Hardening §7: RFC 9116 security.txt. The contact is a URL on this site (valid per spec) and the
+// policy page states that the dedicated security address is still pending ([INPUT B5]).
+const securityTxt = [
+  `Contact: ${base}/fa/security/`,
+  `Contact: ${base}/en/security/`,
+  `Expires: ${new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString()}`,
+  `Canonical: ${base}/.well-known/security.txt`,
+  `Policy: ${base}/fa/security/`,
+  `Preferred-Languages: fa, en`,
+].join("\n");
+await mkdir(path.join(dist, ".well-known"), { recursive: true });
+await writeFile(path.join(dist, ".well-known", "security.txt"), `${securityTxt}\n`, "utf8");
 const links = routes
   .flatMap(({ slug }) => (["fa", "en"] as const).map((locale) => ({ locale, url: `${base}/${locale}/${slug[locale]}${slug[locale] ? "/" : ""}` })))
   .map(({ locale, url }) => {

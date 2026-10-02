@@ -4,7 +4,8 @@
 - Django CSRF middleware برای session/admin و middlewareهای security header فعال‌اند؛ production با `DEBUG=false` HTTPS/HSTS فعال می‌کند.
 - هیچ user code در server اجرا نمی‌شود؛ secrets از env می‌آیند.
 - فایل کاربر در API فعلی پذیرفته نمی‌شود؛ قابلیت upload باید با allowlist mime/size و نام تولیدی اضافه شود.
-- Privacy/legal content هنوز ورودی B9 است.
+- صفحات حقوقی (حریم خصوصی/شرایط/افشای آسیب‌پذیری) منتشر شده‌اند؛ بازبینی حقوقی همچنان ورودی `[INPUT B9]`/`[INPUT B15]` است و در همان صفحه علامت خورده.
+- `.well-known/security.txt` (RFC 9116) با Contact/Policies منتشر می‌شود؛ کانال اختصاصی امنیتی در انتظار `B5` است.
 
 ## F-06 — نگهبان‌های چک‌آپ امنیتی دامنه (فاز ۳)
 
@@ -28,3 +29,22 @@
 - متن پرسش ذخیره نمی‌شود (به‌جز hash برای کش) و به `Job.payload` هم نمی‌ماند.
 - کلید provider فقط از env؛ `NullProvider` پیش‌فرض است و هیچ endpoint خارجی بدون تنظیم صریح صدا زده نمی‌شود.
 - ۲۰ پرسش/ساعت بر IP، حداکثر ۵۰۰ کاراکتر، هانی‌پات، و اعلام صریح AI در هر پاسخ. جزئیات عملیاتی: `docs/AI-OPS.md`.
+
+## بازبینی OWASP Top-10 برای هر سطح (فاز ۵ §۷)
+
+هر ردیف: سطح → کنترل واقعی در کد → شاهد خودکار. آندپوینت‌ها از فهرست واقعی `api/apps/*/urls.py` آمده‌اند.
+
+| OWASP (2021) | سطح‌های در معرض | کنترل پیاده‌شده | شاهد |
+|---|---|---|---|
+| A01 Broken Access Control | `/admin/`, `/api/v1/ops/errors/`, `/api/v1/content/*`, `/api/v1/scanner/results/<id>/unlock/` | `IsAdminUser` روی ops؛ `DEFAULT_PERMISSION_CLASSES = IsAdminUser` در settings و `AllowAny` **صریح و موردی** برای سطوح عمومی؛ جزئیات اسکن فقط با توکن امضاشدهٔ ثبت لید | `test_core.py::TestOpsErrors`, `test_scanner.py::test_unlock_token_is_required_for_internal_detail` |
+| A02 Cryptographic Failures | همهٔ سطوح | HTTPS+HSTS و `SECURE_*` در production؛ هیچ رازی در باندل کلاینت؛ توکن unlock با `django.core.signing` و انقضای ۷ روزه | `emmett/settings.py`, `test_scanner.py` |
+| A03 Injection | ترمینال، ابزارها، دستیار، اسکنر | ORM صرف (بدون SQL خام)؛ ترمینال allow-list است و `eval`/`Function` هرگز اجرا نمی‌شود؛ نرمال‌ساز HTML را escape می‌کند؛ اسکنر ورودی را با regex می‌سنجد | `toolbox/security.test.ts`, `logic.test.ts` (نرمال‌ساز)، `test_scanner.py` |
+| A04 Insecure Design | اسکنر، دستیار، لیدها | رضایت اجباری مسالمت‌آمیز + passive-only؛ سقف هزینهٔ روزانهٔ AI با fallback؛ TTL ۷ روزهٔ نتیجه؛ throttle ۵/ساعت (اسکن و لید)؛ تأخیر مودبانه | `test_scanner.py` (۴ تست نگهبان)، `test_assistant.py::test_cost_cap_reached_falls_back_to_bm25` |
+| A05 Security Misconfiguration | کل سامانه | `DEBUG=false` در production، `SECURE_CONTENT_TYPE_NOSNIFF`, `X_FRAME_OPTIONS=DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, CSP، بدون verbose error عمومی | تنظیمات + `docs/DEPLOYMENT.md` چک‌لیست |
+| A06 Vulnerable Components | وابستگی‌ها | `pip-audit` و `npm audit --audit-level=high` + `gitleaks` در CI | jobهای `api`/`web` در `.github/workflows/ci.yml` |
+| A07 Identification/Auth Failures | admin/session | احراز هویت Django؛ CSRF روی session؛ هیچ سطح ثبت‌نام/رمز عمومی وجود ندارد (کمترین سطح حمله) | settings + `test_core.py` (۴۰۱/۴۰۳ برای ops) |
+| A08 Software & Data Integrity | بکاپ، لینک اشتراکی | `db_backup`/`db_restore` با تأیید صریح `CONFIRM`؛ لینک اشتراکی `noindex` و با شناسهٔ تصادفی؛ SHA-256 artifact باندل در `bundle-stats.json` | dry-run restore (بخش ۴ `LAUNCH-REPORT.md`)، `test_tools.py::test_share_round_trip_and_permanent_noindex_contract` |
+| A09 Logging & Monitoring Failures | عملیات | شمارندهٔ خطای ادمین‌محور (`/api/v1/ops/errors/`)، uptime خارجی، دوناتِ PII در لاگ‌ها (بدون IP، بدون متن پرسش/توکن) | `test_core.py::TestOpsErrors`, `docs/RUNBOOK.md` §۶ |
+| A10 SSRF | اسکنر، دستیار | اسکنر فقط پورت ۸۰/۴۴۳، blocklist پیش از ساخت job، رد RFC1918/localhost و ریدایرکت به پورت دیگر؛ دستیار فقط provider پیکربندی‌شده را صدا می‌زند (پیش‌فرض `NullProvider`) | `test_scanner.py` (نگهبان ۱ و ۴)، `test_assistant.py` (بدون provider → هیچ تماس بیرونی) |
+
+**تست دستی سقف هزینه:** در محیط توسعه پشت provider جعلی (spy) اجرا و تست شد؛ روی میزبان واقعی، رسیدن به سقف نیازمند provider فعال است (`B7`) و همان تست با provider واقعی تکرار می‌شود.

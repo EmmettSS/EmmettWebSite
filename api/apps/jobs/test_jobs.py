@@ -11,9 +11,19 @@ pytestmark = pytest.mark.django_db(transaction=True)
 def test_poll_offset_returns_only_new_steps():
     job = Job.objects.create(kind="scan", progress=[{"step": 1}, {"step": 2}])
     from .polling import PollableJobView
-    from rest_framework.test import APIRequestFactory
+    from django.contrib.auth import get_user_model
+    from rest_framework.test import APIRequestFactory, force_authenticate
 
-    request = APIRequestFactory().get("/?offset=1")
+    factory = APIRequestFactory()
+
+    # Secure by default (OWASP A01): an anonymous poll must not read job state.
+    anonymous = PollableJobView.as_view()(factory.get("/?offset=1"), job.pk)
+    assert anonymous.status_code in (401, 403)
+
+    request = factory.get("/?offset=1")
+    force_authenticate(request, user=get_user_model().objects.create_superuser(
+        username="poller", email="poller@example.test", password="x"
+    ))
     response = PollableJobView.as_view()(request, job.pk)
     assert response.data["progress"] == [{"step": 2}]
     assert response.data["offset_next"] == 2

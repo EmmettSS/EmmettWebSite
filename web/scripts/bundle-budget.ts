@@ -1,4 +1,5 @@
 import { gzipSync } from "node:zlib";
+import { existsSync } from "node:fs";
 import { randomBytes } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
@@ -40,6 +41,11 @@ function assertWithin(label: string, kb: number, budgetKb: number) {
 const initial = await closureKb(entryKey);
 assertWithin("Initial JS", initial.kb, initialBudgetKb);
 
+/** Collected measurements, emitted for F-10 so the lab page shows build truth, not estimates. */
+const measurements: { id: string; kb: number; budgetKb: number }[] = [
+  { id: "initial", kb: initial.kb, budgetKb: initialBudgetKb },
+];
+
 // F-14 §3: the capability matrix must never pull three.js/WebGL into the initial payload.
 for (const file of initial.files) {
   const content = await readFile(path.join(dist, file), "utf8");
@@ -49,13 +55,48 @@ for (const file of initial.files) {
 }
 
 // §5.4: every tool route must stay within its own budget after code-splitting (ADR-005).
-const toolDirs = ["src/features/toolbox/", "src/features/scanner/", "src/features/assistant/"];
+const toolDirs = ["src/features/toolbox/", "src/features/scanner/", "src/features/assistant/", "src/features/biolab/"];
 const toolKeys = Object.keys(manifest).filter((key) => key.endsWith("/index.tsx") && toolDirs.some((dir) => key.startsWith(dir)));
-if (toolKeys.length < 7) throw new Error(`Expected at least seven code-split tool/page routes, found ${toolKeys.length}`);
+if (toolKeys.length < 8) throw new Error(`Expected at least eight code-split tool/page routes, found ${toolKeys.length}`);
 for (const key of toolKeys.sort()) {
   const id = key.split("/").slice(0, -1).pop() ?? key;
   const route = await closureKb(key);
   assertWithin(`Tool route ${id}`, route.kb, routeBudgetKb);
+  measurements.push({ id: `route:${id}`, kb: route.kb, budgetKb: routeBudgetKb });
+}
+
+/**
+ * `--emit <dir>` writes the same numbers the gate just verified, for F-10 (`/lab/performance`).
+ * The lab page reads this file, so it can only ever display measured build output — the page
+ * itself links to the CI artefact that produced it.
+ */
+const emitIndex = process.argv.indexOf("--emit");
+if (emitIndex !== -1) {
+  const target = process.argv[emitIndex + 1];
+  if (!target) throw new Error("--emit requires a directory, e.g. --emit public/data");
+  const { mkdir, writeFile } = await import("node:fs/promises");
+  const { createHash } = await import("node:crypto");
+  await mkdir(target, { recursive: true });
+  const payload = {
+    generatedAt: new Date().toISOString(),
+    source: "web/scripts/bundle-budget.ts (CI: pnpm build && pnpm budget --emit)",
+    budgets: { initialKb: initialBudgetKb, routeKb: routeBudgetKb },
+    measurements,
+    // A single run can only ever report one point; history is appended by CI when it persists
+    // the previous artefact. The lab page renders exactly what it is given and says so.
+    history: [{ at: new Date().toISOString(), initialKb: Number(initial.kb.toFixed(1)), worstRoute: measurements.filter((m) => m.id.startsWith("route:")).sort((a, b) => b.kb - a.kb)[0]?.id ?? "" }],
+    digest: createHash("sha256").update(JSON.stringify(measurements)).digest("hex").slice(0, 16),
+  };
+  const serialized = `${JSON.stringify(payload, null, 2)}\n`;
+  await writeFile(`${target}/bundle-stats.json`, serialized, "utf8");
+  // Mirror into the build that was just measured: the F-10 page fetches this path at runtime, and
+  // a missing file is both a broken lab and a console error — which the Lighthouse gate rejects.
+  const builtCopy = path.join(dist, "data", "bundle-stats.json");
+  if (existsSync(dist)) {
+    await mkdir(path.join(dist, "data"), { recursive: true });
+    await writeFile(builtCopy, serialized, "utf8");
+  }
+  console.log(`Emitted ${measurements.length} measurements → ${target}/bundle-stats.json (sha256:${payload.digest})`);
 }
 
 if (process.argv.includes("--self-test")) {

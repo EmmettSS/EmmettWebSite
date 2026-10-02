@@ -14,7 +14,6 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @emmett/web lint
       - run: pnpm --filter @emmett/web typecheck
-      - run: pnpm --filter @emmett/web test
       - run: pnpm --filter @emmett/web content:check
       - run: pnpm --filter @emmett/web content:check -- --self-test
       - run: pnpm --filter @emmett/web jalali:check
@@ -22,12 +21,34 @@ jobs:
       - run: pnpm --filter @emmett/web tool:contract
       - run: pnpm --filter @emmett/web api:types
       - run: git diff --exit-code -- web/src/lib/api-types.ts
+      # Generated assets first: OG cards and scene fallbacks live in public/ (gitignored) and
+      # `vite build` copies that directory into dist/. Without this step seo:check would look
+      # for og:image files that were never rendered.
+      - run: pnpm --filter @emmett/web assets:render
+      # The build+budget pair runs before the tests: the F-10 tests assert the real artefact
+      # (a missing one must fail, not silently skip), and the lab page fetches it at runtime —
+      # so the Lighthouse `errors-in-console` gate needs it too.
       - run: pnpm --filter @emmett/web build
+      - run: pnpm --filter @emmett/web budget -- --emit public/data
       - run: pnpm --filter @emmett/web budget
       - run: pnpm --filter @emmett/web budget -- --self-test
+      - name: Run unit tests
+        shell: bash
+        run: |
+          set -o pipefail
+          pnpm --filter @emmett/web test 2>&1 | tee /tmp/vitest.log
+      # Same rule as the a11y step below: a red gate must explain itself in the check run, because
+      # the job log is not always reachable.
+      - name: Report unit-test failures
+        if: failure()
+        shell: bash
+        run: |
+          { echo '### vitest log tail'; echo '```'; tail -n 60 /tmp/vitest.log 2>/dev/null; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          node web/scripts/report-vitest-failures.mjs /tmp/vitest.log
+          exit 0
       - run: pnpm --filter @emmett/web seo:render
         env:
-          PUBLIC_SITE_URL: https://example.invalid
+          PUBLIC_SITE_URL: https://ci.example.invalid
       - run: pnpm --filter @emmett/web seo:check
       - run: pnpm --filter @emmett/web exec playwright install --with-deps chromium
       - name: Run a11y (Playwright + axe)
@@ -41,6 +62,16 @@ jobs:
           set -o pipefail
           rm -f /tmp/axe-violations*.json
           pnpm --filter @emmett/web exec playwright test --reporter=list,json 2>&1 | tee /tmp/a11y.log
+      - name: Capture per-feature evidence screenshots (fa + en, zero console errors)
+        shell: bash
+        run: pnpm --filter @emmett/web exec playwright test tests/e2e/evidence.spec.ts --reporter=list
+      - name: Upload feature evidence screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: feature-evidence
+          path: web/test-results/evidence
+          if-no-files-found: warn
       - name: Report a11y failures
         if: failure()
         shell: bash
@@ -48,6 +79,60 @@ jobs:
           { echo '### a11y log tail'; echo '```'; tail -n 80 /tmp/a11y.log 2>/dev/null; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
           node web/scripts/report-playwright-failures.mjs /tmp/a11y.json /tmp/axe-violations.json
           exit 0
+  lighthouse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 9.15.9 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @emmett/web assets:render
+      - run: pnpm --filter @emmett/web build
+      # The lab page fetches /data/bundle-stats.json; without it the browser logs a failed
+      # request and the `errors-in-console` assertion fails. Emit it into the measured build.
+      - run: pnpm --filter @emmett/web budget -- --emit public/data
+      - run: pnpm --filter @emmett/web seo:render
+        env:
+          PUBLIC_SITE_URL: https://ci.example.invalid
+      # The measured directory is the built artifact plus the documented pre-launch stand-in for
+      # the two read-only `/api/` calls the shell makes on load (see the script's header). No page
+      # can silence the browser's own network-log line for a missing backend, and measuring that
+      # absence instead of the app is what used to turn this gate red.
+      - run: node web/scripts/stage-lighthouse-dist.mjs
+      # LHCI does not download a browser and the runner's Chrome is not in a Puppeteer cache, so the
+      # gate needs one installed and pointed at explicitly — the same Chromium the web job uses.
+      - run: pnpm --filter @emmett/web exec playwright install --with-deps chromium
+      - run: echo "CHROME_PATH=$(node web/scripts/browser-path.mjs)" >> "$GITHUB_ENV"
+      # A red gate without a readable reason costs a full round-trip; the log is always uploaded.
+      - name: Lighthouse mobile, low-power tier (Perf >= 90, CLS < 0.1)
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p lhci-logs
+          npx --yes @lhci/cli@0.14.0 autorun --collect.settings.logLevel=verbose 2>&1 | tee lhci-logs/autorun.log
+        working-directory: web
+      - name: Report Lighthouse failures
+        if: failure()
+        shell: bash
+        run: |
+          { echo '### Lighthouse log tail'; echo '```'; tail -n 60 web/lhci-logs/autorun.log 2>/dev/null; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          node web/scripts/report-lighthouse-failures.mjs web/.lighthouseci/assertion-results.json
+          exit 0
+      - name: Upload Lighthouse run log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-logs
+          path: web/lhci-logs
+          if-no-files-found: warn
+      - name: Upload Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports
+          path: web/lhci-reports
   api:
     runs-on: ubuntu-latest
     defaults:

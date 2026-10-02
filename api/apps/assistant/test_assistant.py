@@ -183,6 +183,34 @@ def test_only_changed_content_is_re_embedded(monkeypatch):
     assert AssistantChunk.objects.exclude(embedding=None).count() >= third["embedded"]
 
 
+def test_changed_content_invalidates_cached_answers(monkeypatch):
+    """A re-indexed corpus must not keep serving the answer — especially a cached «پیدا نکردم» —
+    that the old corpus produced: that is exactly the state a fresh deploy lands in."""
+    monkeypatch.setattr(indexer, "get_provider", lambda: SpyProvider())
+    answers.answer_question("سؤال تازه‌ای که هنوز در مطالب نیست", "fa")
+    assert AssistantQueryCache.objects.count() >= 1
+
+    # Nothing changed → the every-5-minutes cron must not wipe the cache.
+    unchanged = indexer.sync_corpus(embed=True, provider=SpyProvider())
+    assert unchanged["chunks"] > 0 and unchanged["cache_invalidated"] == 0
+    assert AssistantQueryCache.objects.count() >= 1
+
+    rows = indexer.chunk_documents()
+    rows[0]["text"] += " نسخهٔ تازه"
+    from .chunking import content_hash
+
+    rows[0]["content_hash"] = content_hash(rows[0]["text"])
+    monkeypatch.setattr(indexer, "chunk_documents", lambda: rows)
+
+    changed = indexer.sync_corpus(embed=True, provider=SpyProvider())
+    assert changed["updated"] >= 1
+    assert changed["cache_invalidated"] >= 1
+    assert AssistantQueryCache.objects.count() == 0
+    # The negative answer is gone too, so the next visitor gets a fresh judgement of the new corpus.
+    fresh = answers.answer_question("سؤال تازه‌ای که هنوز در مطالب نیست", "fa")
+    assert fresh["cached"] is False
+
+
 # --------------------------------------------------------------------------- #
 # 10 — the question text is never retained
 # --------------------------------------------------------------------------- #

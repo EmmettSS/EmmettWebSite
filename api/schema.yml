@@ -291,6 +291,74 @@ paths:
               schema:
                 $ref: '#/components/schemas/Waitlist'
           description: ''
+  /api/v1/ops/errors/:
+    get:
+      operationId: v1_ops_errors_retrieve
+      description: |-
+        Admin-only error counter for the runbook (Phase 5 §6).
+
+        It answers the three questions the daily check asks: is the queue moving, what is failing,
+        and what has the assistant cost today. No visitor data is exposed — only counts.
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpsError'
+          description: ''
+  /api/v1/public/bio/analyze/:
+    post:
+      operationId: v1_public_bio_analyze_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BioAnalyzeRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BioAnalyzeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BioAnalyzeRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BioAnalyzeResponse'
+          description: ''
+  /api/v1/public/bio/codon-tables/:
+    get:
+      operationId: v1_public_bio_codon_tables_retrieve
+      tags:
+      - v1
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CodonTablesResponse'
+          description: ''
+  /api/v1/public/bio/fhir/samples/:
+    get:
+      operationId: v1_public_bio_fhir_samples_retrieve
+      tags:
+      - v1
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FhirSamplesResponse'
+          description: ''
   /api/v1/public/case-studies/:
     get:
       operationId: v1_public_case_studies_retrieve
@@ -682,6 +750,154 @@ components:
       - offset_next
       - progress
       - state
+    BioAnalyzeRequest:
+      type: object
+      properties:
+        sequence:
+          type: string
+          description: FASTA or raw nucleotide sequence (ACGTN). Never stored or logged.
+          maxLength: 500000
+        options:
+          $ref: '#/components/schemas/BioOptions'
+      required:
+      - sequence
+    BioAnalyzeResponse:
+      type: object
+      properties:
+        length:
+          type: integer
+        composition:
+          $ref: '#/components/schemas/Composition'
+        molecular_weight_da:
+          type: number
+          format: double
+        melting_temperature:
+          $ref: '#/components/schemas/MeltingTemperature'
+        orfs:
+          type: array
+          items:
+            $ref: '#/components/schemas/Orf'
+        longest_orf:
+          allOf:
+          - $ref: '#/components/schemas/Orf'
+          nullable: true
+        codon_usage:
+          type: array
+          items:
+            $ref: '#/components/schemas/CodonUsageRow'
+        reverse_complement_preview:
+          type: string
+        protein_preview:
+          type: string
+        options:
+          $ref: '#/components/schemas/BioOptions'
+        header:
+          type: string
+        mode:
+          type: string
+      required:
+      - codon_usage
+      - composition
+      - length
+      - longest_orf
+      - melting_temperature
+      - molecular_weight_da
+      - options
+      - orfs
+      - protein_preview
+      - reverse_complement_preview
+    BioOptions:
+      type: object
+      description: Analysis knobs; every field has a server-side default in `logic.resolve_options`.
+      properties:
+        table:
+          type: string
+        min_orf_aa:
+          type: integer
+          minimum: 1
+        both_strands:
+          type: boolean
+    CodonTable:
+      type: object
+      properties:
+        id:
+          type: string
+        starts:
+          type: array
+          items:
+            type: string
+        stops:
+          type: array
+          items:
+            type: string
+        codons:
+          type: object
+          additionalProperties:
+            type: string
+      required:
+      - codons
+      - id
+      - starts
+      - stops
+    CodonTablesResponse:
+      type: object
+      properties:
+        tables:
+          type: array
+          items:
+            $ref: '#/components/schemas/CodonTable'
+        default:
+          type: string
+        max_sequence_length:
+          type: integer
+      required:
+      - default
+      - max_sequence_length
+      - tables
+    CodonUsageRow:
+      type: object
+      properties:
+        codon:
+          type: string
+        amino:
+          type: string
+        count:
+          type: integer
+        per_thousand:
+          type: number
+          format: double
+      required:
+      - amino
+      - codon
+      - count
+      - per_thousand
+    Composition:
+      type: object
+      properties:
+        length:
+          type: integer
+        counts:
+          type: object
+          additionalProperties:
+            type: integer
+        gc_percent:
+          type: number
+          format: double
+        at_percent:
+          type: number
+          format: double
+        gc_skew:
+          type: number
+          format: double
+        ambiguous:
+          type: integer
+      required:
+      - ambiguous
+      - at_percent
+      - counts
+      - gc_percent
+      - gc_skew
+      - length
     Contact:
       type: object
       properties:
@@ -735,6 +951,28 @@ components:
       required:
       - answer_id
       - helpful
+    FhirSamplesResponse:
+      type: object
+      description: 'Loosely typed on purpose: the payload *is* a FHIR bundle, validated
+        by `fhir.py`.'
+      properties:
+        resourceType:
+          type: string
+        type:
+          type: string
+        entry:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+        validation:
+          type: object
+          additionalProperties: {}
+      required:
+      - entry
+      - resourceType
+      - type
+      - validation
     Health:
       type: object
       properties:
@@ -847,6 +1085,25 @@ components:
       description: |-
         * `fa` - fa
         * `en` - en
+    MeltingTemperature:
+      type: object
+      properties:
+        wallace:
+          type: number
+          format: double
+        gc_formula:
+          type: number
+          format: double
+        salt_molar:
+          type: number
+          format: double
+        method:
+          type: string
+      required:
+      - gc_formula
+      - method
+      - salt_molar
+      - wallace
     Newsletter:
       type: object
       properties:
@@ -914,6 +1171,69 @@ components:
       - normalized
       - rules_version
       - total
+    OpsError:
+      type: object
+      properties:
+        window_hours:
+          type: integer
+        jobs_pending:
+          type: integer
+        jobs_running:
+          type: integer
+        jobs_failed_window:
+          type: integer
+        jobs_failed_total:
+          type: integer
+        jobs_stuck:
+          type: integer
+        oldest_pending_minutes:
+          type: integer
+          nullable: true
+        failures_by_kind:
+          type: object
+          additionalProperties:
+            type: integer
+        assistant_cost_today_usd:
+          type: number
+          format: double
+      required:
+      - assistant_cost_today_usd
+      - failures_by_kind
+      - jobs_failed_total
+      - jobs_failed_window
+      - jobs_pending
+      - jobs_running
+      - jobs_stuck
+      - oldest_pending_minutes
+      - window_hours
+    Orf:
+      type: object
+      properties:
+        start:
+          type: integer
+        end:
+          type: integer
+        frame:
+          type: integer
+        strand:
+          type: string
+        length_nt:
+          type: integer
+        length_aa:
+          type: integer
+        protein:
+          type: string
+        complete:
+          type: boolean
+      required:
+      - complete
+      - end
+      - frame
+      - length_aa
+      - length_nt
+      - protein
+      - start
+      - strand
     RulesEnum:
       enum:
       - yeh
@@ -1124,11 +1444,23 @@ components:
           type: string
         building_en:
           type: string
+        lab_samples_per_day:
+          type: integer
+          nullable: true
+        lab_turnaround_hours:
+          type: integer
+          nullable: true
+        lab_tests_per_sample:
+          type: integer
+          nullable: true
       required:
       - brand_en
       - brand_fa
       - building_en
       - building_fa
+      - lab_samples_per_day
+      - lab_tests_per_sample
+      - lab_turnaround_hours
       - telegram_handle
     SuggestionsResponse:
       type: object
@@ -1252,3 +1584,11 @@ components:
       required:
       - email
       - product
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid

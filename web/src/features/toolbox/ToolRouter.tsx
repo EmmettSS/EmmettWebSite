@@ -1,8 +1,8 @@
 import { lazy, type ComponentType, type LazyExoticComponent } from "react";
-import { Link, useParams } from "react-router";
+import { Link, Navigate, useParams } from "react-router";
 import { useI18n } from "@/app/i18n";
 import { toolsCopy } from "@/content/tools";
-import { toolIdFromSlug, toolMeta } from "./metas";
+import { routeFor, toolIdFromSlug, toolMeta } from "./metas";
 
 /** Every tool is code-split; none of them is part of the initial bundle (ADR-005). */
 const pages: Record<string, LazyExoticComponent<ComponentType>> = {
@@ -22,6 +22,12 @@ export default function ToolRouter() {
   const id = slug ? toolIdFromSlug(slug) : undefined;
   const meta = id ? toolMeta(id) : undefined;
   const Page = id ? pages[id] : undefined;
+
+  // Tools that live outside /tools/* (route override) keep working from their old path,
+  // but always land on the canonical route so no duplicate page is served.
+  if (meta && meta.route && !pages[id ?? ""]) {
+    return <Navigate to={`/${lang}/${routeFor(meta, lang)}/`} replace />;
+  }
 
   if (!meta || !Page) {
     return (

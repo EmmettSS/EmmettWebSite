@@ -15,6 +15,28 @@ export function detectTier(): Tier {
   return "low-power";
 }
 
+/** The raw signals behind `detectTier()` — F-10 shows the visitor *why* their tier was chosen. */
+export type TierDiagnostics = {
+  hardwareConcurrency: number | null;
+  deviceMemory: number | null;
+  reducedMotion: boolean;
+  override: "auto" | "low-power";
+  tier: Tier;
+};
+
+export function describeTier(tier: Tier, override: "auto" | "low-power" = "auto"): TierDiagnostics {
+  if (typeof navigator === "undefined") {
+    return { hardwareConcurrency: null, deviceMemory: null, reducedMotion: false, override, tier };
+  }
+  return {
+    hardwareConcurrency: navigator.hardwareConcurrency ?? null,
+    deviceMemory: (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? null,
+    reducedMotion: window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false,
+    override,
+    tier,
+  };
+}
+
 export function useTier() {
   // Start deterministically to avoid server/client hydration differences.
   const [tier, setTier] = useState<Tier>("balanced");

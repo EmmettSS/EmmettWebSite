@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300" role="img" aria-label="Device tier lattice">
+  <rect width="1200" height="300" fill="#06120c"/>
+  <g fill="#3a4a44">
+    <rect x="40" y="50" width="40" height="34"/><rect x="88" y="50" width="40" height="34"/><rect x="136" y="50" width="40" height="34"/><rect x="184" y="50" width="40" height="34"/><rect x="232" y="50" width="40" height="34"/>
+    <rect x="40" y="130" width="40" height="34"/><rect x="88" y="130" width="40" height="34"/><rect x="136" y="130" width="40" height="34"/><rect x="184" y="130" width="40" height="34"/><rect x="232" y="130" width="40" height="34"/>
+    <rect x="40" y="210" width="40" height="34"/><rect x="88" y="210" width="40" height="34"/><rect x="136" y="210" width="40" height="34"/><rect x="184" y="210" width="40" height="34"/><rect x="232" y="210" width="40" height="34"/>
+  </g>
+  <g>
+    <rect x="40" y="50" width="40" height="34" fill="#25c779" opacity="0.85"/><rect x="88" y="50" width="40" height="34" fill="#25c779" opacity="0.7"/>
+    <rect x="136" y="50" width="40" height="34" fill="#25c779" opacity="0.5"/><rect x="184" y="50" width="40" height="34" fill="#25c779" opacity="0.35"/>
+    <rect x="40" y="130" width="40" height="34" fill="#20b8a8" opacity="0.8"/><rect x="88" y="130" width="40" height="34" fill="#20b8a8" opacity="0.6"/>
+    <rect x="40" y="210" width="40" height="34" fill="#74b86b" opacity="0.7"/>
+  </g>
+</svg>

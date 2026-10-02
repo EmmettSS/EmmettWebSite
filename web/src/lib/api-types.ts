@@ -231,6 +231,76 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/ops/errors/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description Admin-only error counter for the runbook (Phase 5 §6).
+         *
+         *     It answers the three questions the daily check asks: is the queue moving, what is failing,
+         *     and what has the assistant cost today. No visitor data is exposed — only counts.
+         */
+        get: operations["v1_ops_errors_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/bio/analyze/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["v1_public_bio_analyze_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/bio/codon-tables/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_public_bio_codon_tables_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/bio/fhir/samples/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_public_bio_fhir_samples_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/public/case-studies/": {
         parameters: {
             query?: never;
@@ -503,6 +573,65 @@ export interface components {
             result?: unknown;
             error?: string | null;
         };
+        BioAnalyzeRequest: {
+            /** @description FASTA or raw nucleotide sequence (ACGTN). Never stored or logged. */
+            sequence: string;
+            options?: components["schemas"]["BioOptions"];
+        };
+        BioAnalyzeResponse: {
+            length: number;
+            composition: components["schemas"]["Composition"];
+            /** Format: double */
+            molecular_weight_da: number;
+            melting_temperature: components["schemas"]["MeltingTemperature"];
+            orfs: components["schemas"]["Orf"][];
+            longest_orf: components["schemas"]["Orf"] | null;
+            codon_usage: components["schemas"]["CodonUsageRow"][];
+            reverse_complement_preview: string;
+            protein_preview: string;
+            options: components["schemas"]["BioOptions"];
+            header?: string;
+            mode?: string;
+        };
+        /** @description Analysis knobs; every field has a server-side default in `logic.resolve_options`. */
+        BioOptions: {
+            table?: string;
+            min_orf_aa?: number;
+            both_strands?: boolean;
+        };
+        CodonTable: {
+            id: string;
+            starts: string[];
+            stops: string[];
+            codons: {
+                [key: string]: string;
+            };
+        };
+        CodonTablesResponse: {
+            tables: components["schemas"]["CodonTable"][];
+            default: string;
+            max_sequence_length: number;
+        };
+        CodonUsageRow: {
+            codon: string;
+            amino: string;
+            count: number;
+            /** Format: double */
+            per_thousand: number;
+        };
+        Composition: {
+            length: number;
+            counts: {
+                [key: string]: number;
+            };
+            /** Format: double */
+            gc_percent: number;
+            /** Format: double */
+            at_percent: number;
+            /** Format: double */
+            gc_skew: number;
+            ambiguous: number;
+        };
         Contact: {
             name: string;
             /** Format: email */
@@ -523,6 +652,17 @@ export interface components {
         Feedback: {
             answer_id: number;
             helpful: boolean;
+        };
+        /** @description Loosely typed on purpose: the payload *is* a FHIR bundle, validated by `fhir.py`. */
+        FhirSamplesResponse: {
+            resourceType: string;
+            type: string;
+            entry: {
+                [key: string]: unknown;
+            }[];
+            validation: {
+                [key: string]: unknown;
+            };
         };
         Health: {
             status: string;
@@ -567,6 +707,15 @@ export interface components {
          * @enum {string}
          */
         LocaleEnum: "fa" | "en";
+        MeltingTemperature: {
+            /** Format: double */
+            wallace: number;
+            /** Format: double */
+            gc_formula: number;
+            /** Format: double */
+            salt_molar: number;
+            method: string;
+        };
         Newsletter: {
             /** Format: email */
             email: string;
@@ -591,6 +740,30 @@ export interface components {
             changes: components["schemas"]["NormalizeChange"][];
             total: number;
             rules_version: string;
+        };
+        OpsError: {
+            window_hours: number;
+            jobs_pending: number;
+            jobs_running: number;
+            jobs_failed_window: number;
+            jobs_failed_total: number;
+            jobs_stuck: number;
+            oldest_pending_minutes: number | null;
+            failures_by_kind: {
+                [key: string]: number;
+            };
+            /** Format: double */
+            assistant_cost_today_usd: number;
+        };
+        Orf: {
+            start: number;
+            end: number;
+            frame: number;
+            strand: string;
+            length_nt: number;
+            length_aa: number;
+            protein: string;
+            complete: boolean;
         };
         /**
          * @description * `yeh` - yeh
@@ -679,6 +852,9 @@ export interface components {
             telegram_handle: string;
             building_fa: string;
             building_en: string;
+            lab_samples_per_day: number | null;
+            lab_turnaround_hours: number | null;
+            lab_tests_per_sample: number | null;
         };
         SuggestionsResponse: {
             suggestions: unknown[];
@@ -1045,6 +1221,88 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Waitlist"];
+                };
+            };
+        };
+    };
+    v1_ops_errors_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpsError"];
+                };
+            };
+        };
+    };
+    v1_public_bio_analyze_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BioAnalyzeRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["BioAnalyzeRequest"];
+                "multipart/form-data": components["schemas"]["BioAnalyzeRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BioAnalyzeResponse"];
+                };
+            };
+        };
+    };
+    v1_public_bio_codon_tables_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CodonTablesResponse"];
+                };
+            };
+        };
+    };
+    v1_public_bio_fhir_samples_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FhirSamplesResponse"];
                 };
             };
         };

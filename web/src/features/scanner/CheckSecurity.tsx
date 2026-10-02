@@ -1,3 +1,4 @@
+import { emit } from "@/lib/events";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, CheckCircle2, Loader2, ShieldAlert, ShieldCheck } from "lucide-react";
 import { Link, useSearchParams } from "react-router";
@@ -98,6 +99,7 @@ export function CheckSecurity() {
         );
         if (payload?.result_id) {
           const report = await apiGet<ScanResult>(`/scanner/results/${payload.result_id}/`);
+          emit("scan_run", { result_grade: report.grade });
           setResult(report);
           setPhase({ kind: "done", result: report, steps: [] });
           setParams({ id: payload.result_id }, { replace: true });
@@ -295,7 +297,10 @@ export function CheckSecurity() {
             <p className="mt-2 text-xs leading-6 text-white/60">{copy.ctaBody}</p>
             <Link
               to={`/${lang}/products/pentestor`}
-              onClick={() => trackGoal("scan_report_cta", result.domain)}
+              onClick={() => {
+                trackGoal("scan_report_cta", result.domain);
+                emit("pentestor_cta", { source: "scan-report" });
+              }}
               className="mt-3 inline-flex items-center gap-2 rounded-xl border border-[var(--bright)]/60 px-4 py-2 text-sm text-[var(--bright)]"
             >
               {copy.ctaButton}

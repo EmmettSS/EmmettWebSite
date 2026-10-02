@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { emit } from "@/lib/events";
 import { Keyboard } from "lucide-react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useI18n } from "@/app/i18n";
@@ -30,6 +31,12 @@ export function ShellRoot() {
         return;
       }
       if (typing) return;
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        emit("palette_open", { trigger: "keyboard" });
+        setPaletteOpen((value) => !value);
+        return;
+      }
       if (event.key === "`" || (event.key === "/" && !event.metaKey && !event.ctrlKey)) {
         event.preventDefault();
         setTerminalOpen((value) => !value);
@@ -51,7 +58,10 @@ export function ShellRoot() {
     <>
       <button
         type="button"
-        onClick={() => setPaletteOpen(true)}
+        onClick={() => {
+          emit("palette_open", { trigger: "button" });
+          setPaletteOpen(true);
+        }}
         className="fixed bottom-4 end-4 z-[70] hidden items-center gap-2 rounded-2xl border border-[var(--line)] bg-[#06140e]/90 px-3 py-2 text-xs text-white/60 backdrop-blur hover:text-white md:inline-flex"
         aria-keyshortcuts="Meta+K Control+K"
       >

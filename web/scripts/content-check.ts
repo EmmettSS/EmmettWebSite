@@ -2,6 +2,9 @@ import { pages, ui } from "../src/app/content";
 import { siteCopy } from "../src/content/site";
 import { toolsCopy } from "../src/content/tools";
 import { toolMetas } from "../src/features/toolbox/metas";
+import { CAPABILITIES } from "../src/features/registry";
+import { buildMatrix } from "../src/features/capabilities/matrix";
+import { routeFor } from "../src/features/toolbox/metas";
 function compare(path: string, left: unknown, right: unknown, errors: string[] = []): string[] {
   if (Array.isArray(left) || Array.isArray(right)) {
     if (!Array.isArray(left) || !Array.isArray(right) || left.length !== right.length) errors.push(`${path}: array shape mismatch`);
@@ -50,6 +53,43 @@ for (const meta of toolMetas) {
   }
   void localized;
 }
+// F-14 / G1 — a capability may only claim what it can prove: every one of the five
+// capabilities must resolve to at least one live artifact whose evidenceUrl is a real route,
+// and that route must exist in the tool registry or the static page list below.
+const staticRoutes = [
+  "assistant",
+  "capabilities",
+  "lab/performance",
+  "architect",
+  "contact",
+  "privacy",
+  "terms",
+  "security",
+  "services",
+  "tools",
+  "",
+];
+const knownRoutes = new Set<string>([
+  ...staticRoutes,
+  ...toolMetas.flatMap((meta) => [routeFor(meta, "fa"), routeFor(meta, "en")]),
+]);
+for (const row of buildMatrix("fa")) {
+  if (!row.live) errors.push(`capability ${row.capability}: no live artifact with evidenceUrl (G1)`);
+  for (const cell of row.cells) {
+    const path = cell.href.split("?")[0].replace(/^\/(fa|en)\//, "").replace(/\/$/, "");
+    if (!cell.href.startsWith("/fa/") && !cell.href.startsWith("/en/")) {
+      errors.push(`capability ${row.capability}/${cell.id}: evidenceUrl is not an in-app route (${cell.href})`);
+    } else if (!knownRoutes.has(path)) {
+      errors.push(`capability ${row.capability}/${cell.id}: evidenceUrl points at an unknown route (${cell.href})`);
+    }
+  }
+}
+for (const capability of CAPABILITIES) {
+  if (!buildMatrix("en").some((row) => row.capability === capability && row.live)) {
+    errors.push(`capability ${capability}: missing from the English matrix`);
+  }
+}
+
 if (process.argv.includes("--self-test")) {
   const mutated = structuredClone(siteCopy.fa) as Record<string, unknown>;
   delete mutated.notFound;

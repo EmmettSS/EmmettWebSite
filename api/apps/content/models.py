@@ -79,11 +79,28 @@ class SiteConfig(models.Model):
     telegram_handle = models.CharField(max_length=80, blank=True)
     building_fa = models.CharField(max_length=240, blank=True)
     building_en = models.CharField(max_length=240, blank=True)
+    # F-09 tab 3: throughput numbers are *optional* and admin-editable. They stay null until the
+    # lab team supplies real values; the UI renders an explicit not-configured state meanwhile
+    # and never substitutes an invented figure (G1 / card rule 4).
+    lab_samples_per_day = models.PositiveIntegerField(null=True, blank=True)
+    lab_turnaround_hours = models.PositiveIntegerField(null=True, blank=True)
+    lab_tests_per_sample = models.PositiveIntegerField(null=True, blank=True)
 
     class Meta:
         verbose_name = "Site configuration"
         verbose_name_plural = "Site configuration"
 
     def save(self, *args, **kwargs):
+        """Singleton row: always pk=1, and writing it twice updates instead of crashing."""
         self.pk = 1
+        if type(self).objects.filter(pk=1).exists():
+            kwargs.pop("force_insert", None)
+            type(self).objects.filter(pk=1).update(
+                **{
+                    field.attname: getattr(self, field.attname)
+                    for field in self._meta.concrete_fields
+                    if not field.primary_key
+                }
+            )
+            return
         super().save(*args, **kwargs)

@@ -12,6 +12,7 @@ paths = [
   '''^web/src/features/toolbox/jwt/logic\.test\.ts$''',
   '''^web/src/features/toolbox/low-power\.test\.ts$''',
   '''^web/tests/e2e/tools\.spec\.ts$''',
+  '''^web/tests/e2e/evidence\.spec\.ts$''',  # same sample JWT as tools.spec.ts, only to prove the debugger renders it
   '''^web/scripts/render-public-html\.ts$''',
   '''^api/apps/tools/test_tools\.py$''',
   '''^api/apps/scanner/test_scanner\.py$''',

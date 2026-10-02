@@ -9,6 +9,33 @@ import { Link } from "react-router";
 import { useI18n } from "../i18n";
 import { GlowCard, Reveal } from "../components/MotionKit";
 import { Footer } from "../components/Footer";
+import { TierScene } from "@/visuals/TierScene";
+import { HeroSystemStatic } from "@/visuals/fallbacks/HeroSystemStatic";
+import { TelegramCta } from "@/features/telegram/TelegramCta";
+import { useSiteConfig } from "@/lib/site-config";
+
+const capabilityCopy = {
+  fa: {
+    title: "پنج توان، پنج شاهد زنده",
+    note: "هر گره این شبکه یک توان تیم است و به artifact زندهٔ همان توان باز می‌شود؛ روی گره‌ها بروید و خودتان بررسی کنید.",
+  },
+  en: {
+    title: "Five capabilities, five live proofs",
+    note: "Each node is one team capability and opens the live artifact that proves it — hover, click and check for yourself.",
+  },
+} as const;
+
+/** Copy for the SiteConfig-driven "what we are building now" band (Phase 5 §2). */
+const buildingCopy = {
+  fa: {
+    label: "الان چه می‌سازیم",
+    pending: "این خط از پیکربندی سایت خوانده می‌شود و تا ثبت متن تأییدشده خالی می‌ماند — [INPUT B6].",
+  },
+  en: {
+    label: "What we are building now",
+    pending: "This line is read from the site configuration; until approved copy is entered it stays empty — [INPUT B6].",
+  },
+} as const;
 
 const copy = {
   en: {
@@ -16,7 +43,7 @@ const copy = {
     title: "We engineer",
     accent: "intelligent systems.",
     intro:
-      "Emmett turns difficult operational problems into secure, beautifully crafted products powered by AI.",
+      "Emmett turns difficult operational problems into secure, maintainable products — and shows the work instead of describing it.",
     start: "Start a project",
     work: "Explore our work",
     sections: [
@@ -36,7 +63,7 @@ const copy = {
       ],
       [
         "Selected systems",
-        "Real products, real users and measurable operational change.",
+        "Live tools and products, built and maintained by the same team.",
       ],
       [
         "The Field Library",
@@ -82,6 +109,31 @@ const copy = {
 };
 const icons = [BrainCircuit, ShieldCheck, Code2, Sparkles];
 const hrefs = ["services", "products", "projects", "resources"];
+/**
+ * "Now building" — the only place the home page states current work, and it reads it from
+ * `SiteConfig` (editable in the admin). When the team has not filled it in yet, the page says
+ * exactly that instead of inventing a project (MASTER §10: no fabricated claims).
+ */
+function BuildingNow({ lang }: { lang: "fa" | "en" }) {
+  const { status, config } = useSiteConfig();
+  const copyFor = buildingCopy[lang];
+  const text = lang === "fa" ? config?.building_fa : config?.building_en;
+  const ready = status === "ready" && Boolean(text && text.trim());
+
+  return (
+    <p
+      data-testid="building-now"
+      data-state={ready ? "configured" : status === "error" ? "unavailable" : "pending"}
+      className="mt-6 max-w-2xl rounded-2xl border border-[var(--line)] bg-white/[0.02] px-4 py-3 text-sm leading-7 text-white/55"
+    >
+      <span className="font-mono text-[0.7rem] uppercase tracking-widest text-[var(--bright)]/80">
+        {copyFor.label}
+      </span>{" "}
+      {ready ? text : copyFor.pending}
+    </p>
+  );
+}
+
 export function HomeBilingual() {
   const { lang, path } = useI18n();
   const t = copy[lang];
@@ -99,6 +151,7 @@ export function HomeBilingual() {
             <em>{t.accent}</em>
           </h1>
           <p className="hero-copy">{t.intro}</p>
+          <BuildingNow lang={lang} />
           <div className="mt-11 flex flex-wrap gap-4">
             <Link className="primary-btn" to={path("contact")}>
               {t.start}
@@ -107,7 +160,17 @@ export function HomeBilingual() {
             <Link className="ghost-btn" to={path("projects")}>
               {t.work}
             </Link>
+            <TelegramCta source="home" variant="ghost" />
           </div>
+        </div>
+      </section>
+      <section className="relative mx-auto max-w-[1280px] px-6 pb-14 lg:px-12" aria-labelledby="capability-map">
+        <h2 id="capability-map" className="text-2xl text-white/90">
+          {capabilityCopy[lang].title}
+        </h2>
+        <p className="mt-3 max-w-3xl text-sm leading-7 text-white/50">{capabilityCopy[lang].note}</p>
+        <div className="mt-7">
+          <TierScene scene="HeroSystem" height={340} fallback={<HeroSystemStatic />} />
         </div>
       </section>
       <section className="relative mx-auto max-w-[1280px] px-6 pb-28 lg:px-12">

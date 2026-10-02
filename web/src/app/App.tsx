@@ -11,21 +11,32 @@ import { Loader } from "./components/Loader";
 import { Navbar } from "./components/Navbar";
 import { AmbientBackground } from "./components/MotionKit";
 import { LanguageProvider } from "./i18n";
+import { defaultLangTarget, readStoredLang } from "./lang-preference";
 import { HomeBilingual } from "./pages/HomeBilingual";
 import { Page } from "./pages/Page";
 import { Resources } from "./pages/Resources";
 import { Contact } from "./pages/Contact";
+import { Legal } from "./pages/Legal";
 
 const ToolsIndex = lazy(() => import("@/features/toolbox/ToolsIndex"));
 const ToolRouter = lazy(() => import("@/features/toolbox/ToolRouter"));
 const SharePage = lazy(() => import("@/features/toolbox/SharePage"));
 const AssistantPage = lazy(() => import("@/features/assistant"));
+const BiolabPage = lazy(() => import("@/features/biolab"));
+const CapabilitiesPage = lazy(() => import("@/features/capabilities"));
+const PerformanceLabPage = lazy(() => import("@/features/lab/performance"));
+const ArchitectPage = lazy(() => import("@/features/architect"));
 const AssistantWidget = lazy(() => import("@/features/assistant/AssistantWidget").then((module) => ({ default: module.AssistantWidget })));
 const ShellRoot = lazy(() => import("@/features/shell/ShellRoot").then((module) => ({ default: module.ShellRoot })));
 
 function ScrollTop() {
   const { pathname } = useLocation();
-  useEffect(() => window.scrollTo({ top: 0, behavior: "auto" }), [pathname]);
+  // Chrome 153 returns a promise from `window.scrollTo()`; a concise arrow body would hand that
+  // promise to React, which treats any non-function effect return as a broken clean-up and warns.
+  // The block body keeps the effect's return value `undefined` on every browser.
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "auto" });
+  }, [pathname]);
   return null;
 }
 function Site() {
@@ -73,6 +84,9 @@ function Site() {
             <Route path="academy" element={<Page kind="academy" />} />
             <Route path="about" element={<Page kind="about" />} />
             <Route path="contact" element={<Contact />} />
+            <Route path="privacy" element={<Legal kind="privacy" />} />
+            <Route path="terms" element={<Legal kind="terms" />} />
+            <Route path="security" element={<Legal kind="security" />} />
             <Route
               path="tools"
               element={
@@ -94,6 +108,38 @@ function Site() {
               element={
                 <Suspense fallback={<div className="min-h-[60vh]" />}>
                   <AssistantPage />
+                </Suspense>
+              }
+            />
+            <Route
+              path="capabilities"
+              element={
+                <Suspense fallback={<div className="min-h-[60vh]" />}>
+                  <CapabilitiesPage />
+                </Suspense>
+              }
+            />
+            <Route
+              path="lab/performance"
+              element={
+                <Suspense fallback={<div className="min-h-[60vh]" />}>
+                  <PerformanceLabPage />
+                </Suspense>
+              }
+            />
+            <Route
+              path="architect"
+              element={
+                <Suspense fallback={<div className="min-h-[60vh]" />}>
+                  <ArchitectPage />
+                </Suspense>
+              }
+            />
+            <Route
+              path="biolab"
+              element={
+                <Suspense fallback={<div className="min-h-[60vh]" />}>
+                  <BiolabPage />
                 </Suspense>
               }
             />
@@ -125,9 +171,9 @@ export default function App() {
       </AnimatePresence>
       {!loading && (
         <Routes>
-          <Route path="/" element={<Navigate to="/fa" replace />} />
+          <Route path="/" element={<Navigate to={`/${defaultLangTarget(readStoredLang())}`} replace />} />
           <Route path="/:lang/*" element={<Site />} />
-          <Route path="*" element={<Navigate to="/fa" replace />} />
+          <Route path="*" element={<Navigate to={`/${defaultLangTarget(readStoredLang())}`} replace />} />
         </Routes>
       )}
     </BrowserRouter>

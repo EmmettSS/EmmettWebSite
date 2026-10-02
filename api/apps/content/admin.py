@@ -42,4 +42,25 @@ class TeamAdmin(admin.ModelAdmin):
     ordering = ("sort_order",)
 
 
-admin.site.register([Category, Testimonial, SiteConfig])
+class SiteConfigAdmin(admin.ModelAdmin):
+    """Single-row config; the lab numbers are grouped so the team sees what they unlock."""
+
+    fieldsets = (
+        ("Brand", {"fields": ("brand_en", "brand_fa")}),
+        ("Contact", {"fields": ("telegram_handle",)}),
+        ("Building line", {"fields": ("building_fa", "building_en")}),
+        (
+            "Lab pipeline (F-09 tab 3)",
+            {
+                "fields": ("lab_samples_per_day", "lab_turnaround_hours", "lab_tests_per_sample"),
+                "description": "Leave empty until the lab supplies verified numbers; the tool shows a marked not-configured state instead of a guess.",
+            },
+        ),
+    )
+
+    def has_add_permission(self, request):
+        return not SiteConfig.objects.exists()
+
+
+admin.site.register([Category, Testimonial])
+admin.site.register(SiteConfig, SiteConfigAdmin)
