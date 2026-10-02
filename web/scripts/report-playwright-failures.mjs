@@ -12,7 +12,8 @@
 //   A11Y_REPORT=/tmp/axe-violations.json PLAYWRIGHT_JSON_OUTPUT_NAME=/tmp/a11y.json \
 //     playwright test --reporter=list,json
 //   node web/scripts/report-playwright-failures.mjs /tmp/a11y.json /tmp/axe-violations.json
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { basename, dirname, join } from "node:path";
 
 const reportFile = process.argv[2] ?? "/tmp/a11y.json";
 const axeFile = process.argv[3] ?? process.env.A11Y_REPORT ?? "/tmp/axe-violations.json";
@@ -66,10 +67,23 @@ const walk = (suites) => {
 };
 walk(report.suites);
 
-/** $A11Y_REPORT is JSON-lines: one {route, violations} record per failing page. */
-const axePages = [];
+/** $A11Y_REPORT is JSON-lines: one {route, seriousCount, violations} record per analysed page.
+ *  Each Playwright worker writes its own `.w<N>.json` file, so all of them are read. */
+const axeFiles = [];
 if (existsSync(axeFile)) {
-  for (const line of readFileSync(axeFile, "utf8").split("\n")) {
+  axeFiles.push(axeFile);
+} else {
+  const dir = dirname(axeFile);
+  const prefix = basename(axeFile).replace(/\.json$/, "");
+  if (existsSync(dir)) {
+    for (const name of readdirSync(dir)) {
+      if (name.startsWith(prefix) && name.endsWith(".json")) axeFiles.push(join(dir, name));
+    }
+  }
+}
+const axePages = [];
+for (const file of axeFiles) {
+  for (const line of readFileSync(file, "utf8").split("\n")) {
     if (!line.trim()) continue;
     try {
       axePages.push(JSON.parse(line));
@@ -78,6 +92,7 @@ if (existsSync(axeFile)) {
     }
   }
 }
+const analysedRoutes = axePages.map((page) => page.route).filter(Boolean);
 
 const ruleCounts = new Map();
 const buckets = new Map();
@@ -113,6 +128,7 @@ console.log(
       `unexpected=${stats.unexpected ?? 0} expected=${stats.expected ?? 0} flaky=${stats.flaky ?? 0}`,
       `axeRules=${[...ruleCounts].map(([id, count]) => `${id}×${count}`).join(", ") || "none"}`,
       `axePages=${axePages.length}`,
+      `analysed=${[...new Set(analysedRoutes)].slice(0, 30).join(" ") || "none"}`,
       `failingSpecs=${[...new Set(failures.map((failure) => failure.file))].join(", ") || "none"}`,
       `pages=${[...new Set(failures.map((failure) => describe(failure.title)))].join(", ")}`,
     ].join(" ~ "),
@@ -139,6 +155,10 @@ if (chunks.length > budget.length) {
 }
 for (const chunk of budget) console.log(command(`axe: ${chunk}`));
 
+const rawFailures = failures.filter((failure) => !axePages.some((page) => page.route && failure.title.includes(page.route)));
+for (const failure of rawFailures.slice(0, 4)) {
+  console.log(command(`raw: ${failure.file} › ${failure.title} :: ${flatten(failure.message).slice(0, MAX_CHARS - 120)}`));
+}
 if (otherFailures.length) {
   const lines = otherFailures.map((failure) => `${failure.file} › ${failure.title} :: ${flatten(failure.message).slice(0, 220)}`);
   let out = "";

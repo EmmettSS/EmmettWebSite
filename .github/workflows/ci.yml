@@ -39,6 +39,7 @@ jobs:
           PLAYWRIGHT_JSON_OUTPUT_NAME: /tmp/a11y.json
         run: |
           set -o pipefail
+          rm -f /tmp/axe-violations*.json
           pnpm --filter @emmett/web exec playwright test --reporter=list,json 2>&1 | tee /tmp/a11y.log
       - name: Report a11y failures
         if: failure()
@@ -46,7 +47,6 @@ jobs:
         run: |
           { echo '### a11y log tail'; echo '```'; tail -n 80 /tmp/a11y.log 2>/dev/null; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
           node web/scripts/report-playwright-failures.mjs /tmp/a11y.json /tmp/axe-violations.json
-          tail -n 20 /tmp/a11y.log 2>/dev/null | while IFS= read -r line; do echo "::error::a11y-log: ${line:0:900}"; done
           exit 0
   api:
     runs-on: ubuntu-latest

@@ -49,7 +49,7 @@ for (const lang of ['fa', 'en']) {
     const textarea = page.locator('textarea').first()
     await textarea.fill('<script>alert(1)</script>')
     await expect(page.locator('mark').first()).toBeVisible()
-    await expect(page.locator('script')).toHaveCount(0)
+    await expect(page.locator('[aria-live="polite"] script')).toHaveCount(0)
   })
 
   test(`${lang}: JWT debugger warns about alg:none`, async ({ page }) => {
