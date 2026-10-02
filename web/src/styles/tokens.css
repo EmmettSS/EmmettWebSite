@@ -1,0 +1,20 @@
+@theme {
+  --color-brand-emerald: #25c779;
+  --color-brand-forest: #06140e;
+  --color-brand-surface: #0b1d14;
+  --color-capability-frontend: #25c779;
+  --color-capability-backend: #8296aa;
+  --color-capability-security: #20b8a8;
+  --color-capability-ai: #9a83d7;
+  --color-capability-biotech: #74b86b;
+  --spacing-unit: 0.25rem;
+  --radius-card: 1rem;
+  --shadow-card: 0 18px 48px rgb(0 0 0 / 0.18);
+  --duration-fast: 140ms;
+  --duration-base: 240ms;
+  --duration-slow: 420ms;
+}
+:root {
+  --emerald: #25c779; --bright: #72f0ae; --line: rgb(255 255 255 / .10);
+  --surface: #0b1d14; --text: #f4f7f4; --motion-ease: cubic-bezier(.22,1,.36,1);
+}
