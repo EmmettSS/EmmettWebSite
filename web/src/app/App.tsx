@@ -19,6 +19,7 @@ import { Contact } from "./pages/Contact";
 const ToolsIndex = lazy(() => import("@/features/toolbox/ToolsIndex"));
 const ToolRouter = lazy(() => import("@/features/toolbox/ToolRouter"));
 const SharePage = lazy(() => import("@/features/toolbox/SharePage"));
+const AssistantPage = lazy(() => import("@/features/assistant"));
 const AssistantWidget = lazy(() => import("@/features/assistant/AssistantWidget").then((module) => ({ default: module.AssistantWidget })));
 const ShellRoot = lazy(() => import("@/features/shell/ShellRoot").then((module) => ({ default: module.ShellRoot })));
 
@@ -92,7 +93,7 @@ function Site() {
               path="assistant"
               element={
                 <Suspense fallback={<div className="min-h-[60vh]" />}>
-                  <ToolRouter />
+                  <AssistantPage />
                 </Suspense>
               }
             />

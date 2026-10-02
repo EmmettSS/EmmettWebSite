@@ -30,7 +30,21 @@ jobs:
           PUBLIC_SITE_URL: https://example.invalid
       - run: pnpm --filter @emmett/web seo:check
       - run: pnpm --filter @emmett/web exec playwright install --with-deps chromium
-      - run: pnpm --filter @emmett/web a11y
+      - name: Run a11y (Playwright + axe)
+        shell: bash
+        run: |
+          set -o pipefail
+          pnpm --filter @emmett/web a11y 2>&1 | tee /tmp/a11y.log
+      - name: Report a11y failures
+        if: failure()
+        shell: bash
+        run: |
+          set -euo pipefail
+          [ -f /tmp/a11y.log ] || exit 0
+          { echo '### a11y log tail'; echo '```'; tail -n 120 /tmp/a11y.log; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          grep -aE '^\s*[0-9]+\) |✘|Error:|Timed out|strict mode|locator\(|"(id|impact|help|count)":' /tmp/a11y.log | head -80 | while IFS= read -r line; do
+            echo "::error::a11y: ${line}"
+          done
   api:
     runs-on: ubuntu-latest
     defaults:
@@ -53,6 +67,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }  # gitleaks walks the commit range; a shallow clone fails it
       - uses: pnpm/action-setup@v4
         with: { version: 9.15.9 }
       - uses: actions/setup-node@v4
@@ -62,6 +77,10 @@ jobs:
       - uses: gitleaks/gitleaks-action@v2.3.9
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Report gitleaks failures
+        if: failure()
+        shell: bash
+        run: echo "::error::gitleaks failed — see .gitleaks.toml for the documented allowlist (sample JWTs and .env.example placeholders)." 
   queue-race:
     runs-on: ubuntu-latest
     services:
@@ -84,7 +103,11 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: '3.12' }
       - run: pip install -r requirements/dev.txt mysqlclient==2.2.7
-      - run: pytest apps/jobs/test_jobs.py -q
+      - name: Grant the test database to the app user
+        run: |
+          mysql -h 127.0.0.1 -P 3306 -u root -proot -e "GRANT ALL PRIVILEGES ON *.* TO 'emmett'@'%'; FLUSH PRIVILEGES;" && echo "granted emmett the throwaway CI database"
+      - name: Run queue-race test
+        shell: bash
         env:
           DB_ENGINE: mysql
           DB_NAME: emmett
@@ -92,3 +115,16 @@ jobs:
           DB_PASSWORD: emmett
           DB_HOST: 127.0.0.1
           DB_PORT: 3306
+        run: |
+          set -o pipefail
+          pytest apps/jobs/test_jobs.py -q 2>&1 | tee /tmp/pytest.log
+      - name: Report queue-race failures
+        if: failure()
+        shell: bash
+        run: |
+          set -euo pipefail
+          [ -f /tmp/pytest.log ] || exit 0
+          { echo '### queue-race log tail'; echo '```'; tail -n 120 /tmp/pytest.log; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          grep -aE '^(FAILED|ERROR)|^E |>\s*assert|django\.|Error|OperationalError|Permission denied' /tmp/pytest.log | head -60 | while IFS= read -r line; do
+            echo "::error::queue-race: ${line}"
+          done

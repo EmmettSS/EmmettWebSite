@@ -1,0 +1,24 @@
+# Extends the shipped gitleaks rule set. Every allowlist entry below is a *documented* false
+# positive: sample tokens that exist so the JWT debugger has something to show, placeholder
+# values in the example env file, and test fixtures that intentionally look like secrets.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Documented false positives — no real credential ever lives in this repository."
+paths = [
+  '''^\.env\.example$''',
+  '''^web/src/features/toolbox/jwt/Tool\.tsx$''',
+  '''^web/src/features/toolbox/jwt/logic\.test\.ts$''',
+  '''^web/src/features/toolbox/low-power\.test\.ts$''',
+  '''^web/tests/e2e/tools\.spec\.ts$''',
+  '''^web/scripts/render-public-html\.ts$''',
+  '''^api/apps/tools/test_tools\.py$''',
+  '''^api/apps/scanner/test_scanner\.py$''',
+  '''^api/apps/assistant/test_assistant\.py$''',
+]
+regexes = [
+  '''replace-with-a-random-secret''',
+  '''dev-only-insecure-key''',
+  '''example\.invalid''',
+]
