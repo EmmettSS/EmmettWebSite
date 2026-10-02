@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { access, readFile } from "node:fs/promises";
 import path from "node:path";
 import { routeFor, toolIdFromSlug, toolMeta, toolMetas } from "../src/features/toolbox/metas";
 
@@ -113,6 +113,25 @@ const expectedUrls = expected.filter((file) => file.endsWith("index.html")).leng
 if ((sitemap.match(/<url>/g) ?? []).length !== expectedUrls) throw new Error(`Expected ${expectedUrls} sitemap URLs, found ${(sitemap.match(/<url>/g) ?? []).length}`);
 if ((sitemap.match(/<loc>https:\/\//g) ?? []).length !== expectedUrls) throw new Error("Sitemap locations must be absolute HTTPS URLs");
 console.log(`Static Bridge SEO checks passed: ${expectedUrls} HTML pages + sitemap.`);
+
+// Phase 5 §4: every crawlable route must also carry a real Open Graph card — the image file
+// must exist on disk and the tags must point at it (a route shipping the home card is a bug).
+for (const file of expected) {
+  const html = await readFile(path.join(dist, file), "utf8");
+  const lang = file.startsWith("fa/") ? "fa" : "en";
+  const image = html.match(/property="og:image" content="([^"]+)"/)?.[1];
+  const canonical = html.match(/rel="canonical" href="([^"]+)"/)?.[1] ?? "";
+  if (!image) throw new Error(`${file} is missing og:image`);
+  if (!image.endsWith(`-${lang}.png`)) throw new Error(`${file} points at the ${image} card for lang=${lang}`);
+  const asset = image.startsWith("http") ? image.replace(/^https?:\/\/[^/]+/, "") : image;
+  await access(path.join(dist, asset.replace(/^\//, "")));
+  for (const required of ['property="og:title"', 'property="og:description"', 'property="og:url"', 'property="og:locale"', 'name="twitter:card"', 'name="twitter:image"']) {
+    if (!html.includes(required)) throw new Error(`${file} is missing ${required}`);
+  }
+  if (!html.includes(`property="og:url" content="${canonical}"`)) {
+    throw new Error(`${file}: og:url must equal the canonical URL`);
+  }
+}
 
 // Hardening: security.txt must exist and carry the fields RFC 9116 requires.
 {

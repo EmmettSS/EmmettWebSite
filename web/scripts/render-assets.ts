@@ -11,7 +11,7 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { Resvg } from "@resvg/resvg-js";
-import { routeFor, toolMetas } from "../src/features/toolbox/metas";
+import { ogCardCount, ogCards } from "./og-routes";
 
 const root = path.resolve(import.meta.dirname, "..");
 const fallbacksDir = path.join(root, "src", "visuals", "fallbacks");
@@ -51,56 +51,6 @@ function ogCard({ title, subtitle, rtl }: { title: string; subtitle: string; rtl
 </svg>`;
 }
 
-type RouteCard = { file: string; title: { fa: string; en: string }; subtitle: { fa: string; en: string } };
-
-const routes: RouteCard[] = [
-  {
-    file: "home",
-    title: { fa: "مهندسی نرم‌افزار و هوش مصنوعی", en: "Software & AI engineering" },
-    subtitle: { fa: "پنج توان، پنج شاهد زنده", en: "Five capabilities, five live proofs" },
-  },
-  {
-    file: "services",
-    title: { fa: "خدمات مهندسی", en: "Engineering services" },
-    subtitle: { fa: "از مسئله تا سامانهٔ زنده", en: "From problem to living system" },
-  },
-  {
-    file: "tools",
-    title: { fa: "ابزارهای زنده", en: "Live tools" },
-    subtitle: { fa: "بدون شبیه‌سازی، واقعی", en: "Real, not mocked" },
-  },
-  {
-    file: "assistant",
-    title: { fa: "دستیار امت", en: "Emmett assistant" },
-    subtitle: { fa: "پاسخ با ارجاع، یا «پیدا نکردم»", en: "Cited answers, or an honest miss" },
-  },
-  {
-    file: "capabilities",
-    title: { fa: "ماتریس توانمندی", en: "Capability matrix" },
-    subtitle: { fa: "هر خانه یک شاهد زنده", en: "Every cell is live proof" },
-  },
-  {
-    file: "lab-performance",
-    title: { fa: "آزمایشگاه کارایی", en: "Performance lab" },
-    subtitle: { fa: "اعداد واقعی همین سایت", en: "This site's real numbers" },
-  },
-  {
-    file: "architect",
-    title: { fa: "پیشنهاد معماری", en: "Architecture advisor" },
-    subtitle: { fa: "دیاگرام واقعاً تولیدشده", en: "A diagram actually generated" },
-  },
-  {
-    file: "contact",
-    title: { fa: "تماس با امت", en: "Contact Emmett" },
-    subtitle: { fa: "گفت‌وگو دربارهٔ مسئلهٔ فنی", en: "Talk about an engineering problem" },
-  },
-  ...toolMetas.map((meta) => ({
-    file: routeFor(meta, "fa").replace(/\//g, "-"),
-    title: meta.title,
-    subtitle: { fa: "ابزار زندهٔ امت", en: "An Emmett live tool" },
-  })),
-];
-
 await mkdir(path.join(publicDir, "og"), { recursive: true });
 await mkdir(path.join(publicDir, "visuals"), { recursive: true });
 
@@ -110,7 +60,7 @@ for (const name of ["hero-system", "signal-flow", "data-lattice"]) {
 }
 
 let cards = 0;
-for (const route of routes) {
+for (const route of ogCards) {
   for (const lang of ["fa", "en"] as const) {
     const svg = ogCard({ title: route.title[lang], subtitle: route.subtitle[lang], rtl: lang === "fa" });
     await writeFile(path.join(publicDir, "og", `${route.file}-${lang}.png`), render(svg, 1200));
@@ -118,4 +68,5 @@ for (const route of routes) {
   }
 }
 
+if (cards !== ogCardCount) throw new Error(`Rendered ${cards} OG cards but the shared table declares ${ogCardCount}`);
 console.log(`Assets rendered: 3 scene fallbacks (PNG) + ${cards} OG cards (Vazirmatn, fa/en).`);

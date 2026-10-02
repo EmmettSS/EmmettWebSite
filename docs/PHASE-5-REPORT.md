@@ -15,7 +15,7 @@
 | F-13 تلگرام | `TelegramCta` + `buildTelegramLink` با UTM دوزبانه؛ تا `B5` وضعیت صادقانهٔ «پیکربندی‌نشده» (بدون لینک جعلی) |
 | F-14 ماتریس توان | `/fa|en/capabilities/` — هر پنج توان با artifact زنده و شاهد؛ گیت CI مانع ردیف بی‌شاهد |
 | F-12 OWASP زنده | **ساخته نشد، با دلیل مستند** (نیازمند sandbox ایزوله؛ جایگزین: F-06 + صفحهٔ امنیت) |
-| SEO نهایی | `render-public-html` = ۳۸ صفحهٔ دوزبانه، JSON-LD کامل (`Organization`/`WebSite`/`SoftwareApplication`/`HowTo`/`ItemList`/`WebPage`/`BreadcrumbList`) + `BlogPosting` در پل پست‌ها، hreflang دوطرفه با `x-default`، sitemap، robots، **`/.well-known/security.txt`**، ۳۲ کارت OG و ۳ fallback صحنه؛ `seo:check` قرارداد نوع‌ها را اجباری می‌کند |
+| SEO نهایی | `render-public-html` = ۳۸ صفحهٔ دوزبانه، JSON-LD کامل (`Organization`/`WebSite`/`SoftwareApplication`/`HowTo`/`ItemList`/`WebPage`/`BreadcrumbList`) + `BlogPosting` در پل پست‌ها، hreflang دوطرفه با `x-default`، sitemap، robots، **`/.well-known/security.txt`**، ۴۰ کارت OG (۱۵ روت × ۲ زبان؛ شامل کارت پست‌ها برای پل جنگو) و ۳ fallback صحنه؛ `seo:check` قرارداد نوع‌ها را اجباری می‌کند |
 | حقوقی | `/fa|en/{privacy,terms,security}/` + لینک فوتر + `pending` با `[INPUT B9]`/`[INPUT B15]`/`[INPUT B5]` در DOM |
 | Matomo | ۱۳ رویداد نام‌دار و cookieless؛ ردیاب فقط با `VITE_MATOMO_URL`+`VITE_MATOMO_SITE_ID` روشن می‌شود (پیش‌فرض خاموش) |
 | سخت‌سازی | پیش‌فرض امن DRF (`IsAdminUser`)، شمارندهٔ خطای ادمین‌محور `ops/errors`، جدول OWASP در `SECURITY.md`، honeypot/تشخیص ایمیل جعلی، `security.txt`، هدرهای امنیتی + CSP/`Referrer-Policy`، اسکنر passive + رضایت + TTL، بدون لاگ توالی/توکن |

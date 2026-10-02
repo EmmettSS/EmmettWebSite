@@ -51,7 +51,7 @@
 
 ### ✅ ابزارها صفحهٔ SEO مستقل + JSON-LD + OG فارسی دارند
 - **شاهد:** `web/scripts/render-public-html.ts` (مسیرها + JSON-LD)، `web/scripts/assets-render.ts` (کارت‌های OG با Vazirmatn و دو زبان).
-- **شاهد (دستور):** `seo:render` → `38 localized pages`؛ `seo:check` → `38 HTML pages + sitemap` (شامل هر ابزار، هر فیچر P1، حقوقی)؛ `assets:render` → `3 scene fallbacks (PNG) + 32 OG cards`.
+- **شاهد (دستور):** `seo:render` → `38 localized pages`؛ `seo:check` → `38 HTML pages + sitemap` (شامل هر ابزار، هر فیچر P1، حقوقی)؛ `assets:render` → `3 scene fallbacks (PNG) + 40 OG cards`.
 - **قاعدهٔ OG:** کارت بدون متن فارسی ساخته نمی‌شود؛ فونت Vazirmatn در مسیر رندر است.
 
 ### ✅ ابزارها خروجی قابل اشتراک دارند (کارت نتیجه + لینک دائمی)
