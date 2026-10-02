@@ -1,0 +1,40 @@
+import pytest
+from django.core.exceptions import ValidationError
+from django.core.management import call_command
+from rest_framework.test import APIClient
+from .models import Post
+
+pytestmark = pytest.mark.django_db
+
+
+def test_content_published_requires_persian_title_and_body():
+    post = Post(slug="sample", status="published")
+    with pytest.raises(ValidationError):
+        post.full_clean()
+
+
+def test_english_api_falls_back_to_persian_when_untranslated():
+    Post.objects.create(
+        slug="sample", title_fa="عنوان", body_fa="متن", status="published"
+    )
+    response = APIClient().get("/api/v1/public/posts/?lang=en")
+    assert response.status_code == 200
+    assert response.data[0]["title"] == "عنوان" and response.data[0]["body"] == "متن"
+
+
+def test_static_bridge_renders_full_bilingual_html(tmp_path, monkeypatch):
+    Post.objects.create(
+        slug="sample",
+        title_fa="مقاله",
+        body_fa="متن فارسی",
+        title_en="Post",
+        body_en="English text",
+        status="published",
+    )
+    monkeypatch.setenv("STATIC_BRIDGE_DIR", str(tmp_path))
+    monkeypatch.setenv("PUBLIC_SITE_URL", "https://emmett.test")
+    call_command("render_public_html", force=True, verbosity=0)
+    fa = (tmp_path / "fa/posts/sample/index.html").read_text()
+    en = (tmp_path / "en/posts/sample/index.html").read_text()
+    assert "مقاله" in fa and "متن فارسی" in fa and 'hreflang="en"' in fa
+    assert "Post" in en and "English text" in en

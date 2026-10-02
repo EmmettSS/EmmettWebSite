@@ -1,0 +1,455 @@
+openapi: 3.0.3
+info:
+  title: Emmett API
+  version: 1.0.0
+  description: Emmett public and product API
+paths:
+  /api/v1/content/case-studies/:
+    get:
+      operationId: v1_content_case_studies_retrieve
+      tags:
+      - v1
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Content'
+          description: ''
+  /api/v1/content/jobs/:
+    get:
+      operationId: v1_content_jobs_retrieve
+      tags:
+      - v1
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Content'
+          description: ''
+  /api/v1/content/posts/:
+    get:
+      operationId: v1_content_posts_retrieve
+      tags:
+      - v1
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Content'
+          description: ''
+  /api/v1/health/:
+    get:
+      operationId: v1_health_retrieve
+      tags:
+      - v1
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+          description: ''
+  /api/v1/leads/contact/:
+    post:
+      operationId: v1_leads_contact_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Contact'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Contact'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Contact'
+        required: true
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+          description: ''
+  /api/v1/leads/job-application/:
+    post:
+      operationId: v1_leads_job_application_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JobApplication'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/JobApplication'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/JobApplication'
+        required: true
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobApplication'
+          description: ''
+  /api/v1/leads/newsletter/:
+    post:
+      operationId: v1_leads_newsletter_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Newsletter'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Newsletter'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Newsletter'
+        required: true
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Newsletter'
+          description: ''
+  /api/v1/leads/newsletter/confirm/:
+    get:
+      operationId: v1_leads_newsletter_confirm_retrieve
+      tags:
+      - v1
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NewsletterToken'
+          description: ''
+  /api/v1/leads/newsletter/unsubscribe/:
+    post:
+      operationId: v1_leads_newsletter_unsubscribe_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewsletterToken'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/NewsletterToken'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NewsletterToken'
+        required: true
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NewsletterToken'
+          description: ''
+  /api/v1/leads/waitlist/:
+    post:
+      operationId: v1_leads_waitlist_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Waitlist'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Waitlist'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Waitlist'
+        required: true
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Waitlist'
+          description: ''
+  /api/v1/public/case-studies/:
+    get:
+      operationId: v1_public_case_studies_retrieve
+      tags:
+      - v1
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Content'
+          description: ''
+  /api/v1/public/posts/:
+    get:
+      operationId: v1_public_posts_retrieve
+      tags:
+      - v1
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Content'
+          description: ''
+  /api/v1/public/team/:
+    get:
+      operationId: v1_public_team_retrieve
+      tags:
+      - v1
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Team'
+          description: ''
+  /api/v1/public/tools/:
+    get:
+      operationId: v1_public_tools_retrieve
+      tags:
+      - v1
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToolCatalogResponse'
+          description: ''
+  /api/v1/site-config/:
+    get:
+      operationId: v1_site_config_retrieve
+      tags:
+      - v1
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SiteConfig'
+          description: ''
+components:
+  schemas:
+    Contact:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 120
+        email:
+          type: string
+          format: email
+        message:
+          type: string
+          maxLength: 5000
+        locale:
+          allOf:
+          - $ref: '#/components/schemas/LocaleEnum'
+          default: fa
+        website:
+          type: string
+          writeOnly: true
+      required:
+      - email
+      - message
+      - name
+    Content:
+      type: object
+      properties:
+        slug:
+          type: string
+        slug_fa:
+          type: string
+        title:
+          type: string
+        body:
+          type: string
+        published_at:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - body
+      - slug
+      - slug_fa
+      - title
+    Health:
+      type: object
+      properties:
+        status:
+          type: string
+        version:
+          type: string
+        db:
+          type: string
+        uptime:
+          type: integer
+      required:
+      - db
+      - status
+      - uptime
+      - version
+    JobApplication:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 120
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          maxLength: 120
+        cover_letter:
+          type: string
+          maxLength: 5000
+        website:
+          type: string
+          writeOnly: true
+          maxLength: 200
+      required:
+      - email
+      - name
+      - role
+    LocaleEnum:
+      enum:
+      - fa
+      - en
+      type: string
+      description: |-
+        * `fa` - fa
+        * `en` - en
+    Newsletter:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        locale:
+          allOf:
+          - $ref: '#/components/schemas/LocaleEnum'
+          default: fa
+        website:
+          type: string
+      required:
+      - email
+    NewsletterToken:
+      type: object
+      properties:
+        token:
+          type: string
+          maxLength: 400
+      required:
+      - token
+    SiteConfig:
+      type: object
+      properties:
+        brand_en:
+          type: string
+        brand_fa:
+          type: string
+        telegram_handle:
+          type: string
+        building_fa:
+          type: string
+        building_en:
+          type: string
+      required:
+      - brand_en
+      - brand_fa
+      - building_en
+      - building_fa
+      - telegram_handle
+    Team:
+      type: object
+      properties:
+        name_fa:
+          type: string
+        name_en:
+          type: string
+        role_fa:
+          type: string
+        role_en:
+          type: string
+      required:
+      - name_en
+      - name_fa
+      - role_en
+      - role_fa
+    ToolCatalogResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+        count:
+          type: integer
+      required:
+      - count
+      - items
+    Waitlist:
+      type: object
+      properties:
+        product:
+          type: string
+          maxLength: 80
+        email:
+          type: string
+          format: email
+        use_case:
+          type: string
+          maxLength: 2000
+        website:
+          type: string
+      required:
+      - email
+      - product

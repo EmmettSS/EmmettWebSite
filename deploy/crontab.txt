@@ -1,0 +1,7 @@
+# Create a chmod-600 env file outside public_html; set EMMETT_CRON_ENV_FILE per cPanel cron command.
+# That private file must export VIRTUAL_ENV, APP_ROOT, BACKUP_DIR, Django DB/secret settings and SMTP settings.
+* * * * * EMMETT_CRON_ENV_FILE=/home/ACCOUNT/private/EMMETT-cron.env /home/ACCOUNT/APP/deploy/scripts/run-cron.sh scan-jobs
+*/5 * * * * EMMETT_CRON_ENV_FILE=/home/ACCOUNT/private/EMMETT-cron.env /home/ACCOUNT/APP/deploy/scripts/run-cron.sh embed-jobs
+*/10 * * * * EMMETT_CRON_ENV_FILE=/home/ACCOUNT/private/EMMETT-cron.env /home/ACCOUNT/APP/deploy/scripts/run-cron.sh send-outbox
+*/10 * * * * EMMETT_CRON_ENV_FILE=/home/ACCOUNT/private/EMMETT-cron.env /home/ACCOUNT/APP/deploy/scripts/run-cron.sh render-public-html
+30 3 * * * EMMETT_CRON_ENV_FILE=/home/ACCOUNT/private/EMMETT-cron.env /home/ACCOUNT/APP/deploy/scripts/run-cron.sh db-backup
