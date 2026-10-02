@@ -37,14 +37,16 @@
 | SMTP | outbox پر می‌شود اما بدون SMTP ایمیلی ارسال نمی‌شود | مقداردهی B3 و تست ارسال واقعی |
 | بکاپ | `backup.sh`/`restore.sh` روی SQLite تست شد؛ مسیر `mysqldump` روی میزبان تأیید نشده | تست بکاپ/ریستور MySQL و ست‌کردن `BACKUP_DIR` بیرون از `public_html` |
 
-## بررسی‌هایی که فقط در CI معنا دارند (بدون مرورگر در سندباکس)
+## بررسی‌های مرورگری: سنجیده‌شده محلی، تضمین‌شده در CI
 
-| بررسی | جای اجرا | معیار |
-|---|---|---|
-| Lighthouse موبایل (fa/en) | job `lighthouse` در `.github/workflows/ci.yml`، پروفایل low-power | Perf ≥ ۹۰، CLS < ۰٫۱ (A11y ≥ ۹۵ توسط axe) |
-| axe (serious/critical) | `web/tests/e2e/accessibility.spec.ts` (۱۳ روت × ۲ زبان) | صفر violation |
-| Playwright tools/security | `web/tests/e2e/*.spec.ts` | سناریوهای ابزارها و گاردهای امنیتی |
-| صفر خطای console | `web/tests/e2e/evidence.spec.ts` در همان اجرای Playwright (۱۹ صفحه) | هر `console.error`/`pageerror` → شکست؛ در سندباکس مرورگر نصب نمی‌شود (دانلود Chromium مسدود) |
-| شواهد تصویری هر ۹ فیچر P0 | همان spec، artifact به نام `feature-evidence` در job `web` | یک PNG به‌ازای هر فیچر × زبان — الزام `prompts/07-PHASE-5-LAUNCH.md` §۱۰ |
+مرورگر در این محیط با `web/scripts/local-browser.mjs` (بستهٔ `@sparticuz/chromium` هم‌نسخه با `playwright-core`) در دسترس است؛ پس این بررسی‌ها دیگر «CI-only» نیستند و اعداد واقعی‌شان در `docs/LAUNCH-REPORT.md` ثبت شده است. اجرای CI همان گیت‌ها را روی بیلدی که خودش نصب می‌کند دوباره تأیید می‌کند.
 
-> تا زمانی که این چهار مورد در CI سبز نشوند، بندهای مربوطه در `docs/LAUNCH-REPORT.md` با ⚠️ علامت خورده‌اند، نه ✅.
+| بررسی | نتیجهٔ سنجیده‌شدهٔ محلی | جای اجرا در CI | معیار |
+|---|---|---|---|
+| Lighthouse موبایل (fa/en) | ۶ روت ×۲ اجرا: Perf ۰٫۹۹، A11y ۱٫۰۰، CLS ≤ ۰٫۰۱۰۵، صفر خطای console (`All results processed!`) | job `lighthouse` | Perf ≥ ۹۰، CLS < ۰٫۱ (A11y ≥ ۹۵ توسط axe) |
+| axe (serious/critical) | ۲۵ روت × ۲ زبان = ۵۰ صفحه، **صفر violation** | job `web` → `accessibility.spec.ts` | صفر violation |
+| Playwright tools/security | ۹۶ تست در ۵ spec، همه سبز | job `web` | سناریوهای ابزارها و گاردهای امنیتی |
+| صفر خطای console | `evidence.spec.ts` ۱۹ تست سبز (۹ فیچر ×۲ زبان + روت ورود)؛ Lighthouse هم روی ۱۲ اجرا صفر خطا | job `web` (artifact `feature-evidence`) | هر `console.error`/`pageerror` → شکست |
+| شواهد تصویری هر ۹ فیچر P0 | ۱۸ PNG در `web/test-results/evidence/` (۹ فیچر ×۲ زبان) | همان spec، artifact `feature-evidence` | یک PNG به‌ازای هر فیچر × زبان — الزام `prompts/07-PHASE-5-LAUNCH.md` §۱۰ |
+
+> **نکتهٔ محیط اندازه‌گیری:** job لایت‌هاوس بدون بک‌اند اجرا می‌شود و مرورگر خودش خطای شبکهٔ `/api/` را در console ثبت می‌کند (چیزی که هیچ اسکریپت صفحه نمی‌تواند خفه کند). به همین دلیل اندازه‌گیری روی `dist-measure` انجام می‌شود: کپی artifact + پاسخ مستندِ پیش از پیکربندی برای فقط دو فراخوان فقط‌خواندنی `site-config` و `health` (`web/scripts/stage-lighthouse-dist.mjs`). هر مسیر `/api/` دیگری پاسخ ندارد.

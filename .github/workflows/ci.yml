@@ -32,7 +32,20 @@ jobs:
       - run: pnpm --filter @emmett/web budget -- --emit public/data
       - run: pnpm --filter @emmett/web budget
       - run: pnpm --filter @emmett/web budget -- --self-test
-      - run: pnpm --filter @emmett/web test
+      - name: Run unit tests
+        shell: bash
+        run: |
+          set -o pipefail
+          pnpm --filter @emmett/web test 2>&1 | tee /tmp/vitest.log
+      # Same rule as the a11y step below: a red gate must explain itself in the check run, because
+      # the job log is not always reachable.
+      - name: Report unit-test failures
+        if: failure()
+        shell: bash
+        run: |
+          { echo '### vitest log tail'; echo '```'; tail -n 60 /tmp/vitest.log 2>/dev/null; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          node web/scripts/report-vitest-failures.mjs /tmp/vitest.log
+          exit 0
       - run: pnpm --filter @emmett/web seo:render
         env:
           PUBLIC_SITE_URL: https://ci.example.invalid
@@ -83,6 +96,11 @@ jobs:
       - run: pnpm --filter @emmett/web seo:render
         env:
           PUBLIC_SITE_URL: https://ci.example.invalid
+      # The measured directory is the built artifact plus the documented pre-launch stand-in for
+      # the two read-only `/api/` calls the shell makes on load (see the script's header). No page
+      # can silence the browser's own network-log line for a missing backend, and measuring that
+      # absence instead of the app is what used to turn this gate red.
+      - run: node web/scripts/stage-lighthouse-dist.mjs
       # A red gate without a readable reason costs a full round-trip; the log is always uploaded.
       - name: Lighthouse mobile, low-power tier (Perf >= 90, CLS < 0.1)
         shell: bash

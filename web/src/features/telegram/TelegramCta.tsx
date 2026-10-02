@@ -48,12 +48,14 @@ export function TelegramCta({ source, variant = "primary", className = "" }: Tel
           type="button"
           disabled
           aria-disabled="true"
-          className="inline-flex cursor-not-allowed items-center gap-2 rounded-full border border-white/15 px-6 py-3 text-sm text-white/40"
+          className="inline-flex cursor-not-allowed items-center gap-2 rounded-full border border-white/20 bg-black/40 px-6 py-3 text-sm text-white/75"
         >
           <Send className="h-4 w-4" />
           {copy.label}
         </button>
-        <span className="max-w-md font-mono text-[10px] leading-5 text-amber-200/80">{reason}</span>
+        {/* The note must stay legible on any band it lands on (dark hero or emerald CTA strip):
+            a translucent chip gives it its own contrast base instead of borrowing the page's. */}
+        <span className="max-w-md rounded-md bg-black/70 px-2 py-1 font-mono text-[10px] leading-5 text-amber-200">{reason}</span>
       </span>
     );
   }

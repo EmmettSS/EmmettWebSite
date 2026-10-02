@@ -25,13 +25,13 @@ export function HeroSystemStatic() {
               >
                 <span className="text-xs text-white/85">{labelFor(node.capability, lang)}</span>
                 <span className="text-[11px] text-white/55">{entry?.title[lang]}</span>
-                <span className="text-[11px] leading-5 text-white/40">{node.edgeNote[lang]}</span>
+                <span className="text-[11px] leading-5 text-white/55">{node.edgeNote[lang]}</span>
               </Link>
             </li>
           );
         })}
       </ul>
-      <p className="text-[11px] leading-5 text-white/45">
+      <p className="text-[11px] leading-5 text-white/55">
         {lang === "fa"
           ? `${CAPABILITY_EDGES.length} یال: هر یال یک ترکیب واقعی از توان‌هاست.`
           : `${CAPABILITY_EDGES.length} edges: each one is a real combination of capabilities.`}

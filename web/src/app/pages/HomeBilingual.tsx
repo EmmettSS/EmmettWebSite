@@ -18,12 +18,10 @@ const capabilityCopy = {
   fa: {
     title: "پنج توان، پنج شاهد زنده",
     note: "هر گره این شبکه یک توان تیم است و به artifact زندهٔ همان توان باز می‌شود؛ روی گره‌ها بروید و خودتان بررسی کنید.",
-    label: "شبکهٔ توان‌های تیم امت",
   },
   en: {
     title: "Five capabilities, five live proofs",
     note: "Each node is one team capability and opens the live artifact that proves it — hover, click and check for yourself.",
-    label: "The Emmett capability network",
   },
 } as const;
 
@@ -172,7 +170,7 @@ export function HomeBilingual() {
         </h2>
         <p className="mt-3 max-w-3xl text-sm leading-7 text-white/50">{capabilityCopy[lang].note}</p>
         <div className="mt-7">
-          <TierScene scene="HeroSystem" height={340} fallback={<HeroSystemStatic />} label={capabilityCopy[lang].label} />
+          <TierScene scene="HeroSystem" height={340} fallback={<HeroSystemStatic />} />
         </div>
       </section>
       <section className="relative mx-auto max-w-[1280px] px-6 pb-28 lg:px-12">

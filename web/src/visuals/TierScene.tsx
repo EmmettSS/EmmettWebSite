@@ -36,10 +36,9 @@ export type TierSceneProps = {
   /** Fixed height in CSS pixels; keeps CLS at zero (rule 6). */
   height?: number;
   className?: string;
-  label?: string;
 };
 
-export function TierScene({ scene, fallback, minTier, pauseOffscreen = true, height = 320, className = "", label }: TierSceneProps) {
+export function TierScene({ scene, fallback, minTier, pauseOffscreen = true, height = 320, className = "" }: TierSceneProps) {
   const { tier } = useTier();
   const definition = SCENES[scene];
   const minimum = minTier ?? definition.minTier;
@@ -83,6 +82,9 @@ export function TierScene({ scene, fallback, minTier, pauseOffscreen = true, hei
   const started = inView || !pauseOffscreen;
   const showScene = allowed && started;
 
+  // No `aria-label` on the container below, on purpose: a roleless div may not carry one (axe:
+  // aria-prohibited-attr) and the content names itself — the scene renders a labelled capability
+  // list and the fallback renders real links and text.
   return (
     <div
       ref={containerRef}
@@ -92,7 +94,6 @@ export function TierScene({ scene, fallback, minTier, pauseOffscreen = true, hei
       // The box is reserved by CSS, so mounting the scene cannot change layout (rule 6 / CLS).
       style={{ height, contain: "layout paint" }}
       className={`relative w-full overflow-hidden rounded-3xl border border-[var(--line)] bg-[#07130d]/60 ${className}`}
-      aria-label={label}
     >
       {showScene ? (
         <Suspense fallback={<div className="h-full w-full" data-scene-loading="true" />}>

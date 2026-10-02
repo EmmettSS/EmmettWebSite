@@ -177,6 +177,30 @@ for j in Job.objects.filter(state='failed')[:5]:
 
 ---
 
+## ۶.۵ اجرای گیت‌های مرورگری روی ماشین محلی (بدون CDN مسدود)
+
+اگر `playwright install chromium` روی شبکه‌ای کار نمی‌کند (یا می‌خواهید قبل از push همان چیزی را اجرا کنید که CI اجرا می‌کند):
+
+```sh
+cd web
+node scripts/local-browser.mjs            # Chrome for Testing هم‌نسخه با playwright-core را در node_modules/.cache می‌گذارد
+export PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=$(node scripts/local-browser.mjs)
+export LD_LIBRARY_PATH=$(node scripts/local-browser.mjs --lib-dir)
+
+corepack pnpm exec playwright test tests/e2e/evidence.spec.ts      # ۱۹ تست + اسکرین‌شات‌ها در test-results/evidence/
+corepack pnpm exec playwright test tests/e2e/accessibility.spec.ts # ۵۰ تست axe (۲۵ روت ×۲ زبان)
+
+# Lighthouse: اندازه‌گیری روی کپی artifact با پاسخ مستندِ دو فراخوان فقط‌خواندنی /api/
+corepack pnpm build && PUBLIC_SITE_URL=https://<domain> corepack pnpm seo:render
+node scripts/stage-lighthouse-dist.mjs
+CHROME_PATH=$(node scripts/local-browser.mjs) npx --yes @lhci/cli@0.14.0 autorun    # → All results processed!
+```
+
+- `dist-measure/` فقط برای همین اندازه‌گیری است (در `.gitignore`)؛ `dist/` و در نتیجه artifact استقرار هیچ stand-in ندارد.
+- آستانه‌ها در `web/lighthouserc.cjs` است: Perf ≥ ۰٫۹۰، A11y ≥ ۰٫۹۵، CLS ≤ ۰٫۱، `errors-in-console` صفر. اگر روزی مسیر `/api/` تازه‌ای اضافه شد، عمداً در staging پاسخ ندارد تا گیت، خودِ نیاز را نشان دهد.
+
+---
+
 ## ۷. چک‌لیست پیش از هر انتشار
 
 - [ ] `corepack pnpm --filter @emmett/web lint && typecheck && test` سبز

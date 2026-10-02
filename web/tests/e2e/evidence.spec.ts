@@ -6,7 +6,9 @@ import { test, expect, type Page } from '@playwright/test'
  * For every P0 feature this spec:
  *   1. opens the route in fa and en,
  *   2. performs the interaction that produces a result (where the feature has one),
- *   3. asserts the page logged ZERO console errors / page errors (MASTER §10 absolute zero),
+ *   3. asserts the page logged ZERO console errors / page errors (MASTER §10 absolute zero);
+ *      Chrome's own "Failed to load resource" line for an `/api/` call is not a page error — this
+ *      job runs without the API, so those calls must fail and the surfaces must say so honestly,
  *   4. writes a screenshot to test-results/evidence/ (uploaded as a CI artifact).
  *
  * The API is not running in this job, so features must degrade honestly — a visible
@@ -15,14 +17,27 @@ import { test, expect, type Page } from '@playwright/test'
 
 const EVIDENCE_DIR = 'test-results/evidence'
 
-/** Collects console errors and uncaught page errors for one page. */
-function watchErrors(page: Page): string[] {
+/**
+ * Collects console errors and uncaught page errors for one page.
+ *
+ * `errors` are failures. `network` holds Chrome's own "Failed to load resource" log lines, which
+ * no page script can suppress and which this job provokes on purpose: it runs without the API
+ * (every API-dependent surface must show its honest "unavailable" state instead of a result).
+ * Only lines that belong to an `/api/` request are set aside — an app `console.error`, a page
+ * error or a failed resource anywhere else still fails the test.
+ */
+function watchErrors(page: Page): { errors: string[]; network: string[] } {
   const errors: string[] = []
+  const network: string[] = []
   page.on('console', (message) => {
-    if (message.type() === 'error') errors.push(`console: ${message.text()}`)
+    if (message.type() !== 'error') return
+    const text = `console: ${message.text()}`
+    const fromApi = message.text().startsWith('Failed to load resource:') && message.location().url.includes('/api/')
+    if (fromApi) network.push(`${text} @ ${message.location().url}`)
+    else errors.push(text)
   })
   page.on('pageerror', (error) => errors.push(`pageerror: ${error.message}`))
-  return errors
+  return { errors, network }
 }
 
 async function open(page: Page, route: string) {
@@ -108,7 +123,12 @@ const features: Feature[] = [
     en: '/en/tools',
     act: async (page) => {
       await page.keyboard.press('Control+k')
-      await expect(page.getByPlaceholder(/جستجو|Search/).first()).toBeVisible({ timeout: 10_000 })
+      // Assert the palette itself: the dialog role is stable across languages, while a
+      // copy-based placeholder regex is not (the Persian index box reads «جست‌وجوی ابزار…» with a
+      // ZWNJ, and the palette field has its own prompt in each language).
+      const palette = page.getByRole('dialog')
+      await expect(palette).toBeVisible({ timeout: 10_000 })
+      await expect(palette.locator('input').first()).toBeVisible()
       await page.keyboard.press('Escape')
     },
   },
@@ -137,7 +157,7 @@ const features: Feature[] = [
 for (const feature of features) {
   for (const lang of ['fa', 'en'] as const) {
     test(`${feature.id} ${lang}: works and logs no console error`, async ({ page }) => {
-      const errors = watchErrors(page)
+      const { errors } = watchErrors(page)
       await open(page, feature[lang])
       if (feature.act) await feature.act(page)
       await page.screenshot({ path: `${EVIDENCE_DIR}/${feature.id}-${lang}-${feature.slug}.png`, fullPage: false })
@@ -147,7 +167,7 @@ for (const feature of features) {
 }
 
 test('entry sends a first-time visitor to Persian', async ({ page }) => {
-  const errors = watchErrors(page)
+  const { errors } = watchErrors(page)
   await page.goto('/', { waitUntil: 'networkidle' })
   await expect(page).toHaveURL(/\/fa\/?$/)
   expect(errors).toEqual([])

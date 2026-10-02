@@ -1,6 +1,6 @@
 # Launch Report — پذیرش نهایی (Phase 5)
 
-**تاریخ:** ۱۴۰۵/۰۷/۱۰ (۲۰۲۶‑۱۰‑۰۲) · **کامیت پایهٔ گزارش:** `53b21d4` روی شاخهٔ `arena/01a0fbfb-emmettwebsite` · **نویسنده:** عامل ساخت
+**تاریخ:** ۱۴۰۵/۰۷/۱۰ (۲۰۲۶‑۱۰‑۰۲) · **کامیت پایهٔ گزارش:** `f017906` + کامیت شواهد/گیت‌های مرورگری روی شاخهٔ `arena/01a0fbfb-emmettwebsite` · **نویسنده:** عامل ساخت
 **روش:** هر بند `MASTER §10` با **شاهد قابل بازتولید** (فرمان + خروجی) آمده است. هر بندی که به ورودی تیم یا میزبان واقعی نیاز دارد، صریحاً «مسدود» علامت خورده و در `docs/OPEN-ITEMS.md` با مارکر `[INPUT Bx]` ثبت شده است. **طبق قاعدهٔ MASTER، بند بدون شاهد «انجام‌نشده» شمرده می‌شود**؛ جدول‌های زیر دربارهٔ همین قاعده صادق‌اند.
 
 ## ⚠️ تشخیص راه‌اندازی در یک نگاه
@@ -9,7 +9,7 @@
 |---|---|
 | ✅ آمادهٔ انتشار محلی | کد، تست‌ها، بودجه، SEO، Static Bridge، بکاپ/restore، cron، اسکن زنده |
 | ⛔ مسدود به‌خاطر میزبان/تیم | استقرار روی cPanel واقعی (`B2`)، دامنه و SSL، MySQL production، آدرس Matomo (`B4`)، هندل تلگرام (`B5`)، بازبینی حقوقی (`B9`) و SLA امنیتی (`B15`)، Dash/شماره تماس (`B16`) |
-| ⚠️ فقط در CI قابل اثبات | Lighthouse موبایل Perf ≥ ۹۰ / CLS < ۰٫۱ و axe در هر دو زبان (مرورگر در این محیط سندباکس وجود ندارد) |
+| ✅ سنجیده‌شده (محلی + CI) | Lighthouse موبایل در پروفایل low-power روی ۶ روت ×۲ اجرا (Perf ۰٫۹۹، A11y ۱٫۰۰، CLS ≤ ۰٫۰۱، صفر خطای console) و axe روی ۲۵ روت ×۲ زبان (صفر violation) — جزئیات و روش بازتولید در همین سند |
 | ⏸ طولانی/راهبردی (خارج از دامنهٔ این انتشار) | اجرای end-to-end صف CRM، چند‌منطقه‌ای‌سازی، i18n بیش از دو زبان |
 
 ---
@@ -87,14 +87,39 @@
 ### ✅ بودجهٔ لایه‌ای: روت‌های اصلی ≤ ۲۰۰ KB gzip
 - **شاهد (دستور):** `corepack pnpm --filter @emmett/web build && budget` → `Initial JS: 142.5 KB gzip (budget 200 KB)`؛ خروجی کامل ۹ اندازه‌گیری در `public/data/bundle-stats.json` (sha256: `d6f4c1bb4cd0f579`) که در صفحهٔ F-10 «آزمایشگاه کارایی» نمایش داده می‌شود. همهٔ روت‌های `/tools/*` و `/lab/*` زیر ۳۵۰ KB و ≥۸ روت code-split هستند.
 
-### ⚠️ Lighthouse موبایل، هر دو زبان: Perf ≥ ۹۰ (در low-power) و A11y ≥ ۹۵، CLS < ۰٫۱
-- **وضعیت:** در CI اجرا می‌شود (`web/lighthouse/*.json` به‌عنوان artifact، job `lighthouse` با آستانهٔ Perf≥90/CLS<0.1 و پروفایل low-power). **در این سندباکس مرورگر وجود ندارد، پس عدد واقعی هنوز ثبت نشده است** → گیت تا اولین اجرای CI «سبز نشده» شمرده می‌شود.
-- **شاهد (تست‌های جایگزین قابل اجرا همین‌جا):** `a11y` (Playwright+axe، fa و en) و `seo:check` + تست‌های TierGate که همان ریسک‌ها (CLS 容器، canvas اضافه، کنتراست، alt) را پوشش می‌دهند.
-- **ثبت:** در `docs/OPEN-ITEMS.md` به‌عنوان «فقط CI».
+### ✅ Lighthouse موبایل، هر دو زبان: Perf ≥ ۹۰ (در low-power) و A11y ≥ ۹۵، CLS < ۰٫۱
+- **شاهد (اعداد واقعی، ۱۲ اجرا روی ۶ روت):** `npx @lhci/cli autorun` → `All results processed!` (خروج ۰). آستانه‌ها: `categories:performance ≥ 0.90`، `categories:accessibility ≥ 0.95`، `cumulative-layout-shift ≤ 0.1`، `errors-in-console = 0`.
+
+| روت | Perf | A11y | CLS | LCP |
+|---|---|---|---|---|
+| `/fa/` | ۰٫۹۹ | ۱٫۰۰ | ۰٫۰۰۰۶ | ۰٫۴۵ s |
+| `/en/` | ۰٫۹۹ | ۱٫۰۰ | ۰٫۰۰۰۹ | ۰٫۴۰ s |
+| `/fa/tools/` | ۰٫۹۹ | ۱٫۰۰ | ۰٫۰۰۳۸ | ۰٫۲۹ s |
+| `/en/tools/` | ۰٫۹۹ | ۱٫۰۰ | ۰٫۰۰۰۱ | ۰٫۳۸ s |
+| `/fa/biolab/` | ۰٫۹۹ | ۱٫۰۰ | ۰٫۰۱۰۵ | ۰٫۴۵ s |
+| `/en/biolab/` | ۰٫۹۹ | ۱٫۰۰ | ۰٫۰۰۰۱ | ۰٫۳۸ s |
+
+  · هر روت ۲ اجرا؛ عدد جدول بدترین اجراست. هر ۱۲ اجرا **صفر خطای console** دارند (`errors-in-console = 1`) و TBT در همه ۰ ms است.
+  · گزارش‌های خام: `web/lhci-reports/*.report.{json,html}` (پوشه در `.gitignore` است و در CI به‌عنوان artifact بسته‌بندی می‌شود).
+- **چرا معتبر است (سه نکته، همه در `web/lighthouserc.cjs`):**
+  ۱. **حالت low-power واقعاً رویت می‌شود:** `scripts/lighthouse-low-power.cjs` پیش از هر URL مقدار `emmett:low-power` را در localStorage می‌نویسد و `settings.disableStorageReset` جلوی پاک‌شدن آن را می‌گیرد؛ همان فلگی که `lib/device-tier` می‌خواند. اگر این اتصال قطع شود، صحنهٔ WebGL بارگذاری می‌شود و Perf با اختلاف زیاد سقوط می‌کند.
+  ۲. **محیط اندازه‌گیری، خودِ artifact است:** `staticDistDir: ./dist-measure` که با `scripts/stage-lighthouse-dist.mjs` از `dist/` ساخته می‌شود. این کپی، تنها تفاوتش با artifact استقرار این است که دو فراخوان فقط‌خواندنی `/api/v1/site-config/` و `/api/v1/health/` را با **همان payload پیش از پیکربندی** پاسخ می‌دهد (پیش‌فرض‌های مدل + قرارداد health). دلیل: در این job بک‌اند اجرا نمی‌شود و مرورگر خودش خطای شبکهٔ `/api/` را در console می‌نویسد — چیزی که هیچ اسکریپت صفحه نمی‌تواند خفه کند؛ بدون این stand-in، `errors-in-console` در واقع «نبود بک‌اند» را می‌سنجید، نه سایت را. هر مسیر `/api/` دیگری عمداً پاسخ ندارد (فقط دو مسیر بالا) و هیچ‌چیز نمایش‌دادنی جعل نمی‌شود: همهٔ فیلدهای اختیاری خالی/null می‌مانند تا UI همان حالت‌های «پیکربندی‌نشده» را نشان دهد.
+  ۳. **مرورگر همان نسخهٔ CI:** اسکریپت `scripts/local-browser.mjs` بیلد Chrome for Testing هم‌نسخه با `playwright-core` را از npm (بستهٔ `@sparticuz/chromium`) می‌گیرد؛ در CI، `playwright install --with-deps chromium` همین بیلد را نصب می‌کند.
+- **بازتولید محلی (بدون CDN مسدود):**
+  ```sh
+  corepack pnpm --filter @emmett/web build
+  PUBLIC_SITE_URL=https://ci.example.invalid corepack pnpm --filter @emmett/web seo:render
+  cd web && node scripts/local-browser.mjs && node scripts/stage-lighthouse-dist.mjs
+  CHROME_PATH=$(node scripts/local-browser.mjs) LD_LIBRARY_PATH=$(node scripts/local-browser.mjs --lib-dir) \
+    npx --yes @lhci/cli@0.14.0 autorun          # → All results processed!
+  ```
 
 ### ✅ همهٔ تست‌ها سبز (pytest، vitest، Playwright fa+en، content:check)
 - **شاهد:** `pytest -q` → `100 passed, 1 skipped` · `vitest run` → `25 files / 157 tests passed` · `content:check` → `Bilingual content parity passed for all siteCopy, page content and UI keys` (+ self-test تشخیص ترجمهٔ غایب) · `corpus:check` → `corpus is in sync (7 pages, 8 tools, 10 FAQ)`.
-- **Playwright (fa+en):** ۷۲ تست در ۴ فایل (`web/tests/e2e/`)، شامل spec تازهٔ شواهد (`evidence.spec.ts`) که برای هر ۹ فیچر P0 در دو زبان **اسکرین‌شات** می‌گیرد و **صفر خطای console** را assert می‌کند؛ این spec در CI اجرا و به‌عنوان artifact `feature-evidence` آپلود می‌شود. در این سندباکس مرورگر نصب‌شدنی نیست (دانلود Chromium مسدود است)، پس اجرای واقعی‌اش در CI انجام می‌شود — در `OPEN-ITEMS` علامت خورده است.
+- **Playwright (fa+en):** ۹۶ تست در ۵ فایل (`web/tests/e2e/`)، اجراشده روی Chrome for Testing ۱۵۳ (همان بیلد CI) با `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`:
+  · `evidence.spec.ts` → **۱۹ passed**: هر ۹ فیچر P0 در دو زبان با تعامل واقعی + **صفر خطای console/pageerror** به‌ازای هر صفحه، و ۱۸ اسکرین‌شات در `web/test-results/evidence/*.png` (در CI به‌عنوان artifact `feature-evidence` آپلود می‌شود) — این همان «شاهد تصویری هر ۹ فیچر» موردِ خواستهٔ §۱۰ است.
+  · `accessibility.spec.ts` → **۵۰ passed**: ۲۵ روت × {fa,en} با axe-core (`wcag2a/2aa/21a/21aa`)؛ گزارش JSONL (`A11Y_REPORT`) برای **۵۰ صفحه** صفر violation در همهٔ سطوح دارد (نه فقط serious/critical).
+  · دو فایل دیگر (ابزارها + گاردهای امنیتی) همان‌جا اجرا می‌شوند؛ جزئیات شمارش در `docs/PHASE-5-REPORT.md`.
 - **شاهد (نوع/لینت):** `tsc --noEmit` پاک، `eslint .` پاک.
 
 ### ✅ Static Bridge: هر روت محتوا بدون JS قابل crawl است
@@ -158,4 +183,4 @@
 ۲. **`B4` (آدرس Matomo):** با تنظیم `VITE_MATOMO_URL`/`VITE_MATOMO_SITE_ID` رویدادها بی‌درنگ فعال می‌شوند؛ **بدون آن هیچ ردیابی‌ای انجام نمی‌شود** (رفتار طراحی‌شده و در صفحهٔ حریم خصوصی اعلام‌شده).
 ۳. **`B5` (هندل تلگرام / ایمیل امنیتی):** CTA و VDP با وضعیت «پیکربندی‌نشده» و مارکر `[INPUT B5]` کار می‌کنند.
 ۴. **`B9`/`B15`:** بازبینی حقوقی، SLA و کانال گزارش آسیب‌پذیری — متن آماده و مارک‌دار است.
-۵. **CI:** اجرای Lighthouse/axe/Playwright روی سرور CI تا اعداد واقعی کارایی و دسترس‌پذیری ثبت شوند.
+۵. **CI:** همین سه گیت (Lighthouse/axe/Playwright) روی سرور CI هم اجرا می‌شوند تا اعداد محلیِ ثبت‌شده در بالا مستقل تأیید شوند؛ تنها تفاوت محیط، بیلد مرورگری است که CI خودش با `playwright install --with-deps chromium` نصب می‌کند.

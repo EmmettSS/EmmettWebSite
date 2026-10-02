@@ -31,7 +31,12 @@ const ShellRoot = lazy(() => import("@/features/shell/ShellRoot").then((module) 
 
 function ScrollTop() {
   const { pathname } = useLocation();
-  useEffect(() => window.scrollTo({ top: 0, behavior: "auto" }), [pathname]);
+  // Chrome 153 returns a promise from `window.scrollTo()`; a concise arrow body would hand that
+  // promise to React, which treats any non-function effect return as a broken clean-up and warns.
+  // The block body keeps the effect's return value `undefined` on every browser.
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "auto" });
+  }, [pathname]);
   return null;
 }
 function Site() {

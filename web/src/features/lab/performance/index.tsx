@@ -250,7 +250,7 @@ export default function PerformanceLab() {
                 <p className="mt-2 font-mono text-lg text-white/90" data-vital={kind}>
                   {vital ? formatVital(vital) : supportedTypes.length ? copy.vitalsWaiting : copy.notSupported}
                 </p>
-                <p className="mt-2 text-[11px] text-white/40">
+                <p className="mt-2 text-[11px] text-white/55">
                   {copy.threshold}: {VITAL_THRESHOLDS[kind].unit === "score" ? VITAL_THRESHOLDS[kind].goodMax : `${VITAL_THRESHOLDS[kind].goodMax} ms`}
                   {verdict ? ` · ${verdict === "good" ? copy.good : verdict === "needs-improvement" ? copy.needs : copy.poor}` : ""}
                 </p>
@@ -296,7 +296,7 @@ export default function PerformanceLab() {
                   </li>
                 ))}
               </ul>
-              <p className="mt-4 font-mono text-[10px] text-white/40">
+              <p className="mt-4 font-mono text-[10px] text-white/55">
                 {copy.generatedAt}: {bundle.stats.generatedAt} · {copy.digest}: {bundle.stats.digest}
               </p>
             </div>
@@ -373,7 +373,7 @@ export default function PerformanceLab() {
                 </div>
               ))}
             </dl>
-            <p className="text-[11px] text-white/40">
+            <p className="text-[11px] text-white/55">
               {supportedTypes.includes("largest-contentful-paint") ? "" : copy.notSupported}
             </p>
           </div>
@@ -422,7 +422,7 @@ function FpsChart({ samples, label }: { samples: number[]; label: string }) {
           points={samples.map((fps, index) => `${index},${120 - Math.min(120, (fps / 120) * 120)}`).join(" ")}
         />
       </svg>
-      <p className="mt-2 text-[11px] text-white/40">{samples.length ? `${samples.length} frames sampled` : "—"}</p>
+      <p className="mt-2 text-[11px] text-white/55">{samples.length ? `${samples.length} frames sampled` : "—"}</p>
     </figure>
   );
 }
