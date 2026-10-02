@@ -14,7 +14,6 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @emmett/web lint
       - run: pnpm --filter @emmett/web typecheck
-      - run: pnpm --filter @emmett/web test
       - run: pnpm --filter @emmett/web content:check
       - run: pnpm --filter @emmett/web content:check -- --self-test
       - run: pnpm --filter @emmett/web jalali:check
@@ -22,9 +21,14 @@ jobs:
       - run: pnpm --filter @emmett/web tool:contract
       - run: pnpm --filter @emmett/web api:types
       - run: git diff --exit-code -- web/src/lib/api-types.ts
+      # The build+budget pair runs before the tests: the F-10 tests assert the real artefact
+      # (a missing one must fail, not silently skip), and the lab page fetches it at runtime —
+      # so the Lighthouse `errors-in-console` gate needs it too.
       - run: pnpm --filter @emmett/web build
+      - run: pnpm --filter @emmett/web budget -- --emit public/data
       - run: pnpm --filter @emmett/web budget
       - run: pnpm --filter @emmett/web budget -- --self-test
+      - run: pnpm --filter @emmett/web test
       - run: pnpm --filter @emmett/web seo:render
         env:
           PUBLIC_SITE_URL: https://ci.example.invalid
@@ -68,6 +72,9 @@ jobs:
         with: { node-version: 22, cache: pnpm }
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @emmett/web build
+      # The lab page fetches /data/bundle-stats.json; without it the browser logs a failed
+      # request and the `errors-in-console` assertion fails. Emit it into the measured build.
+      - run: pnpm --filter @emmett/web budget -- --emit public/data
       - run: pnpm --filter @emmett/web seo:render
         env:
           PUBLIC_SITE_URL: https://ci.example.invalid

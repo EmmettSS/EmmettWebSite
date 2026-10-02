@@ -1,4 +1,5 @@
 import { gzipSync } from "node:zlib";
+import { existsSync } from "node:fs";
 import { randomBytes } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
@@ -86,7 +87,15 @@ if (emitIndex !== -1) {
     history: [{ at: new Date().toISOString(), initialKb: Number(initial.kb.toFixed(1)), worstRoute: measurements.filter((m) => m.id.startsWith("route:")).sort((a, b) => b.kb - a.kb)[0]?.id ?? "" }],
     digest: createHash("sha256").update(JSON.stringify(measurements)).digest("hex").slice(0, 16),
   };
-  await writeFile(`${target}/bundle-stats.json`, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
+  const serialized = `${JSON.stringify(payload, null, 2)}\n`;
+  await writeFile(`${target}/bundle-stats.json`, serialized, "utf8");
+  // Mirror into the build that was just measured: the F-10 page fetches this path at runtime, and
+  // a missing file is both a broken lab and a console error — which the Lighthouse gate rejects.
+  const builtCopy = path.join(dist, "data", "bundle-stats.json");
+  if (existsSync(dist)) {
+    await mkdir(path.join(dist, "data"), { recursive: true });
+    await writeFile(builtCopy, serialized, "utf8");
+  }
   console.log(`Emitted ${measurements.length} measurements → ${target}/bundle-stats.json (sha256:${payload.digest})`);
 }
 

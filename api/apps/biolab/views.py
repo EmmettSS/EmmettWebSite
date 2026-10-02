@@ -11,6 +11,7 @@ Contract with the card:
 
 from __future__ import annotations
 
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
@@ -20,6 +21,12 @@ from apps.tools.views import _bad_request
 
 from . import logic
 from .fhir import sample_bundle, validate_bundle
+from .serializers import (
+    BioAnalyzeRequestSerializer,
+    BioAnalyzeResponseSerializer,
+    CodonTablesResponseSerializer,
+    FhirSamplesResponseSerializer,
+)
 
 
 class BioWriteThrottle(AnonRateThrottle):
@@ -28,7 +35,9 @@ class BioWriteThrottle(AnonRateThrottle):
     rate = "60/hour"
 
 
+@extend_schema(request=BioAnalyzeRequestSerializer, responses=BioAnalyzeResponseSerializer)
 class BioAnalyzeView(APIView):
+    serializer_class = BioAnalyzeRequestSerializer
     permission_classes = []
     authentication_classes = []
     throttle_classes = [BioWriteThrottle]
@@ -56,7 +65,9 @@ class BioAnalyzeView(APIView):
         return Response(result, status=status.HTTP_200_OK)
 
 
+@extend_schema(responses=CodonTablesResponseSerializer)
 class CodonTablesView(APIView):
+    serializer_class = CodonTablesResponseSerializer
     permission_classes = []
     authentication_classes = []
 
@@ -78,7 +89,9 @@ class CodonTablesView(APIView):
         )
 
 
+@extend_schema(responses=FhirSamplesResponseSerializer)
 class FhirSamplesView(APIView):
+    serializer_class = FhirSamplesResponseSerializer
     permission_classes = []
     authentication_classes = []
 
