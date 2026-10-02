@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { AnimatePresence, motion, useScroll, useSpring } from "motion/react";
 import {
   BrowserRouter,
@@ -15,6 +15,12 @@ import { HomeBilingual } from "./pages/HomeBilingual";
 import { Page } from "./pages/Page";
 import { Resources } from "./pages/Resources";
 import { Contact } from "./pages/Contact";
+
+const ToolsIndex = lazy(() => import("@/features/toolbox/ToolsIndex"));
+const ToolRouter = lazy(() => import("@/features/toolbox/ToolRouter"));
+const SharePage = lazy(() => import("@/features/toolbox/SharePage"));
+const AssistantWidget = lazy(() => import("@/features/assistant/AssistantWidget").then((module) => ({ default: module.AssistantWidget })));
+const ShellRoot = lazy(() => import("@/features/shell/ShellRoot").then((module) => ({ default: module.ShellRoot })));
 
 function ScrollTop() {
   const { pathname } = useLocation();
@@ -66,10 +72,46 @@ function Site() {
             <Route path="academy" element={<Page kind="academy" />} />
             <Route path="about" element={<Page kind="about" />} />
             <Route path="contact" element={<Contact />} />
+            <Route
+              path="tools"
+              element={
+                <Suspense fallback={<div className="min-h-[60vh]" />}>
+                  <ToolsIndex />
+                </Suspense>
+              }
+            />
+            <Route
+              path="tools/:slug"
+              element={
+                <Suspense fallback={<div className="min-h-[60vh]" />}>
+                  <ToolRouter />
+                </Suspense>
+              }
+            />
+            <Route
+              path="assistant"
+              element={
+                <Suspense fallback={<div className="min-h-[60vh]" />}>
+                  <ToolRouter />
+                </Suspense>
+              }
+            />
+            <Route
+              path="share/:id"
+              element={
+                <Suspense fallback={<div className="min-h-[60vh]" />}>
+                  <SharePage />
+                </Suspense>
+              }
+            />
             <Route path="*" element={<Navigate to="." replace />} />
           </Routes>
         </motion.div>
       </AnimatePresence>
+      <Suspense fallback={null}>
+        <ShellRoot />
+        <AssistantWidget />
+      </Suspense>
     </LanguageProvider>
   );
 }

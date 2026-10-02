@@ -17,6 +17,9 @@ jobs:
       - run: pnpm --filter @emmett/web test
       - run: pnpm --filter @emmett/web content:check
       - run: pnpm --filter @emmett/web content:check -- --self-test
+      - run: pnpm --filter @emmett/web jalali:check
+      - run: pnpm --filter @emmett/web corpus:check
+      - run: pnpm --filter @emmett/web tool:contract
       - run: pnpm --filter @emmett/web api:types
       - run: git diff --exit-code -- web/src/lib/api-types.ts
       - run: pnpm --filter @emmett/web build

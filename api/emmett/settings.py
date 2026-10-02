@@ -151,6 +151,22 @@ if not DEBUG and (
     raise ImproperlyConfigured(
         "Production requires SMTP EMAIL_HOST and a real DEFAULT_FROM_EMAIL"
     )
+# F-06: section weights for the passive check-up live in configuration, not in code.
+SCANNER_SECTION_WEIGHTS = {
+    "headers": float(os.getenv("SCANNER_WEIGHT_HEADERS", "0.30")),
+    "tls": float(os.getenv("SCANNER_WEIGHT_TLS", "0.25")),
+    "dns": float(os.getenv("SCANNER_WEIGHT_DNS", "0.15")),
+    "cookies": float(os.getenv("SCANNER_WEIGHT_COOKIES", "0.10")),
+    "content": float(os.getenv("SCANNER_WEIGHT_CONTENT", "0.10")),
+    "leak": float(os.getenv("SCANNER_WEIGHT_LEAK", "0.10")),
+}
+
+# F-08: assistant corpus + provider configuration. Keys only ever come from the environment.
+ASSISTANT_CORPUS_DIR = os.getenv("ASSISTANT_CORPUS_DIR", "")
+ASSISTANT_SITE_CORPUS = os.getenv(
+    "ASSISTANT_SITE_CORPUS", str(BASE_DIR / "apps" / "assistant" / "data" / "site_corpus.json")
+)
+
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = "DENY"
 SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"

@@ -4,6 +4,73 @@
  */
 
 export interface paths {
+    "/api/v1/assistant/ask/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description DRF calls ``view.throttled()`` (not the throttle class), so the view carries the mixin. */
+        post: operations["v1_assistant_ask_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/assistant/ask/{job_id}/poll/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Reusable short-poll response. Subclasses define job_kind and permissions. */
+        get: operations["v1_assistant_ask_poll_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/assistant/feedback/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description DRF calls ``view.throttled()`` (not the throttle class), so the view carries the mixin. */
+        post: operations["v1_assistant_feedback_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/assistant/suggestions/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_assistant_suggestions_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/content/case-studies/": {
         parameters: {
             query?: never;
@@ -228,6 +295,73 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/scanner/jobs/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description DRF calls ``view.throttled()`` (not the throttle class), so the view carries the mixin. */
+        post: operations["v1_scanner_jobs_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/scanner/jobs/{job_id}/poll/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Reusable short-poll response. Subclasses define job_kind and permissions. */
+        get: operations["v1_scanner_jobs_poll_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/scanner/results/{result_id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_scanner_results_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/scanner/results/{result_id}/unlock/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description DRF calls ``view.throttled()`` (not the throttle class), so the view carries the mixin. */
+        post: operations["v1_scanner_results_unlock_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/site-config/": {
         parameters: {
             query?: never;
@@ -244,10 +378,131 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/tools/jalali/convert/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_tools_jalali_convert_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/tools/jalali/holidays/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Versioned holiday source. Cached in LocMem; the DB row is the source of truth. */
+        get: operations["v1_tools_jalali_holidays_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/tools/persian-text/normalize/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["v1_tools_persian_text_normalize_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/tools/share/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["v1_tools_share_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/tools/share/{share_id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_tools_share_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/tools/usage/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Aggregate ping only: tool id, locale, completion flag. No input data, no IP. */
+        post: operations["v1_tools_usage_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        Ask: {
+            question: string;
+            /** @default fa */
+            locale: components["schemas"]["LocaleEnum"];
+            session_id?: string;
+            /** @default false */
+            consent_to_log: boolean;
+            website?: string;
+        };
+        AskAccepted: {
+            job_id: number;
+            state: string;
+            mode: string;
+            disclosure: string;
+        };
+        AssistantPollResponse: {
+            job_id: number;
+            state: string;
+            progress: unknown[];
+            offset_next: number;
+            result?: unknown;
+            error?: string | null;
+        };
         Contact: {
             name: string;
             /** Format: email */
@@ -265,11 +520,38 @@ export interface components {
             /** Format: date-time */
             published_at?: string | null;
         };
+        Feedback: {
+            answer_id: number;
+            helpful: boolean;
+        };
         Health: {
             status: string;
             version: string;
             db: string;
             uptime: number;
+        };
+        HolidayCalendarResponse: {
+            year: number;
+            version: string;
+            source: string;
+            coverage: string;
+            note_fa: string;
+            note_en: string;
+            items: components["schemas"]["HolidayItem"][];
+        };
+        HolidayItem: {
+            date: string;
+            label: string;
+            label_en: string;
+            kind: string;
+        };
+        JalaliConvertResponse: {
+            jalali: string;
+            gregorian: string;
+            weekday_fa: string;
+            weekday_en: string;
+            day_of_year: number;
+            leap_year: boolean;
         };
         JobApplication: {
             name: string;
@@ -295,6 +577,102 @@ export interface components {
         NewsletterToken: {
             token: string;
         };
+        NormalizeChange: {
+            rule: string;
+            count: number;
+            samples: string[];
+        };
+        NormalizeRequest: {
+            text: string;
+            rules?: components["schemas"]["RulesEnum"][];
+        };
+        NormalizeResponse: {
+            normalized: string;
+            changes: components["schemas"]["NormalizeChange"][];
+            total: number;
+            rules_version: string;
+        };
+        /**
+         * @description * `yeh` - yeh
+         *     * `kaf` - kaf
+         *     * `digits` - digits
+         *     * `latin-digits` - latin-digits
+         *     * `diacritics` - diacritics
+         *     * `zwnj` - zwnj
+         *     * `spaces` - spaces
+         *     * `quotes` - quotes
+         *     * `ra` - ra
+         *     * `kashida` - kashida
+         * @enum {string}
+         */
+        RulesEnum: "yeh" | "kaf" | "digits" | "latin-digits" | "diacritics" | "zwnj" | "spaces" | "quotes" | "ra" | "kashida";
+        ScanCreatedResponse: {
+            job_id: number;
+            result_id: string | null;
+            domain: string;
+            blocklist_version: string;
+            estimated_seconds: number;
+        };
+        ScanPollResponse: {
+            job_id: number;
+            state: string;
+            progress: unknown[];
+            offset_next: number;
+            result?: unknown;
+            error?: string | null;
+        };
+        ScanRequest: {
+            domain: string;
+            consent: boolean;
+            /** @default fa */
+            locale: components["schemas"]["LocaleEnum"];
+            website?: string;
+        };
+        ScanResultResponse: {
+            result_id: string;
+            domain: string;
+            grade: string;
+            score: number;
+            created_at: string;
+            expires_at: string;
+            ttl_days: number;
+            noindex: boolean;
+            blocklist_version: string;
+            sections: unknown[];
+            internal: boolean;
+        };
+        ScanUnlock: {
+            /** Format: email */
+            email: string;
+        };
+        ShareCreate: {
+            tool: components["schemas"]["ToolEnum"];
+            /** @default fa */
+            locale: components["schemas"]["LocaleEnum"];
+            summary_fa: string;
+            summary_en: string;
+            params?: {
+                [key: string]: string;
+            };
+        };
+        ShareDetail: {
+            share_id: string;
+            tool: string;
+            locale: string;
+            summary_fa: string;
+            summary_en: string;
+            params: {
+                [key: string]: unknown;
+            };
+            /** Format: date-time */
+            created_at: string;
+        };
+        ShareResponse: {
+            share_id: string;
+            path: string;
+            permanent: boolean;
+            noindex: boolean;
+        };
         SiteConfig: {
             brand_en: string;
             brand_fa: string;
@@ -302,17 +680,49 @@ export interface components {
             building_fa: string;
             building_en: string;
         };
+        SuggestionsResponse: {
+            suggestions: unknown[];
+        };
         Team: {
             name_fa: string;
             name_en: string;
             role_fa: string;
             role_en: string;
         };
+        ToolCatalogItem: {
+            id: string;
+            title: string;
+            title_fa: string;
+            title_en: string;
+            status: string;
+            version: string;
+            capability: string;
+            path: string;
+            evidence_url: string;
+        };
         ToolCatalogResponse: {
-            items: {
-                [key: string]: unknown;
-            }[];
+            items: components["schemas"]["ToolCatalogItem"][];
             count: number;
+        };
+        /**
+         * @description * `jalali` - jalali
+         *     * `kod-meli` - kod-meli
+         *     * `toman` - toman
+         *     * `matn-farsi` - matn-farsi
+         *     * `jwt` - jwt
+         * @enum {string}
+         */
+        ToolEnum: "jalali" | "kod-meli" | "toman" | "matn-farsi" | "jwt";
+        ToolUsage: {
+            tool: components["schemas"]["ToolEnum"];
+            /** @default fa */
+            locale: components["schemas"]["LocaleEnum"];
+            /** @default false */
+            completed: boolean;
+        };
+        ToolUsageResponse: {
+            accepted: boolean;
+            stored: boolean;
         };
         Waitlist: {
             product: string;
@@ -330,6 +740,95 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    v1_assistant_ask_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Ask"];
+                "application/x-www-form-urlencoded": components["schemas"]["Ask"];
+                "multipart/form-data": components["schemas"]["Ask"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AskAccepted"];
+                };
+            };
+        };
+    };
+    v1_assistant_ask_poll_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssistantPollResponse"];
+                };
+            };
+        };
+    };
+    v1_assistant_feedback_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Feedback"];
+                "application/x-www-form-urlencoded": components["schemas"]["Feedback"];
+                "multipart/form-data": components["schemas"]["Feedback"];
+            };
+        };
+        responses: {
+            /** @description No response body */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    v1_assistant_suggestions_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SuggestionsResponse"];
+                };
+            };
+        };
+    };
     v1_content_case_studies_retrieve: {
         parameters: {
             query?: never;
@@ -626,6 +1125,100 @@ export interface operations {
             };
         };
     };
+    v1_scanner_jobs_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ScanRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ScanRequest"];
+                "multipart/form-data": components["schemas"]["ScanRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScanCreatedResponse"];
+                };
+            };
+        };
+    };
+    v1_scanner_jobs_poll_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScanPollResponse"];
+                };
+            };
+        };
+    };
+    v1_scanner_results_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                result_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScanResultResponse"];
+                };
+            };
+        };
+    };
+    v1_scanner_results_unlock_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                result_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ScanUnlock"];
+                "application/x-www-form-urlencoded": components["schemas"]["ScanUnlock"];
+                "multipart/form-data": components["schemas"]["ScanUnlock"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScanUnlock"];
+                };
+            };
+        };
+    };
     v1_site_config_retrieve: {
         parameters: {
             query?: never;
@@ -641,6 +1234,146 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SiteConfig"];
+                };
+            };
+        };
+    };
+    v1_tools_jalali_convert_retrieve: {
+        parameters: {
+            query: {
+                from: "gregorian" | "jalali";
+                to: "gregorian" | "jalali";
+                value: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JalaliConvertResponse"];
+                };
+            };
+        };
+    };
+    v1_tools_jalali_holidays_retrieve: {
+        parameters: {
+            query: {
+                year: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HolidayCalendarResponse"];
+                };
+            };
+        };
+    };
+    v1_tools_persian_text_normalize_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NormalizeRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["NormalizeRequest"];
+                "multipart/form-data": components["schemas"]["NormalizeRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NormalizeResponse"];
+                };
+            };
+        };
+    };
+    v1_tools_share_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ShareCreate"];
+                "application/x-www-form-urlencoded": components["schemas"]["ShareCreate"];
+                "multipart/form-data": components["schemas"]["ShareCreate"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShareResponse"];
+                };
+            };
+        };
+    };
+    v1_tools_share_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                share_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShareDetail"];
+                };
+            };
+        };
+    };
+    v1_tools_usage_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ToolUsage"];
+                "application/x-www-form-urlencoded": components["schemas"]["ToolUsage"];
+                "multipart/form-data": components["schemas"]["ToolUsage"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ToolUsageResponse"];
                 };
             };
         };

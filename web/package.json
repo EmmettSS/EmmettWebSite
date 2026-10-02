@@ -10,11 +10,16 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "content:check": "tsx scripts/content-check.ts",
+    "jalali:check": "tsx scripts/check-jalali.ts",
+    "tool:contract": "tsx scripts/tool-contract.ts",
+    "tool:contract:live": "tsx scripts/tool-contract.ts --live",
     "budget": "tsx scripts/bundle-budget.ts",
     "a11y": "playwright test",
     "seo:render": "tsx scripts/render-public-html.ts",
     "api:types": "openapi-typescript ../api/schema.yml -o src/lib/api-types.ts",
-    "seo:check": "tsx scripts/seo-check.ts"
+    "seo:check": "tsx scripts/seo-check.ts",
+    "corpus:export": "tsx scripts/export-corpus.ts",
+    "corpus:check": "tsx scripts/export-corpus.ts --check"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",

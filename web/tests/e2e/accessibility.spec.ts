@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
-const routes = ['', '/services', '/products', '/about', '/contact']
+const routes = ['', '/services', '/products', '/about', '/contact', '/tools', '/tools/tarikh-shamsi', '/tools/kod-meli', '/tools/toman', '/tools/matn-farsi', '/tools/jwt', '/tools/check-security', '/assistant']
 for (const lang of ['fa', 'en']) for (const route of routes) {
   test(`${lang} ${route || '/'} has no serious axe violations`, async ({ page }) => {
     await page.goto(`/${lang}${route}`)
