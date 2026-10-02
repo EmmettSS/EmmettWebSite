@@ -95,7 +95,7 @@ export function TerminalDock({ open, onClose }: { open: boolean; onClose: () => 
         aria-live="polite"
         className="max-h-[46vh] overflow-auto px-4 pb-3 font-mono text-[12.5px] leading-6"
       >
-        <p className="text-white/35">{copy.terminal.hint}</p>
+        <p className="text-white/55">{copy.terminal.hint}</p>
         {entries.map((entry, index) => (
           <div key={index} className="mt-2">
             <p className="text-white/70">
@@ -104,7 +104,7 @@ export function TerminalDock({ open, onClose }: { open: boolean; onClose: () => 
             <ResponseView response={entry.response} />
           </div>
         ))}
-        {busy ? <p className="text-white/40">…</p> : null}
+        {busy ? <p className="text-white/55">…</p> : null}
       </div>
 
       <form
@@ -157,7 +157,7 @@ export function TerminalDock({ open, onClose }: { open: boolean; onClose: () => 
           autoComplete="off"
           spellCheck={false}
           dir="ltr"
-          className="flex-1 bg-transparent text-white/90 outline-none placeholder:text-white/25"
+          className="flex-1 bg-transparent text-white/90 outline-none placeholder:text-white/55"
           placeholder={copy.terminal.placeholder}
           aria-describedby="terminal-noscript"
           role="combobox"
@@ -169,7 +169,7 @@ export function TerminalDock({ open, onClose }: { open: boolean; onClose: () => 
         </button>
       </form>
 
-      <div id="terminal-noscript" className="border-t border-[var(--line)] px-4 py-2 text-[11px] text-white/35">
+      <div id="terminal-noscript" className="border-t border-[var(--line)] px-4 py-2 text-[11px] text-white/55">
         <span>{copy.terminal.noscript}</span>
         <ul className="mt-1 flex flex-wrap gap-3">
           {localCommands.map((command) => (
@@ -201,7 +201,7 @@ export function ResponseView({ response }: { response: CommandResponse }) {
   }
   return (
     <table className="mt-1 w-full text-[12px]">
-      <thead className="text-white/40">
+      <thead className="text-white/55">
         <tr>
           {response.columns.map((column) => (
             <th key={column} className="p-1 text-start">

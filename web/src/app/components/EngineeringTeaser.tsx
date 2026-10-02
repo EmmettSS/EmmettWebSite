@@ -42,13 +42,13 @@ export function EngineeringTeaser() {
             <div>
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-6 h-px bg-[rgba(245,246,247,0.2)]" />
-                <span className="text-xs font-mono tracking-[0.2em] uppercase text-[rgba(245,246,247,0.38)]">
+                <span className="text-xs font-mono tracking-[0.2em] uppercase text-[rgba(245,246,247,0.62)]">
                   The Engineering System
                 </span>
               </div>
               <h2 className="text-[clamp(1.8rem,4vw,3rem)] font-medium leading-tight tracking-tight text-[#F5F6F7]">
                 Every capability,<br />
-                <span className="text-[rgba(245,246,247,0.38)]">one connected system</span>
+                <span className="text-[rgba(245,246,247,0.62)]">one connected system</span>
               </h2>
             </div>
 
@@ -164,7 +164,7 @@ export function EngineeringTeaser() {
 
             {/* "View full system" overlay hint */}
             <div className="absolute bottom-4 right-4">
-              <span className="text-[10px] font-mono text-[rgba(245,246,247,0.2)] tracking-widest">
+              <span className="text-[10px] font-mono text-[rgba(245,246,247,0.62)] tracking-widest">
                 INTERACTIVE ON /SERVICES
               </span>
             </div>

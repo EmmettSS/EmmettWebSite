@@ -15,7 +15,7 @@ export function HomeCTA() {
         >
           <div className="flex items-center gap-3 mb-8">
             <div className="w-6 h-px bg-[rgba(245,246,247,0.2)]" />
-            <span className="text-xs font-mono tracking-[0.2em] uppercase text-[rgba(245,246,247,0.38)]">
+            <span className="text-xs font-mono tracking-[0.2em] uppercase text-[rgba(245,246,247,0.62)]">
               Ready to build?
             </span>
           </div>
@@ -24,7 +24,7 @@ export function HomeCTA() {
             They don't just build<br />
             the future.
             <br />
-            <span className="text-[rgba(245,246,247,0.3)]">They engineer it.</span>
+            <span className="text-[rgba(245,246,247,0.62)]">They engineer it.</span>
           </h2>
 
           <p className="text-[rgba(245,246,247,0.55)] leading-relaxed max-w-md mb-12">

@@ -40,7 +40,7 @@ export default function ToolsIndex() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-[1200px] px-5 pb-24 pt-28 lg:px-10">
+    <main className="mx-auto w-full max-w-[1200px] px-5 pb-24 pt-28 lg:px-10">
       <JsonLd data={itemList} />
       <header className="max-w-3xl">
         <p className="font-mono text-xs tracking-[0.3em] text-[var(--bright)]">{copy.index.eyebrow}</p>
@@ -51,7 +51,7 @@ export default function ToolsIndex() {
       <div className="mt-8 flex flex-wrap items-center gap-3">
         <label className="relative flex-1 min-w-[240px]">
           <span className="sr-only">{copy.index.search}</span>
-          <Search className="pointer-events-none absolute inset-y-0 start-3 my-auto h-4 w-4 text-white/35" aria-hidden />
+          <Search className="pointer-events-none absolute inset-y-0 start-3 my-auto h-4 w-4 text-white/55" aria-hidden />
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
@@ -77,7 +77,7 @@ export default function ToolsIndex() {
         </div>
       </div>
 
-      <p className="mt-4 text-xs text-white/40">
+      <p className="mt-4 text-xs text-white/55">
         {toPersianDigits(results.length)} {copy.index.toolsCount} · {copy.index.offlineFirst}
       </p>
 
@@ -90,7 +90,7 @@ export default function ToolsIndex() {
                   <span className="rounded-full border border-[var(--line)] px-3 py-1 text-[11px] text-white/55">
                     {entry.title[lang === "fa" ? "en" : "fa"]}
                   </span>
-                  {entry.version ? <span className="font-mono text-[11px] text-white/35">v{entry.version}</span> : null}
+                  {entry.version ? <span className="font-mono text-[11px] text-white/55">v{entry.version}</span> : null}
                 </div>
                 <h2 className="mt-4 text-lg font-semibold">{entry.title[lang]}</h2>
                 <p className="mt-2 flex-1 text-sm leading-7 text-white/55">{entry.description[lang]}</p>
@@ -105,6 +105,6 @@ export default function ToolsIndex() {
       ) : (
         <p className="mt-10 rounded-3xl border border-[var(--line)] p-8 text-center text-sm text-white/50">{copy.index.empty}</p>
       )}
-    </div>
+    </main>
   );
 }

@@ -84,7 +84,7 @@ export function Navbar() {
             className="flex items-center gap-2 font-mono tracking-[.2em]"
           >
             <b>EMMETT</b>
-            <small className="text-white/25">GROUP</small>
+            <small className="text-white/55">GROUP</small>
           </Link>
           <div className="hidden items-center gap-6 lg:flex">
             {(t.nav as string[]).map((label, i) => {
@@ -139,7 +139,7 @@ export function Navbar() {
                                 </span>
                                 <span>
                                   <b className="block text-sm">{a}</b>
-                                  <small className="text-white/35">{b}</small>
+                                  <small className="text-white/55">{b}</small>
                                 </span>
                                 <ArrowUpRight className="ms-auto h-4 w-4 text-white/20 transition group-hover:text-[var(--bright)]" />
                               </Link>

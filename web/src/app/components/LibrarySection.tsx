@@ -106,26 +106,26 @@ export function LibrarySection() {
                 >
                   {featured.category}
                 </span>
-                <span className="text-[10px] font-mono text-[rgba(16,42,32,0.3)] tracking-widest">Featured</span>
+                <span className="text-[10px] font-mono text-[rgba(16,42,32,0.72)] tracking-widest">Featured</span>
               </div>
               {/* Editorial serif title for featured */}
               <h3 className="font-editorial text-[clamp(1.5rem,3vw,2.2rem)] font-medium text-[#102A20] leading-tight mb-4">
                 {featured.title}
               </h3>
-              <p className="text-sm text-[rgba(16,42,32,0.55)] leading-relaxed mb-5">
+              <p className="text-sm text-[rgba(16,42,32,0.72)] leading-relaxed mb-5">
                 {featured.excerpt}
               </p>
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
                   <div className="w-5 h-5 rounded-full bg-[rgba(16,42,32,0.15)] flex items-center justify-center">
-                    <span className="text-[8px] font-mono text-[rgba(16,42,32,0.5)]">AK</span>
+                    <span className="text-[8px] font-mono text-[rgba(16,42,32,0.72)]">AK</span>
                   </div>
-                  <span className="text-xs font-mono text-[rgba(16,42,32,0.5)]">{featured.author}</span>
+                  <span className="text-xs font-mono text-[rgba(16,42,32,0.72)]">{featured.author}</span>
                 </div>
-                <span className="text-[rgba(16,42,32,0.2)]">·</span>
-                <span className="text-xs font-mono text-[rgba(16,42,32,0.38)]">{featured.date}</span>
-                <span className="text-[rgba(16,42,32,0.2)]">·</span>
-                <span className="text-xs font-mono text-[rgba(16,42,32,0.38)]">{featured.readTime} read</span>
+                <span className="text-[rgba(16,42,32,0.72)]">·</span>
+                <span className="text-xs font-mono text-[rgba(16,42,32,0.72)]">{featured.date}</span>
+                <span className="text-[rgba(16,42,32,0.72)]">·</span>
+                <span className="text-xs font-mono text-[rgba(16,42,32,0.72)]">{featured.readTime} read</span>
               </div>
             </div>
             {/* Right visual */}
@@ -171,7 +171,7 @@ export function LibrarySection() {
                   ))}
                 </svg>
               </div>
-              <div className="absolute bottom-3 right-3 text-[9px] font-mono text-[rgba(16,42,32,0.3)] tracking-widest uppercase">
+              <div className="absolute bottom-3 right-3 text-[9px] font-mono text-[rgba(16,42,32,0.72)] tracking-widest uppercase">
                 LLM Throughput Analysis
               </div>
             </div>
@@ -205,16 +205,16 @@ export function LibrarySection() {
                 <h4 className="text-sm font-medium text-[#102A20] group-hover:text-[#0B6B48] transition-colors duration-150 pr-4">
                   {article.title}
                 </h4>
-                <span className="text-xs font-mono text-[rgba(16,42,32,0.4)] hidden lg:block">
+                <span className="text-xs font-mono text-[rgba(16,42,32,0.72)] hidden lg:block">
                   {article.author}
                 </span>
-                <span className="text-xs font-mono text-[rgba(16,42,32,0.3)] hidden lg:block">
+                <span className="text-xs font-mono text-[rgba(16,42,32,0.72)] hidden lg:block">
                   {article.date}
                 </span>
                 <div className="flex items-center justify-between lg:justify-end gap-4">
-                  <span className="text-xs font-mono text-[rgba(16,42,32,0.3)]">{article.readTime}</span>
+                  <span className="text-xs font-mono text-[rgba(16,42,32,0.72)]">{article.readTime}</span>
                   <span
-                    className="text-sm text-[rgba(16,42,32,0.3)] group-hover:text-[#1FAE6E] transition-colors duration-150"
+                    className="text-sm text-[rgba(16,42,32,0.72)] group-hover:text-[#1FAE6E] transition-colors duration-150"
                     aria-hidden
                   >
                     →
@@ -226,7 +226,7 @@ export function LibrarySection() {
         </div>
 
         <div className="border-t border-[rgba(16,42,32,0.1)] pt-8 mt-0 flex items-center justify-between">
-          <span className="text-xs font-mono text-[rgba(16,42,32,0.35)]">
+          <span className="text-xs font-mono text-[rgba(16,42,32,0.72)]">
             Engineering, AI, Security, Bioinformatics, Systems, Research
           </span>
           <Link

@@ -131,7 +131,7 @@ export function Tool() {
           }
         />
       </div>
-      <p className="mt-3 text-xs text-white/40">{copy.tool.resultNoindex}</p>
+      <p className="mt-3 text-xs text-white/55">{copy.tool.resultNoindex}</p>
     </div>
   );
 }
@@ -192,7 +192,7 @@ function ConvertPanel({
           placeholder={direction === "to-gregorian" ? "1404/07/01" : "2025-03-21"}
         />
       </label>
-      <p id="jalali-help" className="text-xs text-white/40">
+      <p id="jalali-help" className="text-xs text-white/55">
         {lang === "fa" ? "ارقام فارسی، عربی یا لاتین؛ جداکننده / یا -" : "Persian, Arabic or Latin digits; / or - separators"}
       </p>
 
@@ -217,7 +217,7 @@ function ConvertPanel({
 function Readout({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-2xl border border-[var(--line)] bg-black/20 p-4">
-      <dt className="text-xs text-white/40">{label}</dt>
+      <dt className="text-xs text-white/55">{label}</dt>
       <dd className="mt-1 font-mono text-lg" dir="auto">
         {value}
       </dd>
@@ -301,7 +301,7 @@ function CalcPanel({ first, second, addDays, onChange }: { first: string; second
             {lang === "fa" ? "محاسبهٔ روز کاری" : "Calculate"}
           </button>
         </div>
-        <p className="mt-3 text-xs text-white/40">
+        <p className="mt-3 text-xs text-white/55">
           {!holidays.loaded
             ? lang === "fa"
               ? "در حال خواندن تقویم تعطیلات…"
@@ -329,7 +329,7 @@ function CalcPanel({ first, second, addDays, onChange }: { first: string; second
                 : `Skipped Fridays: ${plan.skippedWeekends} · skipped holidays: ${plan.skippedHolidays}`}
             </p>
             {plan.holidayLabels.length ? (
-              <ul className="mt-2 list-disc space-y-1 ps-5 text-xs text-white/40">
+              <ul className="mt-2 list-disc space-y-1 ps-5 text-xs text-white/55">
                 {plan.holidayLabels.map((label) => (
                   <li key={label}>{label}</li>
                 ))}
@@ -372,7 +372,7 @@ function BulkPanel() {
             {option === "jalali-to-gregorian" ? (lang === "fa" ? "شمسی → میلادی" : "Jalali → Gregorian") : lang === "fa" ? "میلادی → شمسی" : "Gregorian → Jalali"}
           </button>
         ))}
-        <span className="text-white/40">
+        <span className="text-white/55">
           {lang === "fa" ? `حداکثر ${toPersianDigits(BULK_MAX_LINES)} خط` : `Up to ${BULK_MAX_LINES} lines`}
         </span>
       </div>

@@ -22,7 +22,7 @@ export function ToolShell({ meta, children, aside }: { meta: ToolMeta; children:
   const related = toolEntries.filter((entry) => entry.id !== `tool.${meta.id}`).slice(0, 4);
 
   return (
-    <div className="mx-auto w-full max-w-[1200px] px-5 pb-24 pt-28 lg:px-10">
+    <main className="mx-auto w-full max-w-[1200px] px-5 pb-24 pt-28 lg:px-10">
       <JsonLd
         data={toolJsonLd({
           title: meta.title[lang],
@@ -35,7 +35,7 @@ export function ToolShell({ meta, children, aside }: { meta: ToolMeta; children:
           howToSteps: meta.howToSteps?.[lang],
         })}
       />
-      <nav aria-label={lang === "fa" ? "مسیر" : "Breadcrumb"} className="mb-6 flex items-center gap-2 text-xs text-white/40">
+      <nav aria-label={lang === "fa" ? "مسیر" : "Breadcrumb"} className="mb-6 flex items-center gap-2 text-xs text-white/55">
         <Link to={path("tools")} className="hover:text-white">
           {copy.tool.backToTools}
         </Link>
@@ -130,7 +130,7 @@ export function ToolShell({ meta, children, aside }: { meta: ToolMeta; children:
           </p>
         </aside>
       </div>
-    </div>
+    </main>
   );
 }
 
@@ -149,7 +149,7 @@ function CodeBlock({ label, language, code }: { label: string; language: string;
           {copied === label ? copy.tool.copied : copy.tool.copy}
         </button>
       </figcaption>
-      <pre dir="ltr" className="max-h-80 overflow-auto p-4 text-left text-[12.5px] leading-6 text-white/80">
+      <pre dir="ltr" className="max-h-80 overflow-auto p-4 text-left text-[12.5px] leading-6 text-white/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--bright)]" tabIndex={0}>
         <code>{code}</code>
       </pre>
     </figure>

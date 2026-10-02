@@ -31,7 +31,7 @@ export function Tool() {
           aria-describedby="jwt-help"
         />
       </label>
-      <p id="jwt-help" className="flex items-center gap-2 text-xs text-white/40">
+      <p id="jwt-help" className="flex items-center gap-2 text-xs text-white/55">
         <ShieldCheck className="h-3.5 w-3.5 text-[var(--bright)]" aria-hidden />
         {lang === "fa" ? "هیچ درخواست شبکه‌ای برای decode زده نمی‌شود و لینک اشتراک ساخته نمی‌شود." : "No network request is made to decode, and no share link is created."}
       </p>
@@ -59,9 +59,9 @@ export function Tool() {
               {(["iat", "nbf", "exp"] as const).map((key) =>
                 analysis.timing[key] ? (
                   <div key={key} className="rounded-2xl border border-[var(--line)] bg-black/20 p-4">
-                    <dt className="text-xs text-white/40">{key.toUpperCase()}</dt>
+                    <dt className="text-xs text-white/55">{key.toUpperCase()}</dt>
                     <dd className="mt-1 text-sm">{analysis.timing[key]?.jalali}</dd>
-                    <dd className="text-xs text-white/45">{analysis.timing[key]?.relativeFa}</dd>
+                    <dd className="text-xs text-white/55">{analysis.timing[key]?.relativeFa}</dd>
                   </div>
                 ) : null,
               )}
@@ -107,7 +107,7 @@ function WarningPanel({ warnings }: { warnings: JwtWarning[] }) {
 function SeverityIcon({ severity }: { severity: JwtSeverity }) {
   if (severity === "critical") return <ShieldAlert className="h-4 w-4 text-[var(--color-capability-security)]" aria-hidden />;
   if (severity === "warning") return <AlertTriangle className="h-4 w-4 text-amber-300" aria-hidden />;
-  return <Info className="h-4 w-4 text-white/40" aria-hidden />;
+  return <Info className="h-4 w-4 text-white/55" aria-hidden />;
 }
 
 function Panel({ title, json, text }: { title: string; json?: Record<string, unknown>; text?: string }) {
@@ -115,7 +115,7 @@ function Panel({ title, json, text }: { title: string; json?: Record<string, unk
     <section className="rounded-2xl border border-[var(--line)] bg-black/20 p-4">
       <h2 className="text-xs text-white/50">{title}</h2>
       {json ? (
-        <pre dir="ltr" className="mt-3 max-h-72 overflow-auto text-left text-[12px] leading-6 text-white/75">
+        <pre dir="ltr" className="mt-3 max-h-72 overflow-auto text-left text-[12px] leading-6 text-white/75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--bright)]" tabIndex={0}>
           <code>{JSON.stringify(json, null, 2)}</code>
         </pre>
       ) : (

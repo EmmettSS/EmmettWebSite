@@ -126,7 +126,7 @@ export function AcademySection() {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-base text-[rgba(243,250,246,0.45)] leading-relaxed max-w-[40ch] lg:ml-auto"
+            className="text-base text-[rgba(243,250,246,0.62)] leading-relaxed max-w-[40ch] lg:ml-auto"
           >
             Courses, paths and practical systems designed around real engineering problems — not artificial curricula.
           </motion.p>
@@ -144,7 +144,7 @@ export function AcademySection() {
             style={{ background: "rgba(7,19,15,0.5)", aspectRatio: "16/9" }}
           >
             <div className="flex items-center justify-between mb-3">
-              <span className="text-[10px] font-mono text-[rgba(243,250,246,0.3)] tracking-widest uppercase">
+              <span className="text-[10px] font-mono text-[rgba(243,250,246,0.62)] tracking-widest uppercase">
                 Knowledge Graph · Learning Paths
               </span>
               {activePath && (
@@ -267,7 +267,7 @@ export function AcademySection() {
 
           {/* Learning paths list */}
           <div className="space-y-4">
-            <p className="text-[10px] font-mono text-[rgba(243,250,246,0.3)] tracking-widest uppercase mb-6">
+            <p className="text-[10px] font-mono text-[rgba(243,250,246,0.62)] tracking-widest uppercase mb-6">
               Available Paths
             </p>
             {paths.map((path, i) => (
@@ -299,11 +299,11 @@ export function AcademySection() {
                         {path.name}
                       </h4>
                     </div>
-                    <p className="text-xs font-mono text-[rgba(243,250,246,0.35)] ml-3.5">
+                    <p className="text-xs font-mono text-[rgba(243,250,246,0.62)] ml-3.5">
                       {path.level}
                     </p>
                   </div>
-                  <span className="text-xs font-mono text-[rgba(243,250,246,0.28)] flex-shrink-0">
+                  <span className="text-xs font-mono text-[rgba(243,250,246,0.62)] flex-shrink-0">
                     {path.topics} topics
                   </span>
                 </div>

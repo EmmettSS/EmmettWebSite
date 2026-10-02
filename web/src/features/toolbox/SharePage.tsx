@@ -53,7 +53,7 @@ export default function SharePage() {
   }, [id, lang, copy.share.notFound]);
 
   return (
-    <div className="mx-auto w-full max-w-[860px] px-5 pb-24 pt-32 lg:px-10">
+    <main className="mx-auto w-full max-w-[860px] px-5 pb-24 pt-32 lg:px-10">
       <p className="font-mono text-xs tracking-[0.3em] text-[var(--bright)]">{copy.share.eyebrow}</p>
       <h1 className="mt-4 text-3xl font-semibold">{copy.share.title}</h1>
       <p className="mt-3 text-sm leading-7 text-white/55">{copy.share.description}</p>
@@ -69,7 +69,7 @@ export default function SharePage() {
         <article className="mt-10 rounded-3xl border border-[var(--line)] bg-black/20 p-6">
           <dl className="space-y-4 text-sm">
             <div>
-              <dt className="text-xs text-white/40">{copy.share.tool}</dt>
+              <dt className="text-xs text-white/55">{copy.share.tool}</dt>
               <dd className="mt-1">
                 {toolMeta(state.data.tool) ? (
                   <Link className="text-[var(--bright)] underline decoration-dotted" to={path(`tools/${slugFor(state.data.tool, lang)}`)}>
@@ -81,14 +81,14 @@ export default function SharePage() {
               </dd>
             </div>
             <div>
-              <dt className="text-xs text-white/40">{copy.share.summary}</dt>
+              <dt className="text-xs text-white/55">{copy.share.summary}</dt>
               <dd className="mt-1 whitespace-pre-wrap leading-7" dir="auto">
                 {lang === "fa" ? state.data.summary_fa : state.data.summary_en || state.data.summary_fa}
               </dd>
             </div>
             {Object.keys(state.data.params).length ? (
               <div>
-                <dt className="text-xs text-white/40">{copy.share.params}</dt>
+                <dt className="text-xs text-white/55">{copy.share.params}</dt>
                 <dd className="mt-1 font-mono text-xs text-white/60" dir="ltr">
                   {Object.entries(state.data.params).map(([key, value]) => (
                     <span key={key} className="me-3 inline-block">
@@ -99,9 +99,9 @@ export default function SharePage() {
               </div>
             ) : null}
           </dl>
-          <p className="mt-6 text-xs text-white/35">{copy.share.noindexNote}</p>
+          <p className="mt-6 text-xs text-white/55">{copy.share.noindexNote}</p>
         </article>
       ) : null}
-    </div>
+    </main>
   );
 }

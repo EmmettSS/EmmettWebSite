@@ -37,7 +37,7 @@ export function ShareBar({ state, onCreate, summaryText, canShare = true, note }
           {copy.tool.shareUnavailable}
         </p>
       ) : null}
-      {note ? <p className="mt-3 text-xs leading-6 text-white/40">{note}</p> : null}
+      {note ? <p className="mt-3 text-xs leading-6 text-white/55">{note}</p> : null}
       <p className="sr-only" aria-live="polite">
         {state.status === "ready" ? `${copy.tool.shareReady}${rtl ? "" : ""}` : ""}
       </p>

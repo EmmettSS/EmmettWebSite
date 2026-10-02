@@ -35,6 +35,7 @@ jobs:
         env:
           FORCE_COLOR: '0'
           NO_COLOR: '1'
+          A11Y_REPORT: /tmp/axe-violations.json
           PLAYWRIGHT_JSON_OUTPUT_NAME: /tmp/a11y.json
         run: |
           set -o pipefail
@@ -44,7 +45,7 @@ jobs:
         shell: bash
         run: |
           { echo '### a11y log tail'; echo '```'; tail -n 80 /tmp/a11y.log 2>/dev/null; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
-          node web/scripts/report-playwright-failures.mjs /tmp/a11y.json
+          node web/scripts/report-playwright-failures.mjs /tmp/a11y.json /tmp/axe-violations.json
           tail -n 20 /tmp/a11y.log 2>/dev/null | while IFS= read -r line; do echo "::error::a11y-log: ${line:0:900}"; done
           exit 0
   api:

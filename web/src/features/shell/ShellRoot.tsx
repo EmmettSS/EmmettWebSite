@@ -67,7 +67,7 @@ export function ShellRoot() {
           <Dialog.Overlay className="fixed inset-0 z-[90] bg-black/70 backdrop-blur-sm" />
           <Dialog.Content className="fixed left-1/2 top-1/2 z-[95] w-[min(520px,92vw)] -translate-x-1/2 -translate-y-1/2 rounded-3xl border border-[var(--line)] bg-[#06140e] p-6">
             <Dialog.Title className="text-lg font-semibold">{copy.shell.helpTitle}</Dialog.Title>
-            <Dialog.Description className="mt-1 text-xs text-white/45">{copy.shell.helpDescription}</Dialog.Description>
+            <Dialog.Description className="mt-1 text-xs text-white/55">{copy.shell.helpDescription}</Dialog.Description>
             <dl className="mt-5 space-y-3 text-sm">
               {[
                 ["⌘K / Ctrl+K", copy.shell.shortcuts.palette],

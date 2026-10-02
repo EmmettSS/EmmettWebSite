@@ -74,7 +74,7 @@ export function Tool() {
         </label>
         <div>
           <span className="mb-2 block text-xs text-white/50">{lang === "fa" ? "diff زنده (تغییرات مشخص‌شده)" : "Live diff (changed runs marked)"}</span>
-          <div className="h-[236px] overflow-auto rounded-2xl border border-[var(--line)] bg-black/20 p-4 text-sm leading-7" aria-live="polite">
+          <div className="h-[236px] overflow-auto rounded-2xl border border-[var(--line)] bg-black/20 p-4 text-sm leading-7 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--bright)]" aria-live="polite" tabIndex={0}>
             {/* Segments render as text nodes only — user input can never become markup. */}
             {segments.map((segment, index) =>
               segment.changed ? (
@@ -86,7 +86,7 @@ export function Tool() {
               ),
             )}
           </div>
-          <p id="matn-help" className="mt-2 text-xs text-white/40">
+          <p id="matn-help" className="mt-2 text-xs text-white/55">
             {lang === "fa" ? `قواعد نسخهٔ ${RULES_VERSION} · ${result.total} تغییر` : `Rules ${RULES_VERSION} · ${result.total} changes`}
           </p>
         </div>
@@ -96,7 +96,7 @@ export function Tool() {
         <legend className="px-2 text-xs text-white/50">{lang === "fa" ? "قواعد" : "Rules"}</legend>
         <div className="flex flex-wrap gap-2">
           {ALL_RULE_IDS.map((rule) => (
-            <label key={rule} className={`inline-flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-2 text-xs ${state.rules.includes(rule) ? "border-[var(--bright)]/50 text-white" : "border-[var(--line)] text-white/45"}`}>
+            <label key={rule} className={`inline-flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-2 text-xs ${state.rules.includes(rule) ? "border-[var(--bright)]/50 text-white" : "border-[var(--line)] text-white/55"}`}>
               <input type="checkbox" checked={state.rules.includes(rule)} onChange={() => toggleRule(rule)} className="accent-[var(--emerald)]" />
               {RULE_LABELS[rule][lang]}
             </label>
@@ -110,7 +110,7 @@ export function Tool() {
             {ALL_RULE_IDS.map((rule) => (
               <li key={rule} className="flex flex-wrap items-center gap-2 font-mono text-white/55">
                 <code className="rounded bg-black/40 px-2 py-1">{RULE_LABELS[rule].regex}</code>
-                <span className="text-white/35">{RULE_LABELS[rule][lang === "fa" ? "en" : "fa"]}</span>
+                <span className="text-white/55">{RULE_LABELS[rule][lang === "fa" ? "en" : "fa"]}</span>
               </li>
             ))}
           </ul>
@@ -122,10 +122,10 @@ export function Tool() {
           {result.changes.map((change) => (
             <li key={change.rule} className="rounded-2xl border border-[var(--line)] bg-black/20 p-4 text-xs">
               <b className="block text-white/75">{RULE_LABELS[change.rule][lang]}</b>
-              <span className="mt-1 block text-white/45">
+              <span className="mt-1 block text-white/55">
                 {lang === "fa" ? `${change.count} تغییر` : `${change.count} change(s)`}
               </span>
-              <ul className="mt-2 space-y-1 font-mono text-[11px] text-white/40" dir="rtl">
+              <ul className="mt-2 space-y-1 font-mono text-[11px] text-white/55" dir="rtl">
                 {change.samples.map((sample) => (
                   <li key={sample}>{sample}</li>
                 ))}

@@ -31,7 +31,7 @@ export function Tool() {
           placeholder="0499370899"
         />
       </label>
-      <p id="kod-meli-help" className="text-xs text-white/40">
+      <p id="kod-meli-help" className="text-xs text-white/55">
         {lang === "fa" ? "ورودی شما به هیچ سروری فرستاده نمی‌شود؛ ارقام فارسی و عربی هم پذیرفته می‌شود." : "Your input never leaves the browser; Persian and Arabic digits are accepted."}
       </p>
 
@@ -77,13 +77,13 @@ function ResultBanner({ result }: { result: ReturnType<typeof validateNationalId
       <div className="min-w-0 flex-1 text-sm">
         <p className="font-semibold">{result.valid ? (lang === "fa" ? "ساختار معتبر است" : "Structurally valid") : lang === "fa" ? "ساختار معتبر نیست" : "Structurally invalid"}</p>
         <p className="mt-1 text-white/60">{lang === "fa" ? result.reasonFa : result.reasonEn}</p>
-        <p className="mt-2 text-xs text-white/40">
+        <p className="mt-2 text-xs text-white/55">
           {kindLabel}
           {result.expectedCheckDigit !== null ? ` · ${lang === "fa" ? "رقم کنترل مورد انتظار" : "expected check digit"}: ${toPersianDigits(result.expectedCheckDigit)}` : ""}
           {result.actualCheckDigit !== null ? ` · ${lang === "fa" ? "رقم آخر" : "actual"}: ${toPersianDigits(result.actualCheckDigit)}` : ""}
         </p>
       </div>
-      <ShieldAlert className="h-4 w-4 text-white/30" aria-hidden />
+      <ShieldAlert className="h-4 w-4 text-white/55" aria-hidden />
     </div>
   );
 }

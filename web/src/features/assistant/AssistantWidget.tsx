@@ -30,7 +30,7 @@ export function AssistantWidget() {
             </button>
           </div>
           <Assistant compact />
-          <p className="mt-2 text-[11px] text-white/40">
+          <p className="mt-2 text-[11px] text-white/55">
             <Link to={`/${lang}/assistant`} className="text-[var(--bright)] hover:underline">
               {copy.openChat}
             </Link>

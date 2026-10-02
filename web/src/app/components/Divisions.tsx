@@ -165,13 +165,13 @@ export function Divisions() {
         >
           <div className="flex items-center gap-3 mb-6">
             <div className="w-6 h-px bg-[rgba(245,246,247,0.2)]" />
-            <span className="text-xs font-mono tracking-[0.2em] uppercase text-[rgba(245,246,247,0.38)]">
+            <span className="text-xs font-mono tracking-[0.2em] uppercase text-[rgba(245,246,247,0.62)]">
               04 — Core Divisions
             </span>
           </div>
           <h2 className="text-[clamp(2rem,5vw,3.5rem)] font-medium leading-tight tracking-tight text-[#F5F6F7] max-w-2xl">
             Seven specialized teams,{" "}
-            <span className="text-[rgba(245,246,247,0.38)]">one collective</span>
+            <span className="text-[rgba(245,246,247,0.62)]">one collective</span>
           </h2>
         </motion.div>
 
@@ -205,8 +205,8 @@ export function Divisions() {
                 </div>
 
                 <h3 className="text-base font-semibold text-[#F5F6F7] mb-1">{div.title}</h3>
-                <p className="text-xs font-mono text-[rgba(245,246,247,0.38)] mb-3">{div.subtitle}</p>
-                <p className="text-sm text-[rgba(245,246,247,0.38)] leading-relaxed mb-5 group-hover:text-[rgba(245,246,247,0.55)] transition-colors">
+                <p className="text-xs font-mono text-[rgba(245,246,247,0.62)] mb-3">{div.subtitle}</p>
+                <p className="text-sm text-[rgba(245,246,247,0.62)] leading-relaxed mb-5 group-hover:text-[rgba(245,246,247,0.55)] transition-colors">
                   {div.description}
                 </p>
 

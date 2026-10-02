@@ -5,9 +5,9 @@ import { toPersianDigits } from "@/lib/jalali";
 import { trackToolUse, useShareLink, useUrlState, useDebounced } from "../hooks";
 import { ShareBar } from "../ui/ShareBar";
 import {
-  formatRialFa,
   formatTomanFa,
   formalInvoiceLine,
+  groupLatin,
   invoiceBreakdown,
   parseAmount,
   rialToToman,
@@ -22,7 +22,8 @@ export function Tool() {
         amount: params.get("v") ?? "1250000",
         vat: params.get("vat") ?? "10",
         discount: params.get("off") ?? "0",
-        digits: params.get("digits") === "en" ? "en" : "fa",
+        // digits follow the page language unless the URL pins them
+        digits: params.get("digits") ?? lang,
         rial: params.get("rial") ?? "",
       }),
       [],
@@ -82,7 +83,7 @@ export function Tool() {
           {showDigits ? (lang === "fa" ? "ارقام: فارسی" : "Digits: Persian") : lang === "fa" ? "ارقام: لاتین" : "Digits: Latin"}
         </button>
       </div>
-      <p id="toman-help" className="text-xs text-white/40">
+      <p id="toman-help" className="text-xs text-white/55">
         {lang === "fa" ? "مثال: ۱٬۲۵۰٬۰۰۰ یا 1250000 — ورودی اعشاری پذیرفته نمی‌شود." : "Example: 1,250,000 or 1250000 — decimals are rejected."}
       </p>
 
@@ -92,8 +93,8 @@ export function Tool() {
         </p>
       ) : (
         <dl className="grid gap-3 sm:grid-cols-2">
-          <Output label={lang === "fa" ? "تومان" : "Toman"} value={digit(formatTomanFa(amount).replace(" تومان", ""))} suffix={lang === "fa" ? "تومان" : "toman"} />
-          <Output label={lang === "fa" ? "ریال" : "Rial"} value={digit(formatRialFa(amount).replace(" ریال", ""))} suffix={lang === "fa" ? "ریال" : "rial"} />
+          <Output label={lang === "fa" ? "تومان" : "Toman"} value={digit(groupLatin(amount))} suffix={lang === "fa" ? "تومان" : "toman"} />
+          <Output label={lang === "fa" ? "ریال" : "Rial"} value={digit(groupLatin(amount * 10n))} suffix={lang === "fa" ? "ریال" : "rial"} />
           <Output label={lang === "fa" ? "حروف‌نویسی چک" : "Cheque wording"} value={tomanToWords(amount)} wide />
           <Output label={lang === "fa" ? "شکل رسمی فاکتور" : "Formal invoice line"} value={formalInvoiceLine(amount)} wide />
         </dl>
@@ -115,9 +116,9 @@ export function Tool() {
         </div>
         {invoice ? (
           <dl className="mt-4 grid gap-3 sm:grid-cols-3">
-            <Output label={lang === "fa" ? "مبلغ مشمول" : "Taxable"} value={digit(formatTomanFa(invoice.taxable).replace(" تومان", ""))} suffix={lang === "fa" ? "تومان" : "toman"} />
-            <Output label={lang === "fa" ? "مالیات" : "VAT"} value={digit(formatTomanFa(invoice.vat).replace(" تومان", ""))} suffix={lang === "fa" ? "تومان" : "toman"} />
-            <Output label={lang === "fa" ? "جمع کل" : "Total"} value={digit(formatTomanFa(invoice.total).replace(" تومان", ""))} suffix={lang === "fa" ? "تومان" : "toman"} />
+            <Output label={lang === "fa" ? "مبلغ مشمول" : "Taxable"} value={digit(groupLatin(invoice.taxable))} suffix={lang === "fa" ? "تومان" : "toman"} />
+            <Output label={lang === "fa" ? "مالیات" : "VAT"} value={digit(groupLatin(invoice.vat))} suffix={lang === "fa" ? "تومان" : "toman"} />
+            <Output label={lang === "fa" ? "جمع کل" : "Total"} value={digit(groupLatin(invoice.total))} suffix={lang === "fa" ? "تومان" : "toman"} />
           </dl>
         ) : (
           <p role="alert" className="mt-4 rounded-xl border border-amber-400/30 bg-amber-400/5 p-3 text-sm text-amber-200">
@@ -137,11 +138,11 @@ export function Tool() {
         </label>
         {reverse ? (
           <p className="mt-3 text-sm">
-            <span className="font-mono" dir="auto">{digit(formatTomanFa(reverse.toman))}</span>
+            <span className="font-mono" dir="auto">{digit(groupLatin(reverse.toman))} {lang === "fa" ? "تومان" : "toman"}</span>
             {reverse.rounded ? <span className="ms-2 text-xs text-amber-300">{lang === "fa" ? "(با گردکردن به تومان صحیح)" : "(rounded to whole toman)"}</span> : null}
           </p>
         ) : (
-          <p className="mt-3 text-xs text-white/40">{lang === "fa" ? "برای تبدیل، مبلغ ریال را وارد کنید." : "Enter a rial amount to convert."}</p>
+          <p className="mt-3 text-xs text-white/55">{lang === "fa" ? "برای تبدیل، مبلغ ریال را وارد کنید." : "Enter a rial amount to convert."}</p>
         )}
       </section>
 
@@ -167,10 +168,10 @@ export function Tool() {
 function Output({ label, value, suffix, wide }: { label: string; value: string; suffix?: string; wide?: boolean }) {
   return (
     <div className={`rounded-2xl border border-[var(--line)] bg-black/20 p-4 ${wide ? "sm:col-span-2" : ""}`}>
-      <dt className="text-xs text-white/40">{label}</dt>
+      <dt className="text-xs text-white/55">{label}</dt>
       <dd className="mt-1 font-mono text-lg" dir="auto">
         {value}
-        {suffix ? <span className="ms-2 text-xs text-white/40">{suffix}</span> : null}
+        {suffix ? <span className="ms-2 text-xs text-white/55">{suffix}</span> : null}
       </dd>
     </div>
   );

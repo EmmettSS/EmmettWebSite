@@ -102,7 +102,7 @@ export function Assistant({ compact = false }: { compact?: boolean }) {
         {turns.map((turn, index) => (
           <article key={`${index}-${turn.question}`} className="space-y-2">
             <div className="flex items-start gap-2 text-sm text-white/80">
-              <User className="mt-0.5 h-4 w-4 shrink-0 text-white/40" aria-hidden />
+              <User className="mt-0.5 h-4 w-4 shrink-0 text-white/55" aria-hidden />
               <p>{turn.question}</p>
             </div>
             {turn.failed ? (
@@ -113,7 +113,7 @@ export function Assistant({ compact = false }: { compact?: boolean }) {
               <p className="flex items-center gap-2 text-xs text-white/50">
                 <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
                 {copy.thinking}
-                {steps.length > 0 ? <span className="font-mono text-[11px] text-white/35">{steps.map((step) => step.step).join(" → ")}</span> : null}
+                {steps.length > 0 ? <span className="font-mono text-[11px] text-white/55">{steps.map((step) => step.step).join(" → ")}</span> : null}
               </p>
             ) : (
               <div className="rounded-2xl border border-[var(--line)] bg-black/20 p-3">
@@ -122,8 +122,8 @@ export function Assistant({ compact = false }: { compact?: boolean }) {
                     <Bot className="h-3 w-3" aria-hidden />
                     {modeLabel(turn.payload.mode, lang)}
                   </span>
-                  {turn.payload.cached ? <span className="rounded-full border border-[var(--line)] px-2 py-0.5 text-white/45">{copy.cached}</span> : null}
-                  <span className="font-mono text-white/30">{turn.payload.latency_ms}ms</span>
+                  {turn.payload.cached ? <span className="rounded-full border border-[var(--line)] px-2 py-0.5 text-white/55">{copy.cached}</span> : null}
+                  <span className="font-mono text-white/55">{turn.payload.latency_ms}ms</span>
                 </div>
 
                 {hasVisibleAnswer(turn.payload) ? (
@@ -134,7 +134,7 @@ export function Assistant({ compact = false }: { compact?: boolean }) {
 
                 {turn.payload.citations.length > 0 ? (
                   <div className="mt-3">
-                    <p className="text-[11px] text-white/45">{copy.citations}</p>
+                    <p className="text-[11px] text-white/55">{copy.citations}</p>
                     <ul className="mt-1 flex flex-wrap gap-2">
                       {turn.payload.citations.map((citation) => {
                         const href = citationHref(citation, lang);
@@ -145,7 +145,7 @@ export function Assistant({ compact = false }: { compact?: boolean }) {
                                 {citationLabel(citation)}
                               </a>
                             ) : (
-                              <span className="inline-flex items-center gap-1 rounded-full border border-dashed border-[var(--line)] px-2.5 py-1 text-[11px] text-white/45">
+                              <span className="inline-flex items-center gap-1 rounded-full border border-dashed border-[var(--line)] px-2.5 py-1 text-[11px] text-white/55">
                                 {citationLabel(citation)}
                               </span>
                             )}
@@ -156,7 +156,7 @@ export function Assistant({ compact = false }: { compact?: boolean }) {
                   </div>
                 ) : null}
 
-                <p className="mt-3 border-t border-[var(--line)] pt-2 text-[11px] leading-5 text-white/40">{turn.payload.disclosure || copy.disclosure}</p>
+                <p className="mt-3 border-t border-[var(--line)] pt-2 text-[11px] leading-5 text-white/55">{turn.payload.disclosure || copy.disclosure}</p>
 
                 <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px]">
                   <button
@@ -171,7 +171,7 @@ export function Assistant({ compact = false }: { compact?: boolean }) {
                   {turn.payload.answer_id ? (
                     voted[index] === undefined ? (
                       <>
-                        <span className="text-white/40">{copy.feedback}</span>
+                        <span className="text-white/55">{copy.feedback}</span>
                         <button type="button" onClick={() => void vote(index, turn.payload!, true)} className="rounded-lg border border-[var(--line)] px-2 py-1 hover:text-white">
                           <ThumbsUp className="h-3 w-3" aria-hidden />
                           <span className="sr-only">{copy.helpful}</span>
@@ -182,7 +182,7 @@ export function Assistant({ compact = false }: { compact?: boolean }) {
                         </button>
                       </>
                     ) : (
-                      <span className="text-white/40">{copy.thanks}</span>
+                      <span className="text-white/55">{copy.thanks}</span>
                     )
                   ) : null}
                 </div>
@@ -192,7 +192,7 @@ export function Assistant({ compact = false }: { compact?: boolean }) {
                     {workItems(turn.payload).map((item) => (
                       <li key={`work-${item.chunk_id}`} className="rounded-xl border border-[var(--line)] bg-black/20 p-2">
                         <b className="text-white/75">{item.title || item.source}</b>
-                        <span className="ms-1 font-mono text-white/35">score {item.score}</span>
+                        <span className="ms-1 font-mono text-white/55">score {item.score}</span>
                         <p className="mt-1 leading-5">{item.excerpt}</p>
                       </li>
                     ))}
@@ -206,7 +206,7 @@ export function Assistant({ compact = false }: { compact?: boolean }) {
 
       {turns.length === 0 && suggestions.length > 0 ? (
         <div className="mt-4">
-          <p className="text-[11px] text-white/40">{copy.suggestions}</p>
+          <p className="text-[11px] text-white/55">{copy.suggestions}</p>
           <ul className="mt-2 flex flex-wrap gap-2">
             {suggestions.slice(0, 4).map((suggestion) => (
               <li key={suggestion.id}>
@@ -257,7 +257,7 @@ export function Assistant({ compact = false }: { compact?: boolean }) {
           {copy.ask}
         </button>
       </form>
-      <p className="mt-2 text-[11px] leading-5 text-white/35">
+      <p className="mt-2 text-[11px] leading-5 text-white/55">
         {copy.limitNote}
         {question.length > MAX_QUESTION_CHARS ? <span className="text-[#e26a5a]"> · {question.length}/{MAX_QUESTION_CHARS}</span> : null}
         {rtl ? "" : ""}

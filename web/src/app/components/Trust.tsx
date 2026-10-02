@@ -61,13 +61,13 @@ export function Trust() {
         >
           <div className="flex items-center gap-3 mb-6">
             <div className="w-6 h-px bg-[rgba(245,246,247,0.2)]" />
-            <span className="text-xs font-mono tracking-[0.2em] uppercase text-[rgba(245,246,247,0.38)]">
+            <span className="text-xs font-mono tracking-[0.2em] uppercase text-[rgba(245,246,247,0.62)]">
               12 — Trust & Credibility
             </span>
           </div>
           <h2 className="text-[clamp(2rem,5vw,3.5rem)] font-medium leading-tight tracking-tight text-[#F5F6F7] max-w-2xl">
             Numbers that{" "}
-            <span className="text-[rgba(245,246,247,0.38)]">don't require footnotes</span>
+            <span className="text-[rgba(245,246,247,0.62)]">don't require footnotes</span>
           </h2>
         </motion.div>
 
@@ -85,7 +85,7 @@ export function Trust() {
               <div className="text-[2.5rem] font-mono font-semibold text-[#F5F6F7] mb-2 leading-none">
                 <CountUpStat to={s.value} suffix={s.suffix} decimals={s.decimals} />
               </div>
-              <div className="text-xs font-mono tracking-widest uppercase text-[rgba(245,246,247,0.38)]">{s.label}</div>
+              <div className="text-xs font-mono tracking-widest uppercase text-[rgba(245,246,247,0.62)]">{s.label}</div>
             </motion.div>
           ))}
         </div>
@@ -106,7 +106,7 @@ export function Trust() {
               transition={{ delay: i * 0.05 }}
               className="group px-4 py-2 rounded-full border border-white/[0.06] hover:border-[rgba(16,185,129,0.25)] hover:bg-[rgba(16,185,129,0.04)] transition-all duration-150 cursor-default"
             >
-              <span className="text-sm font-mono text-[rgba(245,246,247,0.38)] group-hover:text-[rgba(245,246,247,0.64)] transition-colors">
+              <span className="text-sm font-mono text-[rgba(245,246,247,0.62)] group-hover:text-[rgba(245,246,247,0.64)] transition-colors">
                 {p.label}
               </span>
             </motion.div>

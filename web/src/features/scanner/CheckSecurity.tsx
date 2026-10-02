@@ -172,7 +172,7 @@ export function CheckSecurity() {
           />
           <span>
             {copy.consent}
-            <span className="mt-1 block text-xs text-white/45">{copy.consentNote}</span>
+            <span className="mt-1 block text-xs text-white/55">{copy.consentNote}</span>
           </span>
         </label>
 
@@ -192,7 +192,7 @@ export function CheckSecurity() {
                   <ShieldAlert className="h-4 w-4 text-[#e26a5a]" aria-hidden />
                 )}
                 {lang === "fa" ? step.label_fa : step.label_en}
-                {step.state === "failed" ? <span className="text-xs text-white/40">— {copy.failedBody}</span> : null}
+                {step.state === "failed" ? <span className="text-xs text-white/55">— {copy.failedBody}</span> : null}
               </li>
             ))}
           {phase.kind === "queued" ? (
@@ -201,7 +201,7 @@ export function CheckSecurity() {
               {copy.degradedBody}
             </li>
           ) : (
-            <li className="text-xs text-white/40">{copy.queueNote}</li>
+            <li className="text-xs text-white/55">{copy.queueNote}</li>
           )}
         </ol>
       )}
@@ -250,7 +250,7 @@ export function CheckSecurity() {
                   <span className="font-mono text-xs text-white/50">{section.checked ? `${section.score}/100` : "—"}</span>
                 </div>
                 {!section.checked ? (
-                  <p className="mt-2 text-xs text-white/45">
+                  <p className="mt-2 text-xs text-white/55">
                     <b className="block text-white/70">{copy.failedTitle}</b>
                     {lang === "fa" ? section.reason_fa : section.reason_en || copy.failedBody}
                   </p>
@@ -259,7 +259,7 @@ export function CheckSecurity() {
                     {section.findings.map((finding) => (
                       <li key={finding.key} className="rounded-xl border border-[var(--line)] bg-black/20 p-2.5">
                         <b className="text-white/80">{lang === "fa" ? finding.label_fa : finding.label_en}</b>{" "}
-                        <span className="text-white/45">· {statusLabel(finding.status, lang)}</span>
+                        <span className="text-white/55">· {statusLabel(finding.status, lang)}</span>
                         <p className="mt-1">{lang === "fa" ? finding.detail_fa : finding.detail_en}</p>
                         {finding.advice_fa || finding.advice_en ? (
                           <p className="mt-1 text-white/50">{lang === "fa" ? finding.advice_fa : finding.advice_en}</p>
@@ -303,7 +303,7 @@ export function CheckSecurity() {
             </Link>
           </section>
 
-          <p className="text-xs leading-6 text-white/45">
+          <p className="text-xs leading-6 text-white/55">
             {copy.noindexNote} · {copy.evidenceNote}
           </p>
         </section>

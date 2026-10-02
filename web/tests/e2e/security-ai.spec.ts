@@ -1,4 +1,9 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
+
+/** ShellRoot is lazy-loaded: wait until its keyboard shortcuts are mounted before pressing keys. */
+async function waitForShell(page: Page) {
+  await expect(page.locator('button[aria-keyshortcuts]').first()).toBeVisible({ timeout: 15_000 })
+}
 
 /**
  * Phase 3 e2e. The API is not reachable in this CI job, so these tests pin the *guards that must
@@ -10,7 +15,8 @@ for (const lang of ['fa', 'en']) {
   test(`${lang}: the scanner refuses to run without explicit consent`, async ({ page }) => {
     await page.goto(`/${lang}/tools/check-security`)
     const submit = page.getByRole('button', { name: lang === 'fa' ? 'شروع بررسی' : 'Start check' })
-    await expect(submit).toBeDisabled()
+    await page.locator('input[type="text"], input:not([type])').first().fill('example.com')
+    await expect(submit).toBeDisabled()  // no consent yet, even with a valid domain
     await page.locator('input[type="checkbox"]').first().check()
     await expect(submit).toBeEnabled()
   })
@@ -36,8 +42,9 @@ for (const lang of ['fa', 'en']) {
 
   test(`${lang}: the terminal requires consent for scan on its own path`, async ({ page }) => {
     await page.goto(`/${lang}`)
+    await waitForShell(page)
     await page.keyboard.press('`')
-    const input = page.locator('input[placeholder]').last()
+    const input = page.locator('#terminal-input')
     await input.fill('scan example.com')
     await input.press('Enter')
     await expect(page.getByText(/--consent|اجازه/).first()).toBeVisible({ timeout: 15_000 })

@@ -119,7 +119,7 @@ export function HomeBilingual() {
                 <Link to={path(hrefs[i])}>
                   <GlowCard className="group min-h-[300px] rounded-2xl border border-[var(--line)] bg-[#0d281d]/85 p-8">
                     <Icon className="h-8 w-8 text-[var(--bright)]" />
-                    <div className="mt-16 text-xs text-white/35">
+                    <div className="mt-16 text-xs text-white/55">
                       0{i + 1} / {t.sections[i]}
                     </div>
                     <h2 className="mt-4 text-3xl">{title}</h2>

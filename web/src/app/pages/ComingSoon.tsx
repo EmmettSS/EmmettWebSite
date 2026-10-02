@@ -26,19 +26,19 @@ export function ComingSoon({ page, subtitle }: { page: string; subtitle: string 
       >
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[rgba(31,174,110,0.12)] bg-[rgba(31,174,110,0.03)] mb-8">
           <div className="w-1 h-1 rounded-full bg-[#1FAE6E]" />
-          <span className="text-[10px] font-mono tracking-[0.2em] uppercase text-[rgba(31,174,110,0.55)]">
+          <span className="text-[10px] font-mono tracking-[0.2em] uppercase text-[rgba(31,174,110,0.9)]">
             Phase 2 · Pending
           </span>
         </div>
 
         <h1 className="text-5xl font-medium text-[#F3FAF6] mb-3 tracking-tight">{page}</h1>
-        <p className="text-[rgba(243,250,246,0.38)] font-mono text-sm mb-10">{subtitle}</p>
+        <p className="text-[rgba(243,250,246,0.62)] font-mono text-sm mb-10">{subtitle}</p>
 
         <div
           className="p-6 rounded-xl border border-[rgba(31,174,110,0.1)] mb-10"
           style={{ background: "rgba(11,31,24,0.5)" }}
         >
-          <p className="text-sm text-[rgba(243,250,246,0.38)] leading-relaxed">
+          <p className="text-sm text-[rgba(243,250,246,0.62)] leading-relaxed">
             This page is part of the Emmett digital ecosystem and will be implemented in a future phase,
             following review and approval of the Home experience.
           </p>
@@ -46,7 +46,7 @@ export function ComingSoon({ page, subtitle }: { page: string; subtitle: string 
 
         <Link
           to="/"
-          className="inline-flex items-center gap-2 text-sm font-mono text-[rgba(243,250,246,0.38)] hover:text-[#1FAE6E] transition-colors"
+          className="inline-flex items-center gap-2 text-sm font-mono text-[rgba(243,250,246,0.62)] hover:text-[#1FAE6E] transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Return to Home

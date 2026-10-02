@@ -1,4 +1,9 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
+
+/** ShellRoot is lazy-loaded: wait until its keyboard shortcuts are mounted before pressing keys. */
+async function waitForShell(page: Page) {
+  await expect(page.locator('button[aria-keyshortcuts]').first()).toBeVisible({ timeout: 15_000 })
+}
 
 /**
  * Phase 2 e2e: every tool from input to output, the palette, the real terminal and the
@@ -33,7 +38,8 @@ for (const lang of ['fa', 'en']) {
   test(`${lang}: toman formatter refuses decimals instead of rounding`, async ({ page }) => {
     await page.goto(`/${lang}/tools/toman`)
     await page.locator('input').first().fill('1250000')
-    await expect(page.getByText('1٬250٬000')).toBeVisible()
+    // digits follow the page language: ۱٬۲۵۰٬۰۰۰ in Persian, 1٬250٬000 in English
+    await expect(page.getByText(lang === 'fa' ? '۱٬۲۵۰٬۰۰۰' : '1٬250٬000').first()).toBeVisible()
     await page.locator('input').first().fill('12.5')
     await expect(page.getByRole('alert').first()).toBeVisible()
   })
@@ -42,7 +48,7 @@ for (const lang of ['fa', 'en']) {
     await page.goto(`/${lang}/tools/matn-farsi`)
     const textarea = page.locator('textarea').first()
     await textarea.fill('<script>alert(1)</script>')
-    await expect(page.locator('mark')).toBeVisible()
+    await expect(page.locator('mark').first()).toBeVisible()
     await expect(page.locator('script')).toHaveCount(0)
   })
 
@@ -60,6 +66,7 @@ for (const lang of ['fa', 'en']) {
 
 test('palette opens with the keyboard and finds a tool', async ({ page }) => {
   await page.goto('/fa/tools')
+  await waitForShell(page)
   await page.keyboard.press('Control+k')
   const dialog = page.getByRole('dialog')
   await expect(dialog).toBeVisible()
@@ -71,6 +78,7 @@ test('palette opens with the keyboard and finds a tool', async ({ page }) => {
 
 test('terminal answers real commands and refuses unknown input', async ({ page }) => {
   await page.goto('/fa/tools')
+  await waitForShell(page)
   await page.keyboard.press('`')
   const terminal = page.locator('section[aria-label]')
   await expect(terminal).toBeVisible()

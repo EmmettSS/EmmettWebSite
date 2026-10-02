@@ -88,13 +88,13 @@ export function Projects() {
         >
           <div className="flex items-center gap-3 mb-6">
             <div className="w-6 h-px bg-[rgba(245,246,247,0.2)]" />
-            <span className="text-xs font-mono tracking-[0.2em] uppercase text-[rgba(245,246,247,0.38)]">
+            <span className="text-xs font-mono tracking-[0.2em] uppercase text-[rgba(245,246,247,0.62)]">
               06 — Case Studies
             </span>
           </div>
           <h2 className="text-[clamp(2rem,5vw,3.5rem)] font-medium leading-tight tracking-tight text-[#F5F6F7] max-w-2xl">
             Proof in production,{" "}
-            <span className="text-[rgba(245,246,247,0.38)]">not in slides</span>
+            <span className="text-[rgba(245,246,247,0.62)]">not in slides</span>
           </h2>
         </motion.div>
 
@@ -112,7 +112,7 @@ export function Projects() {
                 <div className="space-y-6">
                   {/* Header */}
                   <div className="flex items-start gap-4">
-                    <span className="text-xs font-mono text-[rgba(245,246,247,0.22)] mt-1">{cs.number}</span>
+                    <span className="text-xs font-mono text-[rgba(245,246,247,0.62)] mt-1">{cs.number}</span>
                     <div>
                       <h3 className="text-xl font-semibold text-[#F5F6F7] mb-1">{cs.title}</h3>
                       <p className="text-sm font-mono" style={{ color: cs.color }}>{cs.outcome}</p>
@@ -126,16 +126,16 @@ export function Projects() {
                         <div className="text-2xl font-mono font-semibold text-[#F5F6F7]">
                           <CountUp to={m.value} suffix={m.suffix} />
                         </div>
-                        <div className="text-xs text-[rgba(245,246,247,0.38)] font-mono uppercase tracking-widest">{m.label}</div>
+                        <div className="text-xs text-[rgba(245,246,247,0.62)] font-mono uppercase tracking-widest">{m.label}</div>
                       </div>
                     ))}
                   </div>
 
                   {/* Challenges */}
                   <div className="space-y-1.5">
-                    <div className="text-[10px] font-mono tracking-widest uppercase text-[rgba(245,246,247,0.22)]">Key Challenges</div>
+                    <div className="text-[10px] font-mono tracking-widest uppercase text-[rgba(245,246,247,0.62)]">Key Challenges</div>
                     {cs.challenges.map((c) => (
-                      <div key={c} className="flex items-center gap-2 text-sm text-[rgba(245,246,247,0.38)]">
+                      <div key={c} className="flex items-center gap-2 text-sm text-[rgba(245,246,247,0.62)]">
                         <span style={{ color: cs.color }} className="opacity-50">▸</span>
                         {c}
                       </div>
@@ -145,12 +145,12 @@ export function Projects() {
                   {/* Stack + Tags */}
                   <div className="flex flex-wrap gap-2">
                     {cs.tags.map((t) => (
-                      <span key={t} className="px-2.5 py-1 text-xs font-mono rounded-full border border-white/[0.06] text-[rgba(245,246,247,0.38)]">
+                      <span key={t} className="px-2.5 py-1 text-xs font-mono rounded-full border border-white/[0.06] text-[rgba(245,246,247,0.62)]">
                         {t}
                       </span>
                     ))}
                     {cs.stack.map((t) => (
-                      <span key={t} className="px-2.5 py-1 text-xs font-mono rounded-full text-[rgba(245,246,247,0.22)]">
+                      <span key={t} className="px-2.5 py-1 text-xs font-mono rounded-full text-[rgba(245,246,247,0.62)]">
                         {t}
                       </span>
                     ))}
