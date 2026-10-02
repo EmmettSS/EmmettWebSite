@@ -86,6 +86,18 @@ def sync_corpus(embed: bool = True, batch_size: int = 32, provider=None) -> dict
                 stats["embedded"] += 1
 
     cache.delete(CACHE_KEY)
+    # A changed corpus can change any answer — and the stale answer that hurts most is a cached
+    # «پیدا نکردم» for a question the new text *does* answer: content gets published and re-indexed,
+    # yet visitors keep being told the site has nothing on it until someone remembers to purge.
+    # Cache rows are keyed by question hash, never by corpus version, so drop them here whenever
+    # something actually changed. A no-op sync (the every-5-minutes cron case) leaves the cache be.
+    changed = stats["created"] + stats["updated"] + stats["deleted"]
+    if changed:
+        from .models import AssistantQueryCache
+
+        stats["cache_invalidated"] = AssistantQueryCache.objects.all().delete()[0]
+    else:
+        stats["cache_invalidated"] = 0
     return stats
 
 

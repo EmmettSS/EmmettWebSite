@@ -42,7 +42,7 @@
 | فرانت‌اند | F-01 تقویم شمسی · F-03 تومان · F-04 نرمال‌ساز | `/{fa,en}/tools/tarikh-shamsi|toman|matn-farsi/` | زنده + تست | `tool:contract` (۷ ابزار زنده)، تست‌های `logic.test.ts` |
 | بک‌اند | F-02 کد ملی · F-07 ترمینال/پالت روی API واقعی | `/{fa,en}/tools/kod-meli/` · `/tools/` | زنده + تست | `tool:contract`, `api/apps/core` + تست ترمینال |
 | امنیت | F-05 JWT · F-06 اسکنر passive | `/{fa,en}/tools/jwt/` · `/{fa,en}/tools/check-security/` | زنده + ۲۸ تست API | `test_scanner.py`، اجرای زندهٔ اسکن (grade C/75) |
-| هوش مصنوعی | F-08 دستیار RAG با استناد | `/{fa,en}/assistant/` | زنده (BM25؛ LLM در انتظار B7) | ۱۹ تست `test_assistant.py` |
+| هوش مصنوعی | F-08 دستیار RAG با استناد | `/{fa,en}/assistant/` | زنده (BM25؛ LLM در انتظار B7) | ۲۰ تست `test_assistant.py` |
 | بیوتک | F-09 میز کار بیوانفورماتیک | `/{fa,en}/biolab/` | زنده + نمونهٔ مرجع MN908947.3 | `logic/runner/ui` تست‌ها + ۱۱ تست API |
 
 - **شاهد responsiveness (F-09، الزام کارت):** اجرای مکرر `src/features/biolab/runner.test.ts` روی توالی ۱ مگابایتی در همین سندباکس: میانگین فاصلهٔ tick ≈ ۹ ms و **بدترین توقف main thread 55–94 ms** (پیش از این اصلاح ۲۵۰–۳۷۴ ms بود)؛ اسکن فریم‌ها اکنون هر ۲۰٬۰۰۰ کدون yield می‌دهد و معادل‌بودن نتیجه با مسیر همگام (`analyze`) تست شده است.
@@ -65,8 +65,14 @@
 
 ### ✅ دستیار RAG با ارجاع پاسخ می‌دهد و fallback BM25 تست شده است
 - **شاهد (کد):** `api/apps/assistant/answers.py` — آستانهٔ شباهت **پیش از** فراخوانی provider؛ پاسخ بدون ارجاع دور انداخته می‌شود؛ سقف هزینهٔ روزانه → بازگشت به BM25 با پیام صریح.
-- **شاهد (تست):** `api/apps/assistant/test_assistant.py` — ۱۹ تست: `test_unrelated_question_makes_no_llm_call`, `test_llm_path_is_used_when_a_provider_exists`, `test_cost_cap_reached_falls_back_to_bm25`, `test_answer_without_citation_is_discarded`, کش با کلید hash (بدون ذخیرهٔ متن پرسش).
-- **شاهد (اجرا):** `pytest -q` → `100 passed, 1 skipped`.
+- **شاهد (تست):** `api/apps/assistant/test_assistant.py` — ۲۰ تست: `test_unrelated_question_makes_no_llm_call`, `test_llm_path_is_used_when_a_provider_exists`, `test_cost_cap_reached_falls_back_to_bm25`, `test_answer_without_citation_is_discarded`, کش با کلید hash (بدون ذخیرهٔ متن پرسش), و `test_changed_content_invalidates_cached_answers` (پایین توضیح داده شده).
+- **شاهد (اجرا، API واقعی روی SQLite):** `pytest -q` → `101 passed, 1 skipped`. سپس همان مسیر روی سرور واقعی:
+  · `rebuild_assistant_corpus --no-embed` → `{'chunks': 169, 'created': 169, ...}` (۹۱ doc + ۲۰ FAQ + ۵۸ ابزار).
+  · `POST /api/v1/assistant/ask/` با پرسش «چه ابزارهایی روی سایت زنده است؟» → `mode: bm25`, `provider: bm25`، و **سه ارجاع واقعی** با URL (`/tools`، `/tools/assistant`، `/fa/academy`).
+  · پاسخ با ارجاع از متن استخراج می‌شود و چون LLM پیکربندی نشده، پیام صادقانهٔ «پاسخ هوشمند موقتاً در دسترس نیست، این مطالب مرتبط را پیدا کردیم» + فهرست ارجاع‌ها برمی‌گردد (همان fallback مستند).
+  · پرسش بیرون از مطالب («قیمت پن‌تستور چنده؟») → `mode: not_found` و پاسخ «این را در مطالب ما پیدا نکردم»؛ هزینه‌ای هم به provider نمی‌دهد.
+  · سقف throttle واقعاً کار می‌کند: بیست‌ویکمین درخواست در ساعت → `429` با پیام فارسی/انگلیسی.
+- **نقصی که همین اجرا پیدا کرد و رفع شد:** `sync_corpus` حافظهٔ نهانِ chunkها را پاک می‌کرد ولی جدول `AssistantQueryCache` (پاسخ‌های hash-محور) را نه. نتیجه: پس از انتشار محتوای تازه و re-index، پرسش‌های قبلی تا ۳۰ روز همان جواب قدیمی — از جمله «پیدا نکردم» — را می‌گرفتند و به نظر می‌رسید دستیار خراب است (خودِ همین گزارش‌گیری اول به آن برخورد). اکنون هر syncِ دارای تغییرِ واقعی (created/updated/deleted > 0) پاسخ‌های نهان را باطل می‌کند و تعدادش را در `stats.cache_invalidated` برمی‌گرداند؛ اجرای بی‌تغییرِ کرونِ هر ۵ دقیقه دست به کش نمی‌زند. تست `test_changed_content_invalidates_cached_answers` همین دو حالت را قفل می‌کند.
 
 ### ✅ اسکنر F-06 هر ۶ نگهبان امنیتی/قانونی را دارد
 - **شاهد (پیش‌فرض امن، OWASP A01):** `REST_FRAMEWORK.DEFAULT_PERMISSION_CLASSES = IsAdminUser` — هر endpoint تازه به‌صورت پیش‌فرض ادمین‌محور است و سطح‌های عمومی `AllowAny` را صریح اعلام می‌کنند؛ جدول کامل OWASP در `docs/SECURITY.md`.
@@ -115,7 +121,7 @@
   ```
 
 ### ✅ همهٔ تست‌ها سبز (pytest، vitest، Playwright fa+en، content:check)
-- **شاهد:** `pytest -q` → `100 passed, 1 skipped` · `vitest run` → `25 files / 157 tests passed` · `content:check` → `Bilingual content parity passed for all siteCopy, page content and UI keys` (+ self-test تشخیص ترجمهٔ غایب) · `corpus:check` → `corpus is in sync (7 pages, 8 tools, 10 FAQ)`.
+- **شاهد:** `pytest -q` → `101 passed, 1 skipped` · `vitest run` → `25 files / 157 tests passed` · `content:check` → `Bilingual content parity passed for all siteCopy, page content and UI keys` (+ self-test تشخیص ترجمهٔ غایب) · `corpus:check` → `corpus is in sync (7 pages, 8 tools, 10 FAQ)`.
 - **Playwright (fa+en):** ۹۶ تست در ۵ فایل (`web/tests/e2e/`)، اجراشده روی Chrome for Testing ۱۵۳ (همان بیلد CI) با `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`:
   · `evidence.spec.ts` → **۱۹ passed**: هر ۹ فیچر P0 در دو زبان با تعامل واقعی + **صفر خطای console/pageerror** به‌ازای هر صفحه، و ۱۸ اسکرین‌شات در `web/test-results/evidence/*.png` (در CI به‌عنوان artifact `feature-evidence` آپلود می‌شود) — این همان «شاهد تصویری هر ۹ فیچر» موردِ خواستهٔ §۱۰ است.
   · `accessibility.spec.ts` → **۵۰ passed**: ۲۵ روت × {fa,en} با axe-core (`wcag2a/2aa/21a/21aa`)؛ گزارش JSONL (`A11Y_REPORT`) برای **۵۰ صفحه** صفر violation در همهٔ سطوح دارد (نه فقط serious/critical).

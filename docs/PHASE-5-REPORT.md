@@ -27,7 +27,7 @@
 | سنجه | مقدار |
 |---|---|
 | تست‌های وب (vitest) | **۲۵ فایل / ۱۵۷ تست، همه سبز** |
-| تست‌های API (pytest) | **۱۰۰ passed, 1 skipped** |
+| تست‌های API (pytest) | **۱۰۱ passed, 1 skipped** |
 | بودجهٔ JS اولیه | **۱۴۲.۵ KB gzip** (سقف ۲۰۰)؛ artifact: `public/data/bundle-stats.json` (sha256 `d6f4c1bb4cd0f579`) |
 | صفحه‌های Static Bridge | **۳۸ صفحهٔ دوزبانه** + sitemap + robots + security.txt |
 | قرارداد ابزار | ۷ ابزار زنده با شاهد قابل‌حل |

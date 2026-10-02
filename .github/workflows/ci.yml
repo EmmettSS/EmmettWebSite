@@ -101,6 +101,10 @@ jobs:
       # can silence the browser's own network-log line for a missing backend, and measuring that
       # absence instead of the app is what used to turn this gate red.
       - run: node web/scripts/stage-lighthouse-dist.mjs
+      # LHCI does not download a browser and the runner's Chrome is not in a Puppeteer cache, so the
+      # gate needs one installed and pointed at explicitly — the same Chromium the web job uses.
+      - run: pnpm --filter @emmett/web exec playwright install --with-deps chromium
+      - run: echo "CHROME_PATH=$(node web/scripts/browser-path.mjs)" >> "$GITHUB_ENV"
       # A red gate without a readable reason costs a full round-trip; the log is always uploaded.
       - name: Lighthouse mobile, low-power tier (Perf >= 90, CLS < 0.1)
         shell: bash
@@ -109,6 +113,13 @@ jobs:
           mkdir -p lhci-logs
           npx --yes @lhci/cli@0.14.0 autorun --collect.settings.logLevel=verbose 2>&1 | tee lhci-logs/autorun.log
         working-directory: web
+      - name: Report Lighthouse failures
+        if: failure()
+        shell: bash
+        run: |
+          { echo '### Lighthouse log tail'; echo '```'; tail -n 60 web/lhci-logs/autorun.log 2>/dev/null; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          node web/scripts/report-lighthouse-failures.mjs web/.lighthouseci/assertion-results.json
+          exit 0
       - name: Upload Lighthouse run log
         if: always()
         uses: actions/upload-artifact@v4
