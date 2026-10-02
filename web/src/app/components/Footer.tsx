@@ -53,6 +53,10 @@ export function Footer() {
           ["Work", [["Services", "services"], ["Products", "products"], ["Projects", "projects"]]],
           ["Learn", [["Resources", "resources"], ["Academy", "academy"], ["Tools", "tools"]]],
         ];
+  const legal: [string, string][] =
+    lang === "fa"
+      ? [["حریم خصوصی", "privacy"], ["شرایط استفاده", "terms"], ["افشای آسیب‌پذیری", "security"]]
+      : [["Privacy", "privacy"], ["Terms", "terms"], ["Disclosure", "security"]];
 
   return (
     <footer className="relative overflow-hidden border-t border-[var(--line)] bg-[#05110c]">
@@ -71,7 +75,14 @@ export function Footer() {
             </div>
           ))}
         </div>
-        <div className="mt-20 flex flex-wrap items-center justify-between gap-5 border-t border-[var(--line)] pt-7 text-xs text-white/55">
+        <div className="mt-12 flex flex-wrap gap-x-6 gap-y-3 text-xs text-white/45">
+          {legal.map(([label, target]) => (
+            <Link key={label} to={path(target)} className="hover:text-[var(--bright)]">
+              {label}
+            </Link>
+          ))}
+        </div>
+        <div className="mt-12 flex flex-wrap items-center justify-between gap-5 border-t border-[var(--line)] pt-7 text-xs text-white/55">
           <ServiceStatus lang={lang} />
           <span>© {new Date().getFullYear()} Emmett</span>
           {/* Social links stay out until the real profiles arrive ([INPUT B11]); no dead icons. */}

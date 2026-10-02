@@ -5,6 +5,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { useI18n } from "@/app/i18n";
 import { trackGoal } from "@/lib/analytics";
+import { emit, lengthBucket } from "@/lib/events";
 import { trackToolUse } from "@/features/toolbox/hooks";
 import { biolabCopy } from "./copy";
 import { sanitizeInput } from "./logic";
@@ -58,6 +59,7 @@ export function Tool() {
         setAnalysis({ status: "ready", result: analysed, mode });
         trackToolUse("biolab", lang, true);
         trackGoal("biolab_analyze", mode);
+        emit("bio_analyze", { length_bucket: lengthBucket(clean.sequence.length) });
       } catch (error) {
         setAnalysis({ status: "error", message: error instanceof Error ? error.message : String(error) });
         trackGoal("biolab_analyze_error");

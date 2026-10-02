@@ -20,6 +20,12 @@ const expected = [
   "en/lab/performance/index.html",
   "fa/architect/index.html",
   "en/architect/index.html",
+  "fa/privacy/index.html",
+  "en/privacy/index.html",
+  "fa/terms/index.html",
+  "en/terms/index.html",
+  "fa/security/index.html",
+  "en/security/index.html",
   ...toolMetas.flatMap((meta) => [`fa/${routeFor(meta, "fa")}/index.html`, `en/${routeFor(meta, "en")}/index.html`]),
 ];
 for (const file of expected) {
@@ -70,3 +76,11 @@ const expectedUrls = expected.filter((file) => file.endsWith("index.html")).leng
 if ((sitemap.match(/<url>/g) ?? []).length !== expectedUrls) throw new Error(`Expected ${expectedUrls} sitemap URLs, found ${(sitemap.match(/<url>/g) ?? []).length}`);
 if ((sitemap.match(/<loc>https:\/\//g) ?? []).length !== expectedUrls) throw new Error("Sitemap locations must be absolute HTTPS URLs");
 console.log(`Static Bridge SEO checks passed: ${expectedUrls} HTML pages + sitemap.`);
+
+// Hardening: security.txt must exist and carry the fields RFC 9116 requires.
+{
+  const securityTxt = await readFile(path.join(dist, ".well-known", "security.txt"), "utf8");
+  for (const field of ["Contact:", "Expires:", "Canonical:", "Policy:"]) {
+    if (!securityTxt.includes(field)) throw new Error(`security.txt is missing ${field}`);
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "generatedAt": "2026-10-02T12:40:07.944Z",
+  "source": "web/scripts/bundle-budget.ts (CI: pnpm build && pnpm budget --emit)",
+  "budgets": {
+    "initialKb": 200,
+    "routeKb": 350
+  },
+  "measurements": [
+    {
+      "id": "initial",
+      "kb": 142.2421875,
+      "budgetKb": 200
+    },
+    {
+      "id": "route:assistant",
+      "kb": 173.6572265625,
+      "budgetKb": 350
+    },
+    {
+      "id": "route:biolab",
+      "kb": 186.8876953125,
+      "budgetKb": 350
+    },
+    {
+      "id": "route:scanner",
+      "kb": 173.9326171875,
+      "budgetKb": 350
+    },
+    {
+      "id": "route:jalali",
+      "kb": 177.4169921875,
+      "budgetKb": 350
+    },
+    {
+      "id": "route:jwt",
+      "kb": 175.83984375,
+      "budgetKb": 350
+    },
+    {
+      "id": "route:kod-meli",
+      "kb": 175.8134765625,
+      "budgetKb": 350
+    },
+    {
+      "id": "route:matn-farsi",
+      "kb": 175.4599609375,
+      "budgetKb": 350
+    },
+    {
+      "id": "route:toman",
+      "kb": 175.2783203125,
+      "budgetKb": 350
+    }
+  ],
+  "history": [
+    {
+      "at": "2026-10-02T12:40:07.944Z",
+      "initialKb": 142.2,
+      "worstRoute": "route:biolab"
+    }
+  ],
+  "digest": "6f01541f76bb5f0d"
+}

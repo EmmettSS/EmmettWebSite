@@ -3,6 +3,7 @@ import { Bot, ChevronDown, ChevronUp, Loader2, Send, Sparkles, ThumbsDown, Thumb
 import { useI18n } from "@/app/i18n";
 import { toolsCopy } from "@/content/tools";
 import { apiGet, apiPost, ApiError, pollJob } from "@/lib/api-client";
+import { emit } from "@/lib/events";
 import {
   citationHref,
   citationLabel,
@@ -64,6 +65,8 @@ export function Assistant({ compact = false }: { compact?: boolean }) {
           maxMs: 45_000,
           onProgress: (incoming) => setSteps((current) => mergeProgress(current, incoming)),
         });
+        emit("assistant_ask", { had_citation: (result?.citations.length ?? 0) > 0 });
+        if (!result || result.citations.length === 0) emit("assistant_fallback", { reason: "low_similarity" });
         setTurns((current) => {
           const next = [...current];
           const last = next[next.length - 1];
@@ -71,6 +74,7 @@ export function Assistant({ compact = false }: { compact?: boolean }) {
           return next;
         });
       } catch (error) {
+        emit("assistant_fallback", { reason: error instanceof ApiError && error.status === 503 ? "provider_down" : "offline" });
         const message = error instanceof ApiError ? (lang === "fa" ? error.messageFa : error.messageEn) : copy.errorGeneric;
         setTurns((current) => {
           const next = [...current];

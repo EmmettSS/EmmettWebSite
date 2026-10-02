@@ -189,6 +189,24 @@ const routes: Route[] = [
       name: locale === "fa" ? "پیشنهاد معماری" : "Architecture advisor",
     }),
   },
+  {
+    slug: { fa: "privacy", en: "privacy" },
+    fa: { title: "سیاست حریم خصوصی | امت", description: "چه چیزی جمع می‌شود، چه چیزی هرگز جمع نمی‌شود و حق شما چیست.", body: "ابزارها در مرورگر اجرا می‌شوند و ورودی شما به سرور نمی‌رود؛ دستیار متن پرسش را ذخیره نمی‌کند؛ نتیجهٔ اسکنر پس از هفت روز پاک می‌شود؛ آمار بازدید به‌صورت پیش‌فرض خاموش است." },
+    en: { title: "Privacy policy — Emmett", description: "What is collected, what is never collected and what your rights are.", body: "Tools run in your browser and your input is not sent to our servers; the assistant stores no question text; scanner results are removed after seven days; analytics is off by default." },
+    schema: (locale, canonical) => ({ "@context": "https://schema.org", "@type": "WebPage", url: canonical, name: locale === "fa" ? "حریم خصوصی" : "Privacy policy" }),
+  },
+  {
+    slug: { fa: "terms", en: "terms" },
+    fa: { title: "شرایط استفاده | امت", description: "شرط‌های استفاده از ابزارهای عمومی، از جمله قواعد اسکن passive.", body: "ابزارها بدون ضمانت ارائه می‌شوند؛ اسکن فقط با تأیید مالکیت و به‌صورت passive انجام می‌شود؛ شرایط پروژه‌های سفارشی در قرارداد جداگانه تعیین می‌شود." },
+    en: { title: "Terms of use — Emmett", description: "Conditions for the public tools, including the passive-scanning rules.", body: "Tools are provided as is; scanning requires ownership confirmation and is passive only; custom engagements are governed by a separate contract." },
+    schema: (locale, canonical) => ({ "@context": "https://schema.org", "@type": "WebPage", url: canonical, name: locale === "fa" ? "شرایط استفاده" : "Terms of use" }),
+  },
+  {
+    slug: { fa: "security", en: "security" },
+    fa: { title: "افشای آسیب‌پذیری | امت", description: "مسیر گزارش آسیب‌پذیری، تعهد ما و موارد خارج از دامنه.", body: "آسیب‌پذیری‌ها را با شرح و مسیر بازتولید گزارش کنید؛ در نخستین فرصت پاسخ می‌دهیم؛ تست نفوذ و پورت‌اسکن خارج از دامنه است و پیگیری می‌شود." },
+    en: { title: "Vulnerability disclosure — Emmett", description: "How to report a vulnerability, our commitment, and what is out of scope.", body: "Report vulnerabilities with a description and reproduction steps; we reply at the first working opportunity; penetration testing and port scanning are out of scope and will be acted on." },
+    schema: (locale, canonical) => ({ "@context": "https://schema.org", "@type": "WebPage", url: canonical, name: locale === "fa" ? "افشای آسیب‌پذیری" : "Vulnerability disclosure" }),
+  },
   ...toolMetas.map((meta): Route => ({
     slug: { fa: routeFor(meta, "fa"), en: routeFor(meta, "en") },
     fa: { title: `ابزار ${meta.title.fa} | امت`, description: meta.description.fa, body: `${meta.title.fa}: ${meta.description.fa} ${realExample(meta.id, "fa")}` },
@@ -241,6 +259,19 @@ for (const route of routes) {
 }
 
 await writeFile(path.join(dist, "robots.txt"), "User-agent: *\nAllow: /\nSitemap: /sitemap.xml\n");
+
+// Hardening §7: RFC 9116 security.txt. The contact is a URL on this site (valid per spec) and the
+// policy page states that the dedicated security address is still pending ([INPUT B5]).
+const securityTxt = [
+  `Contact: ${base}/fa/security/`,
+  `Contact: ${base}/en/security/`,
+  `Expires: ${new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString()}`,
+  `Canonical: ${base}/.well-known/security.txt`,
+  `Policy: ${base}/fa/security/`,
+  `Preferred-Languages: fa, en`,
+].join("\n");
+await mkdir(path.join(dist, ".well-known"), { recursive: true });
+await writeFile(path.join(dist, ".well-known", "security.txt"), `${securityTxt}\n`, "utf8");
 const links = routes
   .flatMap(({ slug }) => (["fa", "en"] as const).map((locale) => ({ locale, url: `${base}/${locale}/${slug[locale]}${slug[locale] ? "/" : ""}` })))
   .map(({ locale, url }) => {

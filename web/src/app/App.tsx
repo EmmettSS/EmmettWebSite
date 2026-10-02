@@ -11,10 +11,12 @@ import { Loader } from "./components/Loader";
 import { Navbar } from "./components/Navbar";
 import { AmbientBackground } from "./components/MotionKit";
 import { LanguageProvider } from "./i18n";
+import { defaultLangTarget, readStoredLang } from "./lang-preference";
 import { HomeBilingual } from "./pages/HomeBilingual";
 import { Page } from "./pages/Page";
 import { Resources } from "./pages/Resources";
 import { Contact } from "./pages/Contact";
+import { Legal } from "./pages/Legal";
 
 const ToolsIndex = lazy(() => import("@/features/toolbox/ToolsIndex"));
 const ToolRouter = lazy(() => import("@/features/toolbox/ToolRouter"));
@@ -77,6 +79,9 @@ function Site() {
             <Route path="academy" element={<Page kind="academy" />} />
             <Route path="about" element={<Page kind="about" />} />
             <Route path="contact" element={<Contact />} />
+            <Route path="privacy" element={<Legal kind="privacy" />} />
+            <Route path="terms" element={<Legal kind="terms" />} />
+            <Route path="security" element={<Legal kind="security" />} />
             <Route
               path="tools"
               element={
@@ -161,9 +166,9 @@ export default function App() {
       </AnimatePresence>
       {!loading && (
         <Routes>
-          <Route path="/" element={<Navigate to="/fa" replace />} />
+          <Route path="/" element={<Navigate to={`/${defaultLangTarget(readStoredLang())}`} replace />} />
           <Route path="/:lang/*" element={<Site />} />
-          <Route path="*" element={<Navigate to="/fa" replace />} />
+          <Route path="*" element={<Navigate to={`/${defaultLangTarget(readStoredLang())}`} replace />} />
         </Routes>
       )}
     </BrowserRouter>

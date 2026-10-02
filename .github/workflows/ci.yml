@@ -41,6 +41,16 @@ jobs:
           set -o pipefail
           rm -f /tmp/axe-violations*.json
           pnpm --filter @emmett/web exec playwright test --reporter=list,json 2>&1 | tee /tmp/a11y.log
+      - name: Capture per-feature evidence screenshots (fa + en, zero console errors)
+        shell: bash
+        run: pnpm --filter @emmett/web exec playwright test tests/e2e/evidence.spec.ts --reporter=list
+      - name: Upload feature evidence screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: feature-evidence
+          path: web/test-results/evidence
+          if-no-files-found: warn
       - name: Report a11y failures
         if: failure()
         shell: bash

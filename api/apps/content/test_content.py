@@ -2,7 +2,7 @@ import pytest
 from django.core.exceptions import ValidationError
 from django.core.management import call_command
 from rest_framework.test import APIClient
-from .models import Post
+from .models import Post, SiteConfig
 
 pytestmark = pytest.mark.django_db
 
@@ -38,3 +38,37 @@ def test_static_bridge_renders_full_bilingual_html(tmp_path, monkeypatch):
     en = (tmp_path / "en/posts/sample/index.html").read_text()
     assert "مقاله" in fa and "متن فارسی" in fa and 'hreflang="en"' in fa
     assert "Post" in en and "English text" in en
+
+
+class TestSiteConfigLabThroughput:
+    """Plain pytest class (this suite uses pytest, not Django's TestCase runner)."""
+
+    def _get(self):
+        return APIClient().get("/api/v1/site-config/")
+
+    def test_empty_configuration_reports_nulls_not_defaults(self):
+        response = self._get()
+        assert response.status_code == 200
+        body = response.json()
+        for field in ("lab_samples_per_day", "lab_turnaround_hours", "lab_tests_per_sample"):
+            assert body[field] is None, f"{field} must be null (not a fabricated number) when unset"
+        assert body["telegram_handle"] == ""
+
+    def test_configured_values_round_trip(self):
+        SiteConfig.objects.create(
+            telegram_handle="emmett_lab",
+            lab_samples_per_day=240,
+            lab_turnaround_hours=36,
+            lab_tests_per_sample=8,
+        )
+        body = self._get().json()
+        assert body["telegram_handle"] == "emmett_lab"
+        assert body["lab_samples_per_day"] == 240
+        assert body["lab_turnaround_hours"] == 36
+        assert body["lab_tests_per_sample"] == 8
+
+    def test_single_row_is_enforced(self):
+        SiteConfig.objects.create(brand_en="First")
+        SiteConfig.objects.create(brand_en="Second")
+        assert SiteConfig.objects.count() == 1
+        assert SiteConfig.objects.first().brand_en == "Second"

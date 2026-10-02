@@ -11,6 +11,7 @@ import { GlowCard, Reveal } from "../components/MotionKit";
 import { Footer } from "../components/Footer";
 import { TierScene } from "@/visuals/TierScene";
 import { HeroSystemStatic } from "@/visuals/fallbacks/HeroSystemStatic";
+import { TelegramCta } from "@/features/telegram/TelegramCta";
 
 const capabilityCopy = {
   fa: {
@@ -122,6 +123,7 @@ export function HomeBilingual() {
             <Link className="ghost-btn" to={path("projects")}>
               {t.work}
             </Link>
+            <TelegramCta source="home" variant="ghost" />
           </div>
         </div>
       </section>

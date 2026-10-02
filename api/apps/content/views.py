@@ -48,13 +48,18 @@ class SiteConfigView(APIView):
     def get(self, request):
         item = SiteConfig.objects.first()
         if not item:
+            # No row yet: brand defaults are safe, everything team-specific stays a marker so the
+            # UI can show an honest "not configured" state (never an empty promise).
             return Response(
                 {
                     "brand_en": "Emmett",
                     "brand_fa": "امت",
-                    "telegram_handle": "[INPUT B5]",
+                    "telegram_handle": "",
                     "building_fa": "[INPUT B4]",
                     "building_en": "[INPUT B4]",
+                    "lab_samples_per_day": None,
+                    "lab_turnaround_hours": None,
+                    "lab_tests_per_sample": None,
                 }
             )
         return Response(
@@ -64,6 +69,9 @@ class SiteConfigView(APIView):
                 "telegram_handle": item.telegram_handle,
                 "building_fa": item.building_fa,
                 "building_en": item.building_en,
+                "lab_samples_per_day": item.lab_samples_per_day,
+                "lab_turnaround_hours": item.lab_turnaround_hours,
+                "lab_tests_per_sample": item.lab_tests_per_sample,
             }
         )
 

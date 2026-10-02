@@ -1,3 +1,4 @@
+import { emit } from "@/lib/events";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { ApiError, apiPost } from "@/lib/api-client";
@@ -42,6 +43,7 @@ export function useShareLink(tool: string) {
           params: payload.params,
         });
         setState({ status: "ready", path: response.path });
+        emit("tool_share", { tool, method: "link" });
       } catch (error) {
         const message = error instanceof ApiError ? (locale === "fa" ? error.messageFa : error.messageEn) : String(error);
         setState({ status: "unavailable", reason: message });

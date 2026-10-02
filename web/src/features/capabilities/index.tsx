@@ -5,6 +5,7 @@ import { Footer } from "@/app/components/Footer";
 import { useI18n } from "@/app/i18n";
 import { Reveal } from "@/app/components/MotionKit";
 import { useSEO } from "@/lib/seo";
+import { emit } from "@/lib/events";
 import { buildMatrix, capabilityCoverage, MATRIX_COPY } from "./matrix";
 
 export function Capabilities() {
@@ -68,6 +69,7 @@ export function Capabilities() {
                     <li key={cell.id}>
                       <Link
                         to={cell.href}
+                        onClick={() => emit("capability_click", { capability: row.capability })}
                         data-evidence={cell.id}
                         className="group flex h-full flex-col gap-2 rounded-2xl border border-[var(--line)] bg-black/25 p-5 transition-colors hover:border-[var(--bright)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--bright)]"
                       >
