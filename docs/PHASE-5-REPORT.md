@@ -28,7 +28,7 @@
 |---|---|
 | تست‌های وب (vitest) | **۲۵ فایل / ۱۵۷ تست، همه سبز** |
 | تست‌های API (pytest) | **۱۰۱ passed, 1 skipped** |
-| بودجهٔ JS اولیه | **۱۴۲.۵ KB gzip** (سقف ۲۰۰)؛ artifact: `public/data/bundle-stats.json` (sha256 `d6f4c1bb4cd0f579`) |
+| بودجهٔ JS اولیه | **۱۴۲.۵ KB gzip** (سقف ۲۰۰)؛ artifact: `public/data/bundle-stats.json` (۹ اندازه‌گیری + `generatedAt`؛ هر بیلد بازتولید می‌شود) |
 | صفحه‌های Static Bridge | **۳۸ صفحهٔ دوزبانه** + sitemap + robots + security.txt |
 | قرارداد ابزار | ۷ ابزار زنده با شاهد قابل‌حل |
 | جلالی | ۴۷۴۸ تاریخ با ICU و چرخهٔ ۳۳ ساله |

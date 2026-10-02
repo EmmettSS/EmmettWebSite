@@ -103,7 +103,7 @@
 ## لایهٔ فنی
 
 ### ✅ بودجهٔ لایه‌ای: روت‌های اصلی ≤ ۲۰۰ KB gzip
-- **شاهد (دستور):** `corepack pnpm --filter @emmett/web build && budget` → `Initial JS: 142.5 KB gzip (budget 200 KB)`؛ خروجی کامل ۹ اندازه‌گیری در `public/data/bundle-stats.json` (sha256: `d6f4c1bb4cd0f579`) که در صفحهٔ F-10 «آزمایشگاه کارایی» نمایش داده می‌شود. همهٔ روت‌های `/tools/*` و `/lab/*` زیر ۳۵۰ KB و ≥۸ روت code-split هستند.
+- **شاهد (دستور):** `corepack pnpm --filter @emmett/web build && budget` → `Initial JS: 142.5 KB gzip (budget 200 KB)`؛ خروجی کامل ۹ اندازه‌گیری در `public/data/bundle-stats.json` (شامل `generatedAt` و ۹ اندازه‌گیری؛ در هر بیلد بازتولید می‌شود) که در صفحهٔ F-10 «آزمایشگاه کارایی» نمایش داده می‌شود. همهٔ روت‌های `/tools/*` و `/lab/*` زیر ۳۵۰ KB و ≥۸ روت code-split هستند.
 
 ### ✅ Lighthouse موبایل، هر دو زبان: Perf ≥ ۹۰ (در low-power) و A11y ≥ ۹۵، CLS < ۰٫۱
 - **شاهد (اعداد واقعی، ۱۲ اجرا روی ۶ روت):** `npx @lhci/cli autorun` → `All results processed!` (خروج ۰). آستانه‌ها: `categories:performance ≥ 0.90`، `categories:accessibility ≥ 0.95`، `cumulative-layout-shift ≤ 0.1`، `errors-in-console = 0`.
