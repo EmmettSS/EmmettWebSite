@@ -47,13 +47,13 @@ function PentestorBay() {
         </div>
         <div className="flex items-center gap-1.5">
           <LiveDot />
-          <span className="text-[10px] font-mono text-[rgba(245,246,247,0.3)]">DEMO SCAN</span>
+          <span className="text-[10px] font-mono text-[rgba(245,246,247,0.62)]">DEMO SCAN</span>
         </div>
       </div>
 
       {/* Progress */}
       <div className="space-y-1.5">
-        <div className="flex justify-between text-[10px] font-mono text-[rgba(245,246,247,0.3)]">
+        <div className="flex justify-between text-[10px] font-mono text-[rgba(245,246,247,0.62)]">
           <span>scan progress</span>
           <span className="text-[#10B981]">{pct}%</span>
         </div>
@@ -83,7 +83,7 @@ function PentestorBay() {
               {f.sev}
             </span>
             <span className="text-xs font-mono text-[rgba(245,246,247,0.5)] flex-1">{f.label}</span>
-            <span className="text-[10px] font-mono text-[rgba(245,246,247,0.2)]">{f.port}</span>
+            <span className="text-[10px] font-mono text-[rgba(245,246,247,0.62)]">{f.port}</span>
           </motion.div>
         ))}
         {visibleCount < findings.length && (
@@ -91,7 +91,7 @@ function PentestorBay() {
             <motion.span
               animate={{ opacity: [0.2, 0.5, 0.2] }}
               transition={{ duration: 1.2, repeat: Infinity }}
-              className="text-[10px] font-mono text-[rgba(245,246,247,0.2)]"
+              className="text-[10px] font-mono text-[rgba(245,246,247,0.62)]"
             >
               analyzing target…
             </motion.span>
@@ -99,7 +99,7 @@ function PentestorBay() {
         )}
       </div>
 
-      <div className="flex justify-between text-[10px] font-mono text-[rgba(245,246,247,0.18)]">
+      <div className="flex justify-between text-[10px] font-mono text-[rgba(245,246,247,0.62)]">
         <span>target: demo.emmett.lab</span>
         <span>simulated data</span>
       </div>
@@ -123,7 +123,7 @@ function CRMBay() {
         </div>
         <div className="flex items-center gap-1.5">
           <LiveDot />
-          <span className="text-[10px] font-mono text-[rgba(245,246,247,0.3)]">DEMO</span>
+          <span className="text-[10px] font-mono text-[rgba(245,246,247,0.62)]">DEMO</span>
         </div>
       </div>
 
@@ -138,7 +138,7 @@ function CRMBay() {
             <div className="text-xl font-mono font-semibold" style={{ color: m.color }}>
               {m.value}{m.suffix}
             </div>
-            <div className="text-[9px] font-mono text-[rgba(245,246,247,0.28)] leading-tight uppercase tracking-widest">
+            <div className="text-[9px] font-mono text-[rgba(245,246,247,0.62)] leading-tight uppercase tracking-widest">
               {m.label}
             </div>
           </div>
@@ -147,7 +147,7 @@ function CRMBay() {
 
       {/* Activity */}
       <div className="space-y-2">
-        <div className="text-[10px] font-mono text-[rgba(245,246,247,0.2)] uppercase tracking-widest mb-1">
+        <div className="text-[10px] font-mono text-[rgba(245,246,247,0.62)] uppercase tracking-widest mb-1">
           Recent Activity
         </div>
         {[
@@ -157,13 +157,13 @@ function CRMBay() {
         ].map((a, i) => (
           <div key={i} className="flex items-center gap-2.5 py-1">
             <div className="w-1 h-1 rounded-full flex-shrink-0" style={{ backgroundColor: a.dot }} />
-            <span className="text-xs font-mono text-[rgba(245,246,247,0.38)] flex-1">{a.label}</span>
-            <span className="text-[10px] font-mono text-[rgba(245,246,247,0.2)]">{a.time}</span>
+            <span className="text-xs font-mono text-[rgba(245,246,247,0.62)] flex-1">{a.label}</span>
+            <span className="text-[10px] font-mono text-[rgba(245,246,247,0.62)]">{a.time}</span>
           </div>
         ))}
       </div>
 
-      <div className="text-[10px] font-mono text-[rgba(245,246,247,0.18)]">simulated demo data</div>
+      <div className="text-[10px] font-mono text-[rgba(245,246,247,0.62)]">simulated demo data</div>
     </div>
   );
 }
@@ -180,15 +180,15 @@ export function ProductLabTeaser() {
         >
           <div className="flex items-center gap-3 mb-6">
             <div className="w-6 h-px bg-[rgba(245,246,247,0.12)]" />
-            <span className="text-xs font-mono tracking-[0.2em] uppercase text-[rgba(245,246,247,0.3)]">
+            <span className="text-xs font-mono tracking-[0.2em] uppercase text-[rgba(245,246,247,0.62)]">
               The Product Lab
             </span>
           </div>
           <h2 className="text-[clamp(1.8rem,4vw,3rem)] font-medium leading-tight tracking-tight text-[#F5F6F7] max-w-xl">
             Products we built,{" "}
-            <span className="text-[rgba(245,246,247,0.35)]">running now</span>
+            <span className="text-[rgba(245,246,247,0.62)]">running now</span>
           </h2>
-          <p className="mt-4 text-sm text-[rgba(245,246,247,0.38)] max-w-md leading-relaxed">
+          <p className="mt-4 text-sm text-[rgba(245,246,247,0.62)] max-w-md leading-relaxed">
             Not mockups. Intelligent systems operating with real architecture.
           </p>
         </motion.div>
@@ -204,11 +204,11 @@ export function ProductLabTeaser() {
             <div className="flex items-center justify-between px-1">
               <div>
                 <div className="text-sm font-semibold text-[#F5F6F7]">PenTestor</div>
-                <div className="text-xs text-[rgba(245,246,247,0.35)] font-mono">Active penetration testing platform</div>
+                <div className="text-xs text-[rgba(245,246,247,0.62)] font-mono">Active penetration testing platform</div>
               </div>
               <Link
                 to="/products/pentestor"
-                className="inline-flex items-center gap-1.5 text-sm font-mono text-[#6366F1] hover:text-[rgba(99,102,241,0.7)] transition-colors"
+                className="inline-flex items-center gap-1.5 text-sm font-mono text-[#6366F1] hover:text-[#a5b4fc] transition-colors"
               >
                 Enter <ArrowRight className="w-3.5 h-3.5" />
               </Link>
@@ -226,11 +226,11 @@ export function ProductLabTeaser() {
             <div className="flex items-center justify-between px-1">
               <div>
                 <div className="text-sm font-semibold text-[#F5F6F7]">CRM</div>
-                <div className="text-xs text-[rgba(245,246,247,0.35)] font-mono">Intelligent relationship management</div>
+                <div className="text-xs text-[rgba(245,246,247,0.62)] font-mono">Intelligent relationship management</div>
               </div>
               <Link
                 to="/products/crm"
-                className="inline-flex items-center gap-1.5 text-sm font-mono text-[#10B981] hover:text-[rgba(16,185,129,0.7)] transition-colors"
+                className="inline-flex items-center gap-1.5 text-sm font-mono text-[#10B981] hover:text-[rgba(16,185,129,0.9)] transition-colors"
               >
                 Enter <ArrowRight className="w-3.5 h-3.5" />
               </Link>
@@ -246,7 +246,7 @@ export function ProductLabTeaser() {
         >
           <Link
             to="/products"
-            className="group inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-white/[0.07] text-sm font-mono text-[rgba(245,246,247,0.38)] hover:border-white/[0.14] hover:text-[rgba(245,246,247,0.65)] transition-all duration-200"
+            className="group inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-white/[0.07] text-sm font-mono text-[rgba(245,246,247,0.62)] hover:border-white/[0.14] hover:text-[rgba(245,246,247,0.65)] transition-all duration-200"
           >
             Enter the Product Lab
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

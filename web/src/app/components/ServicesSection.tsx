@@ -144,7 +144,7 @@ export function ServicesSection() {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ delay: 0.12 }}
-            className="mt-4 text-base text-[rgba(16,42,32,0.58)] max-w-[52ch] leading-relaxed"
+            className="mt-4 text-base text-[rgba(16,42,32,0.72)] max-w-[52ch] leading-relaxed"
           >
             From infrastructure to intelligence, we design and build the systems that make ambitious products possible.
           </motion.p>
@@ -172,7 +172,7 @@ export function ServicesSection() {
                 }}
               >
                 <div className="flex items-start gap-5">
-                  <span className="text-[11px] font-mono text-[rgba(16,42,32,0.3)] mt-1 pt-0.5 w-6 flex-shrink-0 tracking-widest">
+                  <span className="text-[11px] font-mono text-[rgba(16,42,32,0.72)] mt-1 pt-0.5 w-6 flex-shrink-0 tracking-widest">
                     {s.num}
                   </span>
                   <div className="flex-1 min-w-0">
@@ -184,7 +184,7 @@ export function ServicesSection() {
                         {s.title}
                       </h3>
                     </div>
-                    <p className="text-sm text-[rgba(16,42,32,0.55)] leading-relaxed mb-3">
+                    <p className="text-sm text-[rgba(16,42,32,0.72)] leading-relaxed mb-3">
                       {s.copy}
                     </p>
                     <div className="flex flex-wrap gap-2">
@@ -226,7 +226,7 @@ export function ServicesSection() {
             className="sticky top-24 rounded-2xl overflow-hidden border border-[rgba(16,42,32,0.08)] bg-[rgba(16,42,32,0.03)] p-6"
             style={{ aspectRatio: "4/3" }}
           >
-            <div className="absolute top-4 left-4 text-[10px] font-mono text-[rgba(16,42,32,0.3)] tracking-widest uppercase">
+            <div className="absolute top-4 left-4 text-[10px] font-mono text-[rgba(16,42,32,0.72)] tracking-widest uppercase">
               System Map · Hover to explore
             </div>
 
@@ -345,7 +345,7 @@ export function ServicesSection() {
                   {services.find((s) => s.id === active)?.title}
                 </motion.div>
               ) : (
-                <div className="text-[11px] font-mono text-[rgba(16,42,32,0.3)] tracking-wide">
+                <div className="text-[11px] font-mono text-[rgba(16,42,32,0.72)] tracking-wide">
                   Hover a service to activate
                 </div>
               )}

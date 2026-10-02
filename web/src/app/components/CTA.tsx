@@ -40,13 +40,13 @@ export function CTA() {
             <div>
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-6 h-px bg-[rgba(245,246,247,0.2)]" />
-                <span className="text-xs font-mono tracking-[0.2em] uppercase text-[rgba(245,246,247,0.38)]">
+                <span className="text-xs font-mono tracking-[0.2em] uppercase text-[rgba(245,246,247,0.62)]">
                   14 — Contact
                 </span>
               </div>
               <h2 className="text-[clamp(2rem,5vw,3.5rem)] font-medium leading-tight tracking-tight text-[#F5F6F7]">
                 Let's engineer<br />
-                <span className="text-[rgba(245,246,247,0.38)]">something real</span>
+                <span className="text-[rgba(245,246,247,0.62)]">something real</span>
               </h2>
             </div>
 
@@ -58,21 +58,21 @@ export function CTA() {
                 { label: "Location", value: "University of Tehran · Remote" },
               ].map((item) => (
                 <div key={item.label} className="flex items-center justify-between py-3 border-b border-white/[0.04]">
-                  <span className="text-xs font-mono tracking-widest uppercase text-[rgba(245,246,247,0.22)]">{item.label}</span>
+                  <span className="text-xs font-mono tracking-widest uppercase text-[rgba(245,246,247,0.62)]">{item.label}</span>
                   <span className="text-sm font-mono text-[rgba(245,246,247,0.64)]">{item.value}</span>
                 </div>
               ))}
             </div>
 
             <div>
-              <p className="text-xs font-mono tracking-widest uppercase text-[rgba(245,246,247,0.22)] mb-2">Direct Contact</p>
+              <p className="text-xs font-mono tracking-widest uppercase text-[rgba(245,246,247,0.62)] mb-2">Direct Contact</p>
               <button
                 onClick={() => navigator.clipboard?.writeText("contact@emmettgroup.tech")}
                 className="font-mono text-sm text-[#10B981] hover:text-[#0ea571] transition-colors group"
                 title="Click to copy"
               >
                 contact@emmettgroup.tech
-                <span className="ml-2 text-[rgba(245,246,247,0.22)] text-xs opacity-0 group-hover:opacity-100 transition-opacity">copy</span>
+                <span className="ml-2 text-[rgba(245,246,247,0.62)] text-xs opacity-0 group-hover:opacity-100 transition-opacity">copy</span>
               </button>
             </div>
           </motion.div>
@@ -90,7 +90,7 @@ export function CTA() {
                 <div className="w-2.5 h-2.5 rounded-full bg-[#EF4444]/40" />
                 <div className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]/40" />
                 <div className="w-2.5 h-2.5 rounded-full bg-[#10B981]/40" />
-                <span className="ml-3 text-xs font-mono text-[rgba(245,246,247,0.22)]">emmett-group — new-project</span>
+                <span className="ml-3 text-xs font-mono text-[rgba(245,246,247,0.62)]">emmett-group — new-project</span>
               </div>
 
               {submitted ? (
@@ -101,39 +101,39 @@ export function CTA() {
                 >
                   <CheckCircle className="w-10 h-10 text-[#10B981] mx-auto" />
                   <p className="font-mono text-[#F5F6F7]">Message received.</p>
-                  <p className="font-mono text-sm text-[rgba(245,246,247,0.38)]">We'll respond within 24 hours.</p>
+                  <p className="font-mono text-sm text-[rgba(245,246,247,0.62)]">We'll respond within 24 hours.</p>
                   <a href="#" className="inline-block text-xs font-mono text-[#10B981] mt-2">book a call instead →</a>
                 </motion.div>
               ) : (
                 <form onSubmit={handleSubmit} className="p-6 space-y-5">
                   {/* Name */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-mono tracking-widest uppercase text-[rgba(245,246,247,0.22)]">&gt; NAME</label>
+                    <label className="text-[10px] font-mono tracking-widest uppercase text-[rgba(245,246,247,0.62)]">&gt; NAME</label>
                     <input
                       type="text"
                       value={form.name}
                       onChange={(e) => setForm({ ...form, name: e.target.value })}
                       required
                       placeholder="Your full name"
-                      className="w-full bg-transparent border-b border-white/[0.08] py-2 text-sm font-mono text-[rgba(245,246,247,0.64)] placeholder:text-[rgba(245,246,247,0.18)] outline-none focus:border-[#10B981] transition-colors"
+                      className="w-full bg-transparent border-b border-white/[0.08] py-2 text-sm font-mono text-[rgba(245,246,247,0.64)] placeholder:text-[rgba(245,246,247,0.62)] outline-none focus:border-[#10B981] transition-colors"
                     />
                   </div>
 
                   {/* Company */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-mono tracking-widest uppercase text-[rgba(245,246,247,0.22)]">&gt; COMPANY</label>
+                    <label className="text-[10px] font-mono tracking-widest uppercase text-[rgba(245,246,247,0.62)]">&gt; COMPANY</label>
                     <input
                       type="text"
                       value={form.company}
                       onChange={(e) => setForm({ ...form, company: e.target.value })}
                       placeholder="Organization (optional)"
-                      className="w-full bg-transparent border-b border-white/[0.08] py-2 text-sm font-mono text-[rgba(245,246,247,0.64)] placeholder:text-[rgba(245,246,247,0.18)] outline-none focus:border-[#10B981] transition-colors"
+                      className="w-full bg-transparent border-b border-white/[0.08] py-2 text-sm font-mono text-[rgba(245,246,247,0.64)] placeholder:text-[rgba(245,246,247,0.62)] outline-none focus:border-[#10B981] transition-colors"
                     />
                   </div>
 
                   {/* Project type */}
                   <div className="space-y-2">
-                    <label className="text-[10px] font-mono tracking-widest uppercase text-[rgba(245,246,247,0.22)]">&gt; PROJECT TYPE</label>
+                    <label className="text-[10px] font-mono tracking-widest uppercase text-[rgba(245,246,247,0.62)]">&gt; PROJECT TYPE</label>
                     <div className="grid grid-cols-3 gap-2">
                       {projectTypes.map((pt) => (
                         <button
@@ -155,14 +155,14 @@ export function CTA() {
 
                   {/* Message */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-mono tracking-widest uppercase text-[rgba(245,246,247,0.22)]">&gt; MESSAGE</label>
+                    <label className="text-[10px] font-mono tracking-widest uppercase text-[rgba(245,246,247,0.62)]">&gt; MESSAGE</label>
                     <textarea
                       value={form.message}
                       onChange={(e) => setForm({ ...form, message: e.target.value })}
                       required
                       rows={4}
                       placeholder="Describe your project or challenge…"
-                      className="w-full bg-transparent border-b border-white/[0.08] py-2 text-sm font-mono text-[rgba(245,246,247,0.64)] placeholder:text-[rgba(245,246,247,0.18)] outline-none focus:border-[#10B981] transition-colors resize-none"
+                      className="w-full bg-transparent border-b border-white/[0.08] py-2 text-sm font-mono text-[rgba(245,246,247,0.64)] placeholder:text-[rgba(245,246,247,0.62)] outline-none focus:border-[#10B981] transition-colors resize-none"
                     />
                   </div>
 

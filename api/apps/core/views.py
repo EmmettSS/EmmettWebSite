@@ -5,7 +5,8 @@ from rest_framework import serializers
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import ToolCatalogResponseSerializer
+from apps.tools.catalog import localized_items
+from apps.tools.serializers import ToolCatalogResponseSerializer
 
 _started_at = time.monotonic()
 
@@ -23,8 +24,9 @@ class PublicToolsView(APIView):
     authentication_classes = []
 
     def get(self, request):
-        # The catalog is intentionally empty until Phase 2 ships verified tools.
-        return Response({"items": [], "count": 0})
+        lang = "en" if request.query_params.get("lang") == "en" else "fa"
+        items = localized_items(lang)
+        return Response({"items": items, "count": len(items)})
 
 
 class HealthView(APIView):

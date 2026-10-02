@@ -59,7 +59,7 @@ function PentestorUI() {
     <div className="space-y-2 p-4 rounded-xl bg-[rgba(31,174,110,0.04)] border border-[rgba(31,174,110,0.1)]">
       <div className="flex items-center gap-2 mb-3">
         <div className="w-1.5 h-1.5 rounded-full bg-[#1FAE6E] animate-pulse" />
-        <span className="text-[10px] font-mono text-[rgba(31,174,110,0.6)] tracking-widest uppercase">Scan Active</span>
+        <span className="text-[10px] font-mono text-[rgba(31,174,110,0.9)] tracking-widest uppercase">Scan Active</span>
       </div>
       {[
         { label: "Attack Surface", val: "247 endpoints", status: "ok" },
@@ -68,7 +68,7 @@ function PentestorUI() {
         { label: "Remediation", val: "18 / 21", status: "ok" },
       ].map((row) => (
         <div key={row.label} className="flex items-center justify-between px-3 py-2 rounded-lg bg-[rgba(16,42,32,0.4)] border border-[rgba(31,174,110,0.06)]">
-          <span className="text-[10px] font-mono text-[rgba(243,250,246,0.4)]">{row.label}</span>
+          <span className="text-[10px] font-mono text-[rgba(243,250,246,0.62)]">{row.label}</span>
           <span className={`text-[10px] font-mono font-semibold ${
             row.status === "alert" ? "text-red-400" :
             row.status === "warn" ? "text-amber-400" :
@@ -90,13 +90,13 @@ function CrmUI() {
   return (
     <div className="space-y-2 p-4 rounded-xl bg-[rgba(31,174,110,0.04)] border border-[rgba(31,174,110,0.1)]">
       <div className="flex items-center justify-between mb-3">
-        <span className="text-[10px] font-mono text-[rgba(243,250,246,0.4)] tracking-widest uppercase">Pipeline</span>
+        <span className="text-[10px] font-mono text-[rgba(243,250,246,0.62)] tracking-widest uppercase">Pipeline</span>
         <span className="text-[10px] font-mono text-[#1FAE6E]">Q3 2026</span>
       </div>
       {stages.map((row) => (
         <div key={row.stage} className="space-y-1">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-mono text-[rgba(243,250,246,0.4)]">{row.stage}</span>
+            <span className="text-[10px] font-mono text-[rgba(243,250,246,0.62)]">{row.stage}</span>
             <span className="text-[10px] font-mono text-[rgba(243,250,246,0.6)]">{row.count}</span>
           </div>
           <div className="h-1 rounded-full bg-[rgba(31,174,110,0.12)]">
@@ -118,14 +118,14 @@ function PropertyUI() {
   return (
     <div className="space-y-2 p-4 rounded-xl bg-[rgba(31,174,110,0.04)] border border-[rgba(31,174,110,0.1)]">
       <div className="flex items-center justify-between mb-3">
-        <span className="text-[10px] font-mono text-[rgba(243,250,246,0.4)] tracking-widest uppercase">Tehran</span>
+        <span className="text-[10px] font-mono text-[rgba(243,250,246,0.62)] tracking-widest uppercase">Tehran</span>
         <span className="text-[10px] font-mono text-[#1FAE6E]">1,247 active</span>
       </div>
       {listings.map((row) => (
         <div key={row.area} className="flex items-center justify-between px-3 py-2 rounded-lg bg-[rgba(16,42,32,0.4)] border border-[rgba(31,174,110,0.06)]">
           <span className="text-[10px] font-mono text-[rgba(243,250,246,0.5)]">{row.area}</span>
           <div className="flex items-center gap-3">
-            <span className="text-[10px] font-mono text-[rgba(243,250,246,0.35)]">₺ {row.price}</span>
+            <span className="text-[10px] font-mono text-[rgba(243,250,246,0.62)]">₺ {row.price}</span>
             <span className="text-[10px] font-mono font-semibold text-[#1FAE6E]">{row.score}</span>
           </div>
         </div>
@@ -190,14 +190,14 @@ export function ProductsSection() {
             >
               <div className="p-6 pb-4">
                 <div className="flex items-start justify-between mb-4">
-                  <span className="text-[10px] font-mono text-[rgba(243,250,246,0.28)] tracking-widest">{p.num}</span>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded border border-[rgba(31,174,110,0.2)] text-[rgba(31,174,110,0.6)] tracking-wider">
+                  <span className="text-[10px] font-mono text-[rgba(243,250,246,0.62)] tracking-widest">{p.num}</span>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded border border-[rgba(31,174,110,0.2)] text-[rgba(31,174,110,0.9)] tracking-wider">
                     {p.pill}
                   </span>
                 </div>
                 <h3 className="text-xl font-semibold text-[#F3FAF6] mb-1">{p.name}</h3>
                 <p className="text-sm text-[rgba(243,250,246,0.5)] mb-3 italic">{p.tagline}</p>
-                <p className="text-sm text-[rgba(243,250,246,0.4)] leading-relaxed">{p.copy}</p>
+                <p className="text-sm text-[rgba(243,250,246,0.62)] leading-relaxed">{p.copy}</p>
               </div>
 
               <div className="px-6 py-3 flex-1">
@@ -207,7 +207,7 @@ export function ProductsSection() {
               <div className="p-6 pt-4 border-t border-[rgba(31,174,110,0.08)]">
                 <div className="flex flex-wrap gap-1.5 mb-4">
                   {p.tags.map((t) => (
-                    <span key={t} className="text-[9px] font-mono tracking-widest uppercase px-2 py-0.5 rounded bg-[rgba(31,174,110,0.06)] border border-[rgba(31,174,110,0.12)] text-[rgba(31,174,110,0.55)]">
+                    <span key={t} className="text-[9px] font-mono tracking-widest uppercase px-2 py-0.5 rounded bg-[rgba(31,174,110,0.06)] border border-[rgba(31,174,110,0.12)] text-[rgba(31,174,110,0.9)]">
                       {t}
                     </span>
                   ))}
@@ -232,7 +232,7 @@ export function ProductsSection() {
         >
           <Link
             to="/products"
-            className="text-sm font-mono text-[rgba(243,250,246,0.35)] hover:text-[rgba(243,250,246,0.65)] transition-colors"
+            className="text-sm font-mono text-[rgba(243,250,246,0.62)] hover:text-[rgba(243,250,246,0.65)] transition-colors"
           >
             See all products →
           </Link>

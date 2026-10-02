@@ -178,14 +178,14 @@ export function Resources() {
                   </span>
                 </div>
                 <h3 className="mt-16 text-2xl">{a[1]}</h3>
-                <p className="mt-4 leading-7 text-white/45">{a[2]}</p>
+                <p className="mt-4 leading-7 text-white/55">{a[2]}</p>
                 <ArrowUpRight className="mt-7 h-5 w-5 text-[var(--emerald)] transition group-hover:rotate-45" />
               </GlowCard>
             </Reveal>
           ))}
         </div>
         {!rows.length && (
-          <div className="py-28 text-center text-white/45">{t.empty}</div>
+          <div className="py-28 text-center text-white/55">{t.empty}</div>
         )}
       </section>
       <Footer />

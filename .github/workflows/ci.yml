@@ -17,6 +17,9 @@ jobs:
       - run: pnpm --filter @emmett/web test
       - run: pnpm --filter @emmett/web content:check
       - run: pnpm --filter @emmett/web content:check -- --self-test
+      - run: pnpm --filter @emmett/web jalali:check
+      - run: pnpm --filter @emmett/web corpus:check
+      - run: pnpm --filter @emmett/web tool:contract
       - run: pnpm --filter @emmett/web api:types
       - run: git diff --exit-code -- web/src/lib/api-types.ts
       - run: pnpm --filter @emmett/web build
@@ -27,7 +30,24 @@ jobs:
           PUBLIC_SITE_URL: https://example.invalid
       - run: pnpm --filter @emmett/web seo:check
       - run: pnpm --filter @emmett/web exec playwright install --with-deps chromium
-      - run: pnpm --filter @emmett/web a11y
+      - name: Run a11y (Playwright + axe)
+        shell: bash
+        env:
+          FORCE_COLOR: '0'
+          NO_COLOR: '1'
+          A11Y_REPORT: /tmp/axe-violations.json
+          PLAYWRIGHT_JSON_OUTPUT_NAME: /tmp/a11y.json
+        run: |
+          set -o pipefail
+          rm -f /tmp/axe-violations*.json
+          pnpm --filter @emmett/web exec playwright test --reporter=list,json 2>&1 | tee /tmp/a11y.log
+      - name: Report a11y failures
+        if: failure()
+        shell: bash
+        run: |
+          { echo '### a11y log tail'; echo '```'; tail -n 80 /tmp/a11y.log 2>/dev/null; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          node web/scripts/report-playwright-failures.mjs /tmp/a11y.json /tmp/axe-violations.json
+          exit 0
   api:
     runs-on: ubuntu-latest
     defaults:
@@ -50,6 +70,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }  # gitleaks walks the commit range; a shallow clone fails it
       - uses: pnpm/action-setup@v4
         with: { version: 9.15.9 }
       - uses: actions/setup-node@v4
@@ -59,6 +80,10 @@ jobs:
       - uses: gitleaks/gitleaks-action@v2.3.9
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Report gitleaks failures
+        if: failure()
+        shell: bash
+        run: echo "::error::gitleaks failed — see .gitleaks.toml for the documented allowlist (sample JWTs and .env.example placeholders)." 
   queue-race:
     runs-on: ubuntu-latest
     services:
@@ -81,7 +106,11 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: '3.12' }
       - run: pip install -r requirements/dev.txt mysqlclient==2.2.7
-      - run: pytest apps/jobs/test_jobs.py -q
+      - name: Grant the test database to the app user
+        run: |
+          mysql -h 127.0.0.1 -P 3306 -u root -proot -e "GRANT ALL PRIVILEGES ON *.* TO 'emmett'@'%'; FLUSH PRIVILEGES;" && echo "granted emmett the throwaway CI database"
+      - name: Run queue-race test
+        shell: bash
         env:
           DB_ENGINE: mysql
           DB_NAME: emmett
@@ -89,3 +118,14 @@ jobs:
           DB_PASSWORD: emmett
           DB_HOST: 127.0.0.1
           DB_PORT: 3306
+        run: |
+          set -o pipefail
+          pytest apps/jobs/test_jobs.py -q 2>&1 | tee /tmp/pytest.log
+      - name: Report queue-race failures
+        if: failure()
+        shell: bash
+        run: |
+          { echo '### queue-race log tail'; echo '```'; tail -n 80 /tmp/pytest.log 2>/dev/null; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          grep -aE '^(FAILED|ERROR|Traceback)|^E |sql = |OperationalError|ProgrammingError|Permission denied' /tmp/pytest.log 2>/dev/null | head -40 | while IFS= read -r line; do echo "::error::qr: ${line:0:900}"; done
+          tail -n 30 /tmp/pytest.log 2>/dev/null | while IFS= read -r line; do echo "::error::qr-log: ${line:0:900}"; done
+          exit 0

@@ -168,10 +168,10 @@ export function ContactSection() {
             { label: "Status", value: "Accepting projects" },
           ].map((item) => (
             <div key={item.label} className="text-center">
-              <div className="text-[9px] font-mono text-[rgba(243,250,246,0.2)] tracking-widest uppercase mb-1">
+              <div className="text-[9px] font-mono text-[rgba(243,250,246,0.62)] tracking-widest uppercase mb-1">
                 {item.label}
               </div>
-              <div className="text-xs font-mono text-[rgba(243,250,246,0.45)]">
+              <div className="text-xs font-mono text-[rgba(243,250,246,0.62)]">
                 {item.value}
               </div>
             </div>

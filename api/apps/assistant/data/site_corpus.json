@@ -1,0 +1,1187 @@
+{
+  "generated_by": "web/scripts/export-corpus.ts",
+  "pages": [
+    {
+      "id": "services",
+      "path": "/services",
+      "title": {
+        "fa": "خدمات مهندسی",
+        "en": "Engineering services"
+      },
+      "copy": {
+        "fa": {
+          "eyebrow": "خدمات مهندسی امت",
+          "title": "از یک چالش پیچیده تا",
+          "accent": "محصولی زنده و ماندگار.",
+          "intro": "استراتژی، طراحی محصول، هوش مصنوعی و زیرساخت را در یک تیم منسجم کنار هم می‌آوریم تا ایده شما سریع‌تر، دقیق‌تر و با ریسک کمتر به محصول واقعی تبدیل شود.",
+          "metrics": [
+            [
+              "۴",
+              "تخصص در یک تیم"
+            ],
+            [
+              "۱۴ روز",
+              "تا نمونه اولیه"
+            ],
+            [
+              "٪۹۹٫۹",
+              "هدف پایداری"
+            ]
+          ],
+          "cards": [
+            {
+              "tag": "کشف",
+              "title": "شناخت عمیق سامانه",
+              "copy": "محدودیت واقعی را پیدا می‌کنیم، ریسک را می‌سنجیم و مؤثرترین نقطه شروع را انتخاب می‌کنیم."
+            },
+            {
+              "tag": "ساخت",
+              "title": "مهندسی محصول",
+              "copy": "طراحی، نرم‌افزار و هوش مصنوعی در یک چرخه پیوسته پیش می‌روند."
+            },
+            {
+              "tag": "مقیاس",
+              "title": "هوشمندی عملیاتی",
+              "copy": "رصدپذیری، خودکارسازی و حاکمیت از روز نخست در معماری قرار می‌گیرند."
+            }
+          ],
+          "capabilities": [
+            "مهندسی محصولات هوشمند",
+            "معماری ابری",
+            "مهندسی امنیت",
+            "سکوهای داده",
+            "طراحی محصول",
+            "راهبرد فنی"
+          ]
+        },
+        "en": {
+          "eyebrow": "THE ENGINEERING SYSTEM",
+          "title": "From hard problem to",
+          "accent": "living system.",
+          "intro": "Strategy, product design, AI and resilient infrastructure—one senior team turning consequential ideas into production systems.",
+          "metrics": [
+            [
+              "04",
+              "Integrated disciplines"
+            ],
+            [
+              "14d",
+              "Prototype sprint"
+            ],
+            [
+              "99.9%",
+              "Production target"
+            ]
+          ],
+          "cards": [
+            {
+              "tag": "DISCOVER",
+              "title": "Systems diagnosis",
+              "copy": "Map the real constraint, model risk and find the smallest high-leverage move."
+            },
+            {
+              "tag": "BUILD",
+              "title": "Product engineering",
+              "copy": "Design, software and intelligence move in one continuous delivery loop."
+            },
+            {
+              "tag": "SCALE",
+              "title": "Operational intelligence",
+              "copy": "Observability, automation and governance designed in from day one."
+            }
+          ],
+          "capabilities": [
+            "AI product engineering",
+            "Cloud architecture",
+            "Security engineering",
+            "Data platforms",
+            "Product design",
+            "Technical strategy"
+          ]
+        }
+      }
+    },
+    {
+      "id": "products",
+      "path": "/products",
+      "title": {
+        "fa": "محصولات",
+        "en": "Products"
+      },
+      "copy": {
+        "fa": {
+          "eyebrow": "محصولات امت",
+          "title": "محصولاتی برای",
+          "accent": "نیازهای واقعی کسب‌وکار.",
+          "intro": "جایی که ابزارهای آماده پاسخ‌گو نیستند، محصولات امت وارد می‌شوند؛ برای داده‌های حساس، فرایندهای پیچیده و تصمیم‌هایی که به دید دقیق‌تری نیاز دارند.",
+          "metrics": [
+            [
+              "۲",
+              "محصول اصلی"
+            ],
+            [
+              "۲۴/۷",
+              "پایش هوشمند"
+            ],
+            [
+              "۱",
+              "هسته یکپارچه داده"
+            ]
+          ],
+          "cards": [
+            {
+              "tag": "امنیت",
+              "title": "PenTestor",
+              "copy": "شبیه‌سازی پیوسته حمله و تبدیل یافته‌ها به اصلاحات روشن و اولویت‌بندی‌شده."
+            },
+            {
+              "tag": "عملیات",
+              "title": "Emmett CRM",
+              "copy": "سامانه‌ای برای تبدیل زمینه هر ارتباط به اقدام درست و به‌موقع."
+            },
+            {
+              "tag": "آزمایشی",
+              "title": "موتور سیگنال",
+              "copy": "مسیریابی ترکیبی رویدادها، عامل‌های هوشمند و تصمیم انسانی."
+            }
+          ],
+          "capabilities": [
+            "فرایندهای عامل‌محور",
+            "معماری حریم‌خصوصی‌محور",
+            "هوش مصنوعی توضیح‌پذیر",
+            "کنترل انسانی",
+            "داده زنده",
+            "رابط‌های ترکیب‌پذیر"
+          ]
+        },
+        "en": {
+          "eyebrow": "EMMETT PRODUCT LAB",
+          "title": "Tools born from",
+          "accent": "real constraints.",
+          "intro": "Products built where off-the-shelf software stops: sensitive data, high-friction workflows and decisions that need intelligence.",
+          "metrics": [
+            [
+              "02",
+              "Flagship products"
+            ],
+            [
+              "24/7",
+              "Autonomous signals"
+            ],
+            [
+              "01",
+              "Unified intelligence layer"
+            ]
+          ],
+          "cards": [
+            {
+              "tag": "SECURITY",
+              "title": "PenTestor",
+              "copy": "Continuous attack simulation translated into prioritized, explainable fixes."
+            },
+            {
+              "tag": "OPERATIONS",
+              "title": "Emmett CRM",
+              "copy": "A relationship operating system that turns context into momentum."
+            },
+            {
+              "tag": "EXPERIMENTAL",
+              "title": "Signal Engine",
+              "copy": "Composable routing for events, agents and human decisions."
+            }
+          ],
+          "capabilities": [
+            "Agentic workflows",
+            "Privacy-first architecture",
+            "Explainable AI",
+            "Human controls",
+            "Live telemetry",
+            "Composable APIs"
+          ]
+        }
+      }
+    },
+    {
+      "id": "pentestor",
+      "path": "/products/pentestor",
+      "title": {
+        "fa": "PenTestor",
+        "en": "PenTestor"
+      },
+      "copy": {
+        "fa": {
+          "eyebrow": "امنیت هوشمند و پیوسته",
+          "title": "آسیب‌پذیری را پیدا کنید؛",
+          "accent": "پیش از آن‌که مهاجم پیدا کند.",
+          "intro": "PenTestor به‌صورت پیوسته از نگاه مهاجم زیرساخت شما را بررسی می‌کند، مسیرهای نفوذ واقعی را می‌سنجد و برای هر تهدید، راه اصلاح روشن و اولویت‌بندی‌شده ارائه می‌دهد.",
+          "metrics": [
+            [
+              "۲۴/۷",
+              "ارزیابی پیوسته"
+            ],
+            [
+              "۱۰ برابر",
+              "بررسی سریع‌تر"
+            ],
+            [
+              "٪۱۰۰",
+              "یافته‌های قابل‌توضیح"
+            ]
+          ],
+          "cards": [
+            {
+              "tag": "نقشه",
+              "title": "سطح حمله زنده",
+              "copy": "دارایی‌ها و ارتباط آن‌ها هم‌زمان با تغییر زیرساخت کشف می‌شوند."
+            },
+            {
+              "tag": "شبیه‌سازی",
+              "title": "آزمون امن مهاجمانه",
+              "copy": "مسیرهای قابل بهره‌برداری بدون اختلال در محیط عملیاتی اعتبارسنجی می‌شوند."
+            },
+            {
+              "tag": "اصلاح",
+              "title": "راهکار آماده توسعه",
+              "copy": "شواهد، مالکیت و گام‌های اصلاحی با اولویت روشن ارائه می‌شوند."
+            }
+          ],
+          "capabilities": [
+            "مدل‌سازی مسیر حمله",
+            "کشف دارایی",
+            "ثبت شواهد",
+            "اولویت‌بندی ریسک",
+            "فرایند تیمی",
+            "گزارش مدیریتی"
+          ]
+        },
+        "en": {
+          "eyebrow": "AUTONOMOUS SECURITY",
+          "title": "See the breach",
+          "accent": "before it happens.",
+          "intro": "PenTestor continuously thinks like an attacker, validates exposure and gives engineering teams a clear route from signal to remediation.",
+          "metrics": [
+            [
+              "24/7",
+              "Continuous testing"
+            ],
+            [
+              "10×",
+              "Faster triage"
+            ],
+            [
+              "100%",
+              "Explainable findings"
+            ]
+          ],
+          "cards": [
+            {
+              "tag": "MAP",
+              "title": "Living attack surface",
+              "copy": "Discover assets and relationships as your infrastructure changes."
+            },
+            {
+              "tag": "SIMULATE",
+              "title": "Safe adversarial testing",
+              "copy": "Validate exploitable paths without disrupting production."
+            },
+            {
+              "tag": "REMEDIATE",
+              "title": "Developer-ready fixes",
+              "copy": "Prioritized evidence, ownership and clear mitigation steps."
+            }
+          ],
+          "capabilities": [
+            "Attack-path modeling",
+            "Asset discovery",
+            "Evidence capture",
+            "Risk prioritization",
+            "Team workflows",
+            "Executive reporting"
+          ]
+        }
+      }
+    },
+    {
+      "id": "crm",
+      "path": "/products/crm",
+      "title": {
+        "fa": "Emmett CRM",
+        "en": "Emmett CRM"
+      },
+      "copy": {
+        "fa": {
+          "eyebrow": "مدیریت هوشمند ارتباط با مشتری",
+          "title": "هر مشتری را",
+          "accent": "با تمام جزئیات بشناسید.",
+          "intro": "Emmett CRM اطلاعات پراکنده هر ارتباط را به یک تصویر روشن تبدیل می‌کند و بدون ورود داده‌های تکراری، بهترین زمان و اقدام بعدی را به تیم شما پیشنهاد می‌دهد.",
+          "metrics": [
+            [
+              "۳۶۰°",
+              "نمای کامل مشتری"
+            ],
+            [
+              "٪۴۲",
+              "کاهش کارهای دستی"
+            ],
+            [
+              "۳٫۲ برابر",
+              "پیگیری سریع‌تر"
+            ]
+          ],
+          "cards": [
+            {
+              "tag": "ثبت",
+              "title": "حافظه محیطی",
+              "copy": "جلسه‌ها، پیام‌ها و اقدام‌ها به‌صورت خودکار به زمینه ساختاریافته تبدیل می‌شوند."
+            },
+            {
+              "tag": "درک",
+              "title": "سیگنال فرصت",
+              "copy": "شتاب، ریسک و بهترین اقدام بعدی در زمان مناسب آشکار می‌شود."
+            },
+            {
+              "tag": "اقدام",
+              "title": "هماهنگی فرایند",
+              "copy": "انسان‌ها و عامل‌ها هماهنگ می‌شوند و کنترل نهایی در دست تیم باقی می‌ماند."
+            }
+          ],
+          "capabilities": [
+            "خط زمانی یکپارچه",
+            "خلاصه‌سازی هوشمند",
+            "پیشنهاد اقدام بعدی",
+            "خودکارسازی فرایند",
+            "سطوح دسترسی",
+            "یکپارچه‌سازی باز"
+          ]
+        },
+        "en": {
+          "eyebrow": "RELATIONSHIP INTELLIGENCE",
+          "title": "Every relationship.",
+          "accent": "Full context.",
+          "intro": "Emmett CRM captures the signal behind every conversation and helps teams act at the right moment—without turning work into data entry.",
+          "metrics": [
+            [
+              "360°",
+              "Relationship view"
+            ],
+            [
+              "42%",
+              "Less admin work"
+            ],
+            [
+              "3.2×",
+              "Faster follow-up"
+            ]
+          ],
+          "cards": [
+            {
+              "tag": "CAPTURE",
+              "title": "Ambient memory",
+              "copy": "Meetings, messages and actions become structured context automatically."
+            },
+            {
+              "tag": "UNDERSTAND",
+              "title": "Opportunity signals",
+              "copy": "Surface momentum, risk and the next best action."
+            },
+            {
+              "tag": "ACT",
+              "title": "Workflow orchestration",
+              "copy": "Coordinate people and agents while keeping humans in control."
+            }
+          ],
+          "capabilities": [
+            "Unified timeline",
+            "AI summaries",
+            "Next-best action",
+            "Workflow automation",
+            "Role permissions",
+            "Open integrations"
+          ]
+        }
+      }
+    },
+    {
+      "id": "projects",
+      "path": "/projects",
+      "title": {
+        "fa": "پروژه‌ها",
+        "en": "Projects"
+      },
+      "copy": {
+        "fa": {
+          "eyebrow": "نمونه‌کارهای منتخب",
+          "title": "محصولاتی که",
+          "accent": "زیر فشار هم درست کار می‌کنند.",
+          "intro": "گزیده‌ای از پروژه‌های امنیتی، عملیاتی و هوشمند امت؛ موفقیت هر پروژه را با نتیجه پس از انتشار می‌سنجیم، نه با حجم مستندات و ارائه‌ها.",
+          "metrics": [
+            [
+              "٪۴۲",
+              "کاهش اصطکاک عملیاتی"
+            ],
+            [
+              "۳٫۲ برابر",
+              "تصمیم‌گیری سریع‌تر"
+            ],
+            [
+              "۸ هفته",
+              "تا انتشار نسخه نخست"
+            ]
+          ],
+          "cards": [
+            {
+              "tag": "فین‌تک / هوش مصنوعی",
+              "title": "اتاق فرمان تصمیم",
+              "copy": "سیگنال‌های پراکنده ریسک در یک سطح توضیح‌پذیر یکپارچه شدند."
+            },
+            {
+              "tag": "امنیت",
+              "title": "اطمینان پیوسته",
+              "copy": "ارزیابی‌های مقطعی جای خود را به مدل زنده آسیب‌پذیری دادند."
+            },
+            {
+              "tag": "عملیات",
+              "title": "خلبان خودکار فرایند",
+              "copy": "کارهای تکراری خودکار شدند و استثناها در کنترل متخصصان ماندند."
+            }
+          ],
+          "capabilities": [
+            "چرخه کشف",
+            "معماری تجربه",
+            "توسعه کامل",
+            "ارزیابی هوش مصنوعی",
+            "آماده‌سازی تولید",
+            "توانمندسازی تیم"
+          ]
+        },
+        "en": {
+          "eyebrow": "PROOF OF WORK",
+          "title": "Systems that perform",
+          "accent": "under pressure.",
+          "intro": "Selected engagements across security, operations and intelligent products—measured by what changed after launch.",
+          "metrics": [
+            [
+              "42%",
+              "Less operational drag"
+            ],
+            [
+              "3.2×",
+              "Faster decisions"
+            ],
+            [
+              "8wk",
+              "Average first release"
+            ]
+          ],
+          "cards": [
+            {
+              "tag": "FINTECH / AI",
+              "title": "Decision cockpit",
+              "copy": "Unified fragmented risk signals into one explainable surface."
+            },
+            {
+              "tag": "SECURITY",
+              "title": "Continuous assurance",
+              "copy": "Replaced quarterly snapshots with a living model of exposure."
+            },
+            {
+              "tag": "OPERATIONS",
+              "title": "Workflow autopilot",
+              "copy": "Automated casework while experts controlled exceptions."
+            }
+          ],
+          "capabilities": [
+            "Discovery sprint",
+            "Experience architecture",
+            "Full-stack delivery",
+            "AI evaluation",
+            "Production hardening",
+            "Team enablement"
+          ]
+        }
+      }
+    },
+    {
+      "id": "academy",
+      "path": "/academy",
+      "title": {
+        "fa": "آکادمی",
+        "en": "Academy"
+      },
+      "copy": {
+        "fa": {
+          "eyebrow": "آکادمی امت",
+          "title": "یادگیری واقعی،",
+          "accent": "با ساختن محصول واقعی.",
+          "intro": "مسیرهای فشرده و پروژه‌محور برای کسانی که می‌خواهند اصول مهندسی را عمیق بفهمند، حرفه‌ای‌تر بسازند و نمونه‌کاری قابل‌ارائه داشته باشند.",
+          "metrics": [
+            [
+              "۶",
+              "مسیر تخصصی"
+            ],
+            [
+              "٪۷۰",
+              "یادگیری پروژه‌محور"
+            ],
+            [
+              "∞",
+              "فرصت برای ساختن"
+            ]
+          ],
+          "cards": [
+            {
+              "tag": "پایه",
+              "title": "مهندسی سامانه‌های هوشمند",
+              "copy": "از پرامپت عبور کنید و معماری، ارزیابی و رفتار قابل اتکا را بیاموزید."
+            },
+            {
+              "tag": "پیشرفته",
+              "title": "هوشمندی در مقیاس تولید",
+              "copy": "سامانه‌هایی رصدپذیر، امن و بهینه بسازید."
+            },
+            {
+              "tag": "استودیو",
+              "title": "ساخت در کنار راهنما",
+              "copy": "یک ایده مهم را به محصولی واقعی و قابل ارائه تبدیل کنید."
+            }
+          ],
+          "capabilities": [
+            "استودیوی زنده",
+            "آزمایشگاه عملی",
+            "بازبینی کد",
+            "کلینیک معماری",
+            "پروژه نمونه‌کار",
+            "جامعه سازندگان"
+          ]
+        },
+        "en": {
+          "eyebrow": "EMMETT ACADEMY",
+          "title": "Learn by shipping",
+          "accent": "real systems.",
+          "intro": "Focused paths for builders who want durable mental models, production habits and a portfolio that proves the work.",
+          "metrics": [
+            [
+              "06",
+              "Learning paths"
+            ],
+            [
+              "70%",
+              "Project based"
+            ],
+            [
+              "∞",
+              "Builder mindset"
+            ]
+          ],
+          "cards": [
+            {
+              "tag": "FOUNDATIONS",
+              "title": "AI systems engineering",
+              "copy": "Move beyond prompts into architecture, evaluation and reliable behavior."
+            },
+            {
+              "tag": "ADVANCED",
+              "title": "Production intelligence",
+              "copy": "Build observable, secure and cost-aware systems."
+            },
+            {
+              "tag": "STUDIO",
+              "title": "Ship with mentors",
+              "copy": "Turn one consequential idea into a working product."
+            }
+          ],
+          "capabilities": [
+            "Live studios",
+            "Hands-on labs",
+            "Code reviews",
+            "Architecture clinics",
+            "Portfolio projects",
+            "Builder community"
+          ]
+        }
+      }
+    },
+    {
+      "id": "about",
+      "path": "/about",
+      "title": {
+        "fa": "دربارهٔ ما",
+        "en": "About"
+      },
+      "copy": {
+        "fa": {
+          "eyebrow": "درباره امت",
+          "title": "تیمی جمع‌وجور؛",
+          "accent": "با تجربه‌ای عمیق.",
+          "intro": "امت یک استودیوی مهندسی برای ساخت محصولات دیجیتال اثرگذار است؛ نزدیک به مسئله، نزدیک به کاربر و متعهد به نتیجه‌ای که در عمل دیده می‌شود.",
+          "metrics": [
+            [
+              "۱",
+              "تیم یکپارچه"
+            ],
+            [
+              "+۱۰ سال",
+              "تجربه ساخت محصول"
+            ],
+            [
+              "٪۱۰۰",
+              "همراهی متخصصان ارشد"
+            ]
+          ],
+          "cards": [
+            {
+              "tag": "اصل 01",
+              "title": "شفافیت پیش از سرعت",
+              "copy": "پیش از بزرگ‌تر کردن سامانه، آن را فهمیدنی می‌کنیم."
+            },
+            {
+              "tag": "اصل 02",
+              "title": "ظرافت، بخشی از راهبرد است",
+              "copy": "جزئیات رابط و API در طول زمان به اعتماد تبدیل می‌شوند."
+            },
+            {
+              "tag": "اصل 03",
+              "title": "همراه نتیجه می‌مانیم",
+              "copy": "آنچه در جهان واقعی کار می‌کند معیار ماست، نه صرفاً آنچه تحویل شده است."
+            }
+          ],
+          "capabilities": [
+            "تیم کاملاً ارشد",
+            "همکاری مستقیم",
+            "نمایش هفتگی محصول",
+            "شفافیت تصمیم‌ها",
+            "همراهی بلندمدت",
+            "انتقال دانش"
+          ]
+        },
+        "en": {
+          "eyebrow": "BUILT BY BUILDERS",
+          "title": "Small team.",
+          "accent": "Deep range.",
+          "intro": "Emmett is an engineering studio for consequential digital systems. We stay close to the craft, customer and outcome.",
+          "metrics": [
+            [
+              "01",
+              "Integrated team"
+            ],
+            [
+              "10+",
+              "Years building"
+            ],
+            [
+              "100%",
+              "Senior attention"
+            ]
+          ],
+          "cards": [
+            {
+              "tag": "PRINCIPLE 01",
+              "title": "Clarity before velocity",
+              "copy": "Make the system legible before making it larger."
+            },
+            {
+              "tag": "PRINCIPLE 02",
+              "title": "Craft is strategy",
+              "copy": "Interface and API details compound into trust."
+            },
+            {
+              "tag": "PRINCIPLE 03",
+              "title": "Stay with the outcome",
+              "copy": "Measure what works in the world, not what was delivered."
+            }
+          ],
+          "capabilities": [
+            "Senior-only teams",
+            "Direct collaboration",
+            "Weekly demos",
+            "Transparent tradeoffs",
+            "Long-term stewardship",
+            "Knowledge transfer"
+          ]
+        }
+      }
+    }
+  ],
+  "tools": [
+    {
+      "id": "jalali",
+      "version": "1.0.0",
+      "path": {
+        "fa": "/tools/tarikh-shamsi",
+        "en": "/tools/jalali-date"
+      },
+      "copy": {
+        "fa": {
+          "name": "محاسبات تاریخ شمسی",
+          "tagline": "تبدیل شمسی ↔ میلادی، اختلاف دو تاریخ، روز کاری با تعطیلات نسخه‌دار و تبدیل انبوه.",
+          "description": "تبدیل‌ها با الگوریتم حسابی بورکوفسکی انجام می‌شود؛ سال کبیسه از چرخهٔ ۳۳ساله محاسبه می‌شود، نه از جدول دستی. منطق کد بین مرورگر و سرور مشترک است، پس ابزار آفلاین هم کار می‌کند.",
+          "howItWorks": [
+            "هر تاریخ شمسی به یک «شمارهٔ روز» (روزهای گذشته از ۱۹۷۰-۰۱-۰۱) نگاشت می‌شود. تمام محاسبات — اختلاف، افزودن روز، روز کاری و فاصله تا نوروز — روی همین عدد انجام می‌شود، پس هیچ خطای مرز ماه یا سال پیش نمی‌آید.",
+            "سال کبیسه با الگوریتم چرخهٔ ۳۳ساله و نقاط تصحیح مستند محاسبه می‌شود. بازهٔ پشتیبانی‌شده ۱۲۰۰ تا ۱۵۰۰ شمسی است و خارج از آن پیام روشن می‌گیرید، نه خطای خام.",
+            "تعطیلات رسمی از یک منبع نسخه‌دار در پایگاه داده خوانده می‌شود؛ اگر سالی داده نداشته باشد، ابزار صادقانه می‌گوید فقط جمعه‌ها را در نظر گرفته است."
+          ],
+          "notes": [
+            "بازهٔ سال‌ها ۱۲۰۰ تا ۱۵۰۰ شمسی است (۱۲۱۷ تا ۲۱۲۱ میلادی حدوداً).",
+            "تبدیل انبوه حداکثر ۱۰۰۰ خط در هر بار است.",
+            "«امروز» بر اساس منطقهٔ زمانی Asia/Tehran محاسبه می‌شود.",
+            "تعطیلات رسمی تنها زمانی اعمال می‌شود که تقویم نسخه‌دار آن سال در سامانه ثبت شده باشد."
+          ]
+        },
+        "en": {
+          "name": "Jalali date calculator",
+          "tagline": "Jalali ↔ Gregorian conversion, date differences, business days with a versioned holiday calendar and bulk conversion.",
+          "description": "Conversions use Borkowski's arithmetic algorithm: leap years come from a 33-year cycle, never a hand-written table. The same logic runs in the browser and on the server, so the tool works offline too.",
+          "howItWorks": [
+            "Every Jalali date is mapped to a day number (days since 1970-01-01). All arithmetic — differences, adding days, business days and distance to Nowruz — runs on that number, so month and year boundaries cannot drift.",
+            "Leap years come from the documented 33-year cycle with correction breaks. The supported range is 1200–1500 Jalali; outside it you get a clear message instead of a raw error.",
+            "Official holidays are served from a versioned database source; if a year has no data, the tool says plainly that only Fridays were skipped."
+          ],
+          "notes": [
+            "Supported range: 1200–1500 Jalali (roughly 1821–2122 Gregorian).",
+            "Bulk conversion accepts at most 1000 lines per run.",
+            "“Today” is computed in the Asia/Tehran timezone.",
+            "Official holidays apply only when that year's versioned calendar is loaded in the system."
+          ]
+        }
+      }
+    },
+    {
+      "id": "kod-meli",
+      "version": "1.0.0",
+      "path": {
+        "fa": "/tools/kod-meli",
+        "en": "/tools/national-id"
+      },
+      "copy": {
+        "fa": {
+          "name": "اعتبارسنج کد ملی و شناسهٔ ملی",
+          "tagline": "بررسی ساختاری کد ملی ۱۰ رقمی و شناسهٔ ملی ۱۱ رقمی شرکت‌ها، با نمایش گام‌به‌گام الگوریتم.",
+          "description": "همه‌چیز در مرورگر شما محاسبه می‌شود: هیچ درخواستی به ثبت احوال یا هیچ سرویس ثالثی زده نمی‌شود و مقدار ورودی هرگز ذخیره یا لاگ نمی‌شود. خروجی فقط می‌گوید ساختار رقم درست است یا نه — نه اینکه آن کد وجود دارد.",
+          "howItWorks": [
+            "کد ملی ۱۰ رقمی: ۹ رقم اول از چپ به راست در ضرایب ۱۰ تا ۲ ضرب می‌شوند، مجموع بر ۱۱ تقسیم می‌شود؛ اگر باقیمانده کمتر از ۲ باشد خودش رقم کنترل است و در غیر این صورت ۱۱ منهای باقیمانده. سپس با رقم آخر مقایسه می‌شود.",
+            "کدهای ۱۱ رقمی شناسهٔ ملی اشخاص حقوقی الگوریتم جداگانه دارند: وزن‌های ۱۱ تا ۲ روی ۱۰ رقم چپ و باقیماندهٔ ۱۱ (باقیماندهٔ ۱۰ به صفر تبدیل می‌شود). این یک بررسی ساختاری است و وجود شرکت را تأیید نمی‌کند.",
+            "سه اشتباه رایج پیاده‌سازی‌ها: اول، رد نکردن کدهای با ارقام یکسان («۱۱۱۱۱۱۱۱۱۱» از فیلتر سادهٔ checksum رد می‌شود ولی معتبر نیست). دوم، صفرِ ابتدایی را با Number حذف کردن. سوم، به‌کار بردن الگوریتم کد ملی ده‌رقمی برای شناسهٔ یازده‌رقمی شرکت‌ها."
+          ],
+          "notes": [
+            "الگوریتم شناسهٔ ملی اشخاص حقوقی بر پایهٔ مستندات عمومی است و تأیید نهایی آن نیازمند سیستم ثبت شرکت‌ها است."
+          ]
+        },
+        "en": {
+          "name": "National ID validator",
+          "tagline": "Structural validation for 10-digit personal codes and 11-digit legal-entity IDs, with the full algorithm shown step by step.",
+          "description": "Everything is computed in your browser: no request to the civil registry or any third party is made, and the value is never stored or logged. The output only says whether the digit structure is valid — not that the code exists.",
+          "howItWorks": [
+            "Personal code: multiply the first nine digits, left to right, by weights 10 down to 2, take the sum modulo 11 — if the remainder is below 2 it is the check digit, otherwise it is 11 minus the remainder — and compare it with the last digit.",
+            "The 11-digit legal-entity ID uses its own checksum: weights 11 down to 2 over the ten left digits, modulo 11, with a remainder of 10 folded to 0. It is a structural check that cannot confirm the entity exists.",
+            "The three common implementation bugs: not rejecting repeated digits (1111111111 passes a naive checksum), dropping a leading zero through Number(), and applying the 10-digit algorithm to an 11-digit entity ID."
+          ],
+          "notes": [
+            "The legal-entity checksum follows public documentation; final confirmation requires the companies registry itself."
+          ]
+        }
+      }
+    },
+    {
+      "id": "toman",
+      "version": "1.0.0",
+      "path": {
+        "fa": "/tools/toman",
+        "en": "/tools/toman"
+      },
+      "copy": {
+        "fa": {
+          "name": "فرمت‌کنندهٔ تومان و حروف‌نویسی چک",
+          "tagline": "تومان، ریال، حروف‌نویسی چک، شکل رسمی فاکتور و ماشین‌حساب مالیات — همه با عدد صحیح.",
+          "description": "هیچ‌جای این ابزار از عدد اعشاری استفاده نمی‌شود؛ همهٔ مبالغ BigInt هستند. همین باعث می‌شود مبلغ ۱۰^۱۵ تومان هم بدون خطای گردکردن محاسبه شود و تست رفت‌وبرگشت (عدد ↔ حروف) تضمین شود.",
+          "howItWorks": [
+            "ورودی پس از نرمال‌سازی ارقام (فارسی/عربی/لاتین) به BigInt تبدیل می‌شود. اگر ورودی ممیز داشته باشد، باز می‌گردد با پیام روشن؛ گردکردن پنهانی انجام نمی‌شود چون روی چک و فاکتور هزینهٔ حقوقی دارد.",
+            "حروف‌نویسی از گروه‌های سه‌رقمی ساخته می‌شود (هزار، میلیون، میلیارد، تریلیون) و برای صفر «صفر تومان» برمی‌گرداند. تابع معکوس همان الگوریتم را می‌خواند، پس تست property-based می‌تواند صدها عدد تصادفی را رفت‌وبرگشت کند.",
+            "مالیات بر ارزش افزوده با ریاضی صحیح و گردکردن نیم‌به‌بالا در پایان محاسبه می‌شود؛ درصد و تخفیف همیشه ورودی صریح کاربر هستند."
+          ],
+          "notes": [
+            "حداکثر مبلغ ۱۰^۱۵ تومان است؛ بیشتر از آن پیام روشن می‌گیرید.",
+            "ورودی اعشاری پذیرفته نمی‌شود (به‌جای گردکردن پنهانی).",
+            "نرخ مالیات بین ۰ تا ۱۰۰ درصد و عدد صحیح است."
+          ]
+        },
+        "en": {
+          "name": "Toman formatter and cheque wording",
+          "tagline": "Toman, rial, cheque wording, the formal invoice line and a VAT calculator — all integer math.",
+          "description": "Nothing here uses floating point: every amount is a BigInt. That is how a 10^15 toman amount survives intact and how the number ↔ words round-trip can be proven by tests.",
+          "howItWorks": [
+            "Input is normalised (Persian/Arabic/Latin digits) and converted to BigInt. Decimal input is rejected with a clear message instead of being rounded silently, because rounding on a cheque or invoice has real consequences.",
+            "Words are built from three-digit groups (thousand, million, billion, trillion) and zero spells as «صفر تومان». The inverse function reads the same grammar, so a property test can round-trip hundreds of random amounts.",
+            "VAT is computed with integer math and half-up rounding at the end; rate and discount are always explicit user inputs."
+          ],
+          "notes": [
+            "Maximum amount is 10^15 toman; beyond that you get a clear message.",
+            "Decimal input is rejected rather than silently rounded.",
+            "VAT rate is an integer between 0 and 100."
+          ]
+        }
+      }
+    },
+    {
+      "id": "matn-farsi",
+      "version": "1.0.0",
+      "path": {
+        "fa": "/tools/matn-farsi",
+        "en": "/tools/persian-text"
+      },
+      "copy": {
+        "fa": {
+          "name": "نرمال‌ساز متن فارسی",
+          "tagline": "ی و ک عربی، ارقام، اعراب، نیم‌فاصلهٔ محافظه‌کار، فاصله‌ها و نقل‌قول — با diff زنده و شمارش تغییرات هر قاعده.",
+          "description": "قواعد جداگانه و قابل خاموش‌کردن‌اند و نیم‌فاصله عمداً محافظه‌کار است: فهرست استثناها («میز»، «دفتر»، «دختر») تضمین می‌کند قاعده‌ای که متن را خراب می‌کند اجرا نشود. هر قاعده idempotent است؛ اجرای دوباره خروجی را تغییر نمی‌دهد.",
+          "howItWorks": [
+            "هر قاعده یک تابع خالص روی رشته است که تعداد تغییر و نمونه‌ها را برمی‌گرداند؛ به همین دلیل می‌توان هر قاعده را جدا روشن/خاموش کرد و شمارش دقیق گرفت.",
+            "نیم‌فاصله فقط در سه جای امن اضافه می‌شود: پس از «می/نمی» روی فعل (با فهرست استثنای اسم‌ها)، پیش از «ها/های/تر/ترین» (با فهرست واژه‌هایی مثل «دختر» و «دفتر») و اصلاح نیم‌فاصله‌های دوتایی.",
+            "diff متن را به توکن‌های واژه/فاصله تقسیم می‌کند و با یک الگوریتم سادهٔ بازهم‌تراز‌سازی، بخش‌های تغییر‌کرده را مشخص می‌کند. خروجی فقط متن ساده است؛ رندر با text node انجام می‌شود، پس <script> هرگز به DOM تبدیل نمی‌شود."
+          ],
+          "notes": [
+            "حداکثر ۵۰٬۰۰۰ کاراکتر در هر بار پردازش می‌شود.",
+            "نیم‌فاصله محافظه‌کار است؛ ممکن است برخی ترکیب‌های کم‌کاربرد اصلاح نشوند.",
+            "متن ورودی هرگز به سرور فرستاده نمی‌شود."
+          ]
+        },
+        "en": {
+          "name": "Persian text normaliser",
+          "tagline": "Arabic yeh/kaf, digits, diacritics, conservative ZWNJ, spacing and quotes — with a live diff and per-rule change counts.",
+          "description": "Rules are independent and switchable, and the ZWNJ pass is deliberately conservative: an exception list (میز، دفتر، دختر) keeps word-breaking rules from firing. Every rule is idempotent — running it twice changes nothing.",
+          "howItWorks": [
+            "Each rule is a pure string function returning a change count and samples, which is what makes independent switches and accurate counters possible.",
+            "ZWNJ is inserted in only three safe places: after the verb prefixes می/نمی (with a noun exception list), before ها/های/تر/ترین (with exceptions such as دختر and دفتر), and to fix doubled ZWNJ.",
+            "The diff tokenises text into words/whitespace and resynchronises with a small look-ahead to mark changed runs. Output is plain text segments rendered as text nodes, so <script> can never become DOM."
+          ],
+          "notes": [
+            "Up to 50,000 characters are processed per run.",
+            "ZWNJ handling is conservative by design; rare combinations may stay untouched.",
+            "Input text is never uploaded to the server."
+          ]
+        }
+      }
+    },
+    {
+      "id": "jwt",
+      "version": "1.0.0",
+      "path": {
+        "fa": "/tools/jwt",
+        "en": "/tools/jwt"
+      },
+      "copy": {
+        "fa": {
+          "name": "JWT Debugger با تحلیل امنیتی",
+          "tagline": "decode کاملاً در مرورگر، نمایش تاریخ شمسی انقضا و هشدارهای امنیتی با ارجاع CWE.",
+          "description": "توکن هرگز به سرور ما فرستاده نمی‌شود و هیچ‌جا لاگ نمی‌شود. تحلیل، هدرها را از دید مهاجم می‌خواند: alg:none، confusion بین RS256 و HS256، kid مسیر‌دار، هدرهای jku/jwk و عمر طولانی — هر کدام با توضیح فارسی و شمارهٔ CWE.",
+          "howItWorks": [
+            "توکن به سه بخش با base64url تقسیم می‌شود. decode با TextDecoder و حالت fatal انجام می‌شود تا توکن‌های رمزنگاری‌شده یا خراب به‌جای crash، پیام روشن بگیرند.",
+            "هدر و payload به‌صورت شیء JSON خوانده می‌شوند و سپس یک موتور قاعدهٔ هشدار روی آن‌ها اجرا می‌شود؛ هر هشدار شدت، توضیح فارسی و ارجاع CWE دارد.",
+            "این ابزار تأیید امضا انجام نمی‌دهد. «decode شد» به معنای «معتبر است» نیست و در خروجی هم همین‌طور نوشته می‌شود؛ برای همین هیچ لینک اشتراکی هم ساخته نمی‌شود."
+          ],
+          "notes": [
+            "تأیید امضا (verify) عمداً پیاده‌سازی نشده است.",
+            "توکن‌های رمزنگاری‌شده (JWE) قابل decode نیستند و پیام روشن می‌گیرید."
+          ]
+        },
+        "en": {
+          "name": "JWT debugger with security analysis",
+          "tagline": "Browser-only decoding, Jalali expiry dates and security warnings with CWE references.",
+          "description": "The token is never uploaded and never logged. The analysis reads headers the way an attacker would: alg:none, RS256→HS256 confusion, path-style kid, jku/jwk headers and long lifetimes — each with a Persian explanation and a CWE reference.",
+          "howItWorks": [
+            "The token is split into three base64url parts and decoded with a fatal TextDecoder, so encrypted or corrupt tokens produce a clear message instead of a crash.",
+            "Header and payload are parsed as JSON and passed through a warning rule engine; every warning carries a severity, a Persian explanation and a CWE reference.",
+            "The tool does not verify signatures. “Decoded” never means “valid”, the output says so explicitly, and for that reason no share link is created at all."
+          ],
+          "notes": [
+            "Signature verification is intentionally not implemented.",
+            "Encrypted tokens (JWE) cannot be decoded; you get a clear message instead."
+          ]
+        }
+      }
+    },
+    {
+      "id": "check-security",
+      "version": "1.0.0",
+      "path": {
+        "fa": "/tools/check-security",
+        "en": "/tools/check-security"
+      },
+      "copy": {
+        "fa": {
+          "name": "چک‌آپ امنیتی دامنه",
+          "tagline": "شش بخش عمومی، گرید A تا F، فقط بررسی passive.",
+          "description": "هدرهای امنیتی، TLS، رکوردهای DNS، کوکی‌ها، قرارگیری محتوا و نشت اطلاعات را با یک درخواست HTTPS و رکوردهای عمومی DNS بررسی می‌کند و گزارش قابل اشتراک می‌سازد. هیچ پورت‌اسکن یا تلاش نفوذی انجام نمی‌شود.",
+          "howItWorks": [
+            "هر بررسی از یک choke point عبور می‌کند که فقط پورت‌های ۸۰ و ۴۴۳ را می‌پذیرد؛ دامنه‌های مسدودشده پیش از ساخت job رد می‌شوند.",
+            "اسکن در صف cron اجرا می‌شود و صفحه با polling پیشرفت را نشان می‌دهد؛ هر بخش timeout پنج ثانیه دارد و شکست یک بخش، بقیه را متوقف نمی‌کند.",
+            "نمرهٔ هر بخش ۰ تا ۱۰۰ و وزن‌دار است؛ وزن‌ها در پیکربندی سرور تعریف می‌شوند تا بدون deploy قابل تنظیم باشند."
+          ],
+          "notes": [
+            "فقط دامنه‌ای را بررسی کنید که مالک آن هستید یا اجازه دارید؛ مسئولیت استفاده بر عهدهٔ کاربر است (مادهٔ ۷۲۹ قانون مجازات اسلامی).",
+            "بررسی صرفاً passive است: هیچ پورت‌اسکن، payload یا brute-force انجام نمی‌شود و نتیجه جای تست نفوذ را نمی‌گیرد.",
+            "نتایج پس از ۷ روز حذف می‌شوند و نسخهٔ عمومی، نسخهٔ دقیق سرویس‌دهنده را ماسک می‌کند."
+          ]
+        },
+        "en": {
+          "name": "Domain security check-up",
+          "tagline": "Six public surfaces, an A-to-F grade, passive only.",
+          "description": "Checks security headers, TLS, DNS records, cookies, content placement and information leaks using a single HTTPS request plus public DNS records, then produces a shareable report. No port scan and no intrusion attempt.",
+          "howItWorks": [
+            "Every check passes a single choke point that only accepts ports 80 and 443; blocklisted domains are rejected before a job row is created.",
+            "The scan runs on the cron queue while the page polls progress; each section has a five-second timeout and one failure never stops the rest.",
+            "Each section scores 0–100 with configurable weights, so the team can tune them without a deploy."
+          ],
+          "notes": [
+            "Only scan a domain you own or are allowed to test; you are responsible for lawful use (Article 729 of the Iranian Penal Code).",
+            "The check is passive only: no port scan, payload or brute force, and the report never replaces a penetration test.",
+            "Results are deleted after 7 days and the public report masks the exact software version."
+          ]
+        }
+      }
+    },
+    {
+      "id": "assistant",
+      "version": "1.0.0",
+      "path": {
+        "fa": "/tools/assistant",
+        "en": "/tools/assistant"
+      },
+      "copy": {
+        "fa": {
+          "name": "دستیار امت",
+          "tagline": "RAG روی محتوای واقعی امت، با ارجاع و «نمی‌دانم» صادقانه.",
+          "description": "دستیار فقط از روی مطالب خود امت جواب می‌دهد، هر پاسخ را با ارجاع به منبع نشان می‌دهد و وقتی کورپوس پاسخ ندارد صریح می‌گوید پیدا نکردم. با BM25 کار می‌کند و provider مدل زبانی از طریق ADR-007 قابل تعویض است.",
+          "howItWorks": [
+            "کورپوس از همان فایل‌هایی ساخته می‌شود که سایت را رندر می‌کنند: کپی صفحات، توضیح ابزارها و FAQ با برچسب [INPUT] برای موارد تأییدنشده.",
+            "کرون شبانه فقط chunkهای تغییرکرده را دوباره embedding می‌کند؛ جست‌وجو با BM25 و در صورت وجود provider با cosine در حافظه انجام می‌شود.",
+            "اگر هیچ chunk بالای آستانه نباشد، هیچ تماسی با مدل زبانی زده نمی‌شود و پاسخ «پیدا نکردم» برمی‌گردد."
+          ],
+          "notes": [
+            "کورپوس فعلی از مستندات و محتوای همین سایت ساخته شده؛ اگر پاسخ در آن نباشد، دستیار پاسخ عمومی نمی‌سازد.",
+            "دستیار جای پاسخ رسمی تیم را نمی‌گیرد و متن پرسش بدون رضایت شما ذخیره نمی‌شود."
+          ]
+        },
+        "en": {
+          "name": "Emmett assistant",
+          "tagline": "RAG on Emmett's real material, with citations and an honest “I don't know”.",
+          "description": "The assistant answers only from Emmett's own material, shows a source for every answer, and says so when the corpus has no answer. It works on BM25, with the LLM provider swappable through ADR-007.",
+          "howItWorks": [
+            "The corpus is built from the very files that render the site: page copy, tool descriptions and FAQ entries, with [INPUT] markers for anything unconfirmed.",
+            "A nightly cron re-embeds only changed chunks; search uses BM25, and cosine in memory when a provider exists.",
+            "If no chunk clears the threshold, no model call happens at all and the answer is “I could not find this”."
+          ],
+          "notes": [
+            "The current corpus comes from this site's own content and documentation; when the answer is not there, the assistant does not invent one.",
+            "The assistant does not replace an official answer from the team, and your question is not stored without consent."
+          ]
+        }
+      }
+    }
+  ],
+  "faq": [
+    {
+      "id": "stack",
+      "question": {
+        "fa": "روی چه پشته‌ای کار می‌کنید؟",
+        "en": "What stack do you work on?"
+      },
+      "answer": {
+        "fa": "بک‌اند جنگو و DRF است، فرانت‌اند React و TypeScript با Vite، و میزبانی روی cPanel با MariaDB. همین سایت هم با همین پشته اجرا می‌شود؛ جزئیات معماری در بخش دربارهٔ ما آمده است.",
+        "en": "The backend is Django with DRF, the frontend is React and TypeScript on Vite, and hosting is cPanel with MariaDB. This very site runs on that stack; the architecture notes live on the About page."
+      },
+      "url": {
+        "fa": "/about",
+        "en": "/about"
+      },
+      "tags": [
+        "stack",
+        "architecture",
+        "پشته",
+        "معماری"
+      ]
+    },
+    {
+      "id": "tools-live",
+      "question": {
+        "fa": "چه ابزارهایی روی سایت زنده است؟",
+        "en": "Which tools are live on the site?"
+      },
+      "answer": {
+        "fa": "پنج ابزار زنده است: محاسبات تاریخ شمسی، اعتبارسنج کد ملی و شناسهٔ ملی، فرمت‌کنندهٔ تومان و حروف‌نویسی چک، نرمال‌ساز متن فارسی و دیباگر JWT. هر پنج ابزار منطق واقعی دارند و بدون ثبت‌نام کار می‌کنند.",
+        "en": "Five tools are live: the Jalali date calculator, the national-ID validator, the toman formatter with cheque wording, the Persian text normaliser and the JWT debugger. All five run real logic and need no sign-up."
+      },
+      "url": {
+        "fa": "/tools",
+        "en": "/tools"
+      },
+      "tags": [
+        "tools",
+        "ابزار",
+        "جعبه‌ابزار"
+      ]
+    },
+    {
+      "id": "data-in-tools",
+      "question": {
+        "fa": "داده‌های من در ابزارها کجا می‌رود؟",
+        "en": "Where does my data go in the tools?"
+      },
+      "answer": {
+        "fa": "منطق اصلی ابزارها سمت مرورگر اجرا می‌شود. اعتبارسنج کد ملی و دیباگر JWT هیچ درخواستی به سرور نمی‌فرستند و ورودی شما را ذخیره نمی‌کنند. اگر لینک اشتراک بسازید، فقط خلاصهٔ نتیجه ذخیره می‌شود و آن صفحه noindex است.",
+        "en": "Tool logic runs in the browser. The national-ID validator and the JWT debugger send no request to the server and store no input. If you create a share link, only the result summary is stored and that page is noindex."
+      },
+      "url": {
+        "fa": "/tools",
+        "en": "/tools"
+      },
+      "tags": [
+        "privacy",
+        "حریم خصوصی",
+        "داده"
+      ]
+    },
+    {
+      "id": "pentestor",
+      "question": {
+        "fa": "PenTestor چطور کار می‌کند؟",
+        "en": "How does PenTestor work?"
+      },
+      "answer": {
+        "fa": "چک‌آپ امنیتی دامنه روی همین سایت passive است: فقط رکوردهای عمومی DNS و یک درخواست HTTPS به خود دامنه. گزارش کامل و تست نفوذ واقعی در محصول PenTestor انجام می‌شود.",
+        "en": "The domain check-up on this site is passive: public DNS records plus a single HTTPS request to the domain itself. The full report and real penetration testing happen in the PenTestor product."
+      },
+      "url": {
+        "fa": "/products/pentestor",
+        "en": "/products/pentestor"
+      },
+      "tags": [
+        "pentestor",
+        "security",
+        "امنیت",
+        "اسکن"
+      ]
+    },
+    {
+      "id": "passive-scope",
+      "question": {
+        "fa": "چک‌آپ امنیتی چه چیزهایی را بررسی می‌کند؟",
+        "en": "What does the security check-up look at?"
+      },
+      "answer": {
+        "fa": "شش بخش: هدرهای امنیتی HTTP، TLS و گواهی، رکوردهای DNS (SPF، DMARC، DKIM، CAA، DNSSEC)، کوکی‌ها، قرارگیری محتوا و نشت اطلاعات. هیچ پورت‌اسکن، payload یا brute-force انجام نمی‌شود.",
+        "en": "Six sections: HTTP security headers, TLS and the certificate, DNS records (SPF, DMARC, DKIM, CAA, DNSSEC), cookies, content placement and information leaks. No port scan, payload or brute force is ever run."
+      },
+      "url": {
+        "fa": "/tools/check-security",
+        "en": "/tools/check-security"
+      },
+      "tags": [
+        "scanner",
+        "security",
+        "اسکن",
+        "امنیت"
+      ]
+    },
+    {
+      "id": "assistant-how",
+      "question": {
+        "fa": "دستیار امت چطور جواب می‌دهد؟",
+        "en": "How does the Emmett assistant answer?"
+      },
+      "answer": {
+        "fa": "دستیار فقط از روی مطالب خود امت جواب می‌دهد و هر پاسخ را با ارجاع به منبع نشان می‌دهد. اگر پاسخ در مطالب نباشد، می‌گوید «این را در مطالب ما پیدا نکردم» و از دانش عمومی جواب نمی‌سازد.",
+        "en": "The assistant answers only from Emmett's own material and shows a source for every answer. When the material has no answer it says so instead of inventing one from general knowledge."
+      },
+      "url": {
+        "fa": "/assistant",
+        "en": "/assistant"
+      },
+      "tags": [
+        "assistant",
+        "ai",
+        "دستیار",
+        "رگ"
+      ]
+    },
+    {
+      "id": "jalali-accuracy",
+      "question": {
+        "fa": "دقت محاسبات تاریخ شمسی چطور تضمین می‌شود؟",
+        "en": "How is the Jalali date accuracy guaranteed?"
+      },
+      "answer": {
+        "fa": "تبدیل‌ها با الگوریتم ریاضی انجام می‌شود و در هر بیلد با cal بر مبنای ICU برای هزاران تاریخ مقایسه می‌شود؛ اختلافی که پیدا شود بیلد را متوقف می‌کند.",
+        "en": "Conversions use an arithmetic algorithm and every build compares thousands of dates against the ICU-based cal; any mismatch fails the build."
+      },
+      "url": {
+        "fa": "/tools/tarikh-shamsi",
+        "en": "/tools/jalali-date"
+      },
+      "tags": [
+        "jalali",
+        "date",
+        "تاریخ",
+        "دقت"
+      ]
+    },
+    {
+      "id": "contact",
+      "question": {
+        "fa": "چطور با شما تماس بگیرم؟",
+        "en": "How do I contact you?"
+      },
+      "answer": {
+        "fa": "از صفحهٔ تماس پیام بگذارید. [INPUT B5] نشانی ایمیل و شناسهٔ تلگرام نهایی هنوز ثبت نشده و پس از تأیید مالک سایت جایگزین می‌شود.",
+        "en": "Leave a message on the contact page. [INPUT B5] The final email address and Telegram handle are not registered yet and will be replaced once the site owner confirms them."
+      },
+      "url": {
+        "fa": "/contact",
+        "en": "/contact"
+      },
+      "tags": [
+        "contact",
+        "تماس"
+      ]
+    },
+    {
+      "id": "pricing",
+      "question": {
+        "fa": "هزینهٔ پروژه‌ها چطور محاسبه می‌شود؟",
+        "en": "How is project pricing calculated?"
+      },
+      "answer": {
+        "fa": "[INPUT B5] بازهٔ قیمت و مدل همکاری هنوز تأیید نشده است. برای شروع، مسئله را در صفحهٔ تماس توضیح دهید تا دامنهٔ کار مشخص شود.",
+        "en": "[INPUT B5] The pricing range and engagement model are not confirmed yet. Start by describing the problem on the contact page so the scope can be defined."
+      },
+      "url": {
+        "fa": "/contact",
+        "en": "/contact"
+      },
+      "tags": [
+        "pricing",
+        "قیمت",
+        "هزینه"
+      ]
+    },
+    {
+      "id": "case-studies",
+      "question": {
+        "fa": "کیس‌استادی امنیتی دارید؟",
+        "en": "Do you have a security case study?"
+      },
+      "answer": {
+        "fa": "[INPUT B12] هیچ کیس‌استادی با اعداد و رضایت مشتری هنوز منتشر نشده است. تا آن زمان به‌جای ادعای بی‌سند، مسیر فنی و مستندات همین سایت قابل بررسی است.",
+        "en": "[INPUT B12] No case study with numbers and client permission has been published yet. Until then the technical path and documentation on this site are verifiable instead of unsupported claims."
+      },
+      "url": {
+        "fa": "/projects",
+        "en": "/projects"
+      },
+      "tags": [
+        "case-study",
+        "کیس‌استادی",
+        "نمونه‌کار"
+      ]
+    }
+  ]
+}

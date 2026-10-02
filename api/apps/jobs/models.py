@@ -10,6 +10,7 @@ class Job(models.Model):
 
     class Kind(models.TextChoices):
         SCAN = "scan", "Scan"
+        ASK = "ask", "Ask"
         EMBED = "embed", "Embed"
         OG_IMAGE = "og_image", "Open Graph image"
         DIGEST = "digest", "Digest"

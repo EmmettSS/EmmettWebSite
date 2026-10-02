@@ -71,7 +71,7 @@ export function ProjectsSection() {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-base text-[rgba(16,42,32,0.55)] leading-relaxed max-w-[40ch] lg:text-right lg:ml-auto"
+            className="text-base text-[rgba(16,42,32,0.72)] leading-relaxed max-w-[40ch] lg:text-right lg:ml-auto"
           >
             Real problems. Real constraints. Real systems.
           </motion.p>
@@ -93,7 +93,7 @@ export function ProjectsSection() {
               <div className="grid lg:grid-cols-[80px_1fr_280px] gap-6 items-start">
                 {/* Number */}
                 <div className="pt-1">
-                  <span className="text-[clamp(1.8rem,4vw,3rem)] font-mono font-bold text-[rgba(16,42,32,0.12)] leading-none select-none">
+                  <span className="text-[clamp(1.8rem,4vw,3rem)] font-mono font-bold text-[rgba(16,42,32,0.72)] leading-none select-none">
                     {p.num}
                   </span>
                 </div>
@@ -101,11 +101,11 @@ export function ProjectsSection() {
                 {/* Content */}
                 <div>
                   <div className="flex items-center gap-3 mb-3">
-                    <span className="text-[10px] font-mono tracking-widest uppercase text-[rgba(16,42,32,0.4)]">
+                    <span className="text-[10px] font-mono tracking-widest uppercase text-[rgba(16,42,32,0.72)]">
                       {p.industry}
                     </span>
-                    <span className="text-[rgba(16,42,32,0.2)] text-sm">·</span>
-                    <span className="text-[10px] font-mono text-[rgba(16,42,32,0.3)]">{p.year}</span>
+                    <span className="text-[rgba(16,42,32,0.72)] text-sm">·</span>
+                    <span className="text-[10px] font-mono text-[rgba(16,42,32,0.72)]">{p.year}</span>
                   </div>
                   <h3
                     className="text-xl lg:text-2xl font-semibold text-[#102A20] mb-3 transition-colors duration-200"
@@ -113,14 +113,14 @@ export function ProjectsSection() {
                   >
                     {p.title}
                   </h3>
-                  <p className="text-sm text-[rgba(16,42,32,0.55)] leading-relaxed max-w-[52ch] mb-4">
+                  <p className="text-sm text-[rgba(16,42,32,0.72)] leading-relaxed max-w-[52ch] mb-4">
                     {p.description}
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {p.tech.map((t) => (
                       <span
                         key={t}
-                        className="text-[9px] font-mono tracking-widest uppercase px-2 py-0.5 rounded border border-[rgba(16,42,32,0.15)] text-[rgba(16,42,32,0.45)] bg-[rgba(16,42,32,0.04)]"
+                        className="text-[9px] font-mono tracking-widest uppercase px-2 py-0.5 rounded border border-[rgba(16,42,32,0.15)] text-[rgba(16,42,32,0.72)] bg-[rgba(16,42,32,0.04)]"
                       >
                         {t}
                       </span>
@@ -131,7 +131,7 @@ export function ProjectsSection() {
                 {/* Outcome */}
                 <div className="lg:text-right">
                   <div className="inline-block text-left lg:text-right">
-                    <span className="text-[10px] font-mono tracking-widest uppercase text-[rgba(16,42,32,0.3)] block mb-2">
+                    <span className="text-[10px] font-mono tracking-widest uppercase text-[rgba(16,42,32,0.72)] block mb-2">
                       Outcome
                     </span>
                     <p
@@ -163,7 +163,7 @@ export function ProjectsSection() {
         </div>
 
         <div className="border-t border-[rgba(16,42,32,0.12)] pt-8 mt-0 flex items-center justify-between">
-          <span className="text-sm font-mono text-[rgba(16,42,32,0.4)]">
+          <span className="text-sm font-mono text-[rgba(16,42,32,0.72)]">
             3 of 12 projects shown
           </span>
           <Link

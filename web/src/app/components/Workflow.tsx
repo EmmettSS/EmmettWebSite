@@ -27,13 +27,13 @@ export function Workflow() {
         >
           <div className="flex items-center gap-3 mb-6">
             <div className="w-6 h-px bg-[rgba(245,246,247,0.2)]" />
-            <span className="text-xs font-mono tracking-[0.2em] uppercase text-[rgba(245,246,247,0.38)]">
+            <span className="text-xs font-mono tracking-[0.2em] uppercase text-[rgba(245,246,247,0.62)]">
               11 — Engineering Workflow
             </span>
           </div>
           <h2 className="text-[clamp(2rem,5vw,3.5rem)] font-medium leading-tight tracking-tight text-[#F5F6F7] max-w-2xl">
             How we build{" "}
-            <span className="text-[rgba(245,246,247,0.38)]">what we promise</span>
+            <span className="text-[rgba(245,246,247,0.62)]">what we promise</span>
           </h2>
         </motion.div>
 
@@ -67,15 +67,15 @@ export function Workflow() {
 
                 {/* Card */}
                 <div className="flex items-start gap-6 p-4 rounded-xl hover:bg-white/[0.02] transition-colors">
-                  <span className="text-xs font-mono text-[rgba(245,246,247,0.22)] mt-1 flex-shrink-0 w-5">{stage.n}</span>
+                  <span className="text-xs font-mono text-[rgba(245,246,247,0.62)] mt-1 flex-shrink-0 w-5">{stage.n}</span>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 mb-1">
                       <h3 className="text-base font-semibold text-[#F5F6F7] group-hover:text-[#10B981] transition-colors">
                         {stage.title}
                       </h3>
-                      <span className="text-xs font-mono text-[rgba(245,246,247,0.22)]">{stage.duration}</span>
+                      <span className="text-xs font-mono text-[rgba(245,246,247,0.62)]">{stage.duration}</span>
                     </div>
-                    <p className="text-sm text-[rgba(245,246,247,0.38)] leading-relaxed">{stage.desc}</p>
+                    <p className="text-sm text-[rgba(245,246,247,0.62)] leading-relaxed">{stage.desc}</p>
                   </div>
                 </div>
               </motion.div>

@@ -103,7 +103,7 @@ export function Hero() {
               ].map((s, i) => (
                 <div key={i} className="flex flex-col gap-0.5">
                   <span className="text-2xl font-semibold font-mono text-[#F3FAF6]">{s.value}</span>
-                  <span className="text-[10px] text-[rgba(243,250,246,0.35)] uppercase tracking-[0.15em] font-mono">{s.label}</span>
+                  <span className="text-[10px] text-[rgba(243,250,246,0.62)] uppercase tracking-[0.15em] font-mono">{s.label}</span>
                 </div>
               ))}
             </motion.div>
@@ -125,17 +125,17 @@ export function Hero() {
               <div className="absolute inset-0 bg-gradient-to-t from-[#07130F]/60 via-transparent to-transparent pointer-events-none" />
 
               {/* Technical labels floating on canvas */}
-              <div className="absolute top-10 left-8 font-mono text-[10px] text-[rgba(31,174,110,0.45)] tracking-widest uppercase">AI / ML</div>
-              <div className="absolute top-1/3 right-8 font-mono text-[10px] text-[rgba(77,155,232,0.4)] tracking-widest uppercase">Security</div>
-              <div className="absolute bottom-20 left-12 font-mono text-[10px] text-[rgba(31,174,110,0.35)] tracking-widest uppercase">Backend</div>
-              <div className="absolute bottom-10 right-10 font-mono text-[10px] text-[rgba(243,250,246,0.2)] tracking-[0.08em]">v4.1.2 · live</div>
+              <div className="absolute top-10 left-8 font-mono text-[10px] text-[rgba(31,174,110,0.9)] tracking-widest uppercase">AI / ML</div>
+              <div className="absolute top-1/3 right-8 font-mono text-[10px] text-[rgba(77,155,232,0.9)] tracking-widest uppercase">Security</div>
+              <div className="absolute bottom-20 left-12 font-mono text-[10px] text-[rgba(31,174,110,0.9)] tracking-widest uppercase">Backend</div>
+              <div className="absolute bottom-10 right-10 font-mono text-[10px] text-[rgba(243,250,246,0.62)] tracking-[0.08em]">v4.1.2 · live</div>
             </div>
 
             {/* System status badge */}
             <div className="absolute top-5 right-5 px-3 py-1.5 rounded-md bg-[rgba(31,174,110,0.07)] border border-[rgba(31,174,110,0.15)]">
               <div className="flex items-center gap-2">
                 <div className="w-1.5 h-1.5 rounded-full bg-[#1FAE6E] animate-pulse" />
-                <span className="text-[10px] font-mono text-[rgba(31,174,110,0.7)] tracking-widest uppercase">Systems Online</span>
+                <span className="text-[10px] font-mono text-[rgba(31,174,110,0.9)] tracking-widest uppercase">Systems Online</span>
               </div>
             </div>
           </motion.div>
@@ -160,7 +160,7 @@ export function Hero() {
             className="w-0.5 h-2 rounded-full bg-[rgba(31,174,110,0.4)]"
           />
         </motion.div>
-        <span className="text-[10px] font-mono text-[rgba(243,250,246,0.2)] tracking-widest uppercase">scroll</span>
+        <span className="text-[10px] font-mono text-[rgba(243,250,246,0.62)] tracking-widest uppercase">scroll</span>
       </motion.div>
     </section>
   );

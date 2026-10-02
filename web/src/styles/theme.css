@@ -127,6 +127,23 @@ html[lang="fa"] p { line-height:1.95; }
 html[lang="fa"] .primary-btn,html[lang="fa"] .ghost-btn { font-size:.93rem; font-weight:700; }
 main > section:nth-of-type(n+2) { content-visibility:auto; contain-intrinsic-size:800px; }
 :focus-visible { outline:2px solid var(--bright); outline-offset:3px; }
+/* Decorative footer wordmark: kept out of the text layer so it stays a watermark (WCAG 1.4.3
+   applies to text; this is pure ornament and hidden from assistive tech). */
+.footer-wordmark { position: relative; height: clamp(4rem, 14vw, 11rem); user-select: none; }
+.footer-wordmark::after {
+  content: "EMMETT";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: clamp(4rem, 14vw, 11rem);
+  line-height: 1;
+  color: rgba(37, 199, 121, 0.035);
+}
+
 ::selection { background:rgba(53,201,138,.35); color:white; }
 
 @media (hover:none) { .glow-card { transform:none !important; } }

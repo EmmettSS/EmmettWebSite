@@ -16,7 +16,7 @@ export function LanguagePortal(){
      <LanguageCard lang="fa" label="فارسی" sub="ورود به تجربه فارسی" icon={<ArrowLeft/>} rtl/>
     </div>
    </motion.div>
-   <motion.p initial={{opacity:0}} animate={{opacity:1}} transition={{delay:.7}} className="mt-7 text-center text-xs text-white/30">You can change the language anytime from the navigation bar · زبان را هر زمان از منوی بالا تغییر دهید</motion.p>
+   <motion.p initial={{opacity:0}} animate={{opacity:1}} transition={{delay:.7}} className="mt-7 text-center text-xs text-white/55">You can change the language anytime from the navigation bar · زبان را هر زمان از منوی بالا تغییر دهید</motion.p>
   </div>
  </main>
 }
@@ -28,7 +28,7 @@ function LanguageCard({lang,label,sub,icon,rtl=false}:{lang:"fa"|"en";label:stri
   <div className="absolute inset-x-10 bottom-12 lg:inset-x-14">
    <span className="font-mono text-[10px] tracking-[.25em] text-[var(--bright)]">0{lang==="en"?1:2} / LANGUAGE</span>
    <h1 className="mt-4 text-6xl font-medium tracking-[-.05em] lg:text-8xl">{label}</h1>
-   <div className="mt-7 flex items-center justify-between border-t border-[var(--line)] pt-5 text-white/45"><span>{sub}</span><Magnetic><span className="grid h-12 w-12 place-items-center rounded-full bg-[var(--emerald)] text-[var(--deep)] transition group-hover:scale-110">{icon}</span></Magnetic></div>
+   <div className="mt-7 flex items-center justify-between border-t border-[var(--line)] pt-5 text-white/55"><span>{sub}</span><Magnetic><span className="grid h-12 w-12 place-items-center rounded-full bg-[var(--emerald)] text-[var(--deep)] transition group-hover:scale-110">{icon}</span></Magnetic></div>
   </div>
  </Link>
 }

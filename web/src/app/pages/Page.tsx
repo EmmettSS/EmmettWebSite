@@ -42,7 +42,7 @@ export function Page({ kind }: { kind: PageKey }) {
           {d.metrics.map(([v, l], i) => (
             <Reveal delay={i * 0.1} key={l} className="bg-[#081a12]/95 p-7">
               <b className="text-4xl font-medium text-[var(--bright)]">{v}</b>
-              <div className="mt-2 text-xs text-white/40">{l}</div>
+              <div className="mt-2 text-xs text-white/55">{l}</div>
             </Reveal>
           ))}
         </div>

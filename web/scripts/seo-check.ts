@@ -1,14 +1,60 @@
-import { readFile } from 'node:fs/promises'
-import path from 'node:path'
-const dist = path.resolve('dist')
-const expected = ['fa/index.html','en/index.html','fa/services/index.html','en/services/index.html','fa/contact/index.html','en/contact/index.html']
+import { readFile } from "node:fs/promises";
+import path from "node:path";
+import { toolMetas } from "../src/features/toolbox/metas";
+
+const dist = path.resolve("dist");
+const expected = [
+  "fa/index.html",
+  "en/index.html",
+  "fa/services/index.html",
+  "en/services/index.html",
+  "fa/contact/index.html",
+  "en/contact/index.html",
+  "fa/tools/index.html",
+  "en/tools/index.html",
+  "fa/assistant/index.html",
+  "en/assistant/index.html",
+  ...toolMetas.flatMap((meta) => [`fa/tools/${meta.slug.fa}/index.html`, `en/tools/${meta.slug.en}/index.html`]),
+];
 for (const file of expected) {
-  const html = await readFile(path.join(dist, file), 'utf8')
-  for (const token of ['<title>', 'name="description"', 'rel="canonical"', 'hreflang="fa"', 'hreflang="en"', 'hreflang="x-default"', 'application/ld+json', '<main>']) {
-    if (!html.includes(token)) throw new Error(`${file} is missing ${token}`)
+  const html = await readFile(path.join(dist, file), "utf8");
+  for (const token of ['<title>', 'name="description"', 'rel="canonical"', 'hreflang="fa"', 'hreflang="en"', 'hreflang="x-default"', 'application/ld+json', "<main>"]) {
+    if (!html.includes(token)) throw new Error(`${file} is missing ${token}`);
   }
 }
-const sitemap = await readFile(path.join(dist, 'sitemap.xml'), 'utf8')
-if ((sitemap.match(/<url>/g) ?? []).length !== 6) throw new Error('Expected six sitemap URLs')
-if ((sitemap.match(/<loc>https:\/\//g) ?? []).length !== 6) throw new Error('Sitemap locations must be absolute HTTPS URLs')
-console.log('Static Bridge SEO checks passed: six HTML pages + sitemap.')
+
+// Every tool page must carry SoftwareApplication structured data, and the tools index an ItemList.
+for (const meta of toolMetas) {
+  const html = await readFile(path.join(dist, `fa/tools/${meta.slug.fa}/index.html`), "utf8");
+  if (!html.includes('"@type":"SoftwareApplication"')) throw new Error(`fa/tools/${meta.slug.fa} is missing SoftwareApplication JSON-LD`);
+}
+const toolsIndex = await readFile(path.join(dist, "fa/tools/index.html"), "utf8");
+if (!toolsIndex.includes('"@type":"ItemList"')) throw new Error("tools index is missing ItemList JSON-LD");
+
+// Each tool page must show a real computed example in the crawlable HTML (not a placeholder).
+// The two API-backed surfaces (scanner, assistant) cannot be computed at build time, so for them
+// the guard pins the *live-surface* claim they make instead: the passive envelope and the
+// honest "not found" contract — the two things a fake page would never state.
+const computedExamples: [string, string][] = [
+  ["tarikh-shamsi", "2025/03/20"],
+  ["kod-meli", "۲۷۱۵۸۳۰۴۹۱"],
+  ["toman", "۱٬۲۵۰٬۰۰۰"],
+  ["matn-farsi", "می شود این کتاب را دید"],
+  ["jwt", "CWE-347"],
+  ["check-security", "هیچ پورت‌اسکن یا تلاش نفوذی انجام نمی‌شود"],
+  ["assistant", "پیدا نکردم"],
+];
+for (const [slug, needle] of computedExamples) {
+  const html = await readFile(path.join(dist, `fa/tools/${slug}/index.html`), "utf8");
+  if (!html.includes(needle)) throw new Error(`fa/tools/${slug} does not contain its computed example (${needle})`);
+}
+{
+  const assistant = await readFile(path.join(dist, "fa/assistant/index.html"), "utf8");
+  if (!assistant.includes("پیدا نکردم")) throw new Error("fa/assistant is missing the honest not-found contract");
+}
+
+const sitemap = await readFile(path.join(dist, "sitemap.xml"), "utf8");
+const expectedUrls = expected.filter((file) => file.endsWith("index.html")).length;
+if ((sitemap.match(/<url>/g) ?? []).length !== expectedUrls) throw new Error(`Expected ${expectedUrls} sitemap URLs, found ${(sitemap.match(/<url>/g) ?? []).length}`);
+if ((sitemap.match(/<loc>https:\/\//g) ?? []).length !== expectedUrls) throw new Error("Sitemap locations must be absolute HTTPS URLs");
+console.log(`Static Bridge SEO checks passed: ${expectedUrls} HTML pages + sitemap.`);

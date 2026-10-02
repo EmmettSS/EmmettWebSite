@@ -32,7 +32,7 @@ export function Loader({ onComplete }: { onComplete: () => void }) {
         </div>
 
         <div className="space-y-3 w-72 mx-auto">
-          <div className="flex items-center justify-between text-xs font-mono text-[rgba(243,250,246,0.28)]">
+          <div className="flex items-center justify-between text-xs font-mono text-[rgba(243,250,246,0.62)]">
             <span>INITIALIZING</span>
             <span>{progress}%</span>
           </div>
@@ -45,7 +45,7 @@ export function Loader({ onComplete }: { onComplete: () => void }) {
           </div>
         </div>
 
-        <p className="text-xs font-mono text-[rgba(243,250,246,0.2)] tracking-widest">
+        <p className="text-xs font-mono text-[rgba(243,250,246,0.62)] tracking-widest">
           EMMETT GROUP · ENGINEERING COLLECTIVE
         </p>
       </div>

@@ -84,13 +84,13 @@ export function Solutions() {
         >
           <div className="flex items-center gap-3 mb-6">
             <div className="w-6 h-px bg-[rgba(245,246,247,0.2)]" />
-            <span className="text-xs font-mono tracking-[0.2em] uppercase text-[rgba(245,246,247,0.38)]">
+            <span className="text-xs font-mono tracking-[0.2em] uppercase text-[rgba(245,246,247,0.62)]">
               05 — Business Solutions
             </span>
           </div>
           <h2 className="text-[clamp(2rem,5vw,3.5rem)] font-medium leading-tight tracking-tight text-[#F5F6F7] max-w-2xl">
             Not services.{" "}
-            <span className="text-[rgba(245,246,247,0.38)]">Engineered outcomes.</span>
+            <span className="text-[rgba(245,246,247,0.62)]">Engineered outcomes.</span>
           </h2>
         </motion.div>
 
@@ -108,7 +108,7 @@ export function Solutions() {
               className={`px-4 py-1.5 rounded-full text-xs font-mono tracking-widest uppercase transition-all duration-150 ${
                 activeFilter === f
                   ? "bg-[#10B981] text-[#070709] font-semibold"
-                  : "border border-white/[0.08] text-[rgba(245,246,247,0.38)] hover:border-white/[0.15] hover:text-[rgba(245,246,247,0.64)]"
+                  : "border border-white/[0.08] text-[rgba(245,246,247,0.62)] hover:border-white/[0.15] hover:text-[rgba(245,246,247,0.64)]"
               }`}
             >
               {f}
@@ -146,11 +146,11 @@ export function Solutions() {
                         <h3 className="text-base font-semibold text-[#F5F6F7] mb-1 group-hover:text-[#F5F6F7] transition-colors">
                           {s.title}
                         </h3>
-                        <p className="text-sm text-[rgba(245,246,247,0.38)] leading-snug">{s.problem}</p>
+                        <p className="text-sm text-[rgba(245,246,247,0.62)] leading-snug">{s.problem}</p>
                       </div>
                     </div>
                     <motion.div animate={{ rotate: isExpanded ? 180 : 0 }} transition={{ duration: 0.2 }}>
-                      <ChevronDown className="w-4 h-4 text-[rgba(245,246,247,0.22)] flex-shrink-0 mt-1" />
+                      <ChevronDown className="w-4 h-4 text-[rgba(245,246,247,0.62)] flex-shrink-0 mt-1" />
                     </motion.div>
                   </div>
                 </button>
@@ -165,15 +165,15 @@ export function Solutions() {
                     className="px-6 pb-6 space-y-5 border-t border-white/[0.04]"
                   >
                     <div className="pt-4">
-                      <div className="text-[10px] font-mono tracking-widest uppercase text-[rgba(245,246,247,0.22)] mb-2">SOLUTION</div>
+                      <div className="text-[10px] font-mono tracking-widest uppercase text-[rgba(245,246,247,0.62)] mb-2">SOLUTION</div>
                       <p className="text-sm text-[rgba(245,246,247,0.55)] leading-relaxed">{s.solution}</p>
                     </div>
 
                     <div>
-                      <div className="text-[10px] font-mono tracking-widest uppercase text-[rgba(245,246,247,0.22)] mb-2">STACK</div>
+                      <div className="text-[10px] font-mono tracking-widest uppercase text-[rgba(245,246,247,0.62)] mb-2">STACK</div>
                       <div className="flex flex-wrap gap-1.5">
                         {s.stack.map((t) => (
-                          <span key={t} className="px-2 py-0.5 text-xs font-mono rounded border border-white/[0.06] text-[rgba(245,246,247,0.38)]">
+                          <span key={t} className="px-2 py-0.5 text-xs font-mono rounded border border-white/[0.06] text-[rgba(245,246,247,0.62)]">
                             {t}
                           </span>
                         ))}
@@ -181,7 +181,7 @@ export function Solutions() {
                     </div>
 
                     <div>
-                      <div className="text-[10px] font-mono tracking-widest uppercase text-[rgba(245,246,247,0.22)] mb-2">IMPACT</div>
+                      <div className="text-[10px] font-mono tracking-widest uppercase text-[rgba(245,246,247,0.62)] mb-2">IMPACT</div>
                       <div className="space-y-1">
                         {s.impact.map((imp) => (
                           <div key={imp} className="flex items-center gap-2 text-sm font-mono" style={{ color }}>

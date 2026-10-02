@@ -11,7 +11,10 @@ urlpatterns = [
         name="swagger-ui",
     ),
     path("api/v1/", include("apps.core.urls")),
+    path("api/v1/", include("apps.tools.urls")),
     path("api/v1/", include("apps.jobs.urls")),
     path("api/v1/", include("apps.leads.urls")),
     path("api/v1/", include("apps.content.urls")),
+    path("api/v1/", include("apps.scanner.urls")),
+    path("api/v1/", include("apps.assistant.urls")),
 ]

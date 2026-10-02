@@ -13,9 +13,16 @@ def test_health_reports_database_and_uptime():
     assert isinstance(response.data["uptime"], int)
 
 
-def test_public_tools_contract_is_honest_until_tools_ship():
+def test_public_tools_catalog_lists_live_artifacts_only():
     response = APIClient().get("/api/v1/public/tools/")
-    assert response.status_code == 200 and response.data == {"items": [], "count": 0}
+    assert response.status_code == 200
+    items = response.data["items"]
+    assert response.data["count"] == len(items) == 5
+    assert all(item["status"] == "live" for item in items)
+    for item in items:
+        assert item["evidence_url"].startswith("/fa/tools/")
+        assert item["version"]
+    assert {item["id"] for item in items} == {"jalali", "kod-meli", "toman", "matn-farsi", "jwt"}
 
 
 def test_baseline_security_headers_are_present():

@@ -4,6 +4,93 @@ info:
   version: 1.0.0
   description: Emmett public and product API
 paths:
+  /api/v1/assistant/ask/:
+    post:
+      operationId: v1_assistant_ask_create
+      description: DRF calls ``view.throttled()`` (not the throttle class), so the
+        view carries the mixin.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Ask'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Ask'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Ask'
+        required: true
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AskAccepted'
+          description: ''
+  /api/v1/assistant/ask/{job_id}/poll/:
+    get:
+      operationId: v1_assistant_ask_poll_retrieve
+      description: Reusable short-poll response. Subclasses define job_kind and permissions.
+      parameters:
+      - in: path
+        name: job_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssistantPollResponse'
+          description: ''
+  /api/v1/assistant/feedback/:
+    post:
+      operationId: v1_assistant_feedback_create
+      description: DRF calls ``view.throttled()`` (not the throttle class), so the
+        view carries the mixin.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Feedback'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Feedback'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Feedback'
+        required: true
+      security:
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/assistant/suggestions/:
+    get:
+      operationId: v1_assistant_suggestions_retrieve
+      tags:
+      - v1
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuggestionsResponse'
+          description: ''
   /api/v1/content/case-studies/:
     get:
       operationId: v1_content_case_studies_retrieve
@@ -260,6 +347,109 @@ paths:
               schema:
                 $ref: '#/components/schemas/ToolCatalogResponse'
           description: ''
+  /api/v1/scanner/jobs/:
+    post:
+      operationId: v1_scanner_jobs_create
+      description: DRF calls ``view.throttled()`` (not the throttle class), so the
+        view carries the mixin.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScanRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ScanRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ScanRequest'
+        required: true
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScanCreatedResponse'
+          description: ''
+  /api/v1/scanner/jobs/{job_id}/poll/:
+    get:
+      operationId: v1_scanner_jobs_poll_retrieve
+      description: Reusable short-poll response. Subclasses define job_kind and permissions.
+      parameters:
+      - in: path
+        name: job_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScanPollResponse'
+          description: ''
+  /api/v1/scanner/results/{result_id}/:
+    get:
+      operationId: v1_scanner_results_retrieve
+      parameters:
+      - in: path
+        name: result_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScanResultResponse'
+          description: ''
+  /api/v1/scanner/results/{result_id}/unlock/:
+    post:
+      operationId: v1_scanner_results_unlock_create
+      description: DRF calls ``view.throttled()`` (not the throttle class), so the
+        view carries the mixin.
+      parameters:
+      - in: path
+        name: result_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScanUnlock'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ScanUnlock'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ScanUnlock'
+        required: true
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScanUnlock'
+          description: ''
   /api/v1/site-config/:
     get:
       operationId: v1_site_config_retrieve
@@ -274,8 +464,224 @@ paths:
               schema:
                 $ref: '#/components/schemas/SiteConfig'
           description: ''
+  /api/v1/tools/jalali/convert/:
+    get:
+      operationId: v1_tools_jalali_convert_retrieve
+      parameters:
+      - in: query
+        name: from
+        schema:
+          type: string
+          enum:
+          - gregorian
+          - jalali
+        required: true
+      - in: query
+        name: to
+        schema:
+          type: string
+          enum:
+          - gregorian
+          - jalali
+        required: true
+      - in: query
+        name: value
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JalaliConvertResponse'
+          description: ''
+  /api/v1/tools/jalali/holidays/:
+    get:
+      operationId: v1_tools_jalali_holidays_retrieve
+      description: Versioned holiday source. Cached in LocMem; the DB row is the source
+        of truth.
+      parameters:
+      - in: query
+        name: year
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HolidayCalendarResponse'
+          description: ''
+  /api/v1/tools/persian-text/normalize/:
+    post:
+      operationId: v1_tools_persian_text_normalize_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NormalizeRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/NormalizeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NormalizeRequest'
+        required: true
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NormalizeResponse'
+          description: ''
+  /api/v1/tools/share/:
+    post:
+      operationId: v1_tools_share_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShareCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ShareCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ShareCreate'
+        required: true
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShareResponse'
+          description: ''
+  /api/v1/tools/share/{share_id}/:
+    get:
+      operationId: v1_tools_share_retrieve
+      parameters:
+      - in: path
+        name: share_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShareDetail'
+          description: ''
+  /api/v1/tools/usage/:
+    post:
+      operationId: v1_tools_usage_create
+      description: 'Aggregate ping only: tool id, locale, completion flag. No input
+        data, no IP.'
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ToolUsage'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ToolUsage'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ToolUsage'
+        required: true
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToolUsageResponse'
+          description: ''
 components:
   schemas:
+    Ask:
+      type: object
+      properties:
+        question:
+          type: string
+        locale:
+          allOf:
+          - $ref: '#/components/schemas/LocaleEnum'
+          default: fa
+        session_id:
+          type: string
+          maxLength: 64
+        consent_to_log:
+          type: boolean
+          default: false
+        website:
+          type: string
+          writeOnly: true
+      required:
+      - question
+    AskAccepted:
+      type: object
+      properties:
+        job_id:
+          type: integer
+        state:
+          type: string
+        mode:
+          type: string
+        disclosure:
+          type: string
+      required:
+      - disclosure
+      - job_id
+      - mode
+      - state
+    AssistantPollResponse:
+      type: object
+      properties:
+        job_id:
+          type: integer
+        state:
+          type: string
+        progress:
+          type: array
+          items: {}
+        offset_next:
+          type: integer
+        result:
+          nullable: true
+        error:
+          type: string
+          nullable: true
+      required:
+      - job_id
+      - offset_next
+      - progress
+      - state
     Contact:
       type: object
       properties:
@@ -319,6 +725,16 @@ components:
       - slug
       - slug_fa
       - title
+    Feedback:
+      type: object
+      properties:
+        answer_id:
+          type: integer
+        helpful:
+          type: boolean
+      required:
+      - answer_id
+      - helpful
     Health:
       type: object
       properties:
@@ -335,6 +751,71 @@ components:
       - status
       - uptime
       - version
+    HolidayCalendarResponse:
+      type: object
+      properties:
+        year:
+          type: integer
+        version:
+          type: string
+        source:
+          type: string
+        coverage:
+          type: string
+        note_fa:
+          type: string
+        note_en:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/HolidayItem'
+      required:
+      - coverage
+      - items
+      - note_en
+      - note_fa
+      - source
+      - version
+      - year
+    HolidayItem:
+      type: object
+      properties:
+        date:
+          type: string
+        label:
+          type: string
+        label_en:
+          type: string
+        kind:
+          type: string
+      required:
+      - date
+      - kind
+      - label
+      - label_en
+    JalaliConvertResponse:
+      type: object
+      properties:
+        jalali:
+          type: string
+        gregorian:
+          type: string
+        weekday_fa:
+          type: string
+        weekday_en:
+          type: string
+        day_of_year:
+          type: integer
+        leap_year:
+          type: boolean
+      required:
+      - day_of_year
+      - gregorian
+      - jalali
+      - leap_year
+      - weekday_en
+      - weekday_fa
     JobApplication:
       type: object
       properties:
@@ -388,6 +869,248 @@ components:
           maxLength: 400
       required:
       - token
+    NormalizeChange:
+      type: object
+      properties:
+        rule:
+          type: string
+        count:
+          type: integer
+        samples:
+          type: array
+          items:
+            type: string
+      required:
+      - count
+      - rule
+      - samples
+    NormalizeRequest:
+      type: object
+      properties:
+        text:
+          type: string
+          maxLength: 50000
+        rules:
+          type: array
+          items:
+            $ref: '#/components/schemas/RulesEnum'
+      required:
+      - text
+    NormalizeResponse:
+      type: object
+      properties:
+        normalized:
+          type: string
+        changes:
+          type: array
+          items:
+            $ref: '#/components/schemas/NormalizeChange'
+        total:
+          type: integer
+        rules_version:
+          type: string
+      required:
+      - changes
+      - normalized
+      - rules_version
+      - total
+    RulesEnum:
+      enum:
+      - yeh
+      - kaf
+      - digits
+      - latin-digits
+      - diacritics
+      - zwnj
+      - spaces
+      - quotes
+      - ra
+      - kashida
+      type: string
+      description: |-
+        * `yeh` - yeh
+        * `kaf` - kaf
+        * `digits` - digits
+        * `latin-digits` - latin-digits
+        * `diacritics` - diacritics
+        * `zwnj` - zwnj
+        * `spaces` - spaces
+        * `quotes` - quotes
+        * `ra` - ra
+        * `kashida` - kashida
+    ScanCreatedResponse:
+      type: object
+      properties:
+        job_id:
+          type: integer
+        result_id:
+          type: string
+          nullable: true
+        domain:
+          type: string
+        blocklist_version:
+          type: string
+        estimated_seconds:
+          type: integer
+      required:
+      - blocklist_version
+      - domain
+      - estimated_seconds
+      - job_id
+      - result_id
+    ScanPollResponse:
+      type: object
+      properties:
+        job_id:
+          type: integer
+        state:
+          type: string
+        progress:
+          type: array
+          items: {}
+        offset_next:
+          type: integer
+        result:
+          nullable: true
+        error:
+          type: string
+          nullable: true
+      required:
+      - job_id
+      - offset_next
+      - progress
+      - state
+    ScanRequest:
+      type: object
+      properties:
+        domain:
+          type: string
+          maxLength: 253
+        consent:
+          type: boolean
+        locale:
+          allOf:
+          - $ref: '#/components/schemas/LocaleEnum'
+          default: fa
+        website:
+          type: string
+          writeOnly: true
+      required:
+      - consent
+      - domain
+    ScanResultResponse:
+      type: object
+      properties:
+        result_id:
+          type: string
+        domain:
+          type: string
+        grade:
+          type: string
+        score:
+          type: integer
+        created_at:
+          type: string
+        expires_at:
+          type: string
+        ttl_days:
+          type: integer
+        noindex:
+          type: boolean
+        blocklist_version:
+          type: string
+        sections:
+          type: array
+          items: {}
+        internal:
+          type: boolean
+      required:
+      - blocklist_version
+      - created_at
+      - domain
+      - expires_at
+      - grade
+      - internal
+      - noindex
+      - result_id
+      - score
+      - sections
+      - ttl_days
+    ScanUnlock:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+      required:
+      - email
+    ShareCreate:
+      type: object
+      properties:
+        tool:
+          $ref: '#/components/schemas/ToolEnum'
+        locale:
+          allOf:
+          - $ref: '#/components/schemas/LocaleEnum'
+          default: fa
+        summary_fa:
+          type: string
+          maxLength: 400
+        summary_en:
+          type: string
+          maxLength: 400
+        params:
+          type: object
+          additionalProperties:
+            type: string
+            maxLength: 400
+      required:
+      - summary_en
+      - summary_fa
+      - tool
+    ShareDetail:
+      type: object
+      properties:
+        share_id:
+          type: string
+        tool:
+          type: string
+        locale:
+          type: string
+        summary_fa:
+          type: string
+        summary_en:
+          type: string
+        params:
+          type: object
+          additionalProperties: {}
+        created_at:
+          type: string
+          format: date-time
+      required:
+      - created_at
+      - locale
+      - params
+      - share_id
+      - summary_en
+      - summary_fa
+      - tool
+    ShareResponse:
+      type: object
+      properties:
+        share_id:
+          type: string
+        path:
+          type: string
+        permanent:
+          type: boolean
+        noindex:
+          type: boolean
+      required:
+      - noindex
+      - path
+      - permanent
+      - share_id
     SiteConfig:
       type: object
       properties:
@@ -407,6 +1130,14 @@ components:
       - building_en
       - building_fa
       - telegram_handle
+    SuggestionsResponse:
+      type: object
+      properties:
+        suggestions:
+          type: array
+          items: {}
+      required:
+      - suggestions
     Team:
       type: object
       properties:
@@ -423,19 +1154,87 @@ components:
       - name_fa
       - role_en
       - role_fa
+    ToolCatalogItem:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        title_fa:
+          type: string
+        title_en:
+          type: string
+        status:
+          type: string
+        version:
+          type: string
+        capability:
+          type: string
+        path:
+          type: string
+        evidence_url:
+          type: string
+      required:
+      - capability
+      - evidence_url
+      - id
+      - path
+      - status
+      - title
+      - title_en
+      - title_fa
+      - version
     ToolCatalogResponse:
       type: object
       properties:
         items:
           type: array
           items:
-            type: object
-            additionalProperties: {}
+            $ref: '#/components/schemas/ToolCatalogItem'
         count:
           type: integer
       required:
       - count
       - items
+    ToolEnum:
+      enum:
+      - jalali
+      - kod-meli
+      - toman
+      - matn-farsi
+      - jwt
+      type: string
+      description: |-
+        * `jalali` - jalali
+        * `kod-meli` - kod-meli
+        * `toman` - toman
+        * `matn-farsi` - matn-farsi
+        * `jwt` - jwt
+    ToolUsage:
+      type: object
+      properties:
+        tool:
+          $ref: '#/components/schemas/ToolEnum'
+        locale:
+          allOf:
+          - $ref: '#/components/schemas/LocaleEnum'
+          default: fa
+        completed:
+          type: boolean
+          default: false
+      required:
+      - tool
+    ToolUsageResponse:
+      type: object
+      properties:
+        accepted:
+          type: boolean
+        stored:
+          type: boolean
+      required:
+      - accepted
+      - stored
     Waitlist:
       type: object
       properties:

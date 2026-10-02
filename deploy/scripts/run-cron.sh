@@ -10,6 +10,7 @@ case "$command_name" in
   embed-jobs) exec "$VIRTUAL_ENV/bin/python" "$APP_ROOT/manage.py" process_jobs --kind=embed --limit=20 --timeout=120 ;;
   send-outbox) exec "$VIRTUAL_ENV/bin/python" "$APP_ROOT/manage.py" send_outbox --limit=50 ;;
   render-public-html) exec "$VIRTUAL_ENV/bin/python" "$APP_ROOT/manage.py" render_public_html --incremental ;;
+  purge-results) exec "$VIRTUAL_ENV/bin/python" "$APP_ROOT/manage.py" purge_scan_results ;;
   db-backup) exec "$VIRTUAL_ENV/bin/python" "$APP_ROOT/manage.py" db_backup ;;
   *) echo "Unknown cron task" >&2; exit 2 ;;
 esac
