@@ -1,0 +1,336 @@
+# EMMETT GROUP — WEBSITE CREATIVE SPECIFICATION
+### Light-Tech / Emerald / AI Engineering Ecosystem
+
+**Status:** Implementation-ready
+**Stack:** React + TypeScript + Tailwind CSS + shadcn/ui (Figma Make)
+
+---
+
+## A — Brand Direction
+
+Emmett is an **engineering ecosystem**, not an agency, not a generic AI startup, not a cybersecurity vendor. The site must read as a place where real systems get built — research, engineering, security, product, teaching — all connected through one identity.
+
+Emotional target: *"This feels advanced, but I actually want to explore it."*
+Explicitly avoid: *"Another dark AI startup."*
+
+Composition target: **70% technology / 20% human & product / 10% editorial.**
+Tonal balance across the site: **55% dark-green environments / 45% light soft-green & ivory environments.** No pure white, no pure black, anywhere.
+
+The existing identity (AI/ML, neural networks, system diagrams, cybersecurity, premium typography, technical metadata, sophisticated motion) is **preserved and evolved** — this is a lightening and warming of the palette and rhythm, not a rebuild.
+
+---
+
+## B — Color System
+
+**Backgrounds (tonal spectrum, not fixed light/dark split):**
+
+| Token | Hex | Use |
+|---|---|---|
+| Deep Green-Black | `#07130F` | Hero backgrounds, deepest sections |
+| Dark Emerald | `#0B1F18` | Primary dark surface |
+| Forest Graphite | `#102A20` | Secondary dark surface, cards on dark |
+| Emerald Slate | `#16382B` | Elevated dark surface, borders |
+| Soft Green | `#DDEDE5` | Light surface, transition zones |
+| Warm Green White | `#F1F7F3` | Primary light surface |
+| Warm Ivory | `#F4F6F1` | Editorial/content-heavy light surface |
+
+Sections move along a rhythm: Dark Emerald → Forest → Soft Green → Warm White → Ivory → Dark Emerald — never resting flat on one tone for too long.
+
+**Brand (Emerald):**
+
+| Token | Hex | Use |
+|---|---|---|
+| Primary Emerald | `#1FAE6E` | CTAs, active nav, highlights, node color |
+| Secondary Emerald | `#35C98A` | Secondary accents, hover states |
+| Deep Emerald | `#0B6B48` | Pressed states, deep accents on light bg |
+
+Rule: premium and intelligent, never neon/RGB-gaming green.
+
+**Supporting network colors:** Soft Mint, Muted Blue, and a very restrained Cyan — used only inside neural-network / system-map visuals, never as UI chrome.
+
+**Text:**
+- On dark: `#F3FAF6` (headline), ~70% opacity white for body
+- On light: Forest Graphite `#102A20` (headline), ~70% opacity for body
+
+---
+
+## C — Typography
+
+- **Primary typeface:** modern grotesque sans (e.g. Inter, General Sans, or Söhne-equivalent) — large, confident headlines, strong hierarchy, short paragraphs.
+- **Monospace:** used specifically for technical metadata — timestamps, tags, coordinates, version numbers, category labels.
+- **Editorial serif:** reserved for Library/case-study pull quotes only, where it aids storytelling. Never used site-wide.
+
+Hierarchy: Display (hero headlines, 56–96px fluid) → H1/H2 (section headers) → Body (16–18px, generous line-height) → Metadata (12–13px mono, uppercase, letter-spaced).
+
+---
+
+## D — Grid & Spacing
+
+- 12-column grid on desktop, 4-column on mobile, generous gutters (24–32px desktop, 16px mobile).
+- Asymmetry is a deliberate tool, especially on Projects and Library — avoid uniform card grids.
+- Section rhythm: consistent vertical padding scale (e.g. 96/128/160px desktop) so the page breathes between tonal shifts.
+- Max content width ~1280–1440px, with edge-to-edge treatment for hero visuals and full-bleed imagery.
+
+---
+
+## E — Navigation
+
+**Logo:** EMMETT
+**Primary nav:** Services · Products · Projects · Library · Academy · About
+**CTA:** Start a Project
+
+**Desktop:** transparent/semi-transparent at top of page. On scroll: dark emerald translucent surface, subtle blur, 1px border, Emerald active-state indicator under the current item.
+
+**Mobile:** clean full-screen drawer, large tap targets, CTA pinned at the bottom of the drawer.
+
+States: default / hover / active / focus (2px Emerald outline) — see Component States (Q).
+
+---
+
+## F — Homepage
+
+**Narrative arc (drives section order):**
+1. We solve difficult problems.
+2. We engineer the systems behind them.
+3. We build products from those systems.
+4. We share what we learn.
+5. We teach the next builders.
+6. We work with people who want to build something meaningful.
+
+This maps directly to Services → Products → Projects → Library → Academy → Contact.
+
+**Hero**
+- Background: `#07130F` → `#0B1F18` gradient, never flat black.
+- Headline: **"We engineer intelligent systems."** (alt: "Complex problems. Engineered into systems.")
+- Subhead: "Software, AI, cybersecurity and products built for real-world complexity."
+- Primary CTA: "Explore our work" · Secondary: "Start a project"
+- Visual: large neural network — Emerald nodes, soft mint connections, subtle blue secondary pathways, small technical labels. Depth via opacity/scale/blur layering, not glow. Subtle animation: nodes activate, connections illuminate, data moves through pathways.
+
+**Story sections** below the hero walk the six-step narrative, each transitioning the visual system (network → architecture → product interface → project architecture → knowledge graph) rather than simply stacking static blocks.
+
+---
+
+## G — Services ("The Engineering System")
+
+Not a service-card grid — a **system architecture** the user explores.
+
+Headline: "Engineering across the entire stack."
+Subhead: "From infrastructure to intelligence, we design and build the systems that make ambitious products possible."
+
+| # | Service | Copy | Shows |
+|---|---|---|---|
+| 01 | Software Engineering | Robust software systems designed for scale, reliability and long-term evolution. | Architecture, backend, frontend, APIs, distributed systems |
+| 02 | AI / Machine Learning | From data to intelligent systems, we turn machine learning research into usable products. | ML, deep learning, LLMs, computer vision, automation |
+| 03 | Cybersecurity | Security engineered into the system — from attack surface to infrastructure. | Security architecture, appsec, threat analysis, pentesting, security automation — visually tied to Pentestor |
+| 04 | Product Engineering | We transform complex ideas into products people can actually use. | UX, UI, product architecture, prototyping, development |
+| 05 | Infrastructure | The systems beneath the systems. | Cloud, DevOps, containers, deployment, observability |
+
+**Interaction:** hovering a service reorganizes the shared system-map visual — the relevant node cluster/pathway activates (AI cluster lights up, security pathway highlights, etc.), reinforcing content ↔ visualization.
+
+---
+
+## H — Products ("Things We Actually Built")
+
+Headline: "Products born from engineering problems."
+Subhead: "We build tools and systems because we've encountered problems worth solving ourselves."
+
+Presented as **interactive showcases** with sticky product interface + scroll-driven storytelling (Problem → Solution → System → Result), not static cards.
+
+Featured products: **Pentestor** (see I), a **CRM/business-systems platform** (see J), and a **property-discovery platform** — original Emmett product language, not a Zillow visual clone. Positioning: "Data-driven property discovery and decision making," showing map, listings, filters, and location intelligence.
+
+---
+
+## I — Pentestor
+
+Positioning: **"AI-powered security engineering."**
+Copy: "Pentestor transforms complex security assessment into an intelligent, structured workflow."
+Shows: attack surface, network topology, security findings, AI analysis, risk prioritization.
+CTA: "Explore Pentestor"
+Visual language: dark emerald → near-black, cyan + emerald accents, network-topology motifs, technical interface chrome. Page personality: **security / intense.**
+
+---
+
+## J — CRM / Business Systems
+
+Positioning: "Business systems engineered around the way teams actually work."
+Copy: "A flexible CRM and business operations platform designed around real workflows instead of forcing teams into rigid software."
+Shows: dashboard, contacts, pipeline, tasks, analytics, automation.
+Visual language: notably lighter — soft green / ivory, emerald + indigo accents, real-looking product UI. Page personality: **trust / productivity.**
+
+---
+
+## K — Projects ("Proof of Work")
+
+Not portfolio thumbnails — **engineering stories.**
+
+Headline: "What we've built."
+Subhead: "Real problems. Real constraints. Real systems."
+
+Each project case study covers: Context → Problem → Constraints → Approach → Architecture → Technology → Implementation → Outcome.
+
+Layout: large editorial, asymmetric — big project number, name, industry, short description, large interface image, architecture diagram, technology list, result. Avoid repetitive card grids.
+
+**Interaction:** hover subtly zooms the image, reveals technical metadata, activates an architecture-line animation. Click transitions into a full case study with sticky side nav, large typography, full-width visuals.
+
+---
+
+## L — Library ("Emmett's Technical Mind")
+
+Framed as a modern **engineering publication**, not a blog card wall.
+
+Headline: "What we're learning, building and thinking about."
+Categories: Engineering, AI/ML, Cybersecurity, Bioinformatics, Systems, Research, Product, Technology.
+Content types: technical articles, research notes, engineering notes, project deep dives, tutorials, experiments, team perspectives.
+
+**Layout:** editorial rows (category · title · author · date · reading time · arrow), one featured article with large visual treatment. Hover: row expands slightly, category accent appears, arrow moves, a subtle technical line travels across the row.
+
+---
+
+## M — Academy ("Learn by Building")
+
+Not Udemy-style — an **engineering learning environment.**
+
+Headline: "Build your way into deeper knowledge."
+Subhead: "Courses, paths and practical systems designed around real engineering problems."
+
+Learning paths: Software Engineering, AI/Machine Learning, Cybersecurity, Bioinformatics, Systems Thinking.
+
+Course UI: title, description, level, duration, topics, projects, progress — via technical milestones and learning graphs, not gamified badges.
+
+**Signature visual — Knowledge Graph:** each topic is a node, dependencies are connections, completed topics illuminate, current topic highlights in Emerald. This should be one of the most memorable visuals on the site.
+
+---
+
+## N — About ("The People Behind the Systems")
+
+Must feel notably more human than the rest of the site — photography-led, not corporate.
+
+Headline: "We are builders first."
+Subhead: "Engineers, researchers, designers and problem-solvers working together on difficult things."
+
+Content: team photography, workspace, real project moments, research, whiteboards, development, experimentation.
+
+Sections: Why Emmett exists → How we work → What we believe → What we're learning → Where we're going.
+
+**Values (specific, not generic):**
+- **Build before you brag** — we value working systems over impressive presentations.
+- **Complexity deserves clarity** — we simplify difficult systems without pretending they're simple.
+- **Learn in public** — we document what we discover.
+- **Own the system** — we care about what happens after deployment.
+
+Interaction: minimal — photography transitions, timeline, scroll-based storytelling. Humanity dominates over technical effects here.
+
+---
+
+## O — Contact
+
+Headline: "Have a difficult problem?"
+Subhead: "Tell us what you're trying to build. We'll figure out the system together."
+Background: deep emerald with a large, very subtle neural-network structure.
+CTA: "Start a conversation"
+
+Form fields: What are you building? · What kind of help do you need? · Timeline · Budget/scale · Tell us more · Contact info.
+
+---
+
+## P — Content Strategy & Voice
+
+Copy should be: confident, precise, technical, human, short, intelligent — written like engineers who actually build things.
+
+**Avoid entirely:** "We are passionate about…", "We leverage cutting-edge…", "Revolutionizing the future…", "Empowering businesses…", "Next-generation solutions…", "Unlock your potential…"
+
+**Microcopy examples:** Explore system · View architecture · See how it works · Read the case study · Open project · Explore Pentestor · View product · Read the research · Start building · Meet the team.
+
+---
+
+## Q — Component System & States
+
+Reusable components: buttons, navigation, cards, editorial rows, product showcase, technical metadata blocks, architecture diagrams, neural network, knowledge graph, timeline, stats, forms, tags, filters, search.
+
+Every component needs defined states: **Default, Hover, Active, Focus, Disabled, Loading.**
+- Focus: 2px Emerald (or indigo on CRM context) outline.
+- Loading: skeleton matching the final geometry — never a generic spinner replacing layout.
+
+---
+
+## R — Motion System
+
+Motion is a core differentiator but stays restrained and purposeful:
+
+- **Hero network:** slow node activation, connection flow, subtle parallax, very low overall movement.
+- **Scroll reveals:** opacity + 8–16px translate + scale 0.98→1, 400–600ms.
+- **Service hover:** system map reorganizes to the selected service.
+- **Product scroll:** interface transforms in sync with copy changes.
+- **Project hover:** architecture diagram becomes visible.
+- **Library hover:** row expands.
+- **Academy:** knowledge graph activates on interaction.
+- **Navigation:** smooth state transition on scroll (transparent → translucent emerald).
+
+---
+
+## S — Interactive/Signature Systems
+
+1. **System Map** — a recurring neural-network/system visual that changes by page context (general network on Home, engineering network on Services, product ecosystem on Products, security topology on Pentestor, knowledge graph on Academy). This is the site's visual signature.
+2. **System Explorer** — hover/click nodes (Software Engineering, AI, Security, Infrastructure, Products, Research) to reveal connected areas, building an interactive mental model of Emmett.
+3. **Scroll as Exploration** — scrolling transitions one visual system into the next (Neural Network → Engineering Architecture → Product Interface → Project Architecture → Knowledge Graph) rather than stacking static sections.
+
+---
+
+## T — Responsive Design
+
+Mobile is a **different composition**, not a shrunk desktop (390px baseline):
+
+- **Hero:** text first, network visual underneath.
+- **Services:** vertical system index.
+- **Products:** horizontal swipe showcase.
+- **Projects:** large editorial stories, stacked.
+- **Library:** simple rows.
+- **Academy:** vertical knowledge graph.
+- **About:** photography first.
+
+---
+
+## U — Figma / Build Structure
+
+- Foundations: color tokens, type scale, spacing scale, elevation/blur tokens.
+- Components library: nav, buttons, cards, editorial row, product showcase, forms, tags/filters, architecture diagram, neural network, knowledge graph.
+- Page templates: Home, Services, Products (+ Pentestor, CRM, Property platform sub-pages), Projects (index + case study), Library (index + article), Academy (index + course), About, Contact.
+- Shared system-map component parameterized by page context (per Section S).
+
+---
+
+## V — UX & Accessibility
+
+- Maintain WCAG AA contrast even within the emerald/dark palette — verify text-on-dark and text-on-soft-green combinations specifically, since mid-tone greens are contrast-risky.
+- All interactive nodes/diagrams need a non-hover, non-mouse path (keyboard focus + visible focus ring; tap equivalents on mobile) — the System Explorer and Knowledge Graph must be fully operable without hover.
+- Respect `prefers-reduced-motion`: fall back to simple fades/no parallax for the neural network and scroll-as-exploration transitions.
+- Ensure diagrams/network visuals have text-equivalent content (services, products, topics) so the information isn't visual-only.
+
+---
+
+## W — Final Quality Audit Checklist
+
+Before shipping any page, check it against:
+
+- Too dark? Too white? (Neither — tonal spectrum only.)
+- Does the green read as premium, not neon/gaming?
+- Does the neural network feel intentional and alive, not decorative?
+- Does this page have its own distinct personality (see table below)?
+- Are animations meaningful, or decorative filler?
+- Too many generic cards anywhere?
+- Would a talented engineer look at this and think *"these people actually build things"* — or does it read as agency/generic-SaaS/crypto/corporate?
+
+**Page personalities for reference:**
+
+| Page | Personality |
+|---|---|
+| Home | Intelligent / cinematic |
+| Services | Engineering / systems |
+| Products | Product laboratory |
+| Pentestor | Security / intense |
+| CRM | Trust / productivity |
+| Projects | Proof / editorial engineering |
+| Library | Knowledge / publication |
+| Academy | Learning / knowledge graph |
+| About | Human / culture |
+| Contact | Invitation / confidence |
