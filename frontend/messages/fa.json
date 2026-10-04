@@ -1,0 +1,82 @@
+{
+  "metadata": {
+    "siteName": "امیت",
+    "defaultTitle": "امیت — استودیوی مهندسی نرم‌افزار",
+    "defaultDescription": "امیت یک استودیوی مهندسی است که مسائل پیچیدهٔ سیستمی را با همان دقتی حل می‌کند که یک دفتر معماری صرف ساخت یک بنا می‌کند."
+  },
+  "common": {
+    "skipToContent": "رفتن به محتوای اصلی",
+    "startProject": "شروع یک پروژه",
+    "loading": "در حال بارگذاری…",
+    "readMore": "ادامهٔ مطلب",
+    "viewAll": "مشاهدهٔ همه"
+  },
+  "nav": {
+    "home": "خانه",
+    "services": "خدمات",
+    "products": "محصولات",
+    "projects": "پروژه‌ها",
+    "library": "کتابخانه",
+    "academy": "آکادمی",
+    "about": "دربارهٔ ما",
+    "contact": "تماس",
+    "openMenu": "باز کردن منو",
+    "closeMenu": "بستن منو"
+  },
+  "theme": {
+    "toggleLabel": "تغییر پوستهٔ روشن/تاریک",
+    "light": "روشن",
+    "dark": "تاریک",
+    "system": "سیستم"
+  },
+  "locale": {
+    "switchLabel": "تغییر زبان",
+    "fa": "فارسی",
+    "en": "English"
+  },
+  "footer": {
+    "tagline": "ما سیستم‌ها را برای مسائل دشوار مهندسی می‌کنیم.",
+    "rights": "تمام حقوق محفوظ است.",
+    "builtBy": "طراحی و توسعه توسط تیم مهندسی امیت"
+  },
+  "hero": {
+    "eyebrow": "گروه امیت / استودیوی مهندسی",
+    "headline": "ما سیستم‌ها را برای مسائل دشوار مهندسی می‌کنیم.",
+    "subtext": "نرم‌افزار، هوش مصنوعی، امنیت سایبری و زیرساخت — با همان دقتی که یک دفتر معماری صرف طراحی یک بنا می‌کند.",
+    "primaryCta": "مشاهدهٔ نمونه‌کارها",
+    "secondaryCta": "شروع یک پروژه"
+  },
+  "designSystem": {
+    "title": "سیستم طراحی",
+    "description": "صفحهٔ نمونهٔ زندهٔ توکن‌ها و کامپوننت‌های فاز ۳ — برای بازبینی طراحی، نه بخشی از محتوای نهایی سایت.",
+    "colors": "رنگ‌ها",
+    "typography": "تایپوگرافی",
+    "spacing": "فاصله‌گذاری",
+    "buttons": "دکمه‌ها",
+    "formElements": "عناصر فرم",
+    "cards": "کارت‌ها",
+    "dateNumberSample": "نمونهٔ تاریخ و عدد",
+    "today": "امروز",
+    "sampleAmount": "مبلغ نمونه",
+    "buttonVariant": {
+      "primary": "دکمهٔ اصلی",
+      "secondary": "دکمهٔ ثانویه",
+      "ghost": "دکمهٔ شبح",
+      "loading": "در حال ارسال…",
+      "disabled": "غیرفعال"
+    },
+    "badges": "برچسب‌ها",
+    "avatar": "آواتار",
+    "breadcrumb": "مسیر ناوبری"
+  },
+  "form": {
+    "nameLabel": "نام",
+    "namePlaceholder": "نام خود را وارد کنید",
+    "emailLabel": "ایمیل",
+    "emailPlaceholder": "you@example.com",
+    "messageLabel": "پیام",
+    "messagePlaceholder": "دربارهٔ پروژه‌تان بگویید…",
+    "submit": "ارسال",
+    "requiredError": "این فیلد الزامی است."
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "metadata": {
+    "siteName": "Emmett",
+    "defaultTitle": "Emmett — Software Engineering Studio",
+    "defaultDescription": "Emmett is an engineering studio that solves difficult, systems-level problems with the same rigor an architecture practice brings to a building."
+  },
+  "common": {
+    "skipToContent": "Skip to main content",
+    "startProject": "Start a project",
+    "loading": "Loading…",
+    "readMore": "Read more",
+    "viewAll": "View all"
+  },
+  "nav": {
+    "home": "Home",
+    "services": "Services",
+    "products": "Products",
+    "projects": "Projects",
+    "library": "Library",
+    "academy": "Academy",
+    "about": "About",
+    "contact": "Contact",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
+  },
+  "theme": {
+    "toggleLabel": "Toggle light/dark theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "locale": {
+    "switchLabel": "Switch language",
+    "fa": "فارسی",
+    "en": "English"
+  },
+  "footer": {
+    "tagline": "We engineer systems for difficult problems.",
+    "rights": "All rights reserved.",
+    "builtBy": "Designed and built by the Emmett engineering team"
+  },
+  "hero": {
+    "eyebrow": "Emmett Group / Engineering Studio",
+    "headline": "We engineer systems for difficult problems.",
+    "subtext": "Software, AI/ML, cybersecurity, and infrastructure — with the same rigor an architecture practice brings to a building.",
+    "primaryCta": "Explore our work",
+    "secondaryCta": "Start a project"
+  },
+  "designSystem": {
+    "title": "Design System",
+    "description": "A living sample page for Phase 3 tokens and components — for design review, not final site content.",
+    "colors": "Colors",
+    "typography": "Typography",
+    "spacing": "Spacing",
+    "buttons": "Buttons",
+    "formElements": "Form elements",
+    "cards": "Cards",
+    "dateNumberSample": "Date & number sample",
+    "today": "Today",
+    "sampleAmount": "Sample amount",
+    "buttonVariant": {
+      "primary": "Primary button",
+      "secondary": "Secondary button",
+      "ghost": "Ghost button",
+      "loading": "Submitting…",
+      "disabled": "Disabled"
+    },
+    "badges": "Badges",
+    "avatar": "Avatar",
+    "breadcrumb": "Breadcrumb"
+  },
+  "form": {
+    "nameLabel": "Name",
+    "namePlaceholder": "Enter your name",
+    "emailLabel": "Email",
+    "emailPlaceholder": "you@example.com",
+    "messageLabel": "Message",
+    "messagePlaceholder": "Tell us what you're building…",
+    "submit": "Submit",
+    "requiredError": "This field is required."
+  }
+}
