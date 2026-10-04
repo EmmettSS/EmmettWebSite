@@ -1,8 +1,17 @@
 from __future__ import annotations
 
+import pytest
+from rest_framework.test import APIClient
 from rest_framework.throttling import ScopedRateThrottle
 
-from apps.core.throttling import AIEngineRateThrottle, AuthRateThrottle, ContactFormRateThrottle
+from apps.core.throttling import (
+    AIEngineRateThrottle,
+    AuthRateThrottle,
+    ContactFormRateThrottle,
+    NewsletterRateThrottle,
+)
+
+pytestmark = pytest.mark.django_db
 
 
 class TestThrottleScopes:
@@ -17,3 +26,22 @@ class TestThrottleScopes:
     def test_auth_scope(self) -> None:
         assert AuthRateThrottle.scope == "auth"
         assert issubclass(AuthRateThrottle, ScopedRateThrottle)
+
+    def test_newsletter_scope(self) -> None:
+        assert NewsletterRateThrottle.scope == "newsletter"
+        assert issubclass(NewsletterRateThrottle, ScopedRateThrottle)
+
+
+class TestNewsletterThrottleEnforced:
+    """ADR-0006: عضویت خبرنامه باید به ۳ درخواست/روز/IP محدود شود."""
+
+    def test_fourth_request_in_same_day_is_throttled(self, settings: object) -> None:
+        client = APIClient()
+        for index in range(3):
+            response = client.post(
+                "/api/v1/leads/newsletter/", {"email": f"sub{index}@example.com"}
+            )
+            assert response.status_code == 201
+
+        fourth = client.post("/api/v1/leads/newsletter/", {"email": "sub4@example.com"})
+        assert fourth.status_code == 429

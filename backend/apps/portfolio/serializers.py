@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from apps.portfolio.models import CaseStudy, Project
@@ -76,6 +77,7 @@ class ProjectDetailSerializer(serializers.ModelSerializer[Project]):
     def get_gallery_urls(self, obj: Project) -> list[str]:
         return [media.file.url for media in obj.gallery.all()]
 
+    @extend_schema_field(CaseStudySerializer)
     def get_case_study(self, obj: Project) -> dict[str, object] | None:
         try:
             case_study = obj.case_study

@@ -7,6 +7,7 @@ from django.db import IntegrityError
 
 from apps.accounts.models import User
 from apps.accounts.tests.factories import UserFactory
+from apps.core.models import AuditLog
 
 pytestmark = pytest.mark.django_db
 
@@ -58,3 +59,30 @@ class TestUserModel:
     def test_str_returns_email(self) -> None:
         user = UserFactory(email="display@example.com")
         assert str(user) == "display@example.com"
+
+
+class TestUserRoleChangeAuditLog:
+    """ADR-0013: «تغییر نقش کاربر» نمونهٔ صریح یک رویداد حساس است."""
+
+    def test_role_change_is_logged(self) -> None:
+        user = cast(User, UserFactory(role=User.Role.CLIENT))
+
+        user.role = User.Role.STUDENT
+        user.save()
+
+        entry = AuditLog.objects.get(action="accounts.role_changed")
+        assert entry.metadata == {"from": User.Role.CLIENT, "to": User.Role.STUDENT}
+        assert entry.target == user
+
+    def test_saving_without_role_change_does_not_log(self) -> None:
+        user = cast(User, UserFactory(role=User.Role.CLIENT, first_name="Old"))
+
+        user.first_name = "New"
+        user.save()
+
+        assert not AuditLog.objects.filter(action="accounts.role_changed").exists()
+
+    def test_creating_user_does_not_log_role_change(self) -> None:
+        UserFactory(role=User.Role.ADMIN)
+
+        assert not AuditLog.objects.filter(action="accounts.role_changed").exists()

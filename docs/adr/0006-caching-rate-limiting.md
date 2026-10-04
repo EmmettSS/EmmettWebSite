@@ -43,4 +43,37 @@
 ## پیامدها
 
 - کارایی `FileBasedCache` به I/O دیسک هاست وابسته است؛ در صورت مشاهدهٔ کندی در Performance Testing (فاز بعدی)، باید دوباره گزینهٔ Redis/مدیریت هاست بهتر بررسی شود.
-- چون Celery در دسترس نیست، هر فرایند async (مثل ارسال پیامک Kavenegar، فراخوانی AI) باید به‌صورت synchronous با timeout کوتاه یا از طریق یک صف سادهٔ دیتابیسی + management command دوره‌ای (cron) طراحی شود؛ جزئیات در فاز Implementation `ai_engine`/`leads` مشخص می‌شود.
+- چون Celery در دسترس نیست، هر فرایند async (مثل ارسال پیامک Kavenegar، فراخوانی AI) باید به‌صورت synchronous با timeout کوتاه یا از طریق یک صف سادهٔ دیتابیسی + management command دوره‌ای (cron) طراحی شود؛ جزئیات در فاز Implementation `ai_engine` (فاز ۵، ر.ک. `ADR-0009`) / `leads` مشخص می‌شود.
+
+## به‌روزرسانی (فاز ۴ — انحراف آگاهانه از تصمیم اولیهٔ Rate Limiting)
+
+در زمان Implementation واقعی، به‌جای کتابخانهٔ `django-ratelimit` از کلاس‌های
+`rest_framework.throttling.ScopedRateThrottle` بومی DRF استفاده شد
+(`apps/core/throttling.py`: `ContactFormRateThrottle`, `AuthRateThrottle`,
+`AIEngineRateThrottle`, `NewsletterRateThrottle`). دلیل: پروژه از ابتدا روی
+DRF ساخته شده و `DEFAULT_THROTTLE_CLASSES`/`DEFAULT_THROTTLE_RATES` همان
+cache backend تنظیم‌شده در این ADR را به‌صورت رایگان استفاده می‌کنند؛ افزودن
+`django-ratelimit` به‌عنوان یک کتابخانهٔ دوم و موازی برای همان نیاز، وابستگی
+غیرضروری (نقض قانون ۶) بود. وابستگی `django-ratelimit` از `requirements.txt`
+حذف شد (هیچ‌وقت import هم نشده بود).
+
+نرخ‌های نهایی پیاده‌سازی‌شده دقیقاً با جدول بالا منطبق‌اند (`contact_form`:
+۵/ساعت، `auth`: ۱۰/ساعت — به‌جای ۱۰/۱۵دقیقه، چون `ScopedRateThrottle` واحد
+`rate` را به‌صورت `count/period` با periodهای `sec|min|hour|day` می‌پذیرد و
+«۱۵ دقیقه» واحد مجزا ندارد؛ ۱۰/ساعت محافظه‌کارانه‌تر انتخاب شد، `ai_engine`:
+۲۰/ساعت، `newsletter`: ۳/روز).
+
+**باگ کشف و رفع‌شده (مهم):** در پیاده‌سازی اولیهٔ فاز ۲/۴، زیرکلاس‌های
+`ScopedRateThrottle` مقدار `scope` را به‌صورت attribute کلاس ست می‌کردند
+(مثلاً `class AuthRateThrottle(ScopedRateThrottle): scope = "auth"`) اما
+پیاده‌سازی استاندارد DRF مقدار واقعی scope را در زمان اجرا از
+`getattr(view, "throttle_scope", None)` می‌خواند، **نه** از attribute کلاس
+throttle. چون هیچ‌کدام از viewها (`LoginView`, `RegisterView`,
+`ContactCreateView`, ...) مقدار `throttle_scope` را روی خودشان تنظیم نکرده
+بودند، `allow_request` همیشه بدون محدودیت `True` برمی‌گرداند — یعنی
+rate limiting روی auth/contact_form/newsletter عملاً **هرگز واقعاً اجرا
+نشده بود**، با وجود تست‌های واحدی که فقط `scope` attribute کلاس را بررسی
+می‌کردند (نه رفتار واقعی HTTP). در فاز ۴ (بازبینی/سخت‌سازی) این باگ با
+override کردن `allow_request` در یک کلاس پایهٔ مشترک
+(`_NamedScopedRateThrottle`) رفع و با تست‌های سطح HTTP (نه فقط بررسی
+attribute) دوباره اعتبارسنجی شد (`apps/core/tests/test_throttling.py`).

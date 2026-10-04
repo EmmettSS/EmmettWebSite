@@ -3,10 +3,14 @@ from __future__ import annotations
 from typing import cast
 
 import pytest
+from django.core.exceptions import ValidationError
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 from apps.accounts.models import User
 from apps.accounts.tests.factories import UserFactory
-from apps.core.models import AuditLog, log_action
+from apps.core.models import AuditLog, Media, log_action
+from apps.services.models import Service
+from apps.services.tests.factories import ServiceFactory
 
 pytestmark = pytest.mark.django_db
 
@@ -81,3 +85,92 @@ class TestAuditLogHelper:
         entry = log_action(action="system.startup")
         assert entry.target_content_type is None
         assert entry.target_object_id is None
+
+
+class TestBaseModelLifecycleAuditLog:
+    """ADR-0013: حذف/بازیابی رکورد («حذف/بازیابی رکورد») باید در AuditLog ثبت شود.
+
+    ``Service`` (نه ``AuditLog``) عمداً استفاده می‌شود تا رفتار عمومی
+    ``BaseModel`` روی یک مدل دامنهٔ معمولی تست شود؛ حذف/بازیابی خودِ
+    ``AuditLog`` آگاهانه از این لاگ‌گیری مستثنا شده (ر.ک. ``_log_lifecycle_event``).
+    """
+
+    def test_soft_delete_is_logged(self) -> None:
+        service = cast(Service, ServiceFactory())
+        actor = cast(User, UserFactory())
+
+        service.delete(actor=actor)
+
+        entry = AuditLog.objects.get(action="services.Service.soft_delete")
+        assert entry.actor == actor
+        assert entry.target == service
+
+    def test_hard_delete_is_logged_before_row_disappears(self) -> None:
+        service = cast(Service, ServiceFactory())
+        pk = service.pk
+
+        service.delete(hard=True)
+
+        entry = AuditLog.objects.get(action="services.Service.hard_delete")
+        assert entry.metadata["pk"] == pk
+        assert not Service.all_objects.filter(pk=pk).exists()
+
+    def test_restore_is_logged(self) -> None:
+        service = cast(Service, ServiceFactory())
+        service.delete()
+
+        service.restore()
+
+        assert AuditLog.objects.filter(action="services.Service.restore").exists()
+
+    def test_deleting_an_audit_log_entry_does_not_recurse(self) -> None:
+        entry = log_action(action="test.event")
+        entry.delete()
+
+        # باید دقیقاً همان یک رکورد اولیه باشد؛ هیچ AuditLog اضافه‌ای دربارهٔ
+        # حذف خودِ AuditLog ساخته نشده باشد.
+        assert AuditLog.all_objects.count() == 1
+
+
+class TestMediaValidation:
+    """ADR-0005: whitelist پسوند + بررسی سرنام + محدودیت حجم روی ``core.Media``."""
+
+    def test_valid_png_passes_full_clean(self) -> None:
+        media = Media(
+            file=SimpleUploadedFile(
+                "photo.png", b"\x89PNG\r\n\x1a\n" + b"rest", content_type="image/png"
+            ),
+            media_type=Media.MediaType.IMAGE,
+        )
+        media.full_clean()  # no raise
+
+    def test_disallowed_extension_is_rejected(self) -> None:
+        media = Media(
+            file=SimpleUploadedFile("script.exe", b"MZ...", content_type="application/octet-stream"),
+            media_type=Media.MediaType.DOCUMENT,
+        )
+        with pytest.raises(ValidationError):
+            media.full_clean()
+
+    def test_forged_extension_rejected_by_signature_check(self) -> None:
+        media = Media(
+            file=SimpleUploadedFile("fake.png", b"not-a-real-png", content_type="image/png"),
+            media_type=Media.MediaType.IMAGE,
+        )
+        with pytest.raises(ValidationError):
+            media.full_clean()
+
+    def test_oversized_image_rejected(self, settings: object) -> None:
+        import django.conf
+
+        cast(django.conf.LazySettings, settings).MEDIA_MAX_IMAGE_SIZE_MB = 1
+        media = Media(
+            file=SimpleUploadedFile(
+                "huge.png",
+                b"\x89PNG\r\n\x1a\n" + b"x" * (2 * 1024 * 1024),
+                content_type="image/png",
+            ),
+            media_type=Media.MediaType.IMAGE,
+        )
+        with pytest.raises(ValidationError):
+            media.full_clean()

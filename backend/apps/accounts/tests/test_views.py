@@ -7,6 +7,7 @@ from rest_framework.test import APIClient
 
 from apps.accounts.models import Favorite, Profile, User
 from apps.accounts.tests.factories import UserFactory
+from apps.core.models import AuditLog
 from apps.services.models import Service
 from apps.services.tests.factories import ServiceFactory
 
@@ -41,6 +42,8 @@ class TestRegisterView:
         # already logged-in via session after register
         me_response = client.get("/api/v1/auth/me/")
         assert me_response.status_code == 200
+
+        assert AuditLog.objects.filter(action="auth.register").exists()
 
     def test_weak_password_is_rejected(self) -> None:
         client = APIClient()
@@ -78,6 +81,7 @@ class TestLoginView:
         )
         assert response.status_code == 200
         assert response.data["email"] == "login@example.com"
+        assert AuditLog.objects.filter(action="auth.login_succeeded").exists()
 
     def test_invalid_password_returns_401(self) -> None:
         UserFactory(email="login2@example.com", password="Str0ngP@ssword!")
@@ -87,12 +91,17 @@ class TestLoginView:
         )
         assert response.status_code == 401
 
+        entry = AuditLog.objects.get(action="auth.login_failed")
+        assert entry.actor is None
+        assert entry.metadata["email"] == "login2@example.com"
+
     def test_unknown_email_returns_401(self) -> None:
         client = APIClient()
         response = client.post(
             "/api/v1/auth/login/", {"email": "nobody@example.com", "password": "whatever"}
         )
         assert response.status_code == 401
+        assert AuditLog.objects.filter(action="auth.login_failed").exists()
 
 
 class TestLogoutView:
@@ -107,6 +116,7 @@ class TestLogoutView:
         client.force_authenticate(user=user)
         response = client.post("/api/v1/auth/logout/")
         assert response.status_code == 204
+        assert AuditLog.objects.filter(action="auth.logout", actor=user).exists()
 
 
 class TestMeView:

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from django.db.models import QuerySet
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
@@ -46,6 +47,9 @@ class EnrollmentListView(ListAPIView[Enrollment]):
     serializer_class = EnrollmentSerializer
 
     def get_queryset(self) -> QuerySet[Enrollment]:
+        if getattr(self, "swagger_fake_view", False):  # pragma: no cover - فقط تولید اسکیمای OpenAPI
+            empty: QuerySet[Enrollment] = Enrollment.objects.none()
+            return empty
         queryset: QuerySet[Enrollment] = Enrollment.objects.filter(user=self.request.user)
         return queryset.select_related("course")
 
@@ -55,6 +59,10 @@ class EnrollmentCreateView(APIView):
 
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        request=EnrollmentCreateSerializer,
+        responses={200: EnrollmentSerializer, 201: EnrollmentSerializer},
+    )
     def post(self, request: Request) -> Response:
         serializer = EnrollmentCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

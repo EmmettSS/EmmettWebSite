@@ -33,3 +33,29 @@
 
 - ظرفیت دیسک هاست باید پایش شود (Audit دوره‌ای)؛ در صورت نزدیک‌شدن به سقف، تصمیم مهاجرت به Object Storage باید دوباره باز شود.
 - بکاپ‌گیری از `media/` باید جزو برنامهٔ بکاپ هاست (فاز Deployment) باشد، جدا از بکاپ دیتابیس.
+
+## به‌روزرسانی (فاز ۴ — اجرای واقعی اعتبارسنجی)
+
+در فاز ۲ مدل `core.Media` ساخته شد اما whitelist پسوند/MIME، بررسی magic
+bytes و محدودیت حجم عملاً پیاده‌سازی نشده بودند (شکاف کشف‌شده در
+بازبینی/سخت‌سازی فاز ۴). اکنون `apps/core/validators.py` این سه لایه را
+پیاده‌سازی می‌کند:
+
+- `media_extension_validator` (`FileExtensionValidator` استاندارد Django)
+  روی خودِ فیلد `Media.file`.
+- `validate_media_file_size` در `Media.clean()` — سقف از `settings.MEDIA_MAX_IMAGE_SIZE_MB`/`MEDIA_MAX_DOCUMENT_SIZE_MB` (پیش‌فرض ۵/۱۰، از `.env` قابل تنظیم) خوانده می‌شود.
+- `validate_media_file_signature` در `Media.clean()` — به‌جای افزودن
+  وابستگی `python-magic` (که به `libmagic` سیستمی نیاز دارد و توجیه کافی
+  برای نقض قانون ۶ نداشت)، یک جدول کوچک سرنام بایت اول فایل‌های مجاز
+  (jpg/png/webp/pdf/docx) به‌صورت دستی بررسی می‌شود؛ svg (متن XML، بدون
+  سرنام باینری ثابت) از این بررسی مستثناست و فقط sanitize آن (طبق بند
+  whitelist بالا) هنوز در scope این پروژه پیاده‌سازی **نشده** و به فاز بعد
+  موکول می‌شود.
+- فایل `backend/deploy/media.htaccess.example` اضافه شد؛ باید در زمان
+  دیپلوی production به `backend/media/.htaccess` کپی شود (خودِ `media/` در
+  `.gitignore` است، پس نمی‌تواند مستقیماً commit شود).
+- اسکن ویروس با `clamd` همچنان پیاده‌سازی **نشده** (به فاز Deployment/Infra
+  موکول شد؛ وابسته به در دسترس‌بودن سرویس روی هاست production).
+- آپلود فقط از طریق Django Admin ممکن است (هیچ endpoint عمومی آپلود در
+  API وجود ندارد)، پس اعتبارسنجی فقط برای کاربران staff/editor اعمال
+  می‌شود، دقیقاً طبق تصمیم اصلی این ADR.

@@ -1,12 +1,14 @@
 from __future__ import annotations
 
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.core.throttling import ContactFormRateThrottle
+from apps.core.throttling import ContactFormRateThrottle, NewsletterRateThrottle
 from apps.core.utils.request import get_client_ip
 from apps.leads.models import Contact, Lead, Newsletter
 from apps.leads.notifications import notify_new_contact
@@ -23,6 +25,7 @@ class ContactCreateView(APIView):
     permission_classes = [AllowAny]
     throttle_classes = [ContactFormRateThrottle]
 
+    @extend_schema(request=ContactCreateSerializer, responses={201: ContactResponseSerializer})
     def post(self, request: Request) -> Response:
         serializer = ContactCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -39,8 +42,12 @@ class ContactCreateView(APIView):
 
 
 class NewsletterSubscribeView(APIView):
-    permission_classes = [AllowAny]
+    """عضویت خبرنامه — throttle طبق ADR-0006 (۳ درخواست/روز/IP)."""
 
+    permission_classes = [AllowAny]
+    throttle_classes = [NewsletterRateThrottle]
+
+    @extend_schema(request=NewsletterCreateSerializer, responses={201: OpenApiTypes.OBJECT})
     def post(self, request: Request) -> Response:
         serializer = NewsletterCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

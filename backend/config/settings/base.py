@@ -136,6 +136,10 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
+# محدودیت حجم آپلود ``core.Media`` طبق ADR-0005 — قابل تنظیم بدون دیپلوی مجدد.
+MEDIA_MAX_IMAGE_SIZE_MB = env.int("MEDIA_MAX_IMAGE_SIZE_MB", default=5)
+MEDIA_MAX_DOCUMENT_SIZE_MB = env.int("MEDIA_MAX_DOCUMENT_SIZE_MB", default=10)
+
 MAX_IMAGE_UPLOAD_SIZE_MB = env.int("MAX_IMAGE_UPLOAD_SIZE_MB", default=5)
 MAX_DOCUMENT_UPLOAD_SIZE_MB = env.int("MAX_DOCUMENT_UPLOAD_SIZE_MB", default=10)
 
@@ -217,10 +221,13 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_RATES": {
         "anon": env("THROTTLE_RATE_ANON", default="100/hour"),
         "user": env("THROTTLE_RATE_USER", default="1000/hour"),
-        # Scopeهای اختصاصی برای فازهای بعدی (leads/ai_engine) — از هم‌اکنون رزرو شده‌اند.
+        # "ai_engine" برای فاز ۵ (ر.ک. ADR-0009) از هم‌اکنون رزرو شده؛ هنوز هیچ
+        # view ای از آن استفاده نمی‌کند.
         "contact_form": env("THROTTLE_RATE_CONTACT", default="5/hour"),
         "ai_engine": env("THROTTLE_RATE_AI", default="20/hour"),
         "auth": env("THROTTLE_RATE_AUTH", default="10/hour"),
+        # طبق ADR-0006 (۳ درخواست/روز/IP).
+        "newsletter": env("THROTTLE_RATE_NEWSLETTER", default="3/day"),
     },
     "EXCEPTION_HANDLER": "apps.core.exceptions.custom_exception_handler",
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",

@@ -24,6 +24,12 @@ from django.utils import timezone
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
+from apps.core.validators import (
+    media_extension_validator,
+    validate_media_file_signature,
+    validate_media_file_size,
+)
+
 
 class BaseQuerySet(models.QuerySet["BaseModel"]):
     """QuerySetی که عملیات حذف نرم (soft delete) را به‌صورت پیش‌فرض اعمال می‌کند."""
@@ -82,9 +88,22 @@ class BaseModel(models.Model):
         ordering = ["-created_at"]
 
     def delete(
-        self, using: str | None = None, keep_parents: bool = False, *, hard: bool = False
+        self,
+        using: str | None = None,
+        keep_parents: bool = False,
+        *,
+        hard: bool = False,
+        actor: Any | None = None,
     ) -> tuple[int, dict[str, int]]:
-        """پیش‌فرض: حذف نرم. برای حذف واقعی، ``hard=True`` صریح لازم است."""
+        """پیش‌فرض: حذف نرم. برای حذف واقعی، ``hard=True`` صریح لازم است.
+
+        ``actor`` اختیاری است: صدازننده‌هایی که به request دسترسی دارند
+        می‌توانند ``request.user`` را پاس بدهند تا در AuditLog ثبت شود؛ در غیر
+        این صورت رویداد با ``actor=None`` (سیستم) ثبت می‌شود (قانون ۱۶ /
+        ADR-0013 — «حذف/بازیابی رکورد» صراحتاً نمونهٔ رویداد حساس است).
+        """
+
+        self._log_lifecycle_event("hard_delete" if hard else "soft_delete", actor=actor)
 
         if hard:
             return super().delete(using=using, keep_parents=keep_parents)
@@ -94,12 +113,25 @@ class BaseModel(models.Model):
         self.save(update_fields=["is_active", "deleted_at", "updated_at"])
         return 1, {self._meta.label: 1}
 
-    def restore(self) -> None:
+    def restore(self, *, actor: Any | None = None) -> None:
         """بازگردانی یک رکورد حذف‌شدهٔ نرم."""
 
         self.is_active = True
         self.deleted_at = None
         self.save(update_fields=["is_active", "deleted_at", "updated_at"])
+        self._log_lifecycle_event("restore", actor=actor)
+
+    def _log_lifecycle_event(self, action: str, *, actor: Any | None) -> None:
+        """ثبت حذف/بازیابی در AuditLog — به‌جز خودِ مدل AuditLog (جلوگیری از نویز بی‌پایان)."""
+
+        if self._meta.label == "core.AuditLog":
+            return
+        log_action(
+            action=f"{self._meta.label}.{action}",
+            actor=actor,
+            target=self,
+            metadata={"pk": self.pk},
+        )
 
 
 class TimeStampedModel(models.Model):
@@ -254,7 +286,9 @@ class Media(BaseModel):
         DOCUMENT = "document", _("Document")
         VIDEO = "video", _("Video")
 
-    file = models.FileField(_("file"), upload_to=media_upload_path)
+    file = models.FileField(
+        _("file"), upload_to=media_upload_path, validators=[media_extension_validator]
+    )
     media_type = models.CharField(_("media type"), max_length=20, choices=MediaType.choices)
     alt_text = models.CharField(_("alt text"), max_length=255, blank=True, default="")
     caption = models.CharField(_("caption"), max_length=255, blank=True, default="")
@@ -278,6 +312,20 @@ class Media(BaseModel):
 
     def __str__(self) -> str:
         return self.file.name or f"Media #{self.pk}"
+
+    def clean(self) -> None:
+        """بررسی حجم (بر اساس ``media_type``) و سرنام فایل — ADR-0005.
+
+        جدا از ``clean()`` سطح فیلد (``media_extension_validator``) چون
+        محدودیت حجم به مقدار فیلد دیگری (``media_type``) وابسته است و
+        بررسی سرنام نیاز به خواندن محتوای فایل دارد.
+        """
+
+        super().clean()
+        if not self.file:
+            return
+        validate_media_file_size(self.file, media_type=self.media_type)
+        validate_media_file_signature(self.file)
 
 
 class Translation(models.Model):

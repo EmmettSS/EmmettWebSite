@@ -9,6 +9,8 @@ from django.core.cache import cache
 from django.db import connection
 from django.utils import timezone
 from django.utils.translation import get_language
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -30,6 +32,13 @@ class HealthCheckView(APIView):
     permission_classes = [AllowAny]
     authentication_classes: list[type] = []
 
+    @extend_schema(
+        responses={
+            200: OpenApiTypes.OBJECT,
+            503: OpenApiTypes.OBJECT,
+        },
+        description="بررسی سلامت دیتابیس و cache؛ بدون نیاز به احراز هویت.",
+    )
     def get(self, request: Request) -> Response:
         checks: dict[str, Any] = {"database": self._check_database(), "cache": self._check_cache()}
         healthy = all(checks.values())
@@ -71,6 +80,14 @@ class GlobalSearchView(APIView):
 
     permission_classes = [AllowAny]
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter("q", OpenApiTypes.STR, description="عبارت جست‌وجو"),
+            OpenApiParameter("locale", OpenApiTypes.STR, description="fa یا en؛ پیش‌فرض بر اساس زبان درخواست"),
+            OpenApiParameter("limit", OpenApiTypes.INT, description="حداکثر تعداد نتیجه (سقف ۵۰)"),
+        ],
+        responses=OpenApiTypes.OBJECT,
+    )
     def get(self, request: Request) -> Response:
         query = request.query_params.get("q", "")
         locale = request.query_params.get("locale") or get_language() or "fa"

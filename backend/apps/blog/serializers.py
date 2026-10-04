@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from apps.blog.models import BlogPost, Comment
@@ -81,12 +82,14 @@ class BlogPostDetailSerializer(serializers.ModelSerializer[BlogPost]):
     def get_toc(self, obj: BlogPost) -> list[dict[str, str]]:
         return extract_toc(obj.content_html)
 
+    @extend_schema_field(CommentSerializer(many=True))
     def get_comments(self, obj: BlogPost) -> list[dict[str, object]]:
         approved = obj.comments.filter(status=Comment.Status.APPROVED, parent__isnull=True).select_related(
             "author"
         )
         return list(CommentSerializer(approved, many=True).data)
 
+    @extend_schema_field(BlogPostListSerializer(many=True))
     def get_related_posts(self, obj: BlogPost) -> list[dict[str, object]]:
         related = (
             BlogPost.objects.filter(status=BlogPost.Status.PUBLISHED, categories__in=obj.categories.all())

@@ -153,6 +153,11 @@ backend/
 
 ### ۳.۱۰ اپ `ai_engine`
 
+> **وضعیت (مرور فاز ۴):** جدول‌های زیر فقط طراحی معماری‌اند و هنوز هیچ‌کدام
+> پیاده‌سازی/migrate نشده‌اند. `ai_engine` رسماً به **فاز ۵** موکول شده
+> (ر.ک. به‌روزرسانی انتهای `DISCOVERY.md`)؛ این بخش به‌عنوان مرجع طراحی
+> برای آن فاز حفظ می‌شود، نه یک کار نیمه‌کاره از فازهای ۰ تا ۴.
+
 | مدل | فیلدهای کلیدی | توضیح |
 |---|---|---|
 | `AIRequest` `[public_id]` | `feature` (Enum: lead_discovery_assistant / content_helper)، `user→User` (nullable, مهمان مجاز)، `session_id`، `locale`، `input_payload (JSON — فقط مقادیر از Enum بسته)`، `status` (pending/completed/failed/blocked_by_guardrail)، `provider`، `model_name`، `prompt_template_version`، `latency_ms`، `error_message`، `created_at`، `completed_at` | هیچ فیلد free-text برای ورودی کاربر نهایی ذخیره نمی‌شود — طبق قانون ۱۳ |

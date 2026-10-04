@@ -2,6 +2,92 @@
 
 فرمت این فایل بر اساس [Keep a Changelog](https://keepachangelog.com/) است. هر فاز پروژه یک بخش مستقل دارد.
 
+## [فاز ۴ — بازبینی و سخت‌سازی پیش از PR] — 2026-10-04
+
+مرور کامل فازهای ۰ تا ۴ (کد، ADRها، تست‌ها) پیش از باز شدن اولین Pull
+Request، برای اطمینان از اینکه چیزی از این فازها نیمه‌کاره باقی نمانده.
+برخلاف فازهای قبل که فیچر جدید اضافه می‌کردند، این بخش **شکاف‌های کشف‌شده
+بین مستندات/ADR و کد واقعی** را می‌بندد.
+
+### رفع باگ (یافته‌های امنیتی/صحت)
+
+- **Rate limiting عملاً هیچ‌وقت کار نمی‌کرد (باگ بحرانی):** زیرکلاس‌های
+  `ScopedRateThrottle` (`ContactFormRateThrottle`, `AuthRateThrottle`,
+  `AIEngineRateThrottle`) مقدار `scope` را به‌صورت attribute کلاس ست
+  می‌کردند، اما DRF مقدار واقعی scope را از `view.throttle_scope` در زمان
+  اجرا می‌خواند — چون هیچ viewای این attribute را نداشت، `allow_request`
+  همیشه `True` برمی‌گرداند و فرم تماس/ورود/ثبت‌نام **هرگز محدود نمی‌شدند**.
+  رفع شد با یک کلاس پایهٔ مشترک (`apps/core/throttling.py`) که
+  `view.throttle_scope` را از `scope` کلاس خودش ست می‌کند؛ با تست سطح HTTP
+  (نه فقط assertion روی attribute) دوباره اعتبارسنجی شد. جزئیات کامل در
+  به‌روزرسانی `ADR-0006`.
+- عضویت خبرنامه (`NewsletterSubscribeView`) هیچ throttle ای نداشت، برخلاف
+  جدول صریح `ADR-0006` (۳/روز/IP)؛ `NewsletterRateThrottle` اضافه و اعمال شد.
+- `AuditLog`/`log_action` (`ADR-0013`) از فاز ۲ وجود داشتند اما **هیچ کد
+  واقعی آن‌ها را صدا نمی‌زد** — هیچ رویداد حساسی هرگز ثبت نمی‌شد. اکنون
+  متصل‌اند به: حذف/بازیابی هر رکورد (`BaseModel.delete`/`restore`، عمومی
+  برای همهٔ مدل‌ها)، تغییر نقش کاربر (`pre_save` سیگنال روی `User`)، ورود
+  ناموفق/موفق، خروج، ثبت‌نام، و تعدیل کامنت در ادمین.
+- اعتبارسنجی آپلود `core.Media` (`ADR-0005`: whitelist پسوند، بررسی سرنام
+  فایل، سقف حجم) هیچ‌وقت پیاده‌سازی نشده بود؛ `apps/core/validators.py`
+  اضافه و در `Media.clean()` متصل شد؛ `backend/deploy/media.htaccess.example`
+  برای غیرفعال‌سازی اجرای اسکریپت در دایرکتوری `media/` روی production اضافه شد.
+- مستندات خودکار OpenAPI (`drf-spectacular`) روی ~۱۲ از ~۲۵ endpoint سفارشی
+  (`LoginView`, `RegisterView`, `LogoutView`, `MeView`, `CsrfTokenView`,
+  `FavoriteCreateView`, `FavoriteDeleteView`, `ContactCreateView`,
+  `NewsletterSubscribeView`, `EnrollmentCreateView`, `HealthCheckView`,
+  `GlobalSearchView`) و ۲ فیلد محاسبه‌شده (`BlogPostDetailSerializer.get_comments`/`get_related_posts`,
+  `ProjectDetailSerializer.get_case_study`) warning/error تولید می‌کرد
+  (`python manage.py spectacular --fail-on-warn` با ۵۱ خطا/هشدار fail
+  می‌شد). همهٔ این‌ها با `@extend_schema`/`@extend_schema_field` یا guard
+  کردن `get_queryset` در برابر `swagger_fake_view` رفع شدند؛ اسکیما اکنون
+  کاملاً تمیز تولید می‌شود (۰ warning، ۰ error).
+- وابستگی بلااستفادهٔ `django-ratelimit` (هیچ‌وقت import نشده بود) از
+  `requirements.txt` حذف شد.
+
+### افزوده‌شده
+
+- `backend/README.md` (قبلاً وجود نداشت): راه‌اندازی محلی، نقشهٔ اپ‌ها،
+  مستندات API، تست/کیفیت کد، بخش امنیت/حسابرسی، محدودیت‌های شناخته‌شده.
+- هدرهای HTTP سخت‌سازی پایه در `frontend/next.config.ts`
+  (`X-Content-Type-Options: nosniff`, `Referrer-Policy`, `Permissions-Policy`).
+  عمداً `X-Frame-Options`/`frame-ancestors` اضافه **نشد** چون محیط‌های
+  پیش‌نمایش توسعه‌ای (sandbox) سایت را داخل iframe از origin دیگر نشان
+  می‌دهند؛ این تصمیم به فاز Deployment با دامنهٔ واقعی موکول شد.
+- ۳۰+ تست جدید backend برای رفتارهای بالا (`apps/core/tests/test_throttling.py`,
+  `test_validators.py`, گسترش `test_models.py`/`test_views.py`,
+  `apps/blog/tests/test_admin.py`).
+
+### مستندسازی/تصمیمات صریح
+
+- **`ai_engine` رسماً به فاز ۵ موکول شد** (با تأیید صریح مالک محصول):
+  طراحی معماری (`ARCHITECTURE.md` §۳.۱۰, `ADR-0009`) دست‌نخورده می‌ماند
+  اما implementation آن یک «کار نیمه‌کاره از فاز ۰ تا ۴» محسوب نمی‌شود —
+  نیاز به تصمیمات محصولی جدید (provider AI، کلید API، enum های دقیق) دارد
+  که باید در یک نشست Discovery→Plan→ADR→Implementation مجزا گرفته شوند.
+  جزئیات در به‌روزرسانی انتهای `DISCOVERY.md` و ابتدای `ADR-0009`.
+- **CI/CD (GitHub Actions) عمداً اضافه نشد** (با تأیید صریح مالک محصول):
+  به فاز جداگانهٔ DevOps/Deployment موکول شد؛ تا آن زمان دستورات
+  `pytest`/`ruff`/`mypy`/`npm run lint`/`npx tsc`/`npm run test` باید
+  دستی قبل از هر PR اجرا شوند (مستند در `backend/README.md`/ریشهٔ همین فایل).
+- بخش قدیمی «Gap شناخته‌شده» در `README.md` ریشه دربارهٔ
+  `apps/core/utils/dates.py`/`numerals.py` حذف شد — این فایل‌ها از فاز
+  قبل موجودند؛ آن یادداشت منسوخ بود.
+
+### شناخته‌شده/باز (به‌صورت صریح پذیرفته‌شده، نه فراموش‌شده)
+
+- اسکن ویروس آپلود با `clamd` (`ADR-0005`) پیاده‌سازی نشده؛ وابسته به
+  دسترسی سرویس روی هاست production، به فاز Deployment موکول شد.
+- حذف/آپدیت دسته‌ای مستقیم روی `QuerySet` (نه `instance.delete()`) در
+  AuditLog ثبت نمی‌شود؛ فقط فراخوانی تکی پوشش داده شده (دلیل: حفظ کارایی
+  SQL تکی برای bulk operations).
+- sanitize محتوای SVG آپلودی (طبق whitelist اصلی `ADR-0005`) هنوز
+  پیاده‌سازی نشده؛ اعتبارسنجی فعلی فقط پسوند/حجم را برای svg بررسی می‌کند
+  (بدون بررسی سرنام باینری، چون svg متن XML است).
+- محیط این sandbox هنوز اجازهٔ دانلود باینری مرورگر Playwright را نمی‌دهد
+  (`cdn.playwright.dev` در دسترس نیست)؛ همان محدودیت مستندشده در
+  `frontend/e2e/README.md` از فاز قبل، بدون تغییر.
+
 ## [فاز ۴] — Content Apps، Enrollment، Seed Data و صفحات مصرف‌کنندهٔ API — 2026-10-04
 
 ### افزوده‌شده — بک‌اند
