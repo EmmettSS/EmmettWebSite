@@ -1,0 +1,42 @@
+[tool.mypy]
+plugins = ["mypy_django_plugin.main"]
+python_version = "3.11"
+strict = true
+exclude = ["migrations/", ".venv/"]
+
+# Django ادمین/فرم‌ها/migrationها الگوهای پویا دارند که strict بودن کامل روی
+# آن‌ها ارزش عملی کمی دارد و نویز زیادی تولید می‌کند؛ migrationها به‌طور کامل
+# از بررسی mypy مستثنی هستند (کد تولیدشدهٔ خودکار Django است).
+[[tool.mypy.overrides]]
+module = "*.migrations.*"
+ignore_errors = true
+
+# django-environ هنوز stub رسمی ندارد.
+[[tool.mypy.overrides]]
+module = "environ.*"
+ignore_missing_imports = true
+
+# factory_boy از py.typed پشتیبانی می‌کند، اما در ترکیب با الگوهای پویای
+# DjangoModelFactory در کد تست، سخت‌گیری کامل strict ارزش عملی کمی دارد؛
+# این سطح در فایل‌های تست (نه کد اپلیکیشن) اندکی کاهش می‌یابد.
+[[tool.mypy.overrides]]
+module = "*.tests.*"
+disallow_untyped_decorators = false
+disallow_untyped_calls = false
+warn_return_any = false
+
+[tool.django-stubs]
+django_settings_module = "config.settings.dev"
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+exclude = ["migrations", ".venv"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "DJ"]
+ignore = ["DJ001"]
+
+[tool.coverage.run]
+source = ["apps"]
+omit = ["*/migrations/*", "*/tests/*"]
