@@ -38,17 +38,28 @@ THIRD_PARTY_APPS = [
     "drf_spectacular",
     "corsheaders",
     "django_filters",
-    "modeltranslation",
     "django_structlog",
 ]
 
 LOCAL_APPS = [
     "apps.core",
     "apps.accounts",
+    "apps.taxonomy",
+    "apps.company",
+    "apps.services",
+    "apps.portfolio",
+    "apps.academy",
+    "apps.blog",
+    "apps.leads",
     "apps.api",
 ]
 
-INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+# «modeltranslation» باید پیش از «django.contrib.admin» بیاید، وگرنه در زمان
+# autodiscover خودکار admin.py هر اپ (که از ``django.contrib.admin.apps.AdminConfig.ready``
+# اجرا می‌شود)، ``TranslationAdmin`` با خطای «The model ... is not registered
+# for translation» شکست می‌خورد — چون ``modeltranslation`` هنوز registry خودش
+# را از ``translation.py`` هر اپ پر نکرده است. ر.ک. مستندات django-modeltranslation.
+INSTALLED_APPS = ["modeltranslation"] + DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 AUTH_USER_MODEL = "accounts.User"
 
@@ -173,7 +184,14 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 # Email (fallback — کانال اصلی اعلان Kavenegar است؛ ر.ک. DISCOVERY.md)
 # ---------------------------------------------------------------------------
 EMAIL_BACKEND = env("EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend")
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="noreply@emmett.example")
+
+# --- SMS (ADR-0024) — اگر KAVENEGAR_API_KEY خالی باشد، به‌صورت خودکار
+# ConsoleSMSBackend (فقط لاگ، بدون تماس شبکه‌ای واقعی) انتخاب می‌شود. ---
 KAVENEGAR_API_KEY = env("KAVENEGAR_API_KEY", default="")
+KAVENEGAR_SENDER = env("KAVENEGAR_SENDER", default="")
+LEADS_NOTIFICATION_PHONE = env("LEADS_NOTIFICATION_PHONE", default="")
+LEADS_NOTIFICATION_EMAIL = env("LEADS_NOTIFICATION_EMAIL", default="")
 
 # ---------------------------------------------------------------------------
 # Django REST Framework (ADR-0012, ADR-0014)
@@ -220,6 +238,8 @@ SPECTACULAR_SETTINGS = {
 # ---------------------------------------------------------------------------
 # Structured logging (structlog + django-structlog)
 # ---------------------------------------------------------------------------
+import structlog  # noqa: E402
+
 from apps.core.logging import configure_structlog  # noqa: E402
 
 configure_structlog(debug=DEBUG)
@@ -229,8 +249,14 @@ LOGGING = {
     "disable_existing_loggers": False,
     "formatters": {
         "plain_console": {
-            "()": "structlog.stdlib.ProcessorFormatter",
-            "processor": "structlog.dev.ConsoleRenderer" if DEBUG else "structlog.processors.JSONRenderer",
+            # نکته: مقدار ``()``/``processor`` باید شیء واقعی پایتون باشد، نه
+            # رشتهٔ dotted-path؛ ``logging.config.dictConfig`` کلیدهای دیگر
+            # (غیر از خودِ ``()``) را resolve نمی‌کند و رشته را عیناً به‌عنوان
+            # kwarg پاس می‌دهد — قبلاً این باعث ``TypeError: 'str' object is
+            # not callable`` در هر لاگ درخواست می‌شد (هرگز قبل از نوشتن تست
+            # واقعی لمس نشده بود).
+            "()": structlog.stdlib.ProcessorFormatter,
+            "processor": structlog.dev.ConsoleRenderer() if DEBUG else structlog.processors.JSONRenderer(),
         },
     },
     "handlers": {

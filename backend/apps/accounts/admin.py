@@ -3,7 +3,7 @@ from __future__ import annotations
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 
-from apps.accounts.models import User
+from apps.accounts.models import Favorite, Profile, User
 
 
 @admin.register(User)
@@ -33,3 +33,17 @@ class UserAdmin(DjangoUserAdmin[User]):
             },
         ),
     )
+
+
+@admin.register(Profile)
+class ProfileAdmin(admin.ModelAdmin[Profile]):
+    list_display = ("user", "locale_preference", "job_title", "company_name")
+    search_fields = ("user__email", "job_title", "company_name")
+    autocomplete_fields = ("user",)
+
+
+@admin.register(Favorite)
+class FavoriteAdmin(admin.ModelAdmin[Favorite]):
+    list_display = ("user", "content_type", "object_id", "created_at")
+    list_filter = ("content_type",)
+    search_fields = ("user__email",)

@@ -12,6 +12,8 @@
 
 from __future__ import annotations
 
+import os
+import uuid
 from typing import Any, cast
 
 from django.conf import settings
@@ -19,6 +21,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils import timezone
+from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
 
@@ -177,6 +180,205 @@ def log_action(
     return entry
 
 
+class PublishableModel(models.Model):
+    """Mixin انتزاعی کنترل انتشار محتوا (ر.ک. `ARCHITECTURE.md` بخش ۳.۱).
+
+    هر مدل محتوایی عمومی (Service/Project/Course/BlogPost/...) باید از این
+    کلاس ارث‌بری کند تا نسخه‌های پیش‌نویس هرگز در API عمومی ظاهر نشوند.
+    """
+
+    class Status(models.TextChoices):
+        DRAFT = "draft", _("Draft")
+        PUBLISHED = "published", _("Published")
+        ARCHIVED = "archived", _("Archived")
+
+    status = models.CharField(
+        _("status"), max_length=20, choices=Status.choices, default=Status.DRAFT, db_index=True
+    )
+    published_at = models.DateTimeField(_("published at"), null=True, blank=True, db_index=True)
+
+    class Meta:
+        abstract = True
+
+    @property
+    def is_published(self) -> bool:
+        return self.status == self.Status.PUBLISHED
+
+
+class SEOMetaModel(models.Model):
+    """Mixin انتزاعی فیلدهای SEO مشترک (قانون ۱۷).
+
+    ``og_image`` به ``Media`` ارجاع می‌دهد (پایین همین فایل)؛ هر مدلی که این
+    Mixin را استفاده می‌کند باید `translation.py` خودش ``meta_title``/
+    ``meta_description`` را به‌عنوان فیلد i18n ثبت کند.
+    """
+
+    meta_title = models.CharField(_("meta title"), max_length=70, blank=True, default="")
+    meta_description = models.CharField(_("meta description"), max_length=160, blank=True, default="")
+    og_image = models.ForeignKey(
+        "core.Media",
+        verbose_name=_("OG image"),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+    )
+    canonical_path = models.CharField(
+        _("canonical path"),
+        max_length=255,
+        blank=True,
+        default="",
+        help_text=_("در صورت خالی بودن، مسیر پیش‌فرض صفحه به‌عنوان canonical استفاده می‌شود."),
+    )
+
+    class Meta:
+        abstract = True
+
+
+def media_upload_path(instance: Media, filename: str) -> str:
+    """مسیر تاریخ‌محور آپلود طبق ADR-0005: جلوگیری از برخورد نام/افشای نام اصلی."""
+
+    ext = os.path.splitext(filename)[1].lower()
+    base_name = slugify(os.path.splitext(filename)[0])[:60] or "file"
+    today = timezone.now()
+    return (
+        f"{instance.media_type}/{today:%Y}/{today:%m}/{uuid.uuid4().hex}_{base_name}{ext}"
+    )
+
+
+class Media(BaseModel):
+    """منبع مرکزی فایل برای همهٔ اپ‌های محتوایی (ADR-0005)."""
+
+    class MediaType(models.TextChoices):
+        IMAGE = "image", _("Image")
+        DOCUMENT = "document", _("Document")
+        VIDEO = "video", _("Video")
+
+    file = models.FileField(_("file"), upload_to=media_upload_path)
+    media_type = models.CharField(_("media type"), max_length=20, choices=MediaType.choices)
+    alt_text = models.CharField(_("alt text"), max_length=255, blank=True, default="")
+    caption = models.CharField(_("caption"), max_length=255, blank=True, default="")
+    width = models.PositiveIntegerField(_("width"), null=True, blank=True)
+    height = models.PositiveIntegerField(_("height"), null=True, blank=True)
+    file_size = models.PositiveIntegerField(_("file size (bytes)"), default=0)
+    mime_type = models.CharField(_("MIME type"), max_length=100, blank=True, default="")
+    checksum = models.CharField(_("checksum (sha256)"), max_length=64, blank=True, default="")
+    uploaded_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("uploaded by"),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="uploaded_media",
+    )
+
+    class Meta(BaseModel.Meta):
+        verbose_name = _("Media")
+        verbose_name_plural = _("Media")
+
+    def __str__(self) -> str:
+        return self.file.name or f"Media #{self.pk}"
+
+
+class Translation(models.Model):
+    """رشته‌های پویای قابل‌ویرایش در ادمین، مکمل gettext (ADR-0003).
+
+    برخلاف بقیهٔ مدل‌های این فایل، عمداً از ``BaseModel`` ارث‌بری نمی‌کند:
+    این جدول یک key-value سبک است که نیازی به soft-delete ندارد (حذف یک
+    رشتهٔ ترجمه باید واقعی و فوری باشد، نه بایگانی).
+    """
+
+    namespace = models.CharField(_("namespace"), max_length=100, db_index=True)
+    key = models.CharField(_("key"), max_length=150)
+    locale = models.CharField(_("locale"), max_length=5, choices=settings.LANGUAGES)
+    value = models.TextField(_("value"), blank=True, default="")
+    is_html = models.BooleanField(_("is HTML"), default=False)
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("updated by"),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+    )
+    updated_at = models.DateTimeField(_("updated at"), auto_now=True)
+
+    class Meta:
+        verbose_name = _("Translation")
+        verbose_name_plural = _("Translations")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["namespace", "key", "locale"], name="unique_translation_entry"
+            )
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.namespace}.{self.key} [{self.locale}]"
+
+
+class SiteSettings(models.Model):
+    """تنظیمات سراسری قابل‌ویرایش در ادمین — الگوی Singleton (یک ردیف ثابت ``pk=1``)."""
+
+    site_name = models.CharField(_("site name"), max_length=100, default="Emmett")
+    default_locale = models.CharField(_("default locale"), max_length=5, default="fa")
+    contact_email = models.EmailField(_("contact email"), blank=True, default="")
+    contact_phone = models.CharField(_("contact phone"), max_length=20, blank=True, default="")
+    social_links = models.JSONField(_("social links"), default=dict, blank=True)
+    maintenance_mode = models.BooleanField(_("maintenance mode"), default=False)
+
+    class Meta:
+        verbose_name = _("Site Settings")
+        verbose_name_plural = _("Site Settings")
+
+    def __str__(self) -> str:  # pragma: no cover
+        return str(self.site_name)
+
+    def save(self, *args: Any, **kwargs: Any) -> None:
+        self.pk = 1
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: Any, **kwargs: Any) -> tuple[int, dict[str, int]]:  # pragma: no cover
+        return 0, {}
+
+    @classmethod
+    def load(cls) -> SiteSettings:
+        obj, _created = cls.objects.get_or_create(pk=1)
+        return obj
+
+
+class SearchIndexEntry(models.Model):
+    """جدول ایندکس جست‌وجوی سراسری (ADR-0021).
+
+    هر اپ محتوایی قابل‌جست‌وجو (services/portfolio/academy/blog) از طریق
+    ``apps.core.search.sync_search_index`` این جدول را به‌روز نگه می‌دارد؛
+    خودِ FULLTEXT index (MySQL) / جدول مجازی FTS5 (SQLite) در یک migration
+    اختصاصی و بر اساس ``connection.vendor`` ساخته می‌شود — نه اینجا.
+    """
+
+    content_type = models.CharField(_("content type"), max_length=30, db_index=True)
+    object_id = models.PositiveBigIntegerField(_("object id"))
+    public_id = models.UUIDField(_("public id"))
+    locale = models.CharField(_("locale"), max_length=5, choices=settings.LANGUAGES)
+    title = models.CharField(_("title"), max_length=255)
+    body = models.TextField(_("body"), blank=True, default="")
+    url_path = models.CharField(_("URL path"), max_length=255)
+    category_label = models.CharField(_("category label"), max_length=100, blank=True, default="")
+    updated_at = models.DateTimeField(_("updated at"), auto_now=True)
+
+    class Meta:
+        verbose_name = _("Search Index Entry")
+        verbose_name_plural = _("Search Index Entries")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["content_type", "object_id", "locale"], name="unique_search_index_entry"
+            )
+        ]
+        indexes = [models.Index(fields=["content_type", "locale"])]
+
+    def __str__(self) -> str:  # pragma: no cover
+        return f"[{self.locale}] {self.content_type}#{self.object_id}: {self.title}"
+
+
 __all__ = [
     "BaseQuerySet",
     "BaseManager",
@@ -185,4 +387,11 @@ __all__ = [
     "TimeStampedModel",
     "AuditLog",
     "log_action",
+    "PublishableModel",
+    "SEOMetaModel",
+    "Media",
+    "media_upload_path",
+    "Translation",
+    "SiteSettings",
+    "SearchIndexEntry",
 ]

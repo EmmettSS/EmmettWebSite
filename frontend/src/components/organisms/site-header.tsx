@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, Search, User, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { Link } from "@/i18n/navigation";
@@ -19,6 +19,14 @@ const NAV_ITEMS = [
   "academy",
   "about",
 ] as const;
+
+// «library» در ناوبری برچسب نمایشی «کتابخانه»/«Library» دارد اما طبق قرارداد
+// URL بک‌اند (ر.ک. ``apps.blog.signals``/``apps.blog.feeds``) مسیر واقعی
+// همیشه ``/blog`` است، نه ``/library``.
+const NAV_HREF_OVERRIDES: Partial<Record<(typeof NAV_ITEMS)[number], string>> = {
+  home: "/",
+  library: "/blog",
+};
 
 /**
  * هدر سایت — طبق «Navigation Bar» سند مشخصات طراحی: شفاف روی Hero، هنگام
@@ -56,7 +64,7 @@ export function SiteHeader() {
           {NAV_ITEMS.map((item) => (
             <Link
               key={item}
-              href={item === "home" ? "/" : `/${item}`}
+              href={NAV_HREF_OVERRIDES[item] ?? `/${item}`}
               className="text-sm font-medium text-foreground/80 transition-colors hover:text-foreground"
             >
               {t(item)}
@@ -65,6 +73,20 @@ export function SiteHeader() {
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">
+          <Link
+            href="/search"
+            aria-label={t("search")}
+            className="inline-flex size-9 items-center justify-center rounded-sm text-foreground/80 transition-colors hover:text-foreground"
+          >
+            <Search aria-hidden="true" className="size-4" />
+          </Link>
+          <Link
+            href="/profile"
+            aria-label={t("account")}
+            className="inline-flex size-9 items-center justify-center rounded-sm text-foreground/80 transition-colors hover:text-foreground"
+          >
+            <User aria-hidden="true" className="size-4" />
+          </Link>
           <LocaleSwitcher />
           <ThemeToggle />
           <Button asChild size="sm">
@@ -93,7 +115,7 @@ export function SiteHeader() {
           {NAV_ITEMS.map((item) => (
             <Link
               key={item}
-              href={item === "home" ? "/" : `/${item}`}
+              href={NAV_HREF_OVERRIDES[item] ?? `/${item}`}
               onClick={() => setIsMenuOpen(false)}
               className="rounded-sm px-3 py-2.5 text-sm font-medium text-foreground hover:bg-secondary"
             >

@@ -2,6 +2,42 @@
 
 فرمت این فایل بر اساس [Keep a Changelog](https://keepachangelog.com/) است. هر فاز پروژه یک بخش مستقل دارد.
 
+## [فاز ۴] — Content Apps، Enrollment، Seed Data و صفحات مصرف‌کنندهٔ API — 2026-10-04
+
+### افزوده‌شده — بک‌اند
+
+- اپ `apps.academy.Enrollment`: مدل (کاربر+دوره+وضعیت active/completed/cancelled+درصد پیشرفت، با محدودیت یکتایی کاربر/دوره)، سریالایزرهای `EnrollmentSerializer`/`EnrollmentCreateSerializer`، `EnrollmentListView`/`EnrollmentCreateView` (`IsAuthenticated`)، ثبت در ادمین، ۱۰ تست (مدل+API+مجوز+idempotency ثبت‌نام تکراری).
+- دستور مدیریتی `python manage.py seed_demo_data` (در `apps/core/management/commands/`): ایدمپوتنت، می‌سازد: ۳ کاربر نقش‌دار (`admin@emmett.dev`/`author@emmett.dev`/`client@emmett.dev`)، Category/Tag دوزبانه، TeamMember×۴، Testimonial×۳، Service×۴، Project×۳ (یکی `is_product`) + CaseStudy، Instructor×۲، Course×۳ با Lesson×۳ هرکدام + یک Enrollment نمونه، BlogPost×۳ با Comment نمونه، یک مشترک خبرنامه، به‌روزرسانی `SiteSettings`.
+
+### افزوده‌شده — فرانت‌اند (مصرف‌کنندهٔ API)
+
+- لایهٔ API تایپ‌شده در `frontend/src/lib/api/`: `types.ts` (تمام shapeهای پاسخ سریالایزرهای بک‌اند)، `server.ts` (fetch مستقیم به `INTERNAL_API_URL` برای Server Components، با `revalidate: 60`)، `client.ts` (fetch مسیر نسبی `/api/v1/...` برای Client Components، شامل `ensureCsrfCookie`/`ApiError`/توابع auth، favorites، enrollment، contact، newsletter، comment، search)، `config.ts`.
+- Route Handler `frontend/src/app/api/[...path]/route.ts`: پراکسی سمت سرور تمام متدهای HTTP به بک‌اند Django، با حفظ دقیق مسیر (شامل اسلش پایانی) و همهٔ هدرهای `Set-Cookie` (کوکی‌های چندگانهٔ csrftoken/sessionid).
+- صفحات جدید (هر دو locale): `/services`+`/services/[slug]`، `/projects`+`/projects/[slug]` (شامل رندر Case Study/metrics)، `/products` (فیلتر `is_product=true` روی همان API)، `/academy`+`/academy/[slug]` (+ `EnrollButton` با تشخیص وضعیت مهمان/واردشده/ثبت‌نام‌شده)، `/blog`+`/blog/[slug]` (+ فهرست مطالب، مقالات مرتبط، `CommentForm`)، `/about` (تیم + نظرات مشتریان)، `/contact` (`ContactForm` + `NewsletterForm`)، `/search` (جست‌وجوی سراسری با `SearchBox` کلاینتی)، `/profile` (`ProfileView`: تب ورود/ثبت‌نام، دوره‌های من، علاقه‌مندی‌ها، خروج).
+- صفحات خطای سفارشی: `[locale]/not-found.tsx` و `[locale]/error.tsx` (داخل layout اصلی، دوزبانه از next-intl)، `src/app/not-found.tsx` و `global-error.tsx` (fallback استاتیک دوزبانهٔ بیرون از `[locale]`، برای حالت نادر خطای خود root layout).
+- کلاس CSS سراسری `.markdown-content` در `globals.css` برای رندر HTML تولیدشده از Markdown بک‌اند (جایگزین پلاگین `@tailwindcss/typography` تا وابستگی جدید اضافه نشود).
+- namespaceهای جدید پیام در `messages/{fa,en}.json`: `services`, `projects`, `academy`, `blog`, `team`, `contact`, `search`, `profile`, `errors`, `pagination` (هر دو زبان کاملاً متقارن).
+- تست‌های E2E با Playwright (`frontend/e2e/`, طبق `ADR-0023`): ۲۰ تست در ۵ فایل — ناوبری/فهرست/جزئیات تمام محتوا، حالت مهمان، ۴۰۴، جست‌وجو، فرم تماس/خبرنامه، جریان کامل ثبت‌نام→ورود→ثبت‌نام دوره→کامنت→خروج، و بررسی دوزبانهٔ dir/عنوان/ناوبری (دو پروژهٔ Playwright `fa-locale`/`en`). `frontend/e2e/README.md` مستندساز پیش‌نیازها.
+
+### رفع باگ
+
+- `seed_demo_data`: دو باگ `FieldError` (`full_name_fa`/`author_company_fa`/`name_fa` روی فیلدهای ساده‌ای که ترجمه نشده‌اند) با تغییر به نام فیلد واقعی (`full_name=`, `author_name=`, `author_company=`, `name=`) رفع شد؛ فقط فیلدهای واقعاً ترجمه‌شده (`role_title_fa/en`, `quote_fa/en`, `title_fa/en`) دست‌نخورده ماندند.
+- **باگ بحرانی پراکسی API:** `rewrites()` اولیهٔ `next.config.ts` اسلش پایانی مسیرهای `/api/v1/...` را پیش از فوروارد به بک‌اند حذف می‌کرد؛ چون تمام URLConfهای Django با اسلش پایانی تعریف شده‌اند، جنگو با `APPEND_SLASH` یک ۳۰۱/۳۰۸ برمی‌گرداند که روی متدهای POST/PATCH عملاً درخواست را می‌شکست (ری‌دایرکت خودکار مرورگر POST را به GET تبدیل می‌کند). با جایگزینی کامل rewrites با Route Handler دستی (`src/app/api/[...path]/route.ts`) که از `request.nextUrl.pathname` خام استفاده می‌کند، رفع شد؛ با تست کامل e2e سطح HTTP (ثبت‌نام→ورود→فرم تماس→ثبت‌نام دوره→خروج، هرکدام از طریق پراکسی) تأیید شد.
+- تشخیص «کاربر مهمان» در `EnrollButton`/`CommentForm` فرض اشتباه کد وضعیت ۴۰۱ برای درخواست بدون احراز هویت داشت؛ چون DRF با `SessionAuthentication` تنها (بدون auth scheme دارای `WWW-Authenticate`) همیشه ۴۰۳ برمی‌گرداند نه ۴۰۱، هر دو کد به‌عنوان «مهمان» پذیرفته شدند.
+- دو خطای E501 (خط طولانی) در `seed_demo_data.py` با شکستن رشته‌های f-string رفع شد.
+
+### تصمیمات کلیدی
+
+- معماری اتصال frontend↔backend: Server Components مستقیماً `INTERNAL_API_URL` را صدا می‌زنند (سرور-به-سرور)؛ Client Components فقط مسیر نسبی `/api/v1/...` (پراکسی‌شده) — هم با محدودیت sandbox (مرورگر نباید مستقیم به بک‌اند داخلی وصل شود) و هم با نیاز به کوکی سشن هم‌مبدا سازگار است.
+- `/library` در ناوبری (`SiteHeader`) عمداً به `/blog` map شد (نه مسیر مجزای `/library`)، چون `url_path` واقعی بک‌اند برای بلاگ همیشه `/blog/{slug}` است؛ برچسب نمایشی «کتابخانه» حفظ شد.
+- نتایج جست‌وجوی سراسری (`url_path` از بک‌اند، از قبل دارای پیشوند locale) با `next/link` خام رندر می‌شوند، نه `Link` locale-aware از `i18n/navigation.ts`، تا پیشوند locale دوبار اضافه نشود.
+
+### شناخته‌شده/باز
+
+- **محدودیت sandbox توسعه:** دامنهٔ `cdn.playwright.dev` از شبکهٔ این sandbox در دسترس نبود (TLS reset)، پس باینری مرورگر Chromium قابل‌نصب نشد و `npm run test:e2e` در این محیط واقعاً اجرا نشد. سوییت با `npx playwright test --list` (۲۰ تست، بدون خطای TS/ESLint) اعتبارسنجی ساختاری شد؛ تمام جریان‌های کاربری معادل آن به‌صورت دستی در سطح HTTP (`curl` از طریق پراکسی Next.js، هم روی `next dev` هم روی build تولیدی `next build && next start`) تأیید شدند. در محیطی با دسترسی شبکهٔ کامل (مثل CI)، باید فقط `npx playwright install chromium` اجرا و سپس `npm run test:e2e` بدون تغییر دیگری کار کند.
+- گالری تصاویر پروژه/عکس profile/کاور بلاگ با `<img>` خام رندر می‌شوند (نه `next/image`)، چون دامنهٔ رسانهٔ بک‌اند (media storage) در این فاز پویا/نامشخص است؛ بهینه‌سازی تصویر (lazy loading native مرورگر فعال است اما بدون resize/format negotiation خودکار Next) می‌تواند در فاز بعد با پیکربندی `images.remotePatterns` اضافه شود.
+- صفحهٔ `/profile` فعلاً صفحه‌بندی (pagination) برای علاقه‌مندی‌ها/دوره‌های من ندارد (فرض: تعداد کم در این فاز)؛ باید در صورت رشد داده اضافه شود.
+
 ## [فاز ۳] — Frontend Foundation — 2026-10-04
 
 ### افزوده‌شده

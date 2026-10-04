@@ -38,3 +38,15 @@ jdatetime==6.1.0
 # --- لاگ ساختاریافته ---
 structlog==26.1.0
 django-structlog==10.1.0
+
+# --- Markdown → HTML برای محتوای طولانی (ADR-0022: Markdown همه‌جا) ---
+Markdown==3.9
+
+# --- پاک‌سازی HTML تولیدشده از Markdown قبل از ذخیره/نمایش (ضد XSS — قانون ۱۶)؛
+#     nh3 (بایندینگ Rust/ammonia) انتخاب شد چون bleach دیگر نگه‌داری نمی‌شود ---
+nh3==0.3.7
+
+# --- کلاینت HTTP برای ارسال پیامک از طریق REST API کاوه‌نگار (ADR-0024)؛
+#     به‌جای SDK رسمی kavenegar (نگهداری‌نشده/وابستگی اضافه)، یک adapter نازک
+#     با requests روی REST API مستند Kavenegar نوشته شده است ---
+requests==2.32.5

@@ -4,6 +4,18 @@ python_version = "3.11"
 strict = true
 exclude = ["migrations/", ".venv/"]
 
+# محدودیت شناخته‌شدهٔ بالادستی django-stubs: وقتی مدل پایه (اینجا BaseModel در
+# apps.core.models) یک منیجر سفارشی از طریق ``Manager.from_queryset(...)``
+# تعریف می‌کند (که تقریباً همهٔ مدل‌های این پروژه چنین‌اند)، پلاگین mypy نمی‌تواند
+# نوع related manager معکوس (reverse FK accessor) هیچ رابطه‌ای را که به آن مدل
+# اشاره دارد resolve کند و یک false-positive با کد ``django-manager-missing``
+# می‌دهد — حتی برای روابط کاملاً معتبر که ``manage.py check`` و تست‌ها آن‌ها را
+# تأیید می‌کنند. این یک باگ باز و حل‌نشدهٔ شناخته‌شده در django-stubs است
+# (ر.ک. typeddjango/django-stubs#2512 و #1354)، نه یک خطای واقعی در کد ما؛
+# بنابراین این کد خطا به‌صورت سراسری غیرفعال شده تا نویز کاذب روی هر مدل/رابطهٔ
+# جدید این پروژه تکرار نشود.
+disable_error_code = ["django-manager-missing"]
+
 # Django ادمین/فرم‌ها/migrationها الگوهای پویا دارند که strict بودن کامل روی
 # آن‌ها ارزش عملی کمی دارد و نویز زیادی تولید می‌کند؛ migrationها به‌طور کامل
 # از بررسی mypy مستثنی هستند (کد تولیدشدهٔ خودکار Django است).
@@ -14,6 +26,12 @@ ignore_errors = true
 # django-environ هنوز stub رسمی ندارد.
 [[tool.mypy.overrides]]
 module = "environ.*"
+ignore_missing_imports = true
+
+# Markdown/nh3/jdatetime/django-filter (فاز ۴) هیچ‌کدام stub رسمی/py.typed
+# معتبر برای این نسخه ندارند (ADR-0021/ADR-0022).
+[[tool.mypy.overrides]]
+module = ["markdown.*", "nh3.*", "jdatetime.*", "django_filters.*"]
 ignore_missing_imports = true
 
 # factory_boy از py.typed پشتیبانی می‌کند، اما در ترکیب با الگوهای پویای

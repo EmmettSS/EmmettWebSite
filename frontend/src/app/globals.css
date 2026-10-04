@@ -219,3 +219,114 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/*
+ * استایل محتوای Markdown→HTML رندرشده توسط بک‌اند (ADR-0022) — برای
+ * توضیحات خدمات/پروژه‌ها/دوره‌ها/بلاگ. جایگزین پلاگین @tailwindcss/typography
+ * (که وابستگی جدید لازم داشت)؛ فقط از توکن‌های طراحی موجود استفاده می‌کند.
+ */
+.markdown-content {
+  color: var(--color-foreground);
+  line-height: 1.75;
+}
+
+.markdown-content > :first-child {
+  margin-top: 0;
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4 {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--color-foreground);
+  margin-top: 2em;
+  margin-bottom: 0.75em;
+  scroll-margin-top: 5rem;
+}
+
+.markdown-content h2 {
+  font-size: 1.5rem;
+}
+
+.markdown-content h3 {
+  font-size: 1.25rem;
+}
+
+.markdown-content p {
+  margin-top: 1.1em;
+  margin-bottom: 1.1em;
+}
+
+.markdown-content a {
+  color: var(--color-primary);
+  text-underline-offset: 3px;
+  text-decoration: underline;
+}
+
+.markdown-content ul,
+.markdown-content ol {
+  margin-top: 1em;
+  margin-bottom: 1em;
+  padding-inline-start: 1.5em;
+}
+
+.markdown-content ul {
+  list-style-type: disc;
+}
+
+.markdown-content ol {
+  list-style-type: decimal;
+}
+
+.markdown-content blockquote {
+  border-inline-start: 3px solid var(--color-border);
+  padding-inline-start: 1em;
+  color: var(--color-muted-foreground);
+  font-style: italic;
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+
+.markdown-content code {
+  font-family: var(--font-technical, monospace);
+  font-size: 0.875em;
+  background: var(--color-secondary);
+  border-radius: 0.25rem;
+  padding: 0.15em 0.4em;
+}
+
+.markdown-content pre {
+  background: var(--color-secondary);
+  border-radius: 0.5rem;
+  padding: 1em;
+  overflow-x: auto;
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+
+.markdown-content pre code {
+  background: transparent;
+  padding: 0;
+}
+
+.markdown-content img {
+  border-radius: 0.5rem;
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+
+.markdown-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+
+.markdown-content th,
+.markdown-content td {
+  border: 1px solid var(--color-border);
+  padding: 0.5em 0.75em;
+  text-align: start;
+}

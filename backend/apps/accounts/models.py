@@ -15,10 +15,15 @@ from __future__ import annotations
 import uuid
 from typing import Any, ClassVar
 
+from django.conf import settings
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+
+from apps.core.models import BaseModel
 
 
 class UserManager(BaseUserManager["User"]):
@@ -90,3 +95,60 @@ class User(AbstractUser):
 
     def __str__(self) -> str:
         return self.email
+
+
+class Profile(BaseModel):
+    """اطلاعات تکمیلی کاربر — جدا از ``User`` تا مدل احراز هویت سبک بماند."""
+
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, verbose_name=_("user"), on_delete=models.CASCADE, related_name="profile"
+    )
+    avatar = models.ForeignKey(
+        "core.Media",
+        verbose_name=_("avatar"),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+    )
+    bio = models.TextField(_("bio"), blank=True, default="")
+    locale_preference = models.CharField(
+        _("locale preference"), max_length=5, choices=[("fa", "فارسی"), ("en", "English")], default="fa"
+    )
+    job_title = models.CharField(_("job title"), max_length=150, blank=True, default="")
+    company_name = models.CharField(_("company name"), max_length=150, blank=True, default="")
+
+    class Meta(BaseModel.Meta):
+        verbose_name = _("Profile")
+        verbose_name_plural = _("Profiles")
+
+    def __str__(self) -> str:
+        return f"Profile<{self.user_id}>"
+
+
+class Favorite(BaseModel):
+    """علاقه‌مندی کاربر به یک محتوای دلخواه (Service/Project/Course/BlogPost) — ADR-0025.
+
+    از ``GenericForeignKey`` استفاده می‌شود چون منطق «افزودن/حذف از
+    علاقه‌مندی‌ها» برای هر نوع محتوا کاملاً یکسان است؛ ساخت ۴ جدول M2M جدا
+    تکرار بی‌فایدهٔ کد بود.
+    """
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, verbose_name=_("user"), on_delete=models.CASCADE, related_name="favorites"
+    )
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveBigIntegerField()
+    target = GenericForeignKey("content_type", "object_id")
+
+    class Meta(BaseModel.Meta):
+        verbose_name = _("Favorite")
+        verbose_name_plural = _("Favorites")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "content_type", "object_id"], name="unique_user_favorite"
+            )
+        ]
+
+    def __str__(self) -> str:  # pragma: no cover
+        return f"{self.user_id} ♥ {self.content_type}#{self.object_id}"

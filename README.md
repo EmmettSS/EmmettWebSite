@@ -4,14 +4,16 @@
 
 ```
 .
-├── frontend/                   # Next.js 16 (App Router) + Tailwind v4 + next-intl — فاز ۳
-├── backend/                    # Django 5.2 + DRF — فاز ۲
+├── frontend/                   # Next.js 16 (App Router) + Tailwind v4 + next-intl — فاز ۳/۴
+├── backend/                    # Django 5.2 + DRF — فاز ۲/۴
 ├── legacy-frontend-reference/  # اسکلت قدیمی React/Vite — فقط مرجع بصری، کد مستقیم استفاده نمی‌شود
 ├── docs/adr/                   # تصمیمات معماری (Architecture Decision Records)
 ├── ARCHITECTURE.md             # معماری کلی سیستم
 ├── DISCOVERY.md                # یافته‌های فاز کشف
 └── CHANGELOG.md                # تاریخچهٔ کامل تغییرات به‌تفکیک فاز
 ```
+
+> وضعیت فعلی (فاز ۴): تمام اپ‌های دامنه‌ای بک‌اند (خدمات/پروژه‌ها/آکادمی+Enrollment/بلاگ/شرکت/لید/حساب کاربری) و تمام صفحات مصرف‌کنندهٔ API در فرانت‌اند (خدمات، پروژه‌ها، محصولات، آکادمی، کتابخانه، دربارهٔ ما، تماس، جست‌وجو، پروفایل) پیاده‌سازی و با داده‌ی seed واقعی (`seed_demo_data`) تست شده‌اند. جزئیات کامل در بخش «فاز ۴» پایین همین فایل و در `CHANGELOG.md`.
 
 برای معماری کامل و دلایل هر تصمیم، به `ARCHITECTURE.md` و `docs/adr/` مراجعه کنید.
 
@@ -37,7 +39,18 @@ npm run build       # next build — باید همیشه بدون خطا کام�
 npx tsc --noEmit    # TypeScript strict (قانون ۷)
 npm run lint        # eslint
 npm run test        # vitest — تست واحد منطق (تاریخ/عدد) و کامپوننت
+npm run test:e2e    # playwright — تست E2E مرورگر واقعی (نیاز به بک‌اند seed‌شده؛ ر.ک. frontend/e2e/README.md)
 ```
+
+### صفحات مصرف‌کنندهٔ API (فاز ۴)
+
+علاوه بر صفحهٔ اصلی و Design System (فاز ۳)، فرانت‌اند اکنون تمام محتوای
+بک‌اند را مصرف می‌کند: `/services`, `/projects`, `/products`, `/academy`
+(+ ثبت‌نام دوره)، `/blog` (+ فهرست مطالب و کامنت)، `/about` (تیم + نظرات)،
+`/contact` (فرم لید + خبرنامه)، `/search` (جست‌وجوی سراسری FTS)، `/profile`
+(ورود/ثبت‌نام/دوره‌های من/علاقه‌مندی‌ها). جزئیات کامل مسیرها و معماری اتصال
+به بک‌اند (Server Components مستقیم / Client Components از طریق پراکسی
+Route Handler) در `frontend/README.md`.
 
 ### صفحهٔ نمونهٔ Design System
 
@@ -65,6 +78,7 @@ source .venv/bin/activate          # ویندوز: .venv\Scripts\activate
 pip install -r requirements-dev.txt
 cp .env.example .env                # و مقادیر لازم را پر کنید
 python manage.py migrate
+python manage.py seed_demo_data     # دادهٔ نمایشی دوزبانه (ایدمپوتنت) — ر.ک. فاز ۴ در CHANGELOG
 python manage.py runserver
 ```
 
@@ -86,9 +100,14 @@ ruff check .                                    # lint
 - ReDoc: `/api/v1/schema/redoc/`
 - Health check: `/api/v1/health/`
 
-### Gap شناخته‌شده (فاز بعد)
+### دادهٔ نمایشی (Seed)
 
-`apps/core/utils/dates.py` و `apps/core/utils/numerals.py` (معادل بک‌اند بومی‌سازی تاریخ/عدد، طبق `ADR-0004`) هنوز در فاز ۲ ساخته نشدند؛ وابستگی `jdatetime==6.1.0` در `requirements.txt` پین شده اما در کد اپلیکیشن استفاده نمی‌شود. باید در فاز بعدی بک‌اند (که به API واقعی نیاز دارد) ساخته شود، با رفتار هماهنگ با لایهٔ فرانت‌اند `frontend/src/lib/format/` (ر.ک. `ADR-0019`).
+`python manage.py seed_demo_data` یک مجموعهٔ داده دوزبانهٔ واقع‌گرایانه و
+ایدمپوتنت می‌سازد: کاربران (`admin@emmett.dev` ادمین، `author@emmett.dev`
+ویرایشگر، `client@emmett.dev` مشتری)، تیم/نظرات مشتریان، خدمات، پروژه‌ها
+(+ یک محصول و Case Study)، دوره‌های آکادمی (+ درس و یک Enrollment نمونه)،
+پست‌های بلاگ (+ کامنت نمونه)، مشترک خبرنامه. رمز عبور پیش‌فرض dev با env
+`DEMO_ADMIN_PASSWORD` قابل override است.
 
 ## Legacy Frontend Reference — `legacy-frontend-reference/`
 
