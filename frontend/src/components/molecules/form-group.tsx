@@ -20,7 +20,10 @@ export function FormGroup({ label, htmlFor, error, hint, required, className, ch
   const generatedId = useId();
   const fieldId = htmlFor ?? generatedId;
   const errorId = error ? `${fieldId}-error` : undefined;
-  const hintId = hint ? `${fieldId}-hint` : undefined;
+  // hint فقط وقتی واقعاً رندر می‌شود که error نباشد (رجوع کنید به JSX پایین)؛
+  // اگر اینجا بدون شرط `!error` محاسبه شود، aria-describedby به یک id اشاره
+  // می‌کند که هیچ‌وقت در DOM وجود ندارد — نقض WCAG (قانون ۱۸).
+  const hintId = hint && !error ? `${fieldId}-hint` : undefined;
   const describedBy = [hintId, errorId].filter(Boolean).join(" ") || undefined;
 
   return (

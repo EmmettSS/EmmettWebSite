@@ -1,51 +1,62 @@
-# Emmett — Bilingual Emerald Edition
+# Emmett — وب‌سایت شرکتی دوزبانه
 
-A bilingual Persian/English React experience built with Vite, TypeScript, Tailwind CSS and Motion.
+مونوریپوی پروژهٔ Emmett: فرانت‌اند Next.js (دوزبانه فارسی/انگلیسی) + بک‌اند Django/DRF.
 
-## اجرا در ویندوز
+```
+.
+├── frontend/                   # Next.js 16 (App Router) + Tailwind v4 + next-intl — فاز ۳
+├── backend/                    # Django 5.2 + DRF — فاز ۲
+├── legacy-frontend-reference/  # اسکلت قدیمی React/Vite — فقط مرجع بصری، کد مستقیم استفاده نمی‌شود
+├── docs/adr/                   # تصمیمات معماری (Architecture Decision Records)
+├── ARCHITECTURE.md             # معماری کلی سیستم
+├── DISCOVERY.md                # یافته‌های فاز کشف
+└── CHANGELOG.md                # تاریخچهٔ کامل تغییرات به‌تفکیک فاز
+```
 
-```powershell
-npm install --legacy-peer-deps
+برای معماری کامل و دلایل هر تصمیم، به `ARCHITECTURE.md` و `docs/adr/` مراجعه کنید.
+
+## Frontend (Next.js) — `frontend/`
+
+وب‌سایت عمومی: دوزبانه (فارسی پیش‌فرض بدون پیشوند `/`, انگلیسی با پیشوند `/en`)، RTL/LTR سطح کامپوننت، دارک/لایت‌مود، Design System کامل (atoms/molecules/organisms).
+
+### راه‌اندازی محیط توسعه
+
+```bash
+cd frontend
+npm install
 npm run dev
 ```
 
-سپس آدرس `http://localhost:5173` را باز کنید. سایت با زبان English باز می‌شود و کاربر از کنترل همیشه‌در‌دسترس `EN / FA` داخل Navbar زبان را تغییر می‌دهد.
+سپس `http://localhost:3000` (فارسی) یا `http://localhost:3000/en` (انگلیسی) را باز کنید.
 
-## Production build
+### دستورات کیفیت کد
 
 ```bash
-npm run build
-npm run preview
+cd frontend
+npm run build       # next build — باید همیشه بدون خطا کامل شود
+npx tsc --noEmit    # TypeScript strict (قانون ۷)
+npm run lint        # eslint
+npm run test        # vitest — تست واحد منطق (تاریخ/عدد) و کامپوننت
 ```
 
-## Deploy on Vercel
+### صفحهٔ نمونهٔ Design System
 
-1. Push this folder to a GitHub repository.
-2. Import the repository in Vercel.
-3. Framework: **Vite**
-4. Build command: `npm run build`
-5. Output directory: `dist`
-6. Install command: `npm install --legacy-peer-deps`
+به‌جای Storybook (ر.ک. ADR-0020)، یک صفحهٔ واقعی Next.js تمام atoms/molecules/organisms، رنگ‌ها، تایپوگرافی، و نمونهٔ بومی‌سازی تاریخ/عدد را نمایش می‌دهد:
 
-The included `vercel.json` keeps `/fa/...` and `/en/...` routes working after a direct refresh.
+- فارسی: `/design-system`
+- انگلیسی: `/en/design-system`
 
-## معماری زبان
+### تصمیمات کلیدی فاز ۳ (جزئیات کامل در ADR)
 
-- مسیرهای مستقل `/fa/...` و `/en/...`
-- انتخاب‌گر متحرک `EN / FA` داخل Navbar و ذخیره انتخاب در `localStorage`
-- تغییر هم‌زمان `lang` و `dir` سند
-- فونت Vazirmatn و چیدمان RTL برای فارسی
-- محتوای فارسی بازنویسی‌شده و مستقل از ترجمه لفظی
-
-## Accessibility & motion
-
-Keyboard focus, semantic labels, responsive layouts and `prefers-reduced-motion` are supported.
+- **پشته:** Next.js 16 (App Router) — نه Vite خام (`ADR-0016`).
+- **i18n/مسیریابی:** `next-intl` با `localePrefix: "as-needed"`؛ `proxy.ts` (نه `middleware.ts` — قرارداد جدید Next.js 16) (`ADR-0016`).
+- **توکن‌های طراحی:** از `legacy-frontend-reference/default_shadcn_theme.css` + اسناد `pasted_text/*.md`، بدون Figma واقعی (`ADR-0017`).
+- **فونت:** فارسی = Vazirmatn، لاتین = Inter، مونو = JetBrains Mono — خوداستقرار (self-hosted) با `@fontsource/*`، نه `next/font/google` (شکست build-time در محیط‌های بدون دسترسی به `fonts.googleapis.com`) (`ADR-0018`).
+- **تاریخ/عدد:** `dayjs`+`jalaliday` برای تقویم شمسی، `Intl.NumberFormat` بومی برای ارقام فارسی/لاتین؛ همیشه از `src/lib/format/{date,number}.ts` استفاده شود، هرگز مستقیم (`ADR-0019`).
+- **موشن:** `motion/react` (Motion One/Framer Motion family)، با احترام کامل به `prefers-reduced-motion`.
+- **تم:** `next-themes` (`localStorage` + `prefers-color-scheme`)؛ بخش‌های ادیتوریال برند (مثل Hero) مستقل از تم کاربر هستند (`ADR-0017`).
 
 ## Backend (Django) — `backend/`
-
-کد بک‌اند پروژه (Django 5.2 + DRF) در پوشهٔ `backend/` قرار دارد و مستقل از فرانت‌اند ریشهٔ ریپو توسعه داده می‌شود. برای معماری کامل، ADRها و جزئیات تصمیمات به `ARCHITECTURE.md` و `docs/adr/` مراجعه کنید.
-
-### راه‌اندازی محیط توسعه
 
 ```bash
 cd backend
@@ -74,5 +85,13 @@ ruff check .                                    # lint
 - Swagger UI: `/api/v1/schema/swagger-ui/`
 - ReDoc: `/api/v1/schema/redoc/`
 - Health check: `/api/v1/health/`
+
+### Gap شناخته‌شده (فاز بعد)
+
+`apps/core/utils/dates.py` و `apps/core/utils/numerals.py` (معادل بک‌اند بومی‌سازی تاریخ/عدد، طبق `ADR-0004`) هنوز در فاز ۲ ساخته نشدند؛ وابستگی `jdatetime==6.1.0` در `requirements.txt` پین شده اما در کد اپلیکیشن استفاده نمی‌شود. باید در فاز بعدی بک‌اند (که به API واقعی نیاز دارد) ساخته شود، با رفتار هماهنگ با لایهٔ فرانت‌اند `frontend/src/lib/format/` (ر.ک. `ADR-0019`).
+
+## Legacy Frontend Reference — `legacy-frontend-reference/`
+
+اسکلت قدیمی React/Vite که پیش از تصمیم `ADR-0001` در ریشهٔ ریپو بود؛ فقط به‌عنوان مرجع بصری (رنگ/فونت/موشن) نگه داشته شده، کد آن مستقیماً در `frontend/` استفاده/پورت نشده است. جزئیات در `legacy-frontend-reference/README.md`.
 
 جزئیات کامل تاریخچهٔ تغییرات در `CHANGELOG.md` ثبت می‌شود.
