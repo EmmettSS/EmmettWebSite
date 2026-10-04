@@ -1,0 +1,51 @@
+# Production dependencies — نسخه‌ها Pin شده طبق ADR-0010 برای بازتولیدپذیری دقیق روی هاست cPanel.
+# هر وابستگی جدید باید در PR توجیه شود (قانون ۶) و در CHANGELOG.md ثبت شود (قانون ۲۰).
+
+# --- Core framework ---
+Django==5.2.17                     # فریم‌ورک اصلی — ADR-0011 (LTS تا ۲۰۲۸)
+djangorestframework==3.18.1        # لایهٔ API — هستهٔ مأموریت پروژه
+
+# --- API schema / docs ---
+drf-spectacular==0.30.0            # تولید خودکار OpenAPI schema — قانون ۸
+
+# --- Settings / secrets ---
+django-environ==0.14.0             # خواندن تنظیمات از .env — قانون ۵ (هرگز secret در کد)
+
+# --- i18n محتوای مدل‌محور ---
+django-modeltranslation==0.20.6    # ADR-0003
+
+# --- امنیت / Rate limiting ---
+
+# --- CORS (فقط برای توسعهٔ محلی frontend/backend روی پورت‌های جدا؛ در prod همان‌-مبدأ) ---
+django-cors-headers==4.9.0
+
+# --- فیلترینگ استاندارد DRF ---
+django-filter==26.2
+
+# --- Static files روی هاست اشتراکی بدون نیاز به تنظیم جداگانهٔ Apache ---
+whitenoise==6.12.0
+
+# --- دیتابیس MySQL (پروداکشن) — درایور خالص پایتون، بدون نیاز به کامپایل C (ADR-0011) ---
+PyMySQL==1.2.3
+
+# --- پردازش تصویر برای مدل Media ---
+Pillow==12.3.0
+
+# --- تاریخ شمسی (قانون ۱۰) ---
+jdatetime==6.1.0
+
+# --- لاگ ساختاریافته ---
+structlog==26.1.0
+django-structlog==10.1.0
+
+# --- Markdown → HTML برای محتوای طولانی (ADR-0022: Markdown همه‌جا) ---
+Markdown==3.9
+
+# --- پاک‌سازی HTML تولیدشده از Markdown قبل از ذخیره/نمایش (ضد XSS — قانون ۱۶)؛
+#     nh3 (بایندینگ Rust/ammonia) انتخاب شد چون bleach دیگر نگه‌داری نمی‌شود ---
+nh3==0.3.7
+
+# --- کلاینت HTTP برای ارسال پیامک از طریق REST API کاوه‌نگار (ADR-0024)؛
+#     به‌جای SDK رسمی kavenegar (نگهداری‌نشده/وابستگی اضافه)، یک adapter نازک
+#     با requests روی REST API مستند Kavenegar نوشته شده است ---
+requests==2.32.5

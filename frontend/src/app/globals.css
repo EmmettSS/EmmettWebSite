@@ -1,0 +1,332 @@
+@import "tailwindcss";
+
+/*
+ * فونت‌های خوداستقرار (self-hosted) — از طریق @fontsource (فایل‌های واقعی
+ * در node_modules، نصب‌شده از npm registry، بدون فراخوانی شبکهٔ خارجی در
+ * زمان build). ر.ک. src/lib/fonts.ts و ADR-0018 برای دلیل کامل.
+ */
+@import "@fontsource/vazirmatn/400.css";
+@import "@fontsource/vazirmatn/500.css";
+@import "@fontsource/vazirmatn/600.css";
+@import "@fontsource/vazirmatn/700.css";
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/500.css";
+@import "@fontsource/inter/600.css";
+@import "@fontsource/inter/700.css";
+@import "@fontsource/jetbrains-mono/400.css";
+@import "@fontsource/jetbrains-mono/500.css";
+
+/*
+ * توکن‌های طراحی برند امیت — استخراج‌شده از سند مشخصات طراحی
+ * (legacy-frontend-reference/src/imports/pasted_text/emmett-design-spec.md،
+ * بخش‌های B1–B3) طبق تصمیم صریح مالک محصول (فاز ۳، سؤال ۴).
+ * جزئیات و دلایل هر گروه توکن در ADR-0017 مستند شده است.
+ */
+
+/* ===== حالت روشن (پیش‌فرض) — از «Light surfaces» + «Text light» ===== */
+:root {
+  --background: #f6f4f0; /* color/bg/warm-white */
+  --foreground: #16171a; /* color/text/light-primary */
+
+  --card: #ffffff;
+  --card-foreground: #16171a;
+  --popover: #ffffff;
+  --popover-foreground: #16171a;
+
+  --primary: #5b62e0; /* color/accent/indigo */
+  --primary-foreground: #ffffff;
+
+  --secondary: #e7e5e1; /* color/surface/soft-gray */
+  --secondary-foreground: #16171a;
+
+  --muted: #efebe4; /* color/bg/ivory */
+  --muted-foreground: #4a4b4f; /* color/text/light-secondary */
+
+  --accent: #1fae6e; /* color/accent/emerald */
+  --accent-foreground: #0b0c0e;
+
+  --destructive: #b3433d; /* قرمز مات — اسپک فقط لحن را توصیف کرده، نه hex دقیق (ر.ک. ADR-0017) */
+  --destructive-foreground: #ffffff;
+
+  --border: #dad7d1; /* color/border/hairline-light */
+  --input: #dad7d1;
+  --ring: rgb(91 98 224 / 40%); /* color/border/accent */
+
+  /* لهجه‌های برند، مستقل از حالت روشن/تاریک */
+  --brand-indigo: #5b62e0;
+  --brand-emerald: #1fae6e;
+  --brand-muted-blue: #4c6e91;
+  --brand-cyan: #4fd1d9;
+
+  /* سطوح ادیتوریال ثابت (برای ریتم تناوبی بخش‌های صفحه، مستقل از تم) */
+  --surface-obsidian: #0b0c0e;
+  --surface-graphite: #131417;
+  --surface-slate: #1a1c20;
+  --surface-warm-white: #f6f4f0;
+  --surface-ivory: #efebe4;
+  --surface-soft-gray: #e7e5e1;
+
+  --font-fa: "Vazirmatn", ui-sans-serif, system-ui, sans-serif;
+  --font-en: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-technical-raw: "JetBrains Mono";
+
+  --radius-value-sm: 0.25rem; /* radius/sm — 4px */
+  --radius-value-md: 0.5rem; /* radius/md — 8px */
+  --radius-value-lg: 1rem; /* radius/lg — 16px */
+  --radius-value-none: 0px;
+
+  --shadow-value-sm: 0 1px 2px rgb(0 0 0 / 24%);
+  --shadow-value-md: 0 4px 16px rgb(0 0 0 / 28%);
+  --shadow-value-lg: 0 12px 32px rgb(0 0 0 / 32%);
+  --shadow-value-glow-cta: 0 0 24px rgb(91 98 224 / 30%);
+  --shadow-value-glow-pentestor: 0 0 20px rgb(79 209 217 / 35%);
+}
+
+/* ===== حالت تاریک — از «Dark surfaces» + «Text dark» ===== */
+.dark {
+  --background: #0b0c0e; /* color/bg/obsidian */
+  --foreground: #f2f1ee; /* color/text/dark-primary */
+
+  --card: #202226; /* color/surface/charcoal */
+  --card-foreground: #f2f1ee;
+  --popover: #2a2c31; /* color/surface/charcoal-elevated */
+  --popover-foreground: #f2f1ee;
+
+  --primary: #5b62e0;
+  --primary-foreground: #ffffff;
+
+  --secondary: #202226;
+  --secondary-foreground: #f2f1ee;
+
+  --muted: #1a1c20; /* color/bg/slate */
+  --muted-foreground: #a7a9ae; /* color/text/dark-secondary */
+
+  --accent: #1fae6e;
+  --accent-foreground: #0b0c0e;
+
+  --destructive: #e5726b;
+  --destructive-foreground: #0b0c0e;
+
+  --border: #2e3034; /* color/border/hairline-dark */
+  --input: #2e3034;
+  --ring: rgb(91 98 224 / 50%);
+}
+
+/* ===== نگاشت به سیستم تم Tailwind v4 (CSS-first) ===== */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-brand-indigo: var(--brand-indigo);
+  --color-brand-emerald: var(--brand-emerald);
+  --color-brand-muted-blue: var(--brand-muted-blue);
+  --color-brand-cyan: var(--brand-cyan);
+
+  --color-surface-obsidian: var(--surface-obsidian);
+  --color-surface-graphite: var(--surface-graphite);
+  --color-surface-slate: var(--surface-slate);
+  --color-surface-warm-white: var(--surface-warm-white);
+  --color-surface-ivory: var(--surface-ivory);
+  --color-surface-soft-gray: var(--surface-soft-gray);
+
+  --radius-sm: var(--radius-value-sm);
+  --radius-md: var(--radius-value-md);
+  --radius-lg: var(--radius-value-lg);
+  --radius-none: var(--radius-value-none);
+
+  --shadow-sm: var(--shadow-value-sm);
+  --shadow-md: var(--shadow-value-md);
+  --shadow-lg: var(--shadow-value-lg);
+  --shadow-glow-cta: var(--shadow-value-glow-cta);
+  --shadow-glow-pentestor: var(--shadow-value-glow-pentestor);
+
+  /* موشن (motion/fast, motion/base, motion/slow — بخش B3 اسپک طراحی) */
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 400ms;
+  --ease-emmett-standard: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* بریک‌پوینت‌های برند (بخش B3 — جایگزین کامل مقیاس پیش‌فرض Tailwind) */
+  --breakpoint-xxs: 23.4375rem; /* 375px */
+  --breakpoint-xs: 24.375rem; /* 390px */
+  --breakpoint-sm: 48rem; /* 768px */
+  --breakpoint-md: 64rem; /* 1024px */
+  --breakpoint-lg: 80rem; /* 1280px */
+  --breakpoint-xl: 90rem; /* 1440px */
+
+  /* فونت‌ها — مقدار واقعی متغیر CSS در لایهٔ layout بسته به زبان ست می‌شود */
+  --font-sans: var(--font-active-sans, ui-sans-serif, system-ui, sans-serif);
+  --font-technical: var(--font-technical-raw), ui-monospace, monospace;
+}
+
+/* فعال‌سازی variant سفارشی `dark:` با استراتژی کلاس (next-themes) */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+    outline-color: var(--color-ring);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    transition:
+      background-color var(--duration-base) var(--ease-emmett-standard),
+      color var(--duration-base) var(--ease-emmett-standard);
+  }
+
+  /* کرسر/فوکوس در دسترس: هرگز outline را به‌طور کامل حذف نکنید (WCAG AA) */
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+}
+
+/* احترام سراسری به prefers-reduced-motion، مکمل بررسی در سطح کامپوننت (قانون ۱۸/۱۹) */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/*
+ * استایل محتوای Markdown→HTML رندرشده توسط بک‌اند (ADR-0022) — برای
+ * توضیحات خدمات/پروژه‌ها/دوره‌ها/بلاگ. جایگزین پلاگین @tailwindcss/typography
+ * (که وابستگی جدید لازم داشت)؛ فقط از توکن‌های طراحی موجود استفاده می‌کند.
+ */
+.markdown-content {
+  color: var(--color-foreground);
+  line-height: 1.75;
+}
+
+.markdown-content > :first-child {
+  margin-top: 0;
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4 {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--color-foreground);
+  margin-top: 2em;
+  margin-bottom: 0.75em;
+  scroll-margin-top: 5rem;
+}
+
+.markdown-content h2 {
+  font-size: 1.5rem;
+}
+
+.markdown-content h3 {
+  font-size: 1.25rem;
+}
+
+.markdown-content p {
+  margin-top: 1.1em;
+  margin-bottom: 1.1em;
+}
+
+.markdown-content a {
+  color: var(--color-primary);
+  text-underline-offset: 3px;
+  text-decoration: underline;
+}
+
+.markdown-content ul,
+.markdown-content ol {
+  margin-top: 1em;
+  margin-bottom: 1em;
+  padding-inline-start: 1.5em;
+}
+
+.markdown-content ul {
+  list-style-type: disc;
+}
+
+.markdown-content ol {
+  list-style-type: decimal;
+}
+
+.markdown-content blockquote {
+  border-inline-start: 3px solid var(--color-border);
+  padding-inline-start: 1em;
+  color: var(--color-muted-foreground);
+  font-style: italic;
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+
+.markdown-content code {
+  font-family: var(--font-technical, monospace);
+  font-size: 0.875em;
+  background: var(--color-secondary);
+  border-radius: 0.25rem;
+  padding: 0.15em 0.4em;
+}
+
+.markdown-content pre {
+  background: var(--color-secondary);
+  border-radius: 0.5rem;
+  padding: 1em;
+  overflow-x: auto;
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+
+.markdown-content pre code {
+  background: transparent;
+  padding: 0;
+}
+
+.markdown-content img {
+  border-radius: 0.5rem;
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+
+.markdown-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+
+.markdown-content th,
+.markdown-content td {
+  border: 1px solid var(--color-border);
+  padding: 0.5em 0.75em;
+  text-align: start;
+}

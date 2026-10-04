@@ -1,0 +1,235 @@
+{
+  "metadata": {
+    "siteName": "Emmett",
+    "defaultTitle": "Emmett — Software Engineering Studio",
+    "defaultDescription": "Emmett is an engineering studio that solves difficult, systems-level problems with the same rigor an architecture practice brings to a building."
+  },
+  "common": {
+    "skipToContent": "Skip to main content",
+    "startProject": "Start a project",
+    "loading": "Loading…",
+    "readMore": "Read more",
+    "viewAll": "View all"
+  },
+  "nav": {
+    "home": "Home",
+    "services": "Services",
+    "products": "Products",
+    "projects": "Projects",
+    "library": "Library",
+    "academy": "Academy",
+    "about": "About",
+    "contact": "Contact",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "search": "Search",
+    "account": "Account"
+  },
+  "theme": {
+    "toggleLabel": "Toggle light/dark theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "locale": {
+    "switchLabel": "Switch language",
+    "fa": "فارسی",
+    "en": "English"
+  },
+  "footer": {
+    "tagline": "We engineer systems for difficult problems.",
+    "rights": "All rights reserved.",
+    "builtBy": "Designed and built by the Emmett engineering team"
+  },
+  "hero": {
+    "eyebrow": "Emmett Group / Engineering Studio",
+    "headline": "We engineer systems for difficult problems.",
+    "subtext": "Software, AI/ML, cybersecurity, and infrastructure — with the same rigor an architecture practice brings to a building.",
+    "primaryCta": "Explore our work",
+    "secondaryCta": "Start a project"
+  },
+  "designSystem": {
+    "title": "Design System",
+    "description": "A living sample page for Phase 3 tokens and components — for design review, not final site content.",
+    "colors": "Colors",
+    "typography": "Typography",
+    "spacing": "Spacing",
+    "buttons": "Buttons",
+    "formElements": "Form elements",
+    "cards": "Cards",
+    "dateNumberSample": "Date & number sample",
+    "today": "Today",
+    "sampleAmount": "Sample amount",
+    "buttonVariant": {
+      "primary": "Primary button",
+      "secondary": "Secondary button",
+      "ghost": "Ghost button",
+      "loading": "Submitting…",
+      "disabled": "Disabled"
+    },
+    "badges": "Badges",
+    "avatar": "Avatar",
+    "breadcrumb": "Breadcrumb"
+  },
+  "form": {
+    "nameLabel": "Name",
+    "namePlaceholder": "Enter your name",
+    "emailLabel": "Email",
+    "emailPlaceholder": "you@example.com",
+    "messageLabel": "Message",
+    "messagePlaceholder": "Tell us what you're building…",
+    "submit": "Submit",
+    "requiredError": "This field is required."
+  },
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next",
+    "pageOf": "Page {current} of {total}"
+  },
+  "services": {
+    "title": "Services",
+    "description": "What we build, how we build it, and why it holds up under pressure.",
+    "empty": "No services found.",
+    "backToList": "Back to services"
+  },
+  "projects": {
+    "title": "Projects",
+    "description": "Case studies and products we've shipped for real clients.",
+    "products": "Products",
+    "productsDescription": "Internal products we built and now run ourselves.",
+    "empty": "No projects found.",
+    "filterByTechnology": "Technology",
+    "filterByIndustry": "Industry",
+    "allTechnologies": "All technologies",
+    "allIndustries": "All industries",
+    "client": "Client",
+    "year": "Year",
+    "challenge": "Challenge",
+    "approach": "Approach",
+    "result": "Result",
+    "technologyStack": "Technology stack",
+    "backToList": "Back to projects"
+  },
+  "academy": {
+    "title": "Academy",
+    "description": "Courses to level up your engineering and security skills.",
+    "empty": "No courses found.",
+    "level": "Level",
+    "levels": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced"
+    },
+    "instructor": "Instructor",
+    "duration": "Duration",
+    "hours": "hours",
+    "curriculum": "Curriculum",
+    "lessons": "lessons",
+    "minutes": "min",
+    "preview": "Preview",
+    "enroll": "Enroll in this course",
+    "enrolled": "You're enrolled in this course",
+    "enrollRequiresLogin": "Sign in to enroll",
+    "backToList": "Back to academy"
+  },
+  "blog": {
+    "title": "Library",
+    "description": "Articles on engineering, security, and product craft.",
+    "empty": "No articles found.",
+    "readingTime": "{minutes} min read",
+    "tableOfContents": "On this page",
+    "relatedPosts": "Related articles",
+    "comments": "Comments",
+    "noComments": "No comments yet.",
+    "addComment": "Add a comment",
+    "commentPlaceholder": "Share your thoughts…",
+    "commentSubmit": "Post comment",
+    "commentPending": "Your comment was submitted and is awaiting moderation.",
+    "commentLoginRequired": "Sign in to leave a comment.",
+    "rssFeed": "RSS feed",
+    "backToList": "Back to library"
+  },
+  "team": {
+    "title": "About us",
+    "description": "The people behind Emmett, and what our clients say.",
+    "teamHeading": "Team",
+    "testimonialsHeading": "What clients say"
+  },
+  "contact": {
+    "title": "Contact",
+    "description": "Tell us about your project and we'll get back to you shortly.",
+    "nameLabel": "Name",
+    "emailLabel": "Email",
+    "phoneLabel": "Phone",
+    "projectTypeLabel": "Project type",
+    "budgetLabel": "Budget range",
+    "timelineLabel": "Timeline",
+    "messageLabel": "Message",
+    "consentLabel": "I agree to be contacted about my request.",
+    "submit": "Send message",
+    "submitting": "Sending…",
+    "success": "Thanks! We've received your message and will be in touch soon.",
+    "error": "Something went wrong. Please try again.",
+    "projectTypes": {
+      "website": "Website",
+      "mobile_app": "Mobile app",
+      "security": "Security / Pentest",
+      "crm": "CRM",
+      "consulting": "Consulting",
+      "other": "Other"
+    },
+    "budgetRanges": {
+      "under_50m": "Under 50M Toman",
+      "50_150m": "50-150M Toman",
+      "150_500m": "150-500M Toman",
+      "over_500m": "Over 500M Toman",
+      "not_sure": "Not sure yet"
+    },
+    "timelines": {
+      "immediate": "Immediate",
+      "within_1_month": "Within 1 month",
+      "within_3_months": "Within 3 months",
+      "flexible": "Flexible"
+    },
+    "newsletterTitle": "Subscribe to our newsletter",
+    "newsletterPlaceholder": "you@example.com",
+    "newsletterSubmit": "Subscribe",
+    "newsletterSuccess": "You're subscribed!"
+  },
+  "search": {
+    "title": "Search",
+    "placeholder": "Search services, projects, courses, articles…",
+    "submit": "Search",
+    "resultsCount": "{count} results for \"{query}\"",
+    "empty": "No results found.",
+    "prompt": "Start typing to search the whole site."
+  },
+  "profile": {
+    "title": "Account",
+    "loginTitle": "Sign in",
+    "registerTitle": "Create an account",
+    "loginTab": "Sign in",
+    "registerTab": "Create account",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "firstNameLabel": "First name",
+    "lastNameLabel": "Last name",
+    "loginSubmit": "Sign in",
+    "registerSubmit": "Create account",
+    "logout": "Sign out",
+    "welcome": "Welcome back, {name}",
+    "favoritesHeading": "Favorites",
+    "noFavorites": "You haven't saved anything yet.",
+    "enrollmentsHeading": "My courses",
+    "noEnrollments": "You haven't enrolled in any course yet.",
+    "error": "Something went wrong. Please check your details."
+  },
+  "errors": {
+    "notFoundTitle": "Page not found",
+    "notFoundDescription": "The page you're looking for doesn't exist or has moved.",
+    "notFoundCta": "Back to home",
+    "serverErrorTitle": "Something went wrong",
+    "serverErrorDescription": "An unexpected error occurred. Our team has been notified.",
+    "serverErrorCta": "Try again"
+  }
+}

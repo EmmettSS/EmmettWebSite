@@ -1,0 +1,235 @@
+{
+  "metadata": {
+    "siteName": "امیت",
+    "defaultTitle": "امیت — استودیوی مهندسی نرم‌افزار",
+    "defaultDescription": "امیت یک استودیوی مهندسی است که مسائل پیچیدهٔ سیستمی را با همان دقتی حل می‌کند که یک دفتر معماری صرف ساخت یک بنا می‌کند."
+  },
+  "common": {
+    "skipToContent": "رفتن به محتوای اصلی",
+    "startProject": "شروع یک پروژه",
+    "loading": "در حال بارگذاری…",
+    "readMore": "ادامهٔ مطلب",
+    "viewAll": "مشاهدهٔ همه"
+  },
+  "nav": {
+    "home": "خانه",
+    "services": "خدمات",
+    "products": "محصولات",
+    "projects": "پروژه‌ها",
+    "library": "کتابخانه",
+    "academy": "آکادمی",
+    "about": "دربارهٔ ما",
+    "contact": "تماس",
+    "openMenu": "باز کردن منو",
+    "closeMenu": "بستن منو",
+    "search": "جستجو",
+    "account": "حساب کاربری"
+  },
+  "theme": {
+    "toggleLabel": "تغییر پوستهٔ روشن/تاریک",
+    "light": "روشن",
+    "dark": "تاریک",
+    "system": "سیستم"
+  },
+  "locale": {
+    "switchLabel": "تغییر زبان",
+    "fa": "فارسی",
+    "en": "English"
+  },
+  "footer": {
+    "tagline": "ما سیستم‌ها را برای مسائل دشوار مهندسی می‌کنیم.",
+    "rights": "تمام حقوق محفوظ است.",
+    "builtBy": "طراحی و توسعه توسط تیم مهندسی امیت"
+  },
+  "hero": {
+    "eyebrow": "گروه امیت / استودیوی مهندسی",
+    "headline": "ما سیستم‌ها را برای مسائل دشوار مهندسی می‌کنیم.",
+    "subtext": "نرم‌افزار، هوش مصنوعی، امنیت سایبری و زیرساخت — با همان دقتی که یک دفتر معماری صرف طراحی یک بنا می‌کند.",
+    "primaryCta": "مشاهدهٔ نمونه‌کارها",
+    "secondaryCta": "شروع یک پروژه"
+  },
+  "designSystem": {
+    "title": "سیستم طراحی",
+    "description": "صفحهٔ نمونهٔ زندهٔ توکن‌ها و کامپوننت‌های فاز ۳ — برای بازبینی طراحی، نه بخشی از محتوای نهایی سایت.",
+    "colors": "رنگ‌ها",
+    "typography": "تایپوگرافی",
+    "spacing": "فاصله‌گذاری",
+    "buttons": "دکمه‌ها",
+    "formElements": "عناصر فرم",
+    "cards": "کارت‌ها",
+    "dateNumberSample": "نمونهٔ تاریخ و عدد",
+    "today": "امروز",
+    "sampleAmount": "مبلغ نمونه",
+    "buttonVariant": {
+      "primary": "دکمهٔ اصلی",
+      "secondary": "دکمهٔ ثانویه",
+      "ghost": "دکمهٔ شبح",
+      "loading": "در حال ارسال…",
+      "disabled": "غیرفعال"
+    },
+    "badges": "برچسب‌ها",
+    "avatar": "آواتار",
+    "breadcrumb": "مسیر ناوبری"
+  },
+  "form": {
+    "nameLabel": "نام",
+    "namePlaceholder": "نام خود را وارد کنید",
+    "emailLabel": "ایمیل",
+    "emailPlaceholder": "you@example.com",
+    "messageLabel": "پیام",
+    "messagePlaceholder": "دربارهٔ پروژه‌تان بگویید…",
+    "submit": "ارسال",
+    "requiredError": "این فیلد الزامی است."
+  },
+  "pagination": {
+    "previous": "قبلی",
+    "next": "بعدی",
+    "pageOf": "صفحهٔ {current} از {total}"
+  },
+  "services": {
+    "title": "خدمات",
+    "description": "آنچه می‌سازیم، چگونه می‌سازیم و چرا زیر فشار واقعی هم کار می‌کند.",
+    "empty": "خدمتی یافت نشد.",
+    "backToList": "بازگشت به خدمات"
+  },
+  "projects": {
+    "title": "پروژه‌ها",
+    "description": "نمونه‌کارها و محصولاتی که برای مشتریان واقعی ساخته‌ایم.",
+    "products": "محصولات",
+    "productsDescription": "محصولات داخلی که ساخته‌ایم و خودمان اداره می‌کنیم.",
+    "empty": "پروژه‌ای یافت نشد.",
+    "filterByTechnology": "تکنولوژی",
+    "filterByIndustry": "صنعت",
+    "allTechnologies": "همهٔ تکنولوژی‌ها",
+    "allIndustries": "همهٔ صنایع",
+    "client": "کارفرما",
+    "year": "سال",
+    "challenge": "چالش",
+    "approach": "رویکرد",
+    "result": "نتیجه",
+    "technologyStack": "پشته‌ٔ فناوری",
+    "backToList": "بازگشت به پروژه‌ها"
+  },
+  "academy": {
+    "title": "آکادمی",
+    "description": "دوره‌هایی برای ارتقای مهارت‌های مهندسی و امنیت شما.",
+    "empty": "دوره‌ای یافت نشد.",
+    "level": "سطح",
+    "levels": {
+      "beginner": "مبتدی",
+      "intermediate": "متوسط",
+      "advanced": "پیشرفته"
+    },
+    "instructor": "مدرس",
+    "duration": "مدت",
+    "hours": "ساعت",
+    "curriculum": "سرفصل",
+    "lessons": "درس",
+    "minutes": "دقیقه",
+    "preview": "پیش‌نمایش",
+    "enroll": "ثبت‌نام در این دوره",
+    "enrolled": "شما در این دوره ثبت‌نام کرده‌اید",
+    "enrollRequiresLogin": "برای ثبت‌نام وارد شوید",
+    "backToList": "بازگشت به آکادمی"
+  },
+  "blog": {
+    "title": "کتابخانه",
+    "description": "مقالاتی دربارهٔ مهندسی، امنیت و ساخت محصول.",
+    "empty": "مقاله‌ای یافت نشد.",
+    "readingTime": "{minutes} دقیقه مطالعه",
+    "tableOfContents": "در این صفحه",
+    "relatedPosts": "مقالات مرتبط",
+    "comments": "نظرات",
+    "noComments": "هنوز نظری ثبت نشده است.",
+    "addComment": "افزودن نظر",
+    "commentPlaceholder": "نظر خود را بنویسید…",
+    "commentSubmit": "ثبت نظر",
+    "commentPending": "نظر شما ثبت شد و در انتظار تأیید است.",
+    "commentLoginRequired": "برای ثبت نظر وارد شوید.",
+    "rssFeed": "فید RSS",
+    "backToList": "بازگشت به کتابخانه"
+  },
+  "team": {
+    "title": "دربارهٔ ما",
+    "description": "افراد پشت امیت و آنچه مشتریانمان می‌گویند.",
+    "teamHeading": "تیم",
+    "testimonialsHeading": "نظر مشتریان"
+  },
+  "contact": {
+    "title": "تماس با ما",
+    "description": "دربارهٔ پروژه‌تان بگویید تا در اسرع وقت با شما تماس بگیریم.",
+    "nameLabel": "نام",
+    "emailLabel": "ایمیل",
+    "phoneLabel": "شماره تماس",
+    "projectTypeLabel": "نوع پروژه",
+    "budgetLabel": "بودجهٔ تقریبی",
+    "timelineLabel": "بازهٔ زمانی",
+    "messageLabel": "پیام",
+    "consentLabel": "موافقم که برای پیگیری درخواستم تماس گرفته شود.",
+    "submit": "ارسال پیام",
+    "submitting": "در حال ارسال…",
+    "success": "متشکریم! پیام شما دریافت شد و به‌زودی با شما تماس می‌گیریم.",
+    "error": "مشکلی پیش آمد. لطفاً دوباره تلاش کنید.",
+    "projectTypes": {
+      "website": "وب‌سایت",
+      "mobile_app": "اپلیکیشن موبایل",
+      "security": "امنیت / تست نفوذ",
+      "crm": "سی‌آرام",
+      "consulting": "مشاوره",
+      "other": "سایر"
+    },
+    "budgetRanges": {
+      "under_50m": "کمتر از ۵۰ میلیون تومان",
+      "50_150m": "۵۰ تا ۱۵۰ میلیون تومان",
+      "150_500m": "۱۵۰ تا ۵۰۰ میلیون تومان",
+      "over_500m": "بیش از ۵۰۰ میلیون تومان",
+      "not_sure": "هنوز مشخص نیست"
+    },
+    "timelines": {
+      "immediate": "فوری",
+      "within_1_month": "ظرف ۱ ماه",
+      "within_3_months": "ظرف ۳ ماه",
+      "flexible": "منعطف"
+    },
+    "newsletterTitle": "عضویت در خبرنامه",
+    "newsletterPlaceholder": "you@example.com",
+    "newsletterSubmit": "عضویت",
+    "newsletterSuccess": "عضویت شما با موفقیت ثبت شد!"
+  },
+  "search": {
+    "title": "جستجو",
+    "placeholder": "جستجو در خدمات، پروژه‌ها، دوره‌ها، مقالات…",
+    "submit": "جستجو",
+    "resultsCount": "{count} نتیجه برای «{query}»",
+    "empty": "نتیجه‌ای یافت نشد.",
+    "prompt": "برای جستجو در کل سایت تایپ کنید."
+  },
+  "profile": {
+    "title": "حساب کاربری",
+    "loginTitle": "ورود",
+    "registerTitle": "ایجاد حساب",
+    "loginTab": "ورود",
+    "registerTab": "ایجاد حساب",
+    "emailLabel": "ایمیل",
+    "passwordLabel": "رمز عبور",
+    "firstNameLabel": "نام",
+    "lastNameLabel": "نام خانوادگی",
+    "loginSubmit": "ورود",
+    "registerSubmit": "ایجاد حساب",
+    "logout": "خروج",
+    "welcome": "خوش آمدید، {name}",
+    "favoritesHeading": "علاقه‌مندی‌ها",
+    "noFavorites": "هنوز چیزی ذخیره نکرده‌اید.",
+    "enrollmentsHeading": "دوره‌های من",
+    "noEnrollments": "هنوز در دوره‌ای ثبت‌نام نکرده‌اید.",
+    "error": "مشکلی پیش آمد. لطفاً اطلاعات را بررسی کنید."
+  },
+  "errors": {
+    "notFoundTitle": "صفحه پیدا نشد",
+    "notFoundDescription": "صفحه‌ای که دنبال آن هستید وجود ندارد یا جابه‌جا شده است.",
+    "notFoundCta": "بازگشت به خانه",
+    "serverErrorTitle": "مشکلی پیش آمد",
+    "serverErrorDescription": "خطای غیرمنتظره‌ای رخ داد. تیم ما در جریان قرار گرفت.",
+    "serverErrorCta": "تلاش مجدد"
+  }
+}

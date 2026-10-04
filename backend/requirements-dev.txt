@@ -1,0 +1,18 @@
+# وابستگی‌های توسعه/تست — روی هاست production نصب نمی‌شوند.
+-r requirements.txt
+
+# --- Type checking (قانون ۷: mypy strict) ---
+mypy==2.3.0                        # ۲.۴ هنوز با extras «compatible-mypy» django-stubs سازگار نیست
+django-stubs[compatible-mypy]==6.1.1
+djangorestframework-stubs==3.18.1
+types-PyMySQL==1.1.0.20250711
+types-requests==2.32.4.20250913    # stub رسمی برای requests (ADR-0024 — Kavenegar adapter)
+
+# --- تست ---
+pytest==9.1.1
+pytest-django==4.14.0
+factory-boy==3.3.3
+coverage==7.16.2
+
+# --- Lint/format ---
+ruff==0.16.10

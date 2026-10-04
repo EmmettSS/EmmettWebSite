@@ -1,0 +1,27 @@
+# این فایل باید روی هاست production به صورت backend/media/.htaccess کپی شود
+# (دایرکتوری media/ در .gitignore است و هیچ‌وقت مستقیماً commit نمی‌شود).
+#
+# هدف: طبق ADR-0005، حتی اگر یک فایل مخرب از لایهٔ اعتبارسنجی
+# apps/core/validators.py عبور کند، هرگز توسط Apache/Passenger به‌عنوان
+# اسکریپت قابل‌اجرا سرو نشود — media/ فقط باید فایل استاتیک سرو کند.
+#
+# نحوهٔ استفاده (در مرحلهٔ دیپلوی cPanel):
+#   cp backend/deploy/media.htaccess.example backend/media/.htaccess
+
+# غیرفعال‌کردن اجرای PHP در این دایرکتوری (در صورت فعال‌بودن ماژول PHP روی هاست).
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>
+
+# غیرفعال‌کردن اجرای CGI/اسکریپت از این مسیر.
+Options -ExecCGI -Indexes
+RemoveHandler cgi-script .cgi .pl .py .php .php3 .php4 .php5 .phtml
+AddType text/plain .php .php3 .php4 .php5 .phtml .cgi .pl .py
+
+# جلوگیری از سرو هر فایلی که پسوند اجرایی دارد (دفاع لایهٔ دوم).
+<FilesMatch "\.(php[0-9]?|phtml|pl|py|cgi|sh|exe)$">
+    Require all denied
+</FilesMatch>
