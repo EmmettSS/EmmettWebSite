@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_protect
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
@@ -19,6 +21,7 @@ from apps.leads.serializers import (
 )
 
 
+@method_decorator(csrf_protect, name="dispatch")
 class ContactCreateView(APIView):
     """فرم تماس عمومی — بدون نیاز به ورود، اما throttle سخت‌گیرانه (قانون ۱۶)."""
 
@@ -38,9 +41,12 @@ class ContactCreateView(APIView):
         # پایپ‌لاین فروش: هر Contact جدید یک Lead با status=new می‌سازد.
         Lead.objects.create(contact=contact)
         notify_new_contact(contact)
-        return Response(ContactResponseSerializer(contact).data, status=status.HTTP_201_CREATED)
+        response = Response(ContactResponseSerializer(contact).data, status=status.HTTP_201_CREATED)
+        response["Cache-Control"] = "no-store"
+        return response
 
 
+@method_decorator(csrf_protect, name="dispatch")
 class NewsletterSubscribeView(APIView):
     """عضویت خبرنامه — throttle طبق ADR-0006 (۳ درخواست/روز/IP)."""
 
@@ -52,7 +58,9 @@ class NewsletterSubscribeView(APIView):
         serializer = NewsletterCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response({"detail": "subscribed"}, status=status.HTTP_201_CREATED)
+        response = Response({"detail": "subscribed"}, status=status.HTTP_201_CREATED)
+        response["Cache-Control"] = "no-store"
+        return response
 
 
 __all__ = ["ContactCreateView", "NewsletterSubscribeView", "Newsletter"]

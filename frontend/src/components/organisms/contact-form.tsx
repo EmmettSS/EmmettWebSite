@@ -1,48 +1,58 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
+import { FormGroup } from "@/components/molecules/form-group";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { FormGroup } from "@/components/molecules/form-group";
 import { ApiError, submitContactForm } from "@/lib/api/client";
-
-const PROJECT_TYPES = ["website", "mobile_app", "security", "crm", "consulting", "other"] as const;
-const BUDGET_RANGES = ["under_50m", "50_150m", "150_500m", "over_500m", "not_sure"] as const;
-const TIMELINES = ["immediate", "within_1_month", "within_3_months", "flexible"] as const;
+import type { Catalog } from "@/lib/api/types";
 
 type Status = "idle" | "submitting" | "success" | "error";
 
-/**
- * فرم تماس — POST به ``/api/v1/leads/contact/`` (مسیر نسبی، پراکسی‌شده).
- * قبل از ارسال کوکی CSRF تضمین می‌شود (ر.ک. ``ensureCsrfCookie`` در
- * ``lib/api/client.ts``).
- */
-export function ContactForm() {
+interface ContactFormProps {
+  catalogs: Catalog[] | null;
+}
+
+function optionsFor(catalogs: Catalog[] | null, key: string) {
+  return catalogs?.find((catalog) => catalog.key === key)?.options ?? [];
+}
+
+/** Contact enums are served by the public DB Catalog API, never duplicated in the client. */
+export function ContactForm({ catalogs }: ContactFormProps) {
   const t = useTranslations("contact");
+  const locale = useLocale();
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const projectTypes = optionsFor(catalogs, "project_type");
+  const budgetRanges = optionsFor(catalogs, "budget_range");
+  const timelines = optionsFor(catalogs, "timeline");
+  const catalogsReady = projectTypes.length > 0 && budgetRanges.length > 0 && timelines.length > 0;
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const formElement = event.currentTarget;
     setStatus("submitting");
     setErrorMessage(null);
 
-    const form = new FormData(event.currentTarget);
+    const form = new FormData(formElement);
     try {
-      await submitContactForm({
-        name: String(form.get("name") ?? ""),
-        email: String(form.get("email") ?? ""),
-        phone: String(form.get("phone") ?? ""),
-        project_type: String(form.get("project_type") ?? "other"),
-        budget_range: String(form.get("budget_range") ?? "not_sure"),
-        timeline: String(form.get("timeline") ?? "flexible"),
-        message: String(form.get("message") ?? ""),
-        consent_given: form.get("consent_given") === "on",
-      });
+      await submitContactForm(
+        {
+          name: String(form.get("name") ?? ""),
+          email: String(form.get("email") ?? ""),
+          phone: String(form.get("phone") ?? ""),
+          project_type: String(form.get("project_type") ?? ""),
+          budget_range: String(form.get("budget_range") ?? ""),
+          timeline: String(form.get("timeline") ?? ""),
+          message: String(form.get("message") ?? ""),
+          consent_given: form.get("consent_given") === "on",
+        },
+        locale,
+      );
       setStatus("success");
-      event.currentTarget.reset();
+      formElement.reset();
     } catch (error) {
       setStatus("error");
       setErrorMessage(error instanceof ApiError ? error.message : t("error"));
@@ -53,6 +63,14 @@ export function ContactForm() {
     return (
       <p role="status" className="rounded-lg border border-border bg-secondary/30 p-4 text-sm text-foreground">
         {t("success")}
+      </p>
+    );
+  }
+
+  if (!catalogsReady) {
+    return (
+      <p role="status" className="rounded-lg border border-border bg-secondary/30 p-4 text-sm text-muted-foreground">
+        {t("catalogUnavailable")}
       </p>
     );
   }
@@ -75,12 +93,12 @@ export function ContactForm() {
         <select
           name="project_type"
           required
-          defaultValue="website"
+          defaultValue={projectTypes[0]?.key ?? ""}
           className="flex h-11 w-full rounded-sm border border-input bg-transparent px-3 py-2 text-sm text-foreground transition-colors duration-fast ease-emmett-standard focus-visible:border-primary focus-visible:bg-secondary/30 focus-visible:outline-none"
         >
-          {PROJECT_TYPES.map((value) => (
-            <option key={value} value={value}>
-              {t(`projectTypes.${value}`)}
+          {projectTypes.map((option) => (
+            <option key={option.key} value={option.key}>
+              {option.label}
             </option>
           ))}
         </select>
@@ -90,12 +108,12 @@ export function ContactForm() {
         <select
           name="budget_range"
           required
-          defaultValue="not_sure"
+          defaultValue={budgetRanges.find((option) => option.key === "not_sure")?.key ?? budgetRanges[0]?.key ?? ""}
           className="flex h-11 w-full rounded-sm border border-input bg-transparent px-3 py-2 text-sm text-foreground transition-colors duration-fast ease-emmett-standard focus-visible:border-primary focus-visible:bg-secondary/30 focus-visible:outline-none"
         >
-          {BUDGET_RANGES.map((value) => (
-            <option key={value} value={value}>
-              {t(`budgetRanges.${value}`)}
+          {budgetRanges.map((option) => (
+            <option key={option.key} value={option.key}>
+              {option.label}
             </option>
           ))}
         </select>
@@ -105,12 +123,12 @@ export function ContactForm() {
         <select
           name="timeline"
           required
-          defaultValue="flexible"
+          defaultValue={timelines.find((option) => option.key === "flexible")?.key ?? timelines[0]?.key ?? ""}
           className="flex h-11 w-full rounded-sm border border-input bg-transparent px-3 py-2 text-sm text-foreground transition-colors duration-fast ease-emmett-standard focus-visible:border-primary focus-visible:bg-secondary/30 focus-visible:outline-none"
         >
-          {TIMELINES.map((value) => (
-            <option key={value} value={value}>
-              {t(`timelines.${value}`)}
+          {timelines.map((option) => (
+            <option key={option.key} value={option.key}>
+              {option.label}
             </option>
           ))}
         </select>
@@ -121,6 +139,7 @@ export function ContactForm() {
           name="message"
           required
           rows={5}
+          maxLength={5000}
           className="flex w-full rounded-sm border border-input bg-transparent px-3 py-2 text-sm text-foreground transition-colors duration-fast ease-emmett-standard placeholder:text-muted-foreground focus-visible:border-primary focus-visible:bg-secondary/30 focus-visible:outline-none"
         />
       </FormGroup>

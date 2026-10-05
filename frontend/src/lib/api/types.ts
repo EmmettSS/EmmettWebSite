@@ -150,6 +150,7 @@ export interface BlogPostDetail extends BlogPostListItem {
   toc: TocEntry[];
   comments: Comment[];
   related_posts: BlogPostListItem[];
+  ai_summary: string | null;
   meta_title: string;
   meta_description: string;
   canonical_path: string;
@@ -232,4 +233,51 @@ export interface Enrollment {
   enrolled_at: string;
   completed_at: string | null;
   progress_percent: number;
+}
+
+export interface CatalogOption {
+  key: string;
+  label: string;
+  order: number;
+}
+
+export interface Catalog {
+  key: string;
+  label: string;
+  options: CatalogOption[];
+}
+
+export interface AIOptionLabel {
+  key: string;
+  label: string;
+}
+
+export interface AIConcept {
+  public_id: string;
+  position: number;
+  title: string;
+  description: string;
+  benefit: string;
+  solution_area: AIOptionLabel;
+  complexity: AIOptionLabel;
+  delivery_scope: AIOptionLabel;
+  minimum_working_days: number | null;
+  related_item: { type: "service" | "product"; title: string; slug: string } | null;
+}
+
+export interface AISuggestion {
+  public_id: string;
+  locale: "fa" | "en";
+  concepts: AIConcept[];
+}
+
+export interface AdvisorCreateResponse {
+  share_token: string;
+  suggestion: AISuggestion;
+}
+
+export interface ProjectEstimateResponse {
+  delivery_scope: string;
+  delivery_scope_label: string;
+  minimum_working_days: number | null;
 }

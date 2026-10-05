@@ -30,4 +30,6 @@ urlpatterns = [
     path("academy/", include("apps.academy.urls")),
     path("blog/", include("apps.blog.urls")),
     path("leads/", include("apps.leads.urls")),
+    path("ai/catalogs/", include("apps.ai_engine.catalog.urls")),
+    path("ai/", include("apps.ai_engine.pipelines.urls")),
 ]

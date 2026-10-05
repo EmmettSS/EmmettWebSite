@@ -2,8 +2,8 @@
 
 پروژهٔ Django 5.2 + DRF که API نسخه‌دار (`/api/v1/`) سایت امیت را سرو
 می‌کند. معماری کلان (Modular Monolith، مرزبندی اپ‌ها، i18n، احراز هویت و...)
-در `../ARCHITECTURE.md` و `docs/adr/0001` تا `0025` مستند شده؛ این فایل فقط
-راهنمای عملی توسعهٔ محلی است.
+در `../ARCHITECTURE.md` و ADRهای ریپو (تا `ADR-0026`) مستند شده؛ این فایل
+راهنمای عملی توسعه و عملیات محلی است.
 
 ## راه‌اندازی محلی
 
@@ -66,12 +66,34 @@ API روی <http://localhost:8000/api/v1/> بالا می‌آید؛ پنل اد�
 | `academy` | `Instructor`, `Course`, `Lesson`, `Enrollment` | `/academy/` |
 | `blog` | `BlogPost`, `Comment`, فید RSS | `/blog/` |
 | `leads` | `Contact`, `Lead` (پایپ‌لاین فروش)، `Newsletter` | `/leads/` |
+| `ai_engine` | Gateway مرکزی provider، Catalog/Prompt/Guardrail، advisor، estimator، audit و خلاصهٔ بلاگ | `/ai/` |
 | `api` | بدون مدل؛ فقط ترکیب URLهای بالا زیر `/api/v1/` + OpenAPI | — |
 
-`ai_engine` (دستیار هوشمند کشف نیاز + ابزار کمک‌محتوا) در `ARCHITECTURE.md`
-و `ADR-0009` **طراحی شده** اما عمداً پیاده‌سازی **نشده** — این دامنه به فاز ۵
-موکول شده (نیاز به تصمیم دربارهٔ ارائه‌دهندهٔ AI/کلید API دارد که خارج از
-scope فازهای ۰ تا ۴ است).
+## موتور AI (فاز ۵ — `ADR-0026`)
+
+تمام فراخوانی‌های مدل فقط از `apps.ai_engine` عبور می‌کنند. provider عمومی
+OpenAI-compatible بر پایهٔ `requests` است؛ SDK/dependency تازه‌ای اضافه نشده.
+AI به‌صورت پیش‌فرض خاموش است. برای فعال‌سازی در محیط مقصد، مقادیر واقعی را
+فقط در `.env` همان محیط تنظیم کنید: `AI_ENABLED`, `AI_API_BASE_URL`,
+`AI_API_KEY`, `AI_MODEL`; timeout پیش‌فرض ۱۵ ثانیه، TTL کش ۲۴ ساعت و
+retention audit پیش‌فرض ۳۶۵ روز است. `.env.example` فقط نام متغیرها و مقدارهای
+خالی دارد؛ secret هرگز در Git یا گفتگو قرار نگیرد.
+
+Endpointهای versioned و مستندشده در OpenAPI:
+
+- `/api/v1/ai/catalogs/` — فقط Catalogها و گزینه‌های عمومی/فعال، با label محلی‌شده.
+- `/api/v1/ai/advisor/` — حداکثر سه ایدهٔ اولیهٔ ساختاریافته؛ ورودی فقط کلیدهای Catalog.
+- `/api/v1/ai/results/{token}/` — نتیجهٔ share عمومی، noindex و فاقد ورودی/اطلاعات تماس.
+- `/api/v1/ai/leads/` — ساخت Contact با رضایت و Lead متصل به پیشنهاد/ایده؛ اطلاعات تماس به provider نمی‌رود.
+- `/api/v1/ai/estimates/` — تخمین deterministic حداقل روز کاری؛ بدون مبلغ و بدون provider.
+- خلاصهٔ تأییدشدهٔ مقاله به‌صورت `ai_summary` در جزئیات `/api/v1/blog/{slug}/` برمی‌گردد.
+
+کاتالوگ‌های bootstrap و قواعد اولیه با migration وارد می‌شوند؛ در Admin قابل
+ویرایش‌اند. خلاصهٔ بلاگ را ادمین/cron با `python manage.py generate_blog_summaries`
+می‌سازد؛ نتیجه تا تأیید ادمین Draft می‌ماند. برای نگه‌داشت audit یک‌ساله،
+`python manage.py purge_ai_audit --dry-run` را بررسی و سپس دستور
+`python manage.py purge_ai_audit` را در cron روزانه/هفتگی مقصد زمان‌بندی کنید.
+دادهٔ خلاصهٔ تأییدشده و ارتباط Lead هنگام purge audit حفظ می‌شوند.
 
 ## مستندات API
 
@@ -102,7 +124,11 @@ mypy apps config                        # type-check سخت‌گیرانه (stri
   فرانت‌اند باید اول `GET /api/v1/auth/csrf/` را صدا بزند تا کوکی
   `csrftoken` ست شود.
 - Rate limiting: `rest_framework.throttling.ScopedRateThrottle` سفارشی
-  (`apps/core/throttling.py`) روی فرم تماس، auth، عضویت خبرنامه (`ADR-0006`).
+  (`apps/core/throttling.py`) روی فرم تماس، auth، عضویت خبرنامه و همهٔ
+  endpointهای پرهزینهٔ AI (`ADR-0006`, `ADR-0026`).
+- AI audit: `AIRequest` operational لاگ بدون IP، user-agent و اطلاعات تماس؛
+  requester فقط HMAC pseudonym است و retention پیش‌فرض ۳۶۵ روز دارد.
+  `AIContentArtifact` و نتیجهٔ share محتوای ماندگار جدا از audit هستند.
 - حسابرسی: مدل `core.AuditLog` + تابع کمکی `log_action` رویدادهای حساس
   (ورود ناموفق/موفق، خروج، ثبت‌نام، تغییر نقش کاربر، حذف/بازیابی هر رکورد،
   تعدیل کامنت) را ثبت می‌کنند — `ADR-0013`. از پنل ادمین به‌صورت read-only
@@ -119,4 +145,7 @@ mypy apps config                        # type-check سخت‌گیرانه (stri
   فراخوانی `instance.delete()`/`instance.restore()` تکی پوشش داده شده.
 - CI/CD (GitHub Actions) هنوز تنظیم نشده — دستورات بالا باید فعلاً به‌صورت
   دستی قبل از هر PR اجرا شوند.
-- `ai_engine` (بالا توضیح داده شد) پیاده‌سازی نشده؛ فاز ۵.
+- `AI_ENABLED` در نمونهٔ `.env` خاموش است و provider واقعی تا واردکردن امن
+  تنظیمات env و آزمون دسترسی staging فعال نمی‌شود. دسترسی شبکهٔ هاست مقصد به
+  provider و زمان‌بندی cron برای purge audit/تولید خلاصه باید در staging/production
+  تنظیم و پایش شوند.

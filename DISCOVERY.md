@@ -215,6 +215,18 @@ provider واقعی هوش مصنوعی و مدیریت کلید API مربوط�
 دستیار کشف نیاز مشتری، و قواعد واقعی Guardrail/Prompt Template (نه فقط
 ساختار جدول آن‌ها).
 
+## به‌روزرسانی (فاز ۵ — تصمیمات و وضعیت implementation، 2026-10-05)
+
+فاز ۵ پس از Discovery و تأیید صریح Plan و `ADR-0026` اجرا شد. مرجع تصمیم‌های
+محصولی/فنی (provider عمومی OpenAI-compatible، Catalogهای DB، advisor با حداکثر
+سه ایده، نتیجهٔ share قابل‌لغو، CTA/Lead، تخمین بدون قیمت، خلاصهٔ بلاگ با
+بازبینی، retention یک‌ساله و privacy) همان `docs/adr/0026-ai-engine-implementation-and-creative-advisor.md`
+است. implementation شامل Gateway مرکزی، migrationهای Catalog/Contact، APIهای
+مستندشده، UI دوزبانهٔ advisor/estimator، مدل/فرمان خلاصه‌ساز و تست‌ها در فاز ۵
+تکمیل شده است؛ AI در محیط تازه به‌صورت پیش‌فرض خاموش می‌ماند تا تنظیم env مقصد
+با secret واقعی به‌طور امن انجام شود. جزئیات تغییرات و نتایج نهایی بررسی کیفیت
+در `CHANGELOG.md` و بخش ۳.۱۰ از `ARCHITECTURE.md` آمده‌اند.
+
 ## گام بعدی
 
 هر فاز جدید (Plan، ADR، Implementation و...) با دستور مشخص مالک محصول دربارهٔ دامنهٔ همان نشست آغاز می‌شود. این سند در طول پروژه به‌عنوان مرجع زمینه (context) نگه‌داری و در صورت تصمیمات بنیادین جدید به‌روزرسانی می‌شود.

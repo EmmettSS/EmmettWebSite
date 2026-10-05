@@ -1,8 +1,14 @@
 from __future__ import annotations
 
+import hashlib
+from typing import cast
+
+from django.contrib.contenttypes.models import ContentType
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
+from apps.ai_engine.models import AIContentArtifact
+from apps.ai_engine.utils import resolve_locale
 from apps.blog.models import BlogPost, Comment
 from apps.core.utils.markdown import extract_toc
 from apps.taxonomy.serializers import CategorySerializer, TagSerializer
@@ -52,6 +58,7 @@ class BlogPostDetailSerializer(serializers.ModelSerializer[BlogPost]):
     toc = serializers.SerializerMethodField()
     comments = serializers.SerializerMethodField()
     related_posts = serializers.SerializerMethodField()
+    ai_summary = serializers.SerializerMethodField()
 
     class Meta:
         model = BlogPost
@@ -71,6 +78,7 @@ class BlogPostDetailSerializer(serializers.ModelSerializer[BlogPost]):
             "toc",
             "comments",
             "related_posts",
+            "ai_summary",
             "meta_title",
             "meta_description",
             "canonical_path",
@@ -97,3 +105,29 @@ class BlogPostDetailSerializer(serializers.ModelSerializer[BlogPost]):
             .distinct()[:3]
         )
         return list(BlogPostListSerializer(related, many=True).data)
+
+    @extend_schema_field(serializers.CharField(allow_null=True))
+    def get_ai_summary(self, obj: BlogPost) -> str | None:
+        request = self.context.get("request")
+        locale = resolve_locale(request)
+        source = getattr(obj, f"content_{locale}", "") or obj.content
+        source_hash = hashlib.sha256(source.encode("utf-8")).hexdigest()
+        content_type = ContentType.objects.get_for_model(obj, for_concrete_model=False)
+        artifact = cast(
+            AIContentArtifact | None,
+            AIContentArtifact.objects.filter(
+                content_type=content_type,
+                object_id=obj.pk,
+                locale=locale,
+                status=AIContentArtifact.Status.APPROVED,
+                is_stale=False,
+                is_active=True,
+                deleted_at__isnull=True,
+            )
+            .only("summary_text", "source_hash")
+            .order_by("-created_at")
+            .first(),
+        )
+        if artifact is None or artifact.source_hash != source_hash:
+            return None
+        return artifact.summary_text

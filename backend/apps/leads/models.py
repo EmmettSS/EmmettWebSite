@@ -1,11 +1,4 @@
-"""Contact، Lead، Newsletter — فرم تماس/پایپ‌لاین فروش/خبرنامه.
-
-نکته دربارهٔ مرز ``ai_engine`` (خارج از scope فاز ۴ طبق تصمیم کاربر): فیلد
-``Lead.ai_suggestion`` که در ``ARCHITECTURE.md`` فاز ۱ پیش‌بینی شده بود، در
-این فاز **عمداً حذف شده** چون اپ ``ai_engine`` و مدل ``AISuggestion`` هنوز
-ساخته نشده‌اند. وقتی آن اپ در فاز بعد ساخته شد، این FK باید به‌صورت migration
-مجزا اضافه شود.
-"""
+"""Contact، Lead، Newsletter — فرم تماس، پیگیری فروش و خبرنامه."""
 
 from __future__ import annotations
 
@@ -13,6 +6,7 @@ import secrets
 import uuid
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -24,28 +18,7 @@ def generate_confirmation_token() -> str:
 
 
 class Contact(BaseModel):
-    """ثبت خام فرم تماس — enumهای بسته باید با ai_engine هم‌راستا بمانند."""
-
-    class ProjectType(models.TextChoices):
-        WEBSITE = "website", _("Website")
-        MOBILE_APP = "mobile_app", _("Mobile App")
-        SECURITY = "security", _("Security / Pentest")
-        CRM = "crm", _("CRM")
-        CONSULTING = "consulting", _("Consulting")
-        OTHER = "other", _("Other")
-
-    class BudgetRange(models.TextChoices):
-        UNDER_50M = "under_50m", _("Under 50M Toman")
-        R_50_150M = "50_150m", _("50-150M Toman")
-        R_150_500M = "150_500m", _("150-500M Toman")
-        OVER_500M = "over_500m", _("Over 500M Toman")
-        NOT_SURE = "not_sure", _("Not sure yet")
-
-    class Timeline(models.TextChoices):
-        IMMEDIATE = "immediate", _("Immediate")
-        WITHIN_1_MONTH = "within_1_month", _("Within 1 month")
-        WITHIN_3_MONTHS = "within_3_months", _("Within 3 months")
-        FLEXIBLE = "flexible", _("Flexible")
+    """ثبت درخواست تماس؛ customer-facing enums از Catalogهای فعال خوانده می‌شوند."""
 
     class Source(models.TextChoices):
         WEBSITE_FORM = "website_form", _("Website Form")
@@ -56,13 +29,29 @@ class Contact(BaseModel):
     name = models.CharField(_("name"), max_length=150)
     email = models.EmailField(_("email"))
     phone = models.CharField(_("phone"), max_length=20, blank=True, default="")
-    project_type = models.CharField(_("project type"), max_length=20, choices=ProjectType.choices)
-    budget_range = models.CharField(_("budget range"), max_length=20, choices=BudgetRange.choices)
-    timeline = models.CharField(_("timeline"), max_length=20, choices=Timeline.choices)
-    message = models.TextField(_("message"), max_length=5000)
-    source = models.CharField(
-        _("source"), max_length=20, choices=Source.choices, default=Source.WEBSITE_FORM
+    project_type = models.ForeignKey(
+        "ai_engine.CatalogOption",
+        verbose_name=_("project type"),
+        on_delete=models.PROTECT,
+        related_name="project_contacts",
+        limit_choices_to={"catalog__key": "project_type"},
     )
+    budget_range = models.ForeignKey(
+        "ai_engine.CatalogOption",
+        verbose_name=_("budget range"),
+        on_delete=models.PROTECT,
+        related_name="budget_contacts",
+        limit_choices_to={"catalog__key": "budget_range"},
+    )
+    timeline = models.ForeignKey(
+        "ai_engine.CatalogOption",
+        verbose_name=_("timeline"),
+        on_delete=models.PROTECT,
+        related_name="timeline_contacts",
+        limit_choices_to={"catalog__key": "timeline"},
+    )
+    message = models.TextField(_("message"), max_length=5000)
+    source = models.CharField(_("source"), max_length=20, choices=Source.choices, default=Source.WEBSITE_FORM)
     consent_given = models.BooleanField(_("consent given"), default=False)
     ip_address = models.GenericIPAddressField(_("IP address"), null=True, blank=True)
     user_agent = models.CharField(_("user agent"), max_length=500, blank=True, default="")
@@ -74,6 +63,21 @@ class Contact(BaseModel):
 
     def __str__(self) -> str:
         return f"{self.name} <{self.email}>"
+
+    def clean(self) -> None:
+        super().clean()
+        expected_catalogs = {
+            "project_type": "project_type",
+            "budget_range": "budget_range",
+            "timeline": "timeline",
+        }
+        errors: dict[str, str] = {}
+        for field_name, catalog_key in expected_catalogs.items():
+            option = getattr(self, field_name, None)
+            if option is not None and option.catalog.key != catalog_key:
+                errors[field_name] = str(_("Select an option from the correct catalog."))
+        if errors:
+            raise ValidationError(errors)
 
 
 class Lead(BaseModel):
@@ -88,6 +92,20 @@ class Lead(BaseModel):
     public_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False, db_index=True)
     contact = models.ForeignKey(
         Contact, null=True, blank=True, on_delete=models.SET_NULL, related_name="leads"
+    )
+    ai_suggestion = models.ForeignKey(
+        "ai_engine.AISuggestion",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="leads",
+    )
+    ai_concept = models.ForeignKey(
+        "ai_engine.AIConcept",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="leads",
     )
     assigned_to = models.ForeignKey(
         settings.AUTH_USER_MODEL,

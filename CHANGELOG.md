@@ -2,6 +2,57 @@
 
 فرمت این فایل بر اساس [Keep a Changelog](https://keepachangelog.com/) است. هر فاز پروژه یک بخش مستقل دارد.
 
+## [فاز ۵ — موتور AI و مشاور ایده‌پرداز] — 2026-10-05
+
+فاز ۵ بر پایهٔ Plan و `ADR-0026` تأییدشده پیاده‌سازی شد؛ جزئیات طراحی و
+تصمیم‌های محصولی در ADR، `ARCHITECTURE.md`، `README.md` و راهنمای هر دو بخش
+ثبت شده‌اند.
+
+### افزوده‌شده
+
+- اپ مرکزی `backend/apps/ai_engine`: adapter عمومی OpenAI-compatible با
+  `requests` موجود، Catalog/Prompt/Guardrailهای DB، pipeline مشاور با حداکثر
+  سه ایده، نتیجهٔ share عمومی با token تصادفیِ hash‌شده و قابلیت revoke،
+  تخمین‌گر deterministic بدون هزینهٔ عددی، audit/cache/rate limit، و خلاصه‌ساز
+  مقالات منتشرشده که Draft می‌سازد تا ادمین آن را تأیید کند.
+- migration یکپارچه‌سازی `Contact` با Catalogهای DB، با حفظ stable keyهای
+  فعلی؛ اتصال Lead به پیشنهاد و ایدهٔ انتخاب‌شده؛ UI ترجمه‌شدهٔ `/advisor`،
+  `/advisor/results/[token]` و `/estimate` در فارسی/انگلیسی.
+- خلاصهٔ AI فقط پس از تأیید ادمین از API مقاله برمی‌گردد؛ تغییر محتوای اصلی
+  خلاصهٔ قبلی را stale می‌کند. دستورهای seed و purge یک‌سالهٔ audit نیز اضافه‌اند.
+
+### سخت‌سازی
+
+- محافظت CSRF برای POSTهای عمومی Contact، Newsletter و AI؛ پاسخ‌های Contact،
+  Newsletter، estimator و AI Lead با `Cache-Control: no-store`.
+- CSP با nonce یکتا در `src/proxy.ts` و dynamic SSR در layout؛ HSTS فقط در
+  production. `frame-ancestors` عمداً تا تعیین دامنهٔ production تنظیم نشده
+  تا preview داخل iframe قابل استفاده بماند.
+- ورودی کاربر به provider محدود به کلیدهای Catalog فعال است؛ متن آزاد و اطلاعات
+  تماس وارد prompt/audit نمی‌شود. Audit فاقد IP و user-agent است؛ خطای provider
+  و خروجی ردشده به‌شکل کنترل‌شده مدیریت می‌شوند.
+
+### اعتبارسنجی فاز ۵
+
+- بک‌اند: **257 passed**؛ Ruff check، mypy، `manage.py check`، migration check
+  و OpenAPI `--validate --fail-on-warn` موفق.
+- فرانت‌اند: lint و TypeScript موفق؛ Vitest **19 passed در 4 فایل**؛ build
+  production موفق و routeهای locale به‌شکل dynamic SSR گزارش شدند.
+- smoke test روی build واقعی: CSP/nonce روی script، هدرهای امنیتی و تخمین از
+  مسیر same-origin proxy با CSRF تأیید شدند. provider واقعی عمداً فعال نشد.
+- `ruff format --check .` هنوز 19 فایل قدیمیِ خارج از scope فاز ۵ را
+  unformatted گزارش می‌کند؛ برای پرهیز از diff نامرتبط، format سراسری اعمال نشد.
+
+### محدودیت‌های محیط/تحویل
+
+- AI به‌صورت پیش‌فرض خاموش است؛ اتصال provider واقعی نیازمند تنظیم امن env در
+  staging/production است. هیچ کلیدی در Git یا گفتگو قرار نگرفت.
+- E2E واقعی Playwright به‌دلیل نبود browser binary در sandbox اجرا نشد؛
+  `frontend/e2e/README.md` پیش‌نیاز و محدودیت محیط را ثبت می‌کند.
+- امتیاز Lighthouse (هدف پروژه ≥95) در این محیط اندازه‌گیری نشد؛ باید روی
+  دامنه و زیرساخت مقصد بررسی شود. تعیین `frame-ancestors` نیز تا مشخص‌شدن
+  دامنهٔ رسمی production باز می‌ماند.
+
 ## [فاز ۴ — بازبینی و سخت‌سازی پیش از PR] — 2026-10-04
 
 مرور کامل فازهای ۰ تا ۴ (کد، ADRها، تست‌ها) پیش از باز شدن اولین Pull

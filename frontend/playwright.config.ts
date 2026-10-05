@@ -9,12 +9,10 @@ import { defineConfig, devices } from "@playwright/test";
  * - ``en``: baseURL با پیشوند ``/en``، فقط ``locale.spec.ts`` (نوشته‌شده با
  *   مسیرهای نسبیِ بدون اسلش ابتدایی تا نسبت به baseURL هر پروژه resolve شود).
  *
- * طبق ADR-0023، E2E باید در برابر یک build واقعی اجرا شود (نه ``next dev``)
- * چون صفحات فهرست (``/services``, ``/projects``, ``/academy``, ``/blog``,
- * ``/about``) با ISR (``revalidate: 60``) در زمان build پیش‌رندر می‌شوند؛
- * بک‌اند Django باید **پیش از** اجرای ``next build`` در دسترس و seed شده
- * باشد وگرنه این صفحات با دادهٔ خالی baked خواهند شد (جزئیات در
- * ``e2e/README.md``).
+ * طبق ADR-0023، E2E باید در برابر یک build واقعی اجرا شود (نه ``next dev``).
+ * CSP nonce در ``src/proxy.ts`` رندر صفحات را به SSR پویا می‌برد؛ بک‌اند
+ * Django باید پیش از اجرای تست بالا و seed شده باشد، اما لازم نیست هنگام
+ * ``next build`` در دسترس باشد (جزئیات در ``e2e/README.md``).
  */
 export default defineConfig({
   testDir: "./e2e",
@@ -40,8 +38,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    // ``build`` قبل از ``start`` تضمین می‌کند صفحات ISR با دادهٔ واقعی
-    // بک‌اند (که باید از قبل در حال اجرا و seed‌شده باشد) prerender شوند.
+    // build واقعی طبق ADR-0023؛ داده‌های backend با SSR هنگام اجرای تست خوانده می‌شوند.
     command: "npm run build && npm run start -- -p 3000 -H 0.0.0.0",
     url: "http://127.0.0.1:3000",
     reuseExistingServer: true,
