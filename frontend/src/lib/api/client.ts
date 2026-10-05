@@ -1,10 +1,12 @@
 "use client";
 
 import type {
+  AdvisorCreateResponse,
   Enrollment,
   Favorite,
   Me,
   Paginated,
+  ProjectEstimateResponse,
   SearchResponse,
 } from "./types";
 
@@ -62,13 +64,14 @@ export async function ensureCsrfCookie(): Promise<void> {
   await fetch("/api/v1/auth/csrf/", { credentials: "include" });
 }
 
-async function csrfProtectedFetch<T>(path: string, init: RequestInit): Promise<T> {
+async function csrfProtectedFetch<T>(path: string, init: RequestInit, locale = "fa"): Promise<T> {
   await ensureCsrfCookie();
   const csrfToken = getCookie("csrftoken") ?? "";
   return clientFetch<T>(path, {
     ...init,
     headers: {
       "X-CSRFToken": csrfToken,
+      "Accept-Language": locale,
       ...init.headers,
     },
   });
@@ -120,11 +123,71 @@ export const submitContactForm = (data: {
   timeline: string;
   message: string;
   consent_given: boolean;
-}) =>
-  csrfProtectedFetch<{ public_id: string; name: string; created_at: string }>("/leads/contact/", {
-    method: "POST",
-    body: JSON.stringify(data),
-  });
+}, locale = "fa") =>
+  csrfProtectedFetch<{ public_id: string; name: string; created_at: string }>(
+    "/leads/contact/",
+    { method: "POST", body: JSON.stringify(data) },
+    locale,
+  );
+
+
+export const createAdvisorSuggestion = (
+  data: {
+    job_role: string;
+    business_size: string;
+    city_scale: string;
+    budget_range: string;
+    team_size: string;
+    goals: string[];
+  },
+  locale: string,
+) =>
+  csrfProtectedFetch<AdvisorCreateResponse>(
+    "/ai/advisor/",
+    { method: "POST", body: JSON.stringify(data) },
+    locale,
+  );
+
+export const estimateProject = (
+  data: {
+    job_role: string;
+    business_size: string;
+    city_scale: string;
+    budget_range: string;
+    team_size: string;
+    goals: string[];
+    delivery_scope: string;
+  },
+  locale: string,
+) =>
+  csrfProtectedFetch<ProjectEstimateResponse>(
+    "/ai/estimates/",
+    { method: "POST", body: JSON.stringify(data) },
+    locale,
+  );
+
+export const submitAdvisorLead = (
+  data: {
+    share_token: string;
+    concept_public_id: string;
+    contact: {
+      name: string;
+      email: string;
+      phone: string;
+      project_type: string;
+      budget_range: string;
+      timeline: string;
+      message: string;
+      consent_given: boolean;
+    };
+  },
+  locale: string,
+) =>
+  csrfProtectedFetch<{ public_id: string; name: string; created_at: string }>(
+    "/ai/leads/",
+    { method: "POST", body: JSON.stringify(data) },
+    locale,
+  );
 
 export const subscribeNewsletter = (data: { email: string; locale_preference?: string }) =>
   csrfProtectedFetch<{ detail: string }>("/leads/newsletter/", {

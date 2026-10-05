@@ -18,15 +18,10 @@ const nextConfig: NextConfig = {
   // اسلش پایانی را حذف و ریدایرکت ۳۰۸ می‌دهد.
   skipTrailingSlashRedirect: true,
 
-  // سخت‌سازی پایهٔ HTTP (فاز ۴ — بازبینی/سخت‌سازی): این‌ها مکمل
-  // SECURE_* تنظیمات Django هستند که فقط پاسخ‌های بک‌اند را پوشش می‌دهند،
-  // نه صفحات HTML رندرشده توسط Next.js. عمداً از ``X-Frame-Options`` /
-  // ``Content-Security-Policy: frame-ancestors`` صرف‌نظر شده: محیط‌های
-  // پیش‌نمایش توسعه (از جمله sandbox این پروژه) سایت را داخل یک iframe
-  // از یک origin دیگر نمایش می‌دهند و این هدرها آن را کاملاً می‌بندند؛
-  // تصمیم نهایی دربارهٔ frame-ancestors باید در فاز Deployment با دامنهٔ
-  // واقعی production گرفته شود، نه اینجا با یک مقدار حدسی که محیط توسعه
-  // را خراب می‌کند.
+  // سخت‌سازی پایهٔ HTTP (فازهای ۴/۵): این هدرها مکمل SECURE_* جنگو هستند.
+  // CSP با nonce در src/proxy.ts ست می‌شود تا با hydration سازگار بماند؛
+  // عمداً frame-ancestors/X-Frame-Options تنظیم نشده تا iframe پیش‌نمایش
+  // sandbox کار کند. برای production دامنهٔ واقعی باید allowlist مشخص شود.
   async headers() {
     return [
       {
@@ -38,6 +33,14 @@ const nextConfig: NextConfig = {
             key: "Permissions-Policy",
             value: "camera=(), microphone=(), geolocation=()",
           },
+          ...(process.env.NODE_ENV === "production"
+            ? [
+                {
+                  key: "Strict-Transport-Security",
+                  value: "max-age=31536000; includeSubDomains; preload",
+                },
+              ]
+            : []),
         ],
       },
     ];

@@ -51,6 +51,7 @@ LOCAL_APPS = [
     "apps.academy",
     "apps.blog",
     "apps.leads",
+    "apps.ai_engine",
     "apps.api",
 ]
 
@@ -198,6 +199,17 @@ LEADS_NOTIFICATION_PHONE = env("LEADS_NOTIFICATION_PHONE", default="")
 LEADS_NOTIFICATION_EMAIL = env("LEADS_NOTIFICATION_EMAIL", default="")
 
 # ---------------------------------------------------------------------------
+# AI gateway (ADR-0026) — provider secrets are supplied only via environment.
+# ---------------------------------------------------------------------------
+AI_ENABLED = env.bool("AI_ENABLED", default=False)
+AI_API_BASE_URL = env("AI_API_BASE_URL", default="").rstrip("/")
+AI_API_KEY = env("AI_API_KEY", default="")
+AI_MODEL = env("AI_MODEL", default="")
+AI_TIMEOUT_SECONDS = env.float("AI_TIMEOUT_SECONDS", default=15.0)
+AI_CACHE_TTL_SECONDS = env.int("AI_CACHE_TTL_SECONDS", default=86400)
+AI_AUDIT_RETENTION_DAYS = env.int("AI_AUDIT_RETENTION_DAYS", default=365)
+
+# ---------------------------------------------------------------------------
 # Django REST Framework (ADR-0012, ADR-0014)
 # ---------------------------------------------------------------------------
 REST_FRAMEWORK = {
@@ -221,8 +233,6 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_RATES": {
         "anon": env("THROTTLE_RATE_ANON", default="100/hour"),
         "user": env("THROTTLE_RATE_USER", default="1000/hour"),
-        # "ai_engine" برای فاز ۵ (ر.ک. ADR-0009) از هم‌اکنون رزرو شده؛ هنوز هیچ
-        # view ای از آن استفاده نمی‌کند.
         "contact_form": env("THROTTLE_RATE_CONTACT", default="5/hour"),
         "ai_engine": env("THROTTLE_RATE_AI", default="20/hour"),
         "auth": env("THROTTLE_RATE_AUTH", default="10/hour"),
@@ -240,6 +250,9 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
     "SCHEMA_PATH_PREFIX": r"/api/v1",
+    "ENUM_NAME_OVERRIDES": {
+        "LocalePreferenceEnum": [("fa", "فارسی"), ("en", "English")],
+    },
 }
 
 # ---------------------------------------------------------------------------

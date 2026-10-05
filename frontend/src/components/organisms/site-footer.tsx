@@ -2,7 +2,7 @@ import { useTranslations } from "next-intl";
 
 import { Link } from "@/i18n/navigation";
 
-const FOOTER_LINKS = ["services", "products", "projects", "library", "academy", "about", "contact"] as const;
+const FOOTER_LINKS = ["services", "products", "projects", "library", "academy", "advisor", "estimate", "about", "contact"] as const;
 
 export function SiteFooter() {
   const t = useTranslations("footer");

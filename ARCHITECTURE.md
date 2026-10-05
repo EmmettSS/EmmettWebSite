@@ -1,9 +1,9 @@
 # ARCHITECTURE.md — معماری و مدل دادهٔ پروژهٔ امیت (فاز ۱)
 
-**وضعیت:** پیش‌نویس مصوب برای شروع Implementation — منتظر تأیید نهایی مالک محصول
+**وضعیت سند:** مرجع معماری و مدل دادهٔ مصوب فاز ۱؛ پیاده‌سازی در فازهای بعد طبق ADRها تکمیل شده است.
 **ورودی این سند:** `DISCOVERY.md` (تصمیمات بنیادین فاز ۰) + پاسخ‌های مالک محصول به سؤالات فاز ۱
-**خروجی این فاز:** این فایل + ERD (بخش ۴) + ۱۰ ADR در `docs/adr/`
-**قانون حاکم:** تا تأیید صریح این سند، هیچ کد Implementation (مدل Django واقعی، migration، endpoint) نوشته نمی‌شود.
+**خروجی اولیه:** این فایل + ERD (بخش ۴) + ۱۰ ADR در `docs/adr/`
+**یادداشت وضعیت:** این سند طراحی اولیه را نگه می‌دارد؛ تغییرات پذیرفته‌شدهٔ بعدی، از جمله scope نهایی AI، در `ADR-0026` و `CHANGELOG.md` ثبت شده‌اند.
 
 ---
 
@@ -147,23 +147,26 @@ backend/
 
 | مدل | فیلدهای کلیدی | توضیح |
 |---|---|---|
-| `Contact` `[public_id]` | `name`، `email`، `phone` (nullable)، `project_type` (Enum بسته)، `budget_range` (Enum بسته)، `timeline` (Enum بسته)، `message`، `source` (website_form/ai_assistant/referral)، `consent_given` (bool)، `ip_address`، `user_agent`، `created_at` | ثبت خام فرم تماس؛ فیلدهای Enum با همان لیست‌های بستهٔ مورد استفادهٔ `ai_engine` هم‌راستا هستند |
-| `Lead` `[public_id]` | `contact→Contact` (nullable — ممکن است مستقیماً از AI ساخته شود)، `assigned_to→User` (nullable)، `status` (new/contacted/qualified/proposal/won/lost)، `priority_score` (int، قابل‌تنظیم توسط AISuggestion)، `ai_suggestion→AISuggestion` (nullable)، `notes`، `created_at`، `updated_at` | پایپ‌لاین فروش جدا از Contact (تصمیم فاز۱) |
-| `Newsletter` | `email`، `phone` (nullable)، `locale_preference`، `is_confirmed`، `confirmation_token`، `subscribed_at`، `unsubscribed_at` | عضویت خبرنامه با Double Opt-in |
+| `Contact` `[public_id]` | `name`، `email`، `phone`، `project_type→CatalogOption`، `budget_range→CatalogOption`، `timeline→CatalogOption`، `message`، `source`، `consent_given`، `ip_address`، `user_agent` | stable keyهای قبلی فرم در Catalogهای DB نگه‌داری می‌شوند؛ Contact ساخته‌شده از AI مقدار IP/user-agent ندارد |
+| `Lead` `[public_id]` | `contact→Contact` (nullable)، `assigned_to→User` (nullable)، `status`، `priority_score`، `ai_suggestion→AISuggestion` (nullable)، `ai_concept→AIConcept` (nullable)، `notes` | پایپ‌لاین فروش به نتیجه و ایدهٔ AI مرتبط می‌شود؛ دادهٔ تماس در audit مدل ذخیره نمی‌شود |
+| `Newsletter` | `email`، `phone`، `locale_preference`، `is_confirmed`، `confirmation_token`، `subscribed_at`، `unsubscribed_at` | عضویت خبرنامه با Double Opt-in |
 
-### ۳.۱۰ اپ `ai_engine`
+### ۳.۱۰ اپ `ai_engine` *(implementation فاز ۵؛ `ADR-0026`)*
 
-> **وضعیت (مرور فاز ۴):** جدول‌های زیر فقط طراحی معماری‌اند و هنوز هیچ‌کدام
-> پیاده‌سازی/migrate نشده‌اند. `ai_engine` رسماً به **فاز ۵** موکول شده
-> (ر.ک. به‌روزرسانی انتهای `DISCOVERY.md`)؛ این بخش به‌عنوان مرجع طراحی
-> برای آن فاز حفظ می‌شود، نه یک کار نیمه‌کاره از فازهای ۰ تا ۴.
+تمام قابلیت‌های AI فقط از Gateway این اپ استفاده می‌کنند. provider adapter عمومی
+OpenAI-compatible با `requests` موجود است؛ فعال‌سازی از env انجام می‌شود و پیش‌فرض
+خاموش است. ورودی‌های مشاور/تخمین فقط keyهای فعال Catalog هستند؛ ورودی آزاد یا
+اطلاعات تماس به provider فرستاده نمی‌شود. Cache و rate limit روی advisor اعمال
+می‌شوند؛ خروجی عمومی share بدون ورودی‌ها/اطلاعات تماس است و `noindex` می‌شود.
 
-| مدل | فیلدهای کلیدی | توضیح |
-|---|---|---|
-| `AIRequest` `[public_id]` | `feature` (Enum: lead_discovery_assistant / content_helper)، `user→User` (nullable, مهمان مجاز)، `session_id`، `locale`، `input_payload (JSON — فقط مقادیر از Enum بسته)`، `status` (pending/completed/failed/blocked_by_guardrail)، `provider`، `model_name`، `prompt_template_version`، `latency_ms`، `error_message`، `created_at`، `completed_at` | هیچ فیلد free-text برای ورودی کاربر نهایی ذخیره نمی‌شود — طبق قانون ۱۳ |
-| `AISuggestion` | `request→AIRequest (OneToOne)`، `output_payload (JSON)`، `summary_text` (تولیدشده از قالب، نه خروجی خام مدل)، `confidence_score`، `guardrail_flags (JSON list)`، `is_shown_to_user` (bool)، `linked_lead→Lead` (nullable) | |
-| `GuardrailRule` | `rule_key`، `description`، `rule_type` (keyword_blocklist/cultural_sensitivity/topic_restriction)، `config (JSON)`، `severity`، `is_active` | قابل‌مدیریت در ادمین بدون نیاز به دیپلوی مجدد (قانون ۱۴) |
-| `PromptTemplate` | `feature`، `locale`، `version`، `template_text`، `is_active`، `created_by→User`، `created_at` | نسخهٔ اول می‌تواند با مقادیر ثابت در کد شروع شود؛ جدول از روز اول برای حسابرسی و تغییر بدون دیپلوی طراحی شده (ر.ک. ADR-0009) |
+| مدل | مسئولیت و دادهٔ کلیدی |
+|---|---|
+| `Catalog`, `CatalogOption` | keyهای پایدار، labelهای فارسی/انگلیسی، active/public و metadata؛ تمام گزینه‌های customer-facing از DB مدیریت می‌شوند. |
+| `AIRequest` `[public_id]` | audit عملیاتی feature/locale، فقط انتخاب‌های ساختاریافته، hash درخواست، HMAC pseudonym، provider/model/prompt version، latency/token/cache/guardrail metadata و status؛ بدون IP، user-agent و اطلاعات تماس. retention پیش‌فرض ۳۶۵ روز است. |
+| `AISuggestion`, `AIConcept` | پیشنهاد versioned با یک تا سه ایدهٔ دوبله، دسته‌های Catalog، حداقل روز کاری اختیاری، ارتباط اختیاری با Service/Product و hash توکن اشتراک قابل‌لغو. raw token فقط در پاسخ ایجاد share برمی‌گردد. |
+| `EstimationRule` | حداقل زمان خوش‌بینانه و غیرتعهدآور بر حسب روز کاری از Catalog scope؛ تخمین deterministic است و هیچ هزینه‌ای تولید نمی‌کند. |
+| `PromptTemplate`, `GuardrailRule` | Prompt نسخه‌دار و قواعد فرهنگی/موضوعی DB-driven برای pre/post guardrail؛ تغییرات تنظیمات از admin audit می‌شوند. |
+| `AIContentArtifact` | خلاصهٔ مقاله با source hash، locale و وضعیت draft/approved/rejected؛ متن تغییرکرده stale می‌شود و فقط پس از تأیید ادمین نمایش عمومی می‌یابد. رابطهٔ audit آن nullable است تا purge لاگ محتوای تأییدشده را حذف نکند. |
 
 ---
 
@@ -178,7 +181,6 @@ erDiagram
     USER ||--o{ COMMENT : "writes"
     USER ||--o{ LEAD : "assigned_to"
     USER ||--o{ MEDIA : "uploads"
-    USER ||--o{ AIREQUEST : "initiates (optional)"
     USER ||--o{ AUDITLOG : "actor (optional)"
 
     CATEGORY ||--o{ CATEGORY : "parent/children"
@@ -202,9 +204,13 @@ erDiagram
     BLOGPOST ||--o{ COMMENT : "has"
     COMMENT ||--o{ COMMENT : "replies (parent)"
 
-    CONTACT ||--o| LEAD : "may become"
-    LEAD ||--o| AISUGGESTION : "informed by"
-    AIREQUEST ||--|| AISUGGESTION : "produces"
+    CONTACT ||--o{ LEAD : "may become"
+    AISUGGESTION ||--o{ LEAD : "informs"
+    AIREQUEST ||--o| AISUGGESTION : "may produce"
+    AISUGGESTION ||--o{ AICONCEPT : "contains"
+    CATALOG ||--o{ CATALOGOPTION : "contains"
+    CATALOGOPTION ||--o{ AICONCEPT : "categorizes"
+    BLOGPOST ||--o{ AICONTENTARTIFACT : "has reviewed summary"
 
     MEDIA ||--o{ TEAMMEMBER : "photo"
     MEDIA ||--o{ TESTIMONIAL : "author_photo"
@@ -309,12 +315,16 @@ erDiagram
     CONTACT {
         uuid public_id UK
         bigint id PK
-        string project_type
-        string status
+        bigint project_type_id FK
+        bigint budget_range_id FK
+        bigint timeline_id FK
+        string source
     }
     LEAD {
         uuid public_id UK
         bigint id PK
+        bigint ai_suggestion_id FK
+        bigint ai_concept_id FK
         string status
         int priority_score
     }
@@ -328,13 +338,50 @@ erDiagram
         bigint id PK
         string feature
         string status
-        json input_payload
+        json structured_input
+        string requester_hash
+        string request_hash
     }
     AISUGGESTION {
+        uuid public_id UK
         bigint id PK
         bigint request_id FK
-        json output_payload
-        json guardrail_flags
+        string share_token_hash UK
+        datetime share_revoked_at
+    }
+    AICONCEPT {
+        uuid public_id UK
+        bigint id PK
+        bigint suggestion_id FK
+        bigint solution_area_id FK
+        bigint complexity_id FK
+        bigint delivery_scope_id FK
+    }
+    CATALOG {
+        bigint id PK
+        string key UK
+        string label_fa
+        string label_en
+    }
+    CATALOGOPTION {
+        bigint id PK
+        bigint catalog_id FK
+        string key
+        string label_fa
+        string label_en
+    }
+    ESTIMATIONRULE {
+        bigint id PK
+        bigint delivery_scope_id FK
+        int minimum_working_days
+    }
+    AICONTENTARTIFACT {
+        bigint id PK
+        bigint request_id FK
+        string locale
+        string source_hash
+        string status
+        bool is_stale
     }
     GUARDRAILRULE {
         bigint id PK
@@ -387,7 +434,7 @@ erDiagram
 - بدون Redis/Memcached در فاز اول (طبق فرض محافظه‌کارانهٔ هاست در `DISCOVERY.md`).
 - **Cache:** `django.core.cache.backends.filebased.FileBasedCache` به‌عنوان پیش‌فرض production (مشترک بین پردازه‌های Passenger، بدون سرویس اضافه)؛ `LocMemCache` فقط برای توسعهٔ محلی/تست. تنظیم از طریق env (`CACHE_BACKEND`) تا در صورت فراهم‌شدن Redis در آینده فقط با تغییر env سوییچ شود، بدون تغییر کد.
 - موارد کش‌شونده: `SiteSettings`، جدول `Translation`، لیست‌های published محتوا (Service/Project/Course/BlogPost) با invalidation در `post_save`/`post_delete`.
-- **Rate Limiting:** کتابخانهٔ سبک `django-ratelimit` (مبتنی بر همان cache backend، بدون نیاز به Redis) روی: فرم تماس (`Contact`)، ثبت‌نام/ورود (`accounts`)، تمام endpointهای `ai_engine` (محدودیت سخت‌گیرانه‌تر به دلیل هزینهٔ فراخوانی مدل)، و فرم خبرنامه.
+- **Rate Limiting:** `ScopedRateThrottle` سفارشی در DRF روی فرم تماس، ثبت‌نام/ورود، endpointهای `ai_engine` (محدودیت هزینه‌ای)، و فرم خبرنامه؛ نرخ‌ها از env قابل تنظیم‌اند.
 
 ---
 
@@ -396,9 +443,9 @@ erDiagram
 این‌ها برای جلوگیری از توقف کار فرض شده‌اند؛ هر زمان مالک محصول نظر دیگری داشته باشد، بدون بازطراحی بزرگ قابل تغییرند:
 
 1. Pentestor و CRM به‌عنوان `Project` با `is_product=True` مدل می‌شوند، نه اپ‌های جداگانه — چون در این فاز صرفاً صفحات معرفی/نمونه‌کار هستند، نه محصول SaaS فعال با ورود کاربر.
-2. `PromptTemplate` و `GuardrailRule` از روز اول به‌صورت جدول دیتابیس طراحی شده‌اند (نه ثابت در کد) تا تیم بتواند بدون دیپلوی مجدد گاردریل را تنظیم کند؛ پر کردن مقادیر اولیهٔ آن‌ها بخشی از فاز Implementation اپ `ai_engine` است.
+2. `PromptTemplate` و `GuardrailRule` به‌صورت جدول دیتابیس مدیریت می‌شوند؛ bootstrap اولیه و قواعد فعال در migration فاز ۵ هستند (`ADR-0026`).
 3. وابستگی‌های Python با `requirements.txt` ساده (نه Poetry) مدیریت می‌شوند تا با محیط «Setup Python App» در cPanel سازگار باشد (`ADR-0010`).
-4. مدیریت داده‌های AuditLog/Contact/Lead فعلاً بدون سیاست نگه‌داری خودکار (retention policy) طراحی شده؛ تعیین دورهٔ نگه‌داری در فاز امنیت/انطباق مشخص می‌شود.
+4. AuditLog و Contact/Lead سیاست retention جداگانه دارند؛ operational audit مدل AI با فرمان `purge_ai_audit` به‌طور پیش‌فرض پس از ۳۶۵ روز پاک می‌شود. خلاصهٔ تأییدشده و Lead مستقل از آن باقی می‌مانند (`ADR-0026`).
 5. ایمیل همچنان به‌عنوان کانال fallback (غیرفعال پیش‌فرض) در کنار پیامک Kavenegar نگه داشته می‌شود؛ انتخاب ارائه‌دهندهٔ SMTP نهایی در فاز Notifications مشخص می‌شود.
 
 ---
@@ -417,6 +464,10 @@ erDiagram
 | [ADR-0008](docs/adr/0008-leads-crm-pipeline.md) | مدل داده Contact/Lead/Newsletter |
 | [ADR-0009](docs/adr/0009-ai-engine-data-architecture.md) | معماری دادهٔ ai_engine و Guardrail |
 | [ADR-0010](docs/adr/0010-dependency-management.md) | مدیریت وابستگی‌ها و محیط اجرا (requirements.txt) |
+
+تصمیمات implementation تا فاز ۵ در ADRهای بعدی ثبت شده‌اند؛ scope نهایی AI در
+[ADR-0026](docs/adr/0026-ai-engine-implementation-and-creative-advisor.md) است و
+بخش طراحی اولیهٔ AI در ADR-0009 را supersede می‌کند.
 
 ---
 

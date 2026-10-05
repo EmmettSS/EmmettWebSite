@@ -2,7 +2,7 @@
 
 فرانت‌اند دوزبانهٔ (فارسی RTL پیش‌فرض / انگلیسی LTR در `/en`) سایت امیت، با
 Next.js 16 (App Router + Turbopack)، TypeScript strict، Tailwind v4 و
-`next-intl`. برای تصمیمات معماری کامل، ADRهای `docs/adr/0016` تا `0025` را
+`next-intl`. برای تصمیمات معماری کامل، ADRهای `docs/adr/0016` تا `0026` را
 ببینید؛ این فایل فقط راهنمای عملی توسعه است.
 
 ## اجرای محلی
@@ -21,7 +21,10 @@ npm run dev
 ```
 
 سایت روی <http://localhost:3000> بالا می‌آید (فارسی پیش‌فرض بدون پیشوند؛
-انگلیسی روی `/en`).
+انگلیسی روی `/en`). `src/proxy.ts` برای پاسخ‌های صفحه CSP با nonce و
+`strict-dynamic` می‌سازد؛ بنابراین رندر صفحات dynamic است. `frame-ancestors`
+عمداً تا تعیین دامنهٔ رسمی production تنظیم نشده تا iframe پیش‌نمایش Arena کار
+کند؛ HSTS و secure-cookieها در production از Next/Django اعمال می‌شوند.
 
 ### اتصال به بک‌اند
 
@@ -51,7 +54,14 @@ npm run dev
 | `/contact` | فرم تماس + عضویت خبرنامه |
 | `/search` | جست‌وجوی سراسری (FTS بک‌اند) |
 | `/profile` | ورود/ثبت‌نام/دوره‌های من/علاقه‌مندی‌ها (خارج از نوار ناوبری) |
+| `/advisor` | مشاور ایده‌پرداز با ورودی فقط Catalogهای فعال DB |
+| `/advisor/results/[token]` | ایده‌های قابل‌اشتراک، عمومی و `noindex,nofollow`؛ CTA ساخت Lead |
+| `/estimate` | حداقل زمان خوش‌بینانه و غیرتعهدآور؛ بدون قیمت عددی |
 | `/design-system` | صفحهٔ نمونهٔ کامپوننت‌ها (فاز ۳، برای بازبینی طراحی) |
+
+خلاصهٔ AI بلاگ فقط در صورت تأیید ادمین در API مقاله و UI نمایش داده می‌شود؛
+مقالهٔ ویرایش‌شده خلاصهٔ قبلی را stale می‌کند. AI به‌صورت پیش‌فرض خاموش است
+تا backend مقصد با تنظیمات env فعال شود.
 
 ۴۰۴/۵۰۰ سفارشی: `src/app/[locale]/not-found.tsx` و `[locale]/error.tsx`
 (داخل layout با SiteHeader/SiteFooter)؛ `src/app/not-found.tsx` و

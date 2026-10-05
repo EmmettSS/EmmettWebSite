@@ -1,7 +1,9 @@
 import { getApiBaseUrl } from "./config";
 import type {
+  AISuggestion,
   BlogPostDetail,
   BlogPostListItem,
+  Catalog,
   CourseDetail,
   CourseListItem,
   Paginated,
@@ -91,3 +93,23 @@ export const searchSite = (locale: string, query: string) =>
     `/search/?q=${encodeURIComponent(query)}&locale=${encodeURIComponent(locale)}`,
     locale,
   );
+
+export const getCatalogs = (locale: string, keys?: string[]) =>
+  serverFetch<Catalog[]>(
+    `/ai/catalogs/${keys?.length ? `?keys=${encodeURIComponent(keys.join(","))}` : ""}`,
+    locale,
+  );
+
+export async function getSharedAISuggestion(locale: string, token: string): Promise<AISuggestion | null> {
+  const url = `${getApiBaseUrl()}/ai/results/${encodeURIComponent(token)}/`;
+  try {
+    const response = await fetch(url, {
+      headers: { "Accept-Language": locale },
+      cache: "no-store",
+    });
+    if (!response.ok) return null;
+    return (await response.json()) as AISuggestion;
+  } catch {
+    return null;
+  }
+}

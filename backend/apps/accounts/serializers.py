@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Any
+from collections.abc import Sequence
+from typing import Any, cast
 
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
@@ -63,7 +64,9 @@ class MeUpdateSerializer(serializers.ModelSerializer[User]):
 
     bio = serializers.CharField(source="profile.bio", required=False, allow_blank=True)
     locale_preference = serializers.ChoiceField(
-        source="profile.locale_preference", choices=[("fa", "fa"), ("en", "en")], required=False
+        source="profile.locale_preference",
+        choices=cast(Sequence[tuple[str, str]], Profile._meta.get_field("locale_preference").choices),
+        required=False,
     )
     job_title = serializers.CharField(source="profile.job_title", required=False, allow_blank=True)
     company_name = serializers.CharField(source="profile.company_name", required=False, allow_blank=True)

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
 
 import { routing, localeDirections, type AppLocale } from "@/i18n/routing";
 import { ThemeProvider } from "@/components/providers/theme-provider";
@@ -38,6 +39,8 @@ export default async function LocaleLayout({
   params: Promise<{ locale: string }>;
 }) {
   const { locale: requestedLocale } = await params;
+  // A per-response CSP nonce requires dynamic rendering (Next.js CSP guidance).
+  await connection();
 
   if (!hasLocale(routing.locales, requestedLocale)) {
     notFound();

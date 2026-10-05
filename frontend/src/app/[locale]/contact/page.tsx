@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ContactForm } from "@/components/organisms/contact-form";
 import { NewsletterForm } from "@/components/organisms/newsletter-form";
 import type { AppLocale } from "@/i18n/routing";
+import { getCatalogs } from "@/lib/api/server";
 
 export async function generateMetadata({
   params,
@@ -23,6 +24,7 @@ export default async function ContactPage({
   const { locale } = await params;
   setRequestLocale(locale as AppLocale);
   const t = await getTranslations("contact");
+  const catalogs = await getCatalogs(locale, ["project_type", "budget_range", "timeline"]);
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 lg:px-10">
@@ -32,7 +34,7 @@ export default async function ContactPage({
       </header>
 
       <div className="mt-10">
-        <ContactForm />
+        <ContactForm catalogs={catalogs} />
       </div>
 
       <div className="mt-14 border-t border-border pt-8">

@@ -4,10 +4,15 @@ from typing import Any
 
 from rest_framework import serializers
 
+from apps.ai_engine.catalog.serializers import CatalogOptionKeyField
 from apps.leads.models import Contact, Newsletter
 
 
 class ContactCreateSerializer(serializers.ModelSerializer[Contact]):
+    project_type = CatalogOptionKeyField("project_type")
+    budget_range = CatalogOptionKeyField("budget_range")
+    timeline = CatalogOptionKeyField("timeline")
+
     """سریالایزر ورودی فرم تماس — فقط فیلدهای قابل‌تنظیم توسط کاربر نهایی.
 
     ``ip_address``/``user_agent``/``source`` در view از خودِ request پر

@@ -86,10 +86,7 @@ def get_sms_backend() -> SMSBackend:
 def notify_new_contact(contact: Contact) -> None:
     """بعد از ذخیرهٔ ``Contact`` صدا زده می‌شود — شکست اعلان هرگز نباید روی خودِ ثبت اثر بگذارد."""
 
-    message = (
-        f"درخواست تماس جدید از {contact.name} ({contact.get_project_type_display()}) — "
-        f"{contact.email}"
-    )
+    message = f"درخواست تماس جدید از {contact.name} ({contact.project_type.label_fa}) — {contact.email}"
     team_phone = getattr(settings, "LEADS_NOTIFICATION_PHONE", "") or ""
     if team_phone:
         try:

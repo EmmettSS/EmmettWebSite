@@ -23,7 +23,9 @@
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
     "search": "Search",
-    "account": "Account"
+    "account": "Account",
+    "advisor": "Creative advisor",
+    "estimate": "Project estimate"
   },
   "theme": {
     "toggleLabel": "Toggle light/dark theme",
@@ -147,7 +149,9 @@
     "commentPending": "Your comment was submitted and is awaiting moderation.",
     "commentLoginRequired": "Sign in to leave a comment.",
     "rssFeed": "RSS feed",
-    "backToList": "Back to library"
+    "backToList": "Back to library",
+    "aiSummary": "AI-assisted summary",
+    "aiSummaryReviewed": "Reviewed by the editorial team before publication."
   },
   "team": {
     "title": "About us",
@@ -170,31 +174,11 @@
     "submitting": "Sending…",
     "success": "Thanks! We've received your message and will be in touch soon.",
     "error": "Something went wrong. Please try again.",
-    "projectTypes": {
-      "website": "Website",
-      "mobile_app": "Mobile app",
-      "security": "Security / Pentest",
-      "crm": "CRM",
-      "consulting": "Consulting",
-      "other": "Other"
-    },
-    "budgetRanges": {
-      "under_50m": "Under 50M Toman",
-      "50_150m": "50-150M Toman",
-      "150_500m": "150-500M Toman",
-      "over_500m": "Over 500M Toman",
-      "not_sure": "Not sure yet"
-    },
-    "timelines": {
-      "immediate": "Immediate",
-      "within_1_month": "Within 1 month",
-      "within_3_months": "Within 3 months",
-      "flexible": "Flexible"
-    },
     "newsletterTitle": "Subscribe to our newsletter",
     "newsletterPlaceholder": "you@example.com",
     "newsletterSubmit": "Subscribe",
-    "newsletterSuccess": "You're subscribed!"
+    "newsletterSuccess": "You're subscribed!",
+    "catalogUnavailable": "Form options are temporarily unavailable. Please try again shortly."
   },
   "search": {
     "title": "Search",
@@ -231,5 +215,49 @@
     "serverErrorTitle": "Something went wrong",
     "serverErrorDescription": "An unexpected error occurred. Our team has been notified.",
     "serverErrorCta": "Try again"
+  },
+  "ai": {
+    "eyebrow": "Emmett Product Studio",
+    "advisorTitle": "Creative advisor",
+    "advisorDescription": "Choose a few structured details about your business to receive up to three software concepts for an initial review.",
+    "estimatorTitle": "Project estimator",
+    "estimatorDescription": "Choose the scope of a first release to see an optimistic, non-binding minimum timeline based on current rules.",
+    "jobRoleLabel": "Your role",
+    "businessSizeLabel": "Business size",
+    "cityScaleLabel": "City scale",
+    "budgetLabel": "Approximate project budget",
+    "teamSizeLabel": "Relevant team size",
+    "goalsLabel": "Primary goals",
+    "goalsHint": "Select one to five options.",
+    "catalogUnavailable": "The required options are temporarily unavailable. Please try again shortly.",
+    "goalsRequired": "Select at least one goal to continue.",
+    "requestError": "We could not process the request. Please try again later.",
+    "privacyNote": "Only structured choices from this form are used to generate ideas; your name, contact details, and free text are never sent to the model.",
+    "generateIdeas": "Generate preliminary ideas",
+    "generating": "Generating ideas…",
+    "preliminaryDisclaimer": "These are preliminary concepts for discussion, not ready products or delivery commitments. No numerical price is shown; submit a request for human review and pricing.",
+    "estimatorPrompt": "For an initial timeline,",
+    "estimatorLink": "try the project estimator",
+    "deliveryScopeLabel": "First-release scope",
+    "estimateDisclaimer": "The displayed timeline is an optimistic minimum in working days and is not a delivery commitment. This tool does not provide a numerical price.",
+    "estimateResultTitle": "Initial timeline estimate",
+    "minimumDays": "Optimistic minimum: {days} working days",
+    "estimateUnavailable": "There is no active timeline rule for this scope yet.",
+    "estimateProject": "Estimate initial timeline",
+    "estimating": "Calculating…",
+    "requestQuote": "Request review and pricing",
+    "sharedResultTitle": "Preliminary concepts",
+    "conceptNumber": "Concept {number}",
+    "benefitLabel": "Potential value",
+    "relatedExisting": "Related to: {title}",
+    "leadFormDescription": "Request a follow-up so the Emmett team can review this concept with you.",
+    "leadSuccess": "Your request is in. The Emmett team will contact you to follow up.",
+    "sendingLead": "Submitting request…",
+    "requestReview": "Request a concept review",
+    "contactPrivacyNote": "Your contact details and message are used only to follow up and are never sent to the AI model.",
+    "startAgain": "Generate new ideas",
+    "shareLink": "Copy share link",
+    "linkCopied": "Link copied",
+    "linkCopyError": "Automatic copying is unavailable. Copy the page URL from your browser address bar."
   }
 }

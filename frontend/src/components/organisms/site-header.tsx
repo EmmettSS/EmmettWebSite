@@ -17,6 +17,8 @@ const NAV_ITEMS = [
   "projects",
   "library",
   "academy",
+  "advisor",
+  "estimate",
   "about",
 ] as const;
 

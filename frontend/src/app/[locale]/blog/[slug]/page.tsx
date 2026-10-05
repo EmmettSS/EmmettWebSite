@@ -103,6 +103,17 @@ export default async function BlogPostPage({
         </nav>
       ) : null}
 
+      {post.ai_summary ? (
+        <aside
+          className="mt-8 rounded-xl border border-border bg-secondary/20 p-5 sm:p-6"
+          aria-label={t("aiSummary")}
+        >
+          <h2 className="text-lg font-semibold text-foreground">{t("aiSummary")}</h2>
+          <p className="mt-2 text-sm leading-7 text-muted-foreground">{post.ai_summary}</p>
+          <p className="mt-3 text-xs text-muted-foreground">{t("aiSummaryReviewed")}</p>
+        </aside>
+      ) : null}
+
       <div
         className="markdown-content mt-8"
         dangerouslySetInnerHTML={{ __html: post.content_html }}

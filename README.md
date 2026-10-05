@@ -4,8 +4,8 @@
 
 ```
 .
-├── frontend/                   # Next.js 16 (App Router) + Tailwind v4 + next-intl — فاز ۳/۴
-├── backend/                    # Django 5.2 + DRF — فاز ۲/۴
+├── frontend/                   # Next.js 16 (App Router) + Tailwind v4 + next-intl — فاز ۳ تا ۵
+├── backend/                    # Django 5.2 + DRF — فاز ۲ تا ۵
 ├── legacy-frontend-reference/  # اسکلت قدیمی React/Vite — فقط مرجع بصری، کد مستقیم استفاده نمی‌شود
 ├── docs/adr/                   # تصمیمات معماری (Architecture Decision Records)
 ├── ARCHITECTURE.md             # معماری کلی سیستم
@@ -13,7 +13,7 @@
 └── CHANGELOG.md                # تاریخچهٔ کامل تغییرات به‌تفکیک فاز
 ```
 
-> وضعیت فعلی (فاز ۴، بازبینی‌شده و آمادهٔ PR): تمام اپ‌های دامنه‌ای بک‌اند (خدمات/پروژه‌ها/آکادمی+Enrollment/بلاگ/شرکت/لید/حساب کاربری) و تمام صفحات مصرف‌کنندهٔ API در فرانت‌اند (خدمات، پروژه‌ها، محصولات، آکادمی، کتابخانه، دربارهٔ ما، تماس، جست‌وجو، پروفایل) پیاده‌سازی و با داده‌ی seed واقعی (`seed_demo_data`) تست شده‌اند. پیش از باز شدن PR یک بازبینی کامل فازهای ۰ تا ۴ انجام شد (مستندسازی API، rate limiting، AuditLog، اعتبارسنجی آپلود — جزئیات در بخش «فاز ۴ (بازبینی/سخت‌سازی)» در `CHANGELOG.md`). دامنهٔ `ai_engine` طراحی شده (`ADR-0009`) اما عمداً پیاده‌سازی **نشده** و رسماً به فاز ۵ موکول شده — ر.ک. به‌روزرسانی انتهای `DISCOVERY.md`.
+> وضعیت فعلی (فاز ۵ پیاده‌سازی شده؛ جزئیات در `CHANGELOG.md` و `ADR-0026`): اپ مرکزی `ai_engine` با provider adapter سازگار با OpenAI، Catalogهای قابل‌مدیریت در DB، guardrail، audit یک‌ساله، cache و rate limit پیاده‌سازی شده است. مشاور ایده‌پرداز، نتیجهٔ عمومیِ قابل‌لغو و اتصال Lead، تخمین‌گر زمانِ بدون قیمت، و خلاصه‌ساز بلاگ با تأیید ادمین در دسترس‌اند. مسیرهای `/advisor`، `/advisor/results/[token]` و `/estimate` در هر دو زبان اضافه شده‌اند. AI به‌صورت پیش‌فرض غیرفعال است؛ برای فعال‌سازی فقط تنظیمات محیطی را در `.env` مقصد وارد کنید و هیچ کلیدی را در Git یا گفتگو قرار ندهید. تست‌ها و اعتبارسنجی‌های فاز ۵ در انتهای `CHANGELOG.md` ثبت شده‌اند.
 
 برای معماری کامل و دلایل هر تصمیم، به `ARCHITECTURE.md` و `docs/adr/` مراجعه کنید.
 
@@ -42,7 +42,7 @@ npm run test        # vitest — تست واحد منطق (تاریخ/عدد) و
 npm run test:e2e    # playwright — تست E2E مرورگر واقعی (نیاز به بک‌اند seed‌شده؛ ر.ک. frontend/e2e/README.md)
 ```
 
-### صفحات مصرف‌کنندهٔ API (فاز ۴)
+### صفحات مصرف‌کنندهٔ API (فازهای ۴ و ۵)
 
 علاوه بر صفحهٔ اصلی و Design System (فاز ۳)، فرانت‌اند اکنون تمام محتوای
 بک‌اند را مصرف می‌کند: `/services`, `/projects`, `/products`, `/academy`
@@ -77,7 +77,7 @@ python3 -m venv .venv
 source .venv/bin/activate          # ویندوز: .venv\Scripts\activate
 pip install -r requirements-dev.txt
 cp .env.example .env                # و مقادیر لازم را پر کنید
-python manage.py migrate
+python manage.py migrate             # کاتالوگ‌های AI نیز با migration bootstrap می‌شوند
 python manage.py seed_demo_data     # دادهٔ نمایشی دوزبانه (ایدمپوتنت) — ر.ک. فاز ۴ در CHANGELOG
 python manage.py runserver
 ```
