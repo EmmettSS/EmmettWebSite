@@ -97,4 +97,3 @@ class NewsletterAdmin(ImportDisabledMixin, EmmettImportExportAdmin, SoftDeleteAd
 
 
 __all__ = ["ContactAdmin", "LeadAdmin", "NewsletterAdmin"]
-

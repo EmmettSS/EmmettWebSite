@@ -78,15 +78,19 @@ IMPORT_ENABLED_MODELS = {
 }
 
 #: ادمین‌هایی که مال خود جنگو هستند یا سینگلتون‌اند (خارج از دامنهٔ فاز ۶).
-EXPORT_EXEMPT = {"auth.Group", "core.SiteSettings"}
-NO_SEARCH_EXEMPT = {"auth.Group", "core.SiteSettings"}
+EXPORT_EXEMPT = {
+    "auth.Group",
+    "core.SiteSettings",
+    # ادمین‌های django-otp (فاز ۷): مدل‌های زیرساختی امنیتی‌اند، نه محتوای
+    # قابل‌صادرات؛ نگه‌داشتن resource برایشان فقط سطح حمله را بیشتر می‌کند.
+    "otp_totp.TOTPDevice",
+    "otp_static.StaticDevice",
+}
+NO_SEARCH_EXEMPT = {"auth.Group", "core.SiteSettings", "otp_totp.TOTPDevice", "otp_static.StaticDevice"}
 
 
 def _registry() -> dict[str, Any]:
-    return {
-        model._meta.label: model_admin
-        for model, model_admin in django_admin.site._registry.items()
-    }
+    return {model._meta.label: model_admin for model, model_admin in django_admin.site._registry.items()}
 
 
 def _models_using(mixin: type[Any]) -> set[str]:
@@ -109,8 +113,16 @@ class TestRegistrationSnapshot:
             PUBLISHABLE_MODELS
             | IMPORT_DISABLED_MODELS
             | IMPORT_ENABLED_MODELS
-            | {"accounts.User", "admin.LogEntry", "auth.Group", "core.AuditLog", "core.Media",
-               "core.SearchIndexEntry", "core.SiteSettings", "ai_engine.AIConcept"}
+            | {
+                "accounts.User",
+                "admin.LogEntry",
+                "auth.Group",
+                "core.AuditLog",
+                "core.Media",
+                "core.SearchIndexEntry",
+                "core.SiteSettings",
+                "ai_engine.AIConcept",
+            }
         )
         assert expected - labels == set()
 
@@ -137,8 +149,7 @@ class TestRegistrationSnapshot:
         missing = [
             label
             for label, admin in _registry().items()
-            if isinstance(admin, SoftDeleteAdminMixin)
-            and not _declares_record_state_filter(admin)
+            if isinstance(admin, SoftDeleteAdminMixin) and not _declares_record_state_filter(admin)
         ]
         assert missing == []
 

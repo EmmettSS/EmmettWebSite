@@ -36,6 +36,15 @@ django-jazzmin==3.0.5                # تم ادمین روی AdminLTE 4/Bootstr
 # --- تبادل دادهٔ ادمین (فاز ۶ — ADR-0029) ---
 django-import-export==4.4.1          # صادرات/واردات CSV/JSON/TSV برای ۲۰ مدل (بدون وابستگی سنگین)
 
+# --- احراز هویت دو مرحله‌ای ادمین (فاز ۷ — ADR-0032) ---
+# django-otp: پیاده‌سازی استاندارد TOTP/statically-issued tokens روی جنگو؛
+#   انتخابی برای ادمین (``ADMIN_2FA_REQUIRED``) و بدون وابستگی سنگین.
+# qrcode: تولید QR به‌صورت SVG درون ``data:`` — بدون CDN و بدون Pillow
+#   (فقط ``qrcode.image.svg`` استفاده می‌شود) تا enrollment روی هاست اشتراکی
+#   کاملاً آفلاین و سبک بماند.
+django-otp==1.7.3
+qrcode==8.2
+
 # --- تاریخ شمسی (قانون ۱۰) ---
 jdatetime==6.1.0
 

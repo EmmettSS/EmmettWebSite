@@ -157,10 +157,7 @@ class TestCsvImport:
 
     def test_import_is_idempotent_for_unchanged_rows(self) -> None:
         ServiceFactory(slug="stable", title_fa="ثابت", title_en="Stable")
-        csv_content = (
-            "schema_version,slug,status,title_fa,title_en\n"
-            "1,stable,published,ثابت,Stable\n"
-        )
+        csv_content = "schema_version,slug,status,title_fa,title_en\n1,stable,published,ثابت,Stable\n"
         dataset = base_formats.CSV().create_dataset(csv_content)
 
         result = self._resource().import_data(dataset, dry_run=False, raise_errors=True)
@@ -171,10 +168,7 @@ class TestCsvImport:
 
     def test_import_updates_existing_row(self) -> None:
         ServiceFactory(slug="editable", title_fa="قدیمی", title_en="Old")
-        csv_content = (
-            "schema_version,slug,status,title_fa,title_en\n"
-            "1,editable,published,تازه,New\n"
-        )
+        csv_content = "schema_version,slug,status,title_fa,title_en\n1,editable,published,تازه,New\n"
         dataset = base_formats.CSV().create_dataset(csv_content)
 
         result = self._resource().import_data(dataset, dry_run=False, raise_errors=True)
@@ -261,7 +255,14 @@ class TestImportPolicy:
     #: ادمین‌هایی که عمداً صادرات ندارند:
     #: - ``auth.Group`` مال جنگو است و این پروژه از گروه‌های پیش‌فرض استفاده نمی‌کند.
     #: - ``core.SiteSettings`` سینگلتون است؛ صادرات/واردات JSON آن معنا ندارد.
-    EXPORT_EXEMPT = {"auth.Group", "core.SiteSettings"}
+    #: - مدل‌های ``django-otp`` (فاز ۷) زیرساخت امنیتی‌اند و نباید صادر شوند
+    #:   (خروجی‌گرفتن از توکن‌های ۲FA یعنی نشت راز).
+    EXPORT_EXEMPT = {
+        "auth.Group",
+        "core.SiteSettings",
+        "otp_totp.TOTPDevice",
+        "otp_static.StaticDevice",
+    }
 
     def test_every_project_admin_can_be_exported(self) -> None:
         """همهٔ ادمین‌های پروژه (به‌جز استثناهای مستند) باید صادرات داشته باشند."""
@@ -274,6 +275,7 @@ class TestImportPolicy:
             if not isinstance(model_admin, EmmettImportExportAdmin):
                 missing.append(label)
         assert missing == []
+
 
 class TestExportAuditTrail:
     """صادرات باید رد حسابرسی داشته باشد (خود پکیج برای export ردی ``LogEntry`` نمی‌سازد)."""

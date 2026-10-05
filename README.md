@@ -8,13 +8,23 @@
 ├── backend/                    # Django 5.2 + DRF — فاز ۲ تا ۵
 ├── legacy-frontend-reference/  # اسکلت قدیمی React/Vite — فقط مرجع بصری، کد مستقیم استفاده نمی‌شود
 ├── docs/adr/                   # تصمیمات معماری (Architecture Decision Records)
-├── docs/admin-guide-fa.md       # راهنمای فارسی پنل مدیریت (فاز ۶)
+├── docs/admin-guide-fa.md       # راهنمای فارسی پنل مدیریت (فاز ۶ + بخش‌های SEO/۲FA فاز ۷)
 ├── ARCHITECTURE.md             # معماری کلی سیستم
 ├── DISCOVERY.md                # یافته‌های فاز کشف
 └── CHANGELOG.md                # تاریخچهٔ کامل تغییرات به‌تفکیک فاز
 ```
 
-> وضعیت فعلی (فاز ۶ پیاده‌سازی شده؛ جزئیات در `CHANGELOG.md` و `ADR-0027`–`ADR-0030`):
+> وضعیت فعلی (فاز ۷ پیاده‌سازی شده؛ جزئیات در `CHANGELOG.md` و `ADR-0031`–`ADR-0033`):
+> **SEO در لایهٔ Next.js** ساخته می‌شود (sitemap/robots پویا، hreflang `fa-IR`/`en`/`x-default`
+> با canonical خودارجاع، JSON-LD شش‌نوعه، OG پویا با تصویر ۱۲۰۰×۶۳۰، RSS/Atom بلاگ و دوره)
+> و Django فقط منبع داده/ادمین است؛ دامنهٔ canonical تنها از `PUBLIC_SITE_URL` می‌آید.
+> **کارایی** با معیار جانشین اندازه‌گیری‌پذیر تضمین شده است: تصویر AVIF/WebP با `next/image`،
+> فونت خودمیزبان با `font-display: swap` و سقف تعداد کوئری هر endpoint در تست‌ها.
+> **امنیت**: CSP دو‌سیاستی (API سخت / ادمین سازگار Jazzmin)، 2FA اختیاری/اجباری ادمین با
+> TOTP + کد بازیابی، قفل ورود ضدbrute-force با پاسخ `429`، Audit Log رویدادهای امنیتی و
+> دستور `backup_db` با fallback چند-strategy.
+>
+> وضعیت قبلی (فاز ۶؛ جزئیات در `ADR-0027`–`ADR-0030`):
 > پنل مدیریت Django حالا یک **پنل SaaS فارسی/انگلیسی** است: تم اختصاصی امیت با RTL واقعی
 > و فونت خودمیزبان، داشبورد KPI کش‌شده با نمودار SVG درون‌خطی، گردش‌کار گروهی انتشار
 > (Draft→Published→Archived) با ثبت `AuditLog`، مدیریت ترجمه‌ها و کاتالوگ/پرامپت‌های AI
@@ -97,6 +107,10 @@ source .venv/bin/activate
 coverage run -m pytest && coverage report -m   # تست‌ها + پوشش
 mypy apps config                                # mypy --strict (قانون ۷)
 ruff check .                                    # lint
+python manage.py check                          # System Checkها (emmett_admin.E001–W013)
+python manage.py check --deploy                 # هشدارهای مخصوص production (۲FA/CSP/بکاپ/راز)
+python scripts/i18n.py check                     # یکسانی .po و تازگی .mo (ADR-0030)
+python manage.py backup_db --keep 7              # پشتیبان دیتابیس (+مدیا) — ADR-0033
 ```
 
 ### مستندات API
@@ -132,6 +146,27 @@ ruff check .                                    # lint
   مدل‌های محتوایی.
 
 راهنمای گام‌به‌گام فارسی: [`docs/admin-guide-fa.md`](docs/admin-guide-fa.md).
+
+### SEO، کارایی و امنیت (فاز ۷)
+
+- **ابزار پیکربندی‌محور (نه کد):** متای پیش‌فرض، کد تأیید Search Console، FAQ هر صفحه،
+  ریدایرکت‌های ۳۰۱/۳۰۲/۴۱۰ و دو شبکهٔ اجتماعی در ادمین ویرایش می‌شوند
+  (`Site settings`, `Redirects`, `FAQ items`) و از API به فرانت می‌رسند (`ADR-0031`).
+- **دامنه:** فقط `PUBLIC_SITE_URL` (env) — نه hard-code، نه هدر `Host`. در
+  `manage.py check --deploy` خالی/پیش‌فرض‌بودن آن خطا است (`W007`).
+- **نقشهٔ خودکار:** `sitemap.xml` و `robots.txt` در Next.js ساخته می‌شوند؛ مسیرهای خصوصی
+  (`/admin`, `/api`, `/profile`, `/search`, `/advisor/results/*`) هم `noindex` هستند و هم
+  از sitemap حذف می‌شوند.
+- **فیدها:** `/blog/rss` و `/academy/rss` (RSS 2.0 + `atom:link`)؛ مسیر قدیمی
+  `/api/v1/blog/rss/` هم برای سازگاری حفظ شده است.
+- **۲FA ادمین:** `/admin/2fa/setup|verify|status|recovery` — TOTP با QR درون `data:`
+  (بدون CDN)، کلید Base32 برای ورود دستی، کدهای بازیابی یک‌بارمصرف و قفل موقت پس از
+  چند کد نامعتبر. در production `ADMIN_2FA_REQUIRED=True` پیش‌فرض است (`ADR-0033`).
+- **بکاپ:** `python manage.py backup_db` — روی SQLite با `VACUUM INTO` (سازگار با قفل
+  pytest/سایت زنده)، روی MySQL با `mysqldump` و در نبودش fallback به `dumpdata`؛
+  خروجی `gz` + `manifest-{stamp}.json` + هرس خودکار بر اساس `BACKUP_RETENTION`.
+- **مستندسازی:** تصمیم‌ها در `docs/adr/0031`–`0033`؛ چک‌لیست استقرار و راهنمای ۲FA/SEO
+  در [`docs/admin-guide-fa.md`](docs/admin-guide-fa.md).
 
 ### دادهٔ نمایشی (Seed)
 

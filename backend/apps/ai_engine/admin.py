@@ -135,9 +135,7 @@ class CatalogOptionAdmin(AuditedConfigurationAdmin):
             return [EstimationRuleInline]
         return []
 
-    def get_readonly_fields(
-        self, request: HttpRequest, obj: CatalogOption | None = None
-    ) -> tuple[str, ...]:
+    def get_readonly_fields(self, request: HttpRequest, obj: CatalogOption | None = None) -> tuple[str, ...]:
         if obj is None:
             return ()
         return ("catalog", "key")
@@ -167,9 +165,7 @@ class PromptTemplateAdmin(AuditedConfigurationAdmin):
         (_("Publication"), {"fields": ("is_active",)}),
     )
 
-    def get_readonly_fields(
-        self, request: HttpRequest, obj: PromptTemplate | None = None
-    ) -> tuple[str, ...]:
+    def get_readonly_fields(self, request: HttpRequest, obj: PromptTemplate | None = None) -> tuple[str, ...]:
         return ("feature", "locale", "version") if obj is not None else ()
 
     @admin.display(boolean=True, description=_("Active version"))
@@ -236,9 +232,7 @@ class GuardrailRuleAdmin(AuditedConfigurationAdmin):
         (_("Configuration"), {"fields": ("config", "is_active")}),
     )
 
-    def get_readonly_fields(
-        self, request: HttpRequest, obj: GuardrailRule | None = None
-    ) -> tuple[str, ...]:
+    def get_readonly_fields(self, request: HttpRequest, obj: GuardrailRule | None = None) -> tuple[str, ...]:
         return ("rule_key",) if obj is not None else ()
 
 
@@ -248,9 +242,7 @@ class ReadOnlyAIAdmin(ImportDisabledMixin, EmmettImportExportAdmin, SoftDeleteAd
     def has_add_permission(self, request: HttpRequest) -> bool:
         return False
 
-    def has_change_permission(
-        self, request: HttpRequest, obj: Any | None = None
-    ) -> bool:
+    def has_change_permission(self, request: HttpRequest, obj: Any | None = None) -> bool:
         """مشاهدهٔ جزئیات مجاز است، اما هیچ فیلدی قابل ویرایش نیست."""
 
         return False
@@ -315,9 +307,7 @@ class AISuggestionAdmin(ReadOnlyAIAdmin):
             actor=request.user,
             metadata={"suggestion_ids": suggestion_ids},
         )
-        self.message_user(
-            request, _("Revoked %(count)s share link(s).") % {"count": len(suggestion_ids)}
-        )
+        self.message_user(request, _("Revoked %(count)s share link(s).") % {"count": len(suggestion_ids)})
 
 
 @admin.register(AIConcept)
@@ -390,9 +380,7 @@ class AIContentArtifactAdmin(EmmettImportExportAdmin, SoftDeleteAdminMixin):
             actor=request.user,
             metadata={"artifact_ids": artifact_ids},
         )
-        self.message_user(
-            request, _("Approved %(count)s summarie(s).") % {"count": len(artifact_ids)}
-        )
+        self.message_user(request, _("Approved %(count)s summarie(s).") % {"count": len(artifact_ids)})
 
     @admin.action(description=_("Reject selected summaries"), permissions=["change"])
     def reject_summaries(self, request: HttpRequest, queryset: Any) -> None:
@@ -410,9 +398,7 @@ class AIContentArtifactAdmin(EmmettImportExportAdmin, SoftDeleteAdminMixin):
             actor=request.user,
             metadata={"artifact_ids": artifact_ids},
         )
-        self.message_user(
-            request, _("Rejected %(count)s summarie(s).") % {"count": len(artifact_ids)}
-        )
+        self.message_user(request, _("Rejected %(count)s summarie(s).") % {"count": len(artifact_ids)})
 
     def save_model(self, request: HttpRequest, obj: AIContentArtifact, form: Any, change: bool) -> None:
         if change and "summary_text" in form.changed_data:

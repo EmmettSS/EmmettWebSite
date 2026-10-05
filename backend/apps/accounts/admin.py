@@ -12,9 +12,9 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, cast
 
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from django.http import HttpRequest
 from django.utils.translation import gettext_lazy as _
@@ -27,6 +27,7 @@ from apps.core.admin_mixins import (
     RecordStateFilter,
     SoftDeleteAdminMixin,
 )
+from apps.core.models import log_action
 
 
 @admin.register(User)
@@ -42,7 +43,16 @@ class UserAdmin(DjangoUserAdmin[User], ImportDisabledMixin, EmmettImportExportAd
 
     resource_class = UserResource
     ordering = ("-date_joined",)
-    list_display = ("email", "full_name", "role", "is_staff", "is_active", "date_joined", "last_login")
+    list_display = (
+        "email",
+        "full_name",
+        "role",
+        "is_staff",
+        "is_active",
+        "two_factor_status",
+        "date_joined",
+        "last_login",
+    )
     list_display_links = ("email",)
     list_filter = ("role", "is_staff", "is_active", "is_phone_verified", "date_joined")
     search_fields = ("email", "phone", "first_name", "last_name")
@@ -68,9 +78,62 @@ class UserAdmin(DjangoUserAdmin[User], ImportDisabledMixin, EmmettImportExportAd
         ),
     )
 
+    actions = ("disable_two_factor", "unlock_login")
+
     @admin.display(description=_("Full name"), ordering="last_name")
     def full_name(self, obj: User) -> str:
         return obj.get_full_name() or "—"
+
+    @admin.display(boolean=True, description=_("2FA"))
+    def two_factor_status(self, obj: User) -> bool:
+        """آیا کاربر دستگاه ۲FA تأییدشده دارد؟ (در ``get_queryset`` prefetch شده)"""
+
+        # django-otp این رابطهٔ معکوس را به User تزریق می‌کند ولی stub ندارد؛
+        # ``cast(Any, …)`` فقط ابهام mypy را برمی‌دارد و پیش‌واکشی
+        # ``get_queryset`` را دست‌نخورده نگه می‌دارد (بدون کوئری اضافه).
+        devices = list(cast(Any, obj).totpdevice_set.all())
+        return any(device.confirmed for device in devices)
+
+    def get_queryset(self, request: HttpRequest) -> Any:
+        """``totpdevice_set`` پیش‌واکشی می‌شود تا ستون ۲FA باعث N+1 نشود."""
+
+        return super().get_queryset(request).prefetch_related("totpdevice_set")
+
+    @admin.action(description=_("Disable two-factor authentication (support reset)"), permissions=["change"])
+    def disable_two_factor(self, request: HttpRequest, queryset: Any) -> None:
+        """بازنشانی پشتیبانی: اگر کارمندی گوشی‌اش را گم کند، ابرکاربر می‌تواند ۲FA را بردارد."""
+
+        from django_otp.plugins.otp_static.models import StaticDevice
+        from django_otp.plugins.otp_totp.models import TOTPDevice
+
+        user_ids = [int(pk) for pk in queryset.values_list("pk", flat=True)]
+        removed = TOTPDevice.objects.filter(user_id__in=user_ids).delete()[0]
+        removed += StaticDevice.objects.filter(user_id__in=user_ids).delete()[0]
+        log_action(
+            action="auth.2fa_disabled_by_admin",
+            actor=request.user if request.user.is_authenticated else None,
+            metadata={"user_ids": user_ids, "devices_removed": removed},
+        )
+        self.message_user(
+            request,
+            _("Disabled two-factor authentication for %(count)s user(s).") % {"count": len(user_ids)},
+            messages.WARNING,
+        )
+
+    @admin.action(description=_("Clear login lockout"), permissions=["change"])
+    def unlock_login(self, request: HttpRequest, queryset: Any) -> None:
+        """بازکردن قفل ورود کاربرانی که با محافظت brute-force قفل شده‌اند."""
+
+        from apps.core.security import LoginLockout
+
+        lockout = LoginLockout()
+        for email in queryset.values_list("email", flat=True):
+            lockout.unlock(email=str(email))
+        self.message_user(
+            request,
+            _("Cleared login lockout for %(count)s user(s).") % {"count": queryset.count()},
+            messages.SUCCESS,
+        )
 
     def get_actions(self, request: HttpRequest) -> dict[str, Any]:
         """«حذف گروهی» عمداً برداشته شده است — کاربر با محتوای وابسته گره دارد."""

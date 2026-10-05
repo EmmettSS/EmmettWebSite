@@ -13,10 +13,19 @@
 - ``W005`` نبود فایل ترجمهٔ کامپایل‌شدهٔ فارسی (ادمین انگلیسی نمایش داده می‌شود)
 - ``W006`` روشن بودن CDN فونت گوگل در Jazzmin (نقض فونت self-hosted)
 - ``W007`` باقی‌ماندن ``PUBLIC_SITE_URL`` روی مقدار پیش‌فرض در production
+
+فاز ۷ (ADR-0033) این‌ها را اضافه کرد:
+
+- ``W008`` خاموش‌بودن CSP جنگو
+- ``W009`` (deploy) خاموش‌بودن اجبار ۲FA ادمین در production
+- ``W010`` (deploy) تنظیم‌نشدن کد تأیید Search Console
+- ``W011``/``W012`` (deploy) نبود/غیرقابل‌نوشتن‌بودن پوشهٔ پشتیبان‌گیری
+- ``W013`` (deploy) ضعیف/نمونه‌بودن ``SECRET_KEY``
 """
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from typing import Any, cast
 
@@ -27,9 +36,7 @@ from apps.core.admin_theme import ADMIN_THEME_ASSETS
 
 
 @register()
-def check_admin_theme_apps(
-    *, app_configs: Any = None, **kwargs: Any
-) -> list[Error]:
+def check_admin_theme_apps(*, app_configs: Any = None, **kwargs: Any) -> list[Error]:
     """ترتیب اپ‌ها و حضور وابستگی‌های ادمین را بررسی می‌کند."""
 
     errors: list[Error] = []
@@ -189,6 +196,114 @@ def check_public_site_url(*, app_configs: object = None, **kwargs: object) -> li
                 f"PUBLIC_SITE_URL روی مقدار پیش‌فرض/محلی است: {public_site_url!r}",
                 id="emmett_admin.W007",
                 hint="در env مقصد مقدار واقعی دامنه را قرار دهید.",
+            )
+        ]
+    return []
+
+
+# ---------------------------------------------------------------------------
+# فاز ۷ — سخت‌سازی امنیتی (ADR-0033)
+# ---------------------------------------------------------------------------
+
+
+@register()
+def check_csp_enabled(*, app_configs: object = None, **kwargs: object) -> list[Error | Warning]:
+    """CSP باید فعال باشد؛ وگرنه XSS در ادمین/API مهار نمی‌شود.
+
+    این check «خطا» است (نه هشدار) چون خاموش‌کردن CSP یک تصمیم امنیتی است که
+    باید صریح و آگاهانه باشد (``DJANGO_CSP_ENABLED=0``) — نه نتیجهٔ فراموشی.
+    """
+
+    if not getattr(settings, "CSP_ENABLED", False):
+        return [
+            Warning(
+                "CSP جنگو خاموش است؛ هدر Content-Security-Policy روی ادمین/API ست نمی‌شود.",
+                id="emmett_admin.W008",
+                hint="DJANGO_CSP_ENABLED=1 (پیش‌فرض) را برنگردانید مگر با دلیل مستند.",
+            )
+        ]
+    return []
+
+
+@register(Tags.security, deploy=True)
+def check_admin_two_factor(*, app_configs: object = None, **kwargs: object) -> list[Warning]:
+    """در production، ۲FA ادمین باید روشن باشد (ADR-0033)."""
+
+    if settings.DEBUG:
+        return []
+    if not getattr(settings, "ADMIN_2FA_REQUIRED", False):
+        return [
+            Warning(
+                "ADMIN_2FA_REQUIRED در production خاموش است؛ ورود ادمین فقط با رمز ممکن است.",
+                id="emmett_admin.W009",
+                hint="ADMIN_2FA_REQUIRED=1 و برای هر staff دستگاه TOTP ثبت کنید.",
+            )
+        ]
+    return []
+
+
+@register(Tags.security, deploy=True)
+def check_search_console_verification(*, app_configs: object = None, **kwargs: object) -> list[Warning]:
+    """کد تأیید Search Console در production باید پر باشد (ADR-0031)."""
+
+    if settings.DEBUG:
+        return []
+    from apps.core.models import SiteSettings
+
+    try:
+        verification = SiteSettings.load().search_console_verification
+    except Exception:  # noqa: BLE001 - نبود جدول/DB در چک اولیه نباید بشکند
+        return []
+    if not verification:
+        return [
+            Warning(
+                "کد تأیید Google Search Console تنظیم نشده است.",
+                id="emmett_admin.W010",
+                hint="Admin → Site settings → SEO → Google Search Console verification code",
+            )
+        ]
+    return []
+
+
+@register(Tags.security, deploy=True)
+def check_backup_directory(*, app_configs: object = None, **kwargs: object) -> list[Warning]:
+    """مسیر پشتیبان‌گیری باید وجود/قابل‌نوشتن باشد (ADR-0033)."""
+
+    if settings.DEBUG:
+        return []
+    path = Path(str(getattr(settings, "BACKUP_DIR", "")))
+    if not path or not path.exists():
+        return [
+            Warning(
+                f"پوشهٔ پشتیبان‌گیری وجود ندارد: {path}",
+                id="emmett_admin.W011",
+                hint="پوشه را بسازید و Cron روزانهٔ manage.py backup_db را در cPanel فعال کنید.",
+            )
+        ]
+    if not os.access(path, os.W_OK):
+        return [
+            Warning(
+                f"پوشهٔ پشتیبان‌گیری قابل‌نوشتن نیست: {path}",
+                id="emmett_admin.W012",
+                hint="دسترسی پوشه را برای کاربر اپلیکیشن اصلاح کنید (755/775).",
+            )
+        ]
+    return []
+
+
+@register(Tags.security, deploy=True)
+def check_secret_key_entropy(*, app_configs: object = None, **kwargs: object) -> list[Warning]:
+    """``SECRET_KEY`` ضعیف/پیش‌فرض در production (تکمیل ``security.W009`` جنگو)."""
+
+    if settings.DEBUG:
+        return []
+    secret = str(getattr(settings, "SECRET_KEY", ""))
+    if secret.startswith("django-insecure") or len(secret) < 50 or len(set(secret)) < 5:
+        return [
+            Warning(
+                "SECRET_KEY ضعیف/مقدار نمونه است؛ باید در env مقصد مقدار تصادفی ۵۰+ کاراکتری بگذارید.",
+                id="emmett_admin.W013",
+                hint='python -c "import secrets; print(secrets.token_urlsafe(64))"',
             )
         ]
     return []

@@ -6,6 +6,9 @@ import type { AppLocale } from "@/i18n/routing";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/molecules/card";
 import { getServices } from "@/lib/api/server";
+import { getSeoSettingsOrDefaults } from "@/lib/api/seo";
+import { buildPageMetadata } from "@/lib/seo/metadata";
+import { getPublicSiteUrl, toAppLocale } from "@/lib/seo/site";
 
 export async function generateMetadata({
   params,
@@ -14,7 +17,15 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "services" });
-  return { title: t("title"), description: t("description") };
+  const settings = await getSeoSettingsOrDefaults();
+  return buildPageMetadata({
+    locale: toAppLocale(locale),
+    path: "/services",
+    title: t("title"),
+    description: t("description"),
+    settings,
+    siteUrl: getPublicSiteUrl(),
+  });
 }
 
 export default async function ServicesPage({

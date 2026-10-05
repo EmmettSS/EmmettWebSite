@@ -151,9 +151,7 @@ class PublishWorkflowMixin(admin.ModelAdmin[Any]):
     def unpublish_selected(self, request: HttpRequest, queryset: QuerySet[Any]) -> None:
         """بازگشت به پیش‌نویس و پاک‌کردن ``published_at`` (مفهوم انتشار از دست می‌رود)."""
 
-        pending = list(
-            queryset.exclude(status=PublishableModel.Status.DRAFT).values_list("pk", flat=True)
-        )
+        pending = list(queryset.exclude(status=PublishableModel.Status.DRAFT).values_list("pk", flat=True))
         if not pending:
             self.message_user(request, _("Nothing to do: the selected items are already drafts."))
             return
@@ -162,9 +160,7 @@ class PublishWorkflowMixin(admin.ModelAdmin[Any]):
         updated = queryset.filter(pk__in=pending).update(
             status=PublishableModel.Status.DRAFT, published_at=None, updated_at=now
         )
-        self._log_bulk_action(
-            request, action="unpublished", ids=pending, metadata={"updated": updated}
-        )
+        self._log_bulk_action(request, action="unpublished", ids=pending, metadata={"updated": updated})
         self.message_user(
             request,
             _("Returned %(count)s item(s) to draft.") % {"count": updated},
@@ -175,9 +171,7 @@ class PublishWorkflowMixin(admin.ModelAdmin[Any]):
     def archive_selected(self, request: HttpRequest, queryset: QuerySet[Any]) -> None:
         """بایگانی: محتوا از API عمومی حذف می‌شود ولی رکورد و تاریخچهٔ انتشار می‌ماند."""
 
-        pending = list(
-            queryset.exclude(status=PublishableModel.Status.ARCHIVED).values_list("pk", flat=True)
-        )
+        pending = list(queryset.exclude(status=PublishableModel.Status.ARCHIVED).values_list("pk", flat=True))
         if not pending:
             self.message_user(request, _("Nothing to do: the selected items are already archived."))
             return
@@ -227,9 +221,7 @@ class RecordStateFilter(admin.SimpleListFilter):
     parameter_name = "record_state"
     request_key = "record_state"
 
-    def lookups(
-        self, request: HttpRequest, model_admin: admin.ModelAdmin[Any]
-    ) -> list[tuple[str, Any]]:
+    def lookups(self, request: HttpRequest, model_admin: admin.ModelAdmin[Any]) -> list[tuple[str, Any]]:
         return [
             ("active", _("Active only")),
             ("deleted", _("Soft-deleted only")),
@@ -309,9 +301,7 @@ class ExportFormatsMixin:
 
         return list(emmett_export_formats())
 
-    def get_export_filename(
-        self, request: HttpRequest, queryset: QuerySet[Any], file_format: Any
-    ) -> str:
+    def get_export_filename(self, request: HttpRequest, queryset: QuerySet[Any], file_format: Any) -> str:
         """نام فایل صادرات با پیشوند برند و تاریخ میلادی (سازگاری بین‌المللی).
 
         توجه: ``file_format`` یک **نمونهٔ** کلاس فرمت است (نه رشتهٔ پسوند)؛ جنگو/پکیج

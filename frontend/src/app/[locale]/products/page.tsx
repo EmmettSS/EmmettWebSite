@@ -6,6 +6,10 @@ import type { AppLocale } from "@/i18n/routing";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardDescription, CardMedia } from "@/components/molecules/card";
 import { getProjects } from "@/lib/api/server";
+import { getSeoSettingsOrDefaults } from "@/lib/api/seo";
+import { buildPageMetadata } from "@/lib/seo/metadata";
+import { getPublicSiteUrl, toAppLocale } from "@/lib/seo/site";
+import Image from "next/image";
 
 export async function generateMetadata({
   params,
@@ -14,7 +18,16 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "projects" });
-  return { title: t("products"), description: t("productsDescription") };
+  const settings = await getSeoSettingsOrDefaults();
+  return buildPageMetadata({
+    locale: toAppLocale(locale),
+    path: "/products",
+    title: t("products"),
+    description: t("productsDescription"),
+    settings,
+    siteUrl: getPublicSiteUrl(),
+    
+  });
 }
 
 export default async function ProductsPage({
@@ -47,10 +60,11 @@ export default async function ProductsPage({
               <Card className="h-full overflow-hidden">
                 {project.cover_image_url ? (
                   <CardMedia>
-                    {/* eslint-disable-next-line @next/next/no-img-element -- دامنهٔ تصاویر از بک‌اند پویاست */}
-                    <img
+                    <Image
                       src={project.cover_image_url}
                       alt=""
+                      fill
+                      sizes="(max-width: 768px) 100vw, 33vw"
                       className="aspect-video w-full object-cover"
                     />
                   </CardMedia>

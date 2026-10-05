@@ -6,6 +6,9 @@ import { Badge } from "@/components/ui/badge";
 import { SearchBox } from "@/components/organisms/search-box";
 import type { AppLocale } from "@/i18n/routing";
 import { searchSite } from "@/lib/api/server";
+import { getSeoSettingsOrDefaults } from "@/lib/api/seo";
+import { buildPageMetadata } from "@/lib/seo/metadata";
+import { getPublicSiteUrl, toAppLocale } from "@/lib/seo/site";
 
 export async function generateMetadata({
   params,
@@ -14,7 +17,16 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "search" });
-  return { title: t("title") };
+  const settings = await getSeoSettingsOrDefaults();
+  return buildPageMetadata({
+    locale: toAppLocale(locale),
+    path: "/search",
+    title: t("title"),
+    
+    settings,
+    siteUrl: getPublicSiteUrl(),
+    noindex: true,
+  });
 }
 
 export default async function SearchPage({

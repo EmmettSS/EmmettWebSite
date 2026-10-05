@@ -28,6 +28,9 @@ backend/.coverage
 backend/.coverage.*
 backend/*.log
 
+# === آرتیفکت‌های موقت بررسی (تصاویر OG تولیدشده در build و مانند آن) ===
+.arena-tmp/
+
 # === ابزارها / ویرایشگرها ===
 .DS_Store
 .vscode/

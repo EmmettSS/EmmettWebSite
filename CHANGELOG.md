@@ -2,6 +2,99 @@
 
 فرمت این فایل بر اساس [Keep a Changelog](https://keepachangelog.com/) است. هر فاز پروژه یک بخش مستقل دارد.
 
+## [فاز ۷ — SEO، کارایی و امنیت] — 2026-10-05
+
+دامنهٔ فاز طبق واگذاری صریح مالک محصول («اگر تمام نشده تمام کن سپس گزارش بده»؛
+پاسخ ۱: SEO در Next.js، پاسخ ۲: دامنه از env، پاسخ ۶: JSON-LD روی همهٔ بخش‌ها،
+پاسخ ۹: مجوز افزودن وابستگی تصویر، پاسخ ۱۰: معیار جانشین Lighthouse، پاسخ ۱۴:
+۲FA با پکیج آماده) در سه محور اجرا شد و تصمیم‌ها در `ADR-0031`–`ADR-0033` ثبت شدند.
+
+### SEO (`ADR-0031`)
+- **منبع حقیقت URL و رندر در Next.js:** `src/lib/seo/{site,metadata,json-ld,redirects,feed,types}.ts`،
+  `src/app/sitemap.ts`، `src/app/robots.ts`، `src/app/[locale]/opengraph-image.tsx` و
+  `src/app/[locale]/{blog,academy}/rss/route.ts`. جنگو فقط داده/ادمین/فید سازگاری است.
+- **دامنه از `PUBLIC_SITE_URL`** (نه hard-code، نه هدر `Host`)؛ در حالت `check --deploy`
+  نبود آن خطای `emmett_admin.W007` است.
+- **hreflang `fa-IR`/`en`/`x-default` + canonical خودارجاع** روی همهٔ صفحات عمومی و متادیتای
+  پویا از `SiteSettings` (`buildPageMetadata`)؛ ۱۴ صفحه از این مسیر عبور کردند.
+- **JSON-LD شش‌نوعه:** `Organization`+`WebSite` (ریشه)، `Article` (بلاگ/پروژه)، `Course`،
+  `Service`، `BreadcrumbList` و `FAQPage` (FAQ از ادمین، با اندپوینت `/api/v1/seo/faq/?path=`).
+- **OG/Twitter پویا** با تصویر ۱۲۰۰×۶۳۰ که متنش از کاتالوگ پیام‌ها می‌آید؛ رندر تصویر با
+  `satori` دو سازگاری لازم داشت که در build کشف و رفع شد: نبود پشتیبانی از قالب `wOF2`
+  (استفاده از نسخهٔ `.woff`) و نیاز به `direction: rtl` + زیرمجموعهٔ فونت لاتین برای متن‌های
+  دوزبانه (بدون آن، نشان برند و نیم‌فاصله به‌هم‌ریخته رندر می‌شد).
+- **sitemap/robots پویا** با `dynamic = "force-dynamic"` (چون API ممکن است در build خالی
+  باشد)؛ مسیرهای noindex (`/profile`, `/search`, `/advisor`, `/estimate`, `/admin`, `/api`,
+  `/i18n`, `/media`) از sitemap حذف و در robots Disallow می‌شوند.
+- **ریدایرکت‌های مدیریت‌شده (۳۰۱/۳۰۲/۴۱۰)** از ادمین، در لبهٔ Next (`src/proxy.ts`) و در
+  جنگو (`RedirectFallbackMiddleware`)؛ ۴۱۰ صفحهٔ HTML با `X-Robots-Tag: noindex` و
+  نرمال‌سازی یکسان کلید در دو طرف + شمارش بازدید و کش.
+- **RSS/Atom بلاگ و دوره** روی `/blog/rss` و `/academy/rss` (+ مسیر سازگاری
+  `/api/v1/blog/rss/`)؛ مسیر قدیمی `rss.xml` با ۳۰۱ به مسیر جدید می‌رود.
+- **تأیید Search Console** از ادمین (`search_console_verification`) با هشدار `W010` در
+  production و متای مربوطه در فرانت.
+
+### کارایی (`ADR-0032`)
+- **معیار جانشین Lighthouse** (Lighthouse واقعی در sandbox بدون Chromium ممکن نیست):
+  نبود `<img>` خام + AVIF/WebP + `sizes`، `font-display: swap` و فونت خودمیزبان،
+  صفر وابستگی ثالث در مسیر بحرانی، و **سقف کوئری در تست**.
+- **تصویر:** هر ۷ تگ `<img>` خام با `next/image` جایگزین شد (کاور بلاگ با `priority`،
+  گالری پروژه با `fill`/`sizes`/lazy) و `next.config.ts` فرمت‌های `image/avif`/`image/webp`،
+  `deviceSizes` پروژه و `minimumCacheTTL` سی‌روزه را اعلام می‌کند.
+- **کش لایه‌ای:** `seo:sitemap:entries:v1`, `seo:settings:v1`, `seo:redirects:map:v1` +
+  `revalidate` در فرانت؛ بار دوم sitemap و settings صفر کوئری است (قفل‌شده در تست).
+- **فونت:** وزیرمتن ۷۰۰ برای وزن تیتر و `swap` برای همه؛ بودجهٔ بارگذاری در
+  `src/lib/fonts.ts` مستند شد.
+- **N+1:** هر endpoint عمومی با `select_related`/`prefetch_related` صریح؛ سقف‌ها در
+  `test_performance_budget.py` (فهرست‌ها ≤ ۶ برای ۳ و ۱۲ آیتم، detail ≤ ۱۴، sitemap ≤ ۱۲).
+
+### امنیت (`ADR-0033`)
+- **CSP دو‌سیاستی:** API/غیرادمین `default-src 'none'; script-src 'self'` و ادمین
+  `default-src 'self'` + `unsafe-inline` (اجبار Jazzmin)؛ با `DJANGO_CSP_REPORT_ONLY` و
+  `DJANGO_CSP_REPORT_URI` قابل انتقال به حالت گزارش. Referrer، Permissions-Policy
+  (`camera=(), microphone=(), geolocation=()`) و COOP `same-origin` سراسری.
+  `X-Frame-Options`/`frame-ancestors` عمداً در dev باز است تا پیش‌نمایش iframe بشکند نشود.
+- **۲FA ادمین** (`django-otp==1.7.3` + `qrcode==8.2`): TOTP با QR درون `data:`، کلید
+  Base32 برای ورود دستی (`device.key` هگز است — باگ کشف و رفع شد)، کدهای بازیابی
+  یک‌بارمصرف، و قفل موقت صفحهٔ تأیید پس از `OTP_MAX_ATTEMPTS`.
+- **قفل ورود ضد brute-force** روی cache با پنجره/آستانه/مدت از env؛ پاسخ API `429` +
+  `Retry-After`؛ کلیدها با هش ایمیل و IP تا هم حملهٔ حساب‌محور و هم IP-محور گرفته شود.
+- **دو یافتهٔ امنیتی رفع‌شده:** کد بازیابی تهی ⇒ بای‌پس ۲FA، و اتکا به `cache.ttl()` ⇒
+  قفل ورود عملاً بی‌اثر؛ هر دو با تست موفق/ناموفق قفل شده‌اند.
+- **Audit Log** رویدادهای امنیتی (`auth.account_locked`, `auth.login_blocked`,
+  `auth.2fa_*`) بدون IP خام و بدون راز.
+- **بکاپ:** `manage.py backup_db` — SQLite با `VACUUM INTO` (+ `busy_timeout`)، MySQL با
+  `mysqldump` و fallback به `dumpdata`، مدیا `tar.gz`، `manifest-{stamp}.json` و
+  هرس بر اساس `BACKUP_RETENTION`؛ رویه در راهنمای ادمین توضیح داده شده است.
+- **رازها:** همه از `.env` با django-environ؛ کلیدهای فاز ۷ به `.env.example` اضافه شدند
+  (`DJANGO_CSP_*`, `DJANGO_FRAME_ANCESTORS`, `LOGIN_LOCKOUT_*`, `ADMIN_2FA_*`,
+  `BACKUP_*`, `SEO_*`, `PUBLIC_SITE_URL`).
+- **System Checkهای تازه:** `emmett_admin.W008` (CSP خاموش)، `W009` (۲FA اجباری خاموش در
+  production)، `W010` (کد Search Console)، `W011`/`W012` (پوشهٔ بکاپ)، `W013` (ضعف/نمونه‌بودن
+  `SECRET_KEY`).
+
+### وابستگی‌های افزوده (قانون ۶ — توجیه مکتوب)
+- `django-otp==1.7.3` و `qrcode==8.2` **بک‌اند** (۲FA و QR SVG بدون CDN/Pillow)؛
+  پیش‌تر کد ۲FA بدون ثبت در `requirements.txt` نوشته شده بود که در همین فاز اصلاح شد.
+- هیچ وابستگی **فرانت‌اند** جدیدی اضافه نشد (SEO/OG با امکانات خود Next.js).
+
+### اعتبارسنجی (اعداد واقعی)
+- بک‌اند: **485 passed** (`pytest -q`, ۷۸ ثانیه) شامل ۲۳ تست امنیت، ۲۲ تست ۲FA، ۹ تست
+  بکاپ، ۱۸ تست SEO API، ۲۵ تست ریدایرکت، ۱۸ تست بودجهٔ کوئری و ۵ تست فید؛
+  `ruff check .` = All checks passed؛ `mypy apps config` (strict) = بدون خطا در ۲۴۰ فایل؛
+  `manage.py check` بدون خطا؛ `makemigrations --check` = بدون تغییر؛ `i18n.py check` سبز.
+- فرانت: `npx tsc --noEmit` تمیز، `eslint` صفر مشکل، `vitest run` = ۴۲ تست در ۸ فایل سبز،
+  `next build` = ۳۱ صفحه بدون خطا و رندر موفق تصاویر OG دوزبانه (بررسی چشمی/حجمی).
+- `ruff format --check` روی فایل‌های همین فاز اجرا و اعمال شد؛ ۱۷ فایل قدیمی خارج از دامنهٔ
+  فاز همچنان unformatted است (سیاست از فاز ۵: بدون diff نامرتبط).
+
+### محدودیت‌های محیط/تحویل
+- Lighthouse واقعی (هدف ≥۹۵) و Playwright در این محیط قابل اجرا نیستند (نبود Chromium)؛
+  معیار جانشین بالا مبنای پذیرش است و اجرای یک‌بارهٔ Lighthouse روی دامنهٔ مقصد در
+  چک‌لیست استقرار راهنمای ادمین آمده است.
+- `PUBLIC_SITE_URL` تا تعیین دامنهٔ نهایی روی مقدار dev است؛ تنها نقطهٔ تغییر دامنه همان
+  env var است (نه کد).
+
 ## [فاز ۶ — Admin Customization در سطح SaaS] — 2026-10-05
 
 فاز ۶ بر پایهٔ چهار پاسخ صریح مالک محصول پیاده‌سازی شد: **Jazzmin + لایهٔ RTL اختصاصی**

@@ -20,7 +20,7 @@ msgid "name"
 msgstr "نام"
 
 #: apps/academy/models.py:27 apps/academy/models.py:49
-#: apps/academy/models.py:82 apps/blog/models.py:18 apps/core/models.py:410
+#: apps/academy/models.py:82 apps/blog/models.py:18 apps/core/models.py:467
 #: apps/portfolio/models.py:25 apps/services/models.py:17
 msgid "title"
 msgstr "عنوان"
@@ -69,7 +69,7 @@ msgstr "ویژه است"
 
 #: apps/academy/models.py:65 apps/academy/models.py:87
 #: apps/ai_engine/models.py:24 apps/ai_engine/models.py:56
-#: apps/company/models.py:31 apps/company/models.py:58
+#: apps/company/models.py:31 apps/company/models.py:58 apps/core/models.py:570
 #: apps/portfolio/models.py:50 apps/services/models.py:29
 msgid "order"
 msgstr "ترتیب"
@@ -107,7 +107,7 @@ msgid "Lessons"
 msgstr "درس‌ها"
 
 #: apps/academy/models.py:129 apps/ai_engine/models.py:181
-#: apps/blog/models.py:66 apps/core/models.py:228 apps/leads/models.py:118
+#: apps/blog/models.py:66 apps/core/models.py:229 apps/leads/models.py:118
 msgid "status"
 msgstr "وضعیت"
 
@@ -147,7 +147,7 @@ msgstr "پیشرفته"
 msgid "قابل‌مشاهده بدون نیاز به ورود/خرید."
 msgstr "قابل مشاهده بدون نیاز به ورود یا خرید."
 
-#: apps/academy/models.py:116 apps/ai_engine/admin.py:299
+#: apps/academy/models.py:116 apps/ai_engine/admin.py:304
 #: apps/core/dashboard.py:401
 msgid "Active"
 msgstr "فعال"
@@ -185,12 +185,12 @@ msgstr "نقش"
 msgid "phone verified"
 msgstr "تلفن تأییدشده"
 
-#: apps/accounts/models.py:83 apps/core/models.py:78 apps/core/models.py:140
+#: apps/accounts/models.py:83 apps/core/models.py:79 apps/core/models.py:141
 msgid "created at"
 msgstr "تاریخ ایجاد"
 
-#: apps/accounts/models.py:84 apps/core/models.py:79 apps/core/models.py:141
-#: apps/core/models.py:352 apps/core/models.py:414
+#: apps/accounts/models.py:84 apps/core/models.py:80 apps/core/models.py:142
+#: apps/core/models.py:353 apps/core/models.py:471
 msgid "updated at"
 msgstr "تاریخ بروزرسانی"
 
@@ -298,7 +298,7 @@ msgstr "کاتالوگ‌ها"
 msgid "option key"
 msgstr "کلید گزینه"
 
-#: apps/ai_engine/models.py:57 apps/core/models.py:170
+#: apps/ai_engine/models.py:57 apps/core/models.py:171
 msgid "metadata"
 msgstr "فراداده"
 
@@ -316,7 +316,7 @@ msgstr "قابلیت"
 
 #: apps/ai_engine/models.py:102 apps/ai_engine/models.py:180
 #: apps/ai_engine/models.py:216 apps/ai_engine/models.py:302
-#: apps/core/models.py:341 apps/core/models.py:409
+#: apps/core/models.py:342 apps/core/models.py:466
 msgid "locale"
 msgstr "زبان"
 
@@ -572,7 +572,7 @@ msgstr "ناموفق"
 msgid "Blocked"
 msgstr "مسدود"
 
-#: apps/ai_engine/models.py:290 apps/core/models.py:223
+#: apps/ai_engine/models.py:290 apps/core/models.py:224
 msgid "Draft"
 msgstr "پیش‌نویس"
 
@@ -618,7 +618,7 @@ msgstr "نوشتهٔ وبلاگ"
 msgid "Blog Posts"
 msgstr "نوشته‌های وبلاگ"
 
-#: apps/blog/models.py:64 apps/core/models.py:411
+#: apps/blog/models.py:64 apps/core/models.py:468
 msgid "body"
 msgstr "متن"
 
@@ -642,7 +642,7 @@ msgstr "نام کامل"
 msgid "role title"
 msgstr "عنوان شغلی"
 
-#: apps/company/models.py:30 apps/core/models.py:374
+#: apps/company/models.py:30 apps/core/models.py:375
 msgid "social links"
 msgstr "پیوندهای شبکه‌های اجتماعی"
 
@@ -682,210 +682,210 @@ msgstr "نظرات مشتریان"
 msgid "Core"
 msgstr "هسته"
 
-#: apps/core/models.py:80
+#: apps/core/models.py:81
 msgid "is active"
 msgstr "فعال است"
 
-#: apps/core/models.py:81
+#: apps/core/models.py:82
 msgid "deleted at"
 msgstr "تاریخ حذف"
 
-#: apps/core/models.py:164
+#: apps/core/models.py:165
 msgid "action"
 msgstr "اقدام"
 
-#: apps/core/models.py:171 apps/leads/models.py:56
+#: apps/core/models.py:172 apps/leads/models.py:56
 msgid "IP address"
 msgstr "نشانی IP"
 
-#: apps/core/models.py:172 apps/leads/models.py:57
+#: apps/core/models.py:173 apps/leads/models.py:57
 msgid "user agent"
 msgstr "عامل کاربر"
 
-#: apps/core/models.py:175
+#: apps/core/models.py:176
 msgid "Audit Log"
 msgstr "گزارش حسابرسی"
 
-#: apps/core/models.py:176
+#: apps/core/models.py:177
 msgid "Audit Logs"
 msgstr "گزارش‌های حسابرسی"
 
-#: apps/core/models.py:230
+#: apps/core/models.py:231
 msgid "published at"
 msgstr "تاریخ انتشار"
 
-#: apps/core/models.py:248
+#: apps/core/models.py:249
 msgid "meta title"
 msgstr "عنوان متا"
 
-#: apps/core/models.py:249
+#: apps/core/models.py:250
 msgid "meta description"
 msgstr "توضیح متا"
 
-#: apps/core/models.py:259
+#: apps/core/models.py:260
 msgid "canonical path"
 msgstr "مسیر canonical"
 
-#: apps/core/models.py:290
+#: apps/core/models.py:291
 msgid "file"
 msgstr "فایل"
 
-#: apps/core/models.py:292
+#: apps/core/models.py:293
 msgid "media type"
 msgstr "نوع رسانه"
 
-#: apps/core/models.py:293
+#: apps/core/models.py:294
 msgid "alt text"
 msgstr "متن جایگزین"
 
-#: apps/core/models.py:294
+#: apps/core/models.py:295
 msgid "caption"
 msgstr "توضیح تصویر"
 
-#: apps/core/models.py:295
+#: apps/core/models.py:296
 msgid "width"
 msgstr "عرض"
 
-#: apps/core/models.py:296
+#: apps/core/models.py:297
 msgid "height"
 msgstr "ارتفاع"
 
-#: apps/core/models.py:297
+#: apps/core/models.py:298
 msgid "file size (bytes)"
 msgstr "حجم فایل (بایت)"
 
-#: apps/core/models.py:298
+#: apps/core/models.py:299
 msgid "MIME type"
 msgstr "نوع MIME"
 
-#: apps/core/models.py:299
+#: apps/core/models.py:300
 msgid "checksum (sha256)"
 msgstr "چک‌سام (SHA-256)"
 
-#: apps/academy/admin.py:83 apps/blog/admin.py:57 apps/core/models.py:310
-#: apps/core/models.py:311 apps/portfolio/admin.py:63
+#: apps/academy/admin.py:83 apps/blog/admin.py:57 apps/core/models.py:311
+#: apps/core/models.py:312 apps/portfolio/admin.py:63
 msgid "Media"
 msgstr "رسانه"
 
-#: apps/core/models.py:339
+#: apps/core/models.py:340
 msgid "namespace"
 msgstr "فضای نام"
 
-#: apps/core/models.py:340
+#: apps/core/models.py:341
 msgid "key"
 msgstr "کلید"
 
-#: apps/core/models.py:342
+#: apps/core/models.py:343
 msgid "value"
 msgstr "مقدار"
 
-#: apps/core/models.py:343
+#: apps/core/models.py:344
 msgid "is HTML"
 msgstr "HTML است"
 
-#: apps/core/models.py:355
+#: apps/core/models.py:356
 msgid "Translation"
 msgstr "ترجمه"
 
-#: apps/core/models.py:356
+#: apps/core/models.py:357
 msgid "Translations"
 msgstr "ترجمه‌ها"
 
-#: apps/core/models.py:370
+#: apps/core/models.py:371
 msgid "site name"
 msgstr "نام سایت"
 
-#: apps/core/models.py:371
+#: apps/core/models.py:372
 msgid "default locale"
 msgstr "زبان پیش‌فرض"
 
-#: apps/core/models.py:372
+#: apps/core/models.py:373
 msgid "contact email"
 msgstr "ایمیل تماس"
 
-#: apps/core/models.py:373
+#: apps/core/models.py:374
 msgid "contact phone"
 msgstr "تلفن تماس"
 
-#: apps/core/models.py:375
+#: apps/core/models.py:376
 msgid "maintenance mode"
 msgstr "حالت تعمیرات"
 
-#: apps/core/models.py:378 apps/core/models.py:379
+#: apps/core/models.py:428 apps/core/models.py:429
 msgid "Site Settings"
 msgstr "تنظیمات سایت"
 
-#: apps/core/models.py:406
+#: apps/core/models.py:463
 msgid "content type"
 msgstr "نوع محتوا"
 
-#: apps/core/models.py:407
+#: apps/core/models.py:464
 msgid "object id"
 msgstr "شناسهٔ شیء"
 
-#: apps/core/models.py:408
+#: apps/core/models.py:465
 msgid "public id"
 msgstr "شناسهٔ عمومی"
 
-#: apps/core/models.py:412
+#: apps/core/models.py:469
 msgid "URL path"
 msgstr "مسیر URL"
 
-#: apps/core/models.py:413
+#: apps/core/models.py:470
 msgid "category label"
 msgstr "برچسب دسته"
 
-#: apps/core/models.py:417
+#: apps/core/models.py:474
 msgid "Search Index Entry"
 msgstr "مدخل نمایهٔ جست‌وجو"
 
-#: apps/core/models.py:418
+#: apps/core/models.py:475
 msgid "Search Index Entries"
 msgstr "مدخل‌های نمایهٔ جست‌وجو"
 
-#: apps/core/models.py:157
+#: apps/core/models.py:158
 msgid "actor"
 msgstr "اقدام‌کننده"
 
-#: apps/core/models.py:162
+#: apps/core/models.py:163
 msgid "کاربری که عملیات را انجام داده؛ خالی یعنی سیستم/کاربر مهمان."
 msgstr "کاربری که عملیات را انجام داده؛ خالی یعنی سیستم یا کاربر مهمان."
 
-#: apps/core/models.py:224
+#: apps/core/models.py:225
 msgid "Published"
 msgstr "منتشرشده"
 
-#: apps/core/models.py:225
+#: apps/core/models.py:226
 msgid "Archived"
 msgstr "بایگانی‌شده"
 
-#: apps/core/models.py:252
+#: apps/core/models.py:253
 msgid "OG image"
 msgstr "تصویر Open Graph"
 
-#: apps/core/models.py:263
+#: apps/core/models.py:264
 msgid ""
 "در صورت خالی بودن، مسیر پیش‌فرض صفحه به‌عنوان canonical استفاده می‌شود."
 msgstr ""
 "در صورت خالی بودن، مسیر پیش‌فرض صفحه به‌عنوان canonical استفاده می‌شود."
 
-#: apps/core/models.py:285
+#: apps/core/models.py:286
 msgid "Image"
 msgstr "تصویر"
 
-#: apps/core/models.py:286
+#: apps/core/models.py:287
 msgid "Document"
 msgstr "سند"
 
-#: apps/core/models.py:287
+#: apps/core/models.py:288
 msgid "Video"
 msgstr "ویدیو"
 
-#: apps/core/models.py:302
+#: apps/core/models.py:303
 msgid "uploaded by"
 msgstr "بارگذارنده"
 
-#: apps/core/models.py:346
+#: apps/core/models.py:347
 msgid "updated by"
 msgstr "بروزرسانی‌کننده"
 
@@ -921,7 +921,7 @@ msgstr "منبع"
 msgid "consent given"
 msgstr "رضایت داده‌شده"
 
-#: apps/leads/models.py:60
+#: apps/core/admin.py:250 apps/leads/models.py:60
 msgid "Contact"
 msgstr "تماس"
 
@@ -1146,13 +1146,13 @@ msgstr "مشخصات دوره"
 msgid "Categories and ordering"
 msgstr "دسته‌بندی و ترتیب نمایش"
 
-#: apps/academy/admin.py:85 apps/ai_engine/admin.py:162 apps/blog/admin.py:59
+#: apps/academy/admin.py:85 apps/ai_engine/admin.py:167 apps/blog/admin.py:59
 #: apps/portfolio/admin.py:68 apps/services/admin.py:32
 msgid "Publication"
 msgstr "انتشار"
 
-#: apps/academy/admin.py:86 apps/blog/admin.py:60 apps/portfolio/admin.py:69
-#: apps/services/admin.py:33
+#: apps/academy/admin.py:86 apps/blog/admin.py:60 apps/core/admin.py:252
+#: apps/portfolio/admin.py:69 apps/services/admin.py:33
 msgid "SEO"
 msgstr "سئو"
 
@@ -1161,104 +1161,104 @@ msgstr "سئو"
 msgid "Technical details"
 msgstr "جزئیات فنی"
 
-#: apps/academy/admin.py:120 apps/ai_engine/admin.py:368
+#: apps/academy/admin.py:120 apps/ai_engine/admin.py:373
 #: apps/leads/admin.py:84
 msgid "Status"
 msgstr "وضعیت"
 
-#: apps/accounts/admin.py:53
+#: apps/accounts/admin.py:63
 msgid "Personal information"
 msgstr "اطلاعات شخصی"
 
-#: apps/accounts/admin.py:55
+#: apps/accounts/admin.py:65
 msgid "Role and permissions"
 msgstr "نقش و دسترسی‌ها"
 
-#: apps/accounts/admin.py:58
+#: apps/accounts/admin.py:68
 msgid "Timeline"
 msgstr "زمان‌بندی"
 
-#: apps/accounts/admin.py:59
+#: apps/accounts/admin.py:69
 msgid "Public identifier"
 msgstr "شناسهٔ عمومی"
 
-#: apps/accounts/admin.py:71
+#: apps/accounts/admin.py:83
 msgid "Full name"
 msgstr "نام کامل"
 
-#: apps/accounts/admin.py:92
+#: apps/accounts/admin.py:152
 msgid "Biography"
 msgstr "زندگی‌نامه"
 
-#: apps/ai_engine/admin.py:91
+#: apps/ai_engine/admin.py:96
 msgid "Options"
 msgstr "گزینه‌ها"
 
-#: apps/ai_engine/admin.py:161
+#: apps/ai_engine/admin.py:166
 msgid "Prompt"
 msgstr "پرامپت"
 
-#: apps/ai_engine/admin.py:170
+#: apps/ai_engine/admin.py:175
 msgid "Active version"
 msgstr "نسخهٔ فعال"
 
-#: apps/ai_engine/admin.py:189
+#: apps/ai_engine/admin.py:194
 msgid "Archive superseded versions of the same feature and locale"
 msgstr "بایگانی نسخه‌های قدیمی‌ترِ همان قابلیت و زبان"
 
-#: apps/ai_engine/admin.py:230
+#: apps/ai_engine/admin.py:235
 msgid "Descriptions"
 msgstr "توضیحات"
 
-#: apps/ai_engine/admin.py:231
+#: apps/ai_engine/admin.py:236
 msgid "Configuration"
 msgstr "پیکربندی"
 
-#: apps/ai_engine/admin.py:297
+#: apps/ai_engine/admin.py:302
 msgid "Public share"
 msgstr "اشتراک عمومی"
 
-#: apps/ai_engine/admin.py:301
+#: apps/ai_engine/admin.py:306
 msgid "Revoke public share links for selected suggestions"
 msgstr "لغو پیوندهای اشتراک عمومی پیشنهادهای انتخاب‌شده"
 
-#: apps/ai_engine/admin.py:372
+#: apps/ai_engine/admin.py:377
 msgid "Approve selected summaries for public display"
 msgstr "تأیید خلاصه‌های انتخاب‌شده برای نمایش عمومی"
 
-#: apps/ai_engine/admin.py:392
+#: apps/ai_engine/admin.py:397
 msgid "Reject selected summaries"
 msgstr "رد خلاصه‌های انتخاب‌شده"
 
-#: apps/ai_engine/admin.py:215
+#: apps/ai_engine/admin.py:220
 msgid "Archived %(count)s superseded prompt version(s)."
 msgstr "%(count)s نسخهٔ قدیمی پرامپت بایگانی شد."
 
-#: apps/ai_engine/admin.py:299
+#: apps/ai_engine/admin.py:304
 msgid "Revoked"
 msgstr "لغوشده"
 
-#: apps/ai_engine/admin.py:305
+#: apps/ai_engine/admin.py:310
 msgid "Nothing to revoke: no active share link was selected."
 msgstr "چیزی برای لغو نیست: هیچ پیوند اشتراک فعالی انتخاب نشده است."
 
-#: apps/ai_engine/admin.py:314
+#: apps/ai_engine/admin.py:319
 msgid "Revoked %(count)s share link(s)."
 msgstr "%(count)s پیوند اشتراک لغو شد."
 
-#: apps/ai_engine/admin.py:376
+#: apps/ai_engine/admin.py:381
 msgid "Nothing to approve: selected summaries are stale."
 msgstr "چیزی برای تأیید نیست: خلاصه‌های انتخاب‌شده کهنه شده‌اند."
 
-#: apps/ai_engine/admin.py:389
+#: apps/ai_engine/admin.py:394
 msgid "Approved %(count)s summarie(s)."
 msgstr "%(count)s خلاصه تأیید شد."
 
-#: apps/ai_engine/admin.py:396
+#: apps/ai_engine/admin.py:401
 msgid "Nothing to reject: no summary was selected."
 msgstr "چیزی برای ردکردن نیست: هیچ خلاصه‌ای انتخاب نشده است."
 
-#: apps/ai_engine/admin.py:409
+#: apps/ai_engine/admin.py:414
 msgid "Rejected %(count)s summarie(s)."
 msgstr "%(count)s خلاصه رد شد."
 
@@ -1298,23 +1298,23 @@ msgstr "پیوندها"
 msgid "Quote"
 msgstr "نقل‌قول"
 
-#: apps/core/admin.py:98
+#: apps/core/admin.py:112
 msgid "Change summary"
 msgstr "خلاصهٔ تغییر"
 
-#: apps/core/admin.py:152
+#: apps/core/admin.py:179
 msgid "Value"
 msgstr "مقدار"
 
-#: apps/core/admin.py:167
+#: apps/core/admin.py:194
 msgid "Create the missing language row for selected entries"
 msgstr "ساخت ردیف زبان غایب برای مدخل‌های انتخاب‌شده"
 
-#: apps/core/admin.py:203
+#: apps/core/admin.py:230
 msgid "All selected entries already exist in both languages."
 msgstr "همهٔ مدخل‌های انتخاب‌شده در هر دو زبان موجودند."
 
-#: apps/core/admin.py:199
+#: apps/core/admin.py:226
 msgid "Created %(count)s translation row(s)."
 msgstr "%(count)s ردیف ترجمه ساخته شد."
 
@@ -1342,76 +1342,76 @@ msgstr "بدون نسخهٔ انگلیسی (en)"
 msgid "Registered in both languages"
 msgstr "ثبت‌شده در هر دو زبان"
 
-#: apps/core/admin_mixins.py:219
+#: apps/core/admin_mixins.py:226
 msgid "record state"
 msgstr "وضعیت رکورد"
 
-#: apps/core/admin_mixins.py:110 apps/core/tests/test_i18n_tooling.py:148
+#: apps/core/admin_mixins.py:117 apps/core/tests/test_i18n_tooling.py:148
 #: apps/core/tests/test_i18n_tooling.py:154
 msgid "Publish selected content"
 msgstr "انتشار محتوای انتخاب‌شده"
 
-#: apps/core/admin_mixins.py:143
+#: apps/core/admin_mixins.py:150
 msgid "Return selected content to draft"
 msgstr "بازگرداندن محتوای انتخاب‌شده به پیش‌نویس"
 
-#: apps/core/admin_mixins.py:167
+#: apps/core/admin_mixins.py:174
 msgid "Archive selected content"
 msgstr "بایگانی محتوای انتخاب‌شده"
 
-#: apps/core/admin_mixins.py:189
+#: apps/core/admin_mixins.py:196
 msgid "Publication status"
 msgstr "وضعیت انتشار"
 
-#: apps/core/admin_mixins.py:254
+#: apps/core/admin_mixins.py:261
 msgid "Restore selected records"
 msgstr "بازگردانی رکوردهای انتخاب‌شده"
 
-#: apps/core/admin_mixins.py:277
+#: apps/core/admin_mixins.py:284
 msgid "Deleted?"
 msgstr "حذف‌شده؟"
 
-#: apps/core/admin_mixins.py:122
+#: apps/core/admin_mixins.py:129
 msgid "Nothing to do: the selected items are already published."
 msgstr "کاری لازم نیست: موارد انتخاب‌شده از قبل منتشر شده‌اند."
 
-#: apps/core/admin_mixins.py:139
+#: apps/core/admin_mixins.py:146
 msgid "Published %(count)s item(s)."
 msgstr "%(count)s مورد منتشر شد."
 
-#: apps/core/admin_mixins.py:151
+#: apps/core/admin_mixins.py:158
 msgid "Nothing to do: the selected items are already drafts."
 msgstr "کاری لازم نیست: موارد انتخاب‌شده از قبل پیش‌نویس‌اند."
 
-#: apps/core/admin_mixins.py:163
+#: apps/core/admin_mixins.py:170
 msgid "Returned %(count)s item(s) to draft."
 msgstr "%(count)s مورد به پیش‌نویس بازگردانده شد."
 
-#: apps/core/admin_mixins.py:175
+#: apps/core/admin_mixins.py:182
 msgid "Nothing to do: the selected items are already archived."
 msgstr "کاری لازم نیست: موارد انتخاب‌شده از قبل بایگانی شده‌اند."
 
-#: apps/core/admin_mixins.py:185
+#: apps/core/admin_mixins.py:192
 msgid "Archived %(count)s item(s)."
 msgstr "%(count)s مورد بایگانی شد."
 
-#: apps/core/admin_mixins.py:227
+#: apps/core/admin_mixins.py:234
 msgid "Active only"
 msgstr "فقط فعال"
 
-#: apps/core/admin_mixins.py:228
+#: apps/core/admin_mixins.py:235
 msgid "Soft-deleted only"
 msgstr "فقط حذف‌شده‌ها"
 
-#: apps/core/admin_mixins.py:229
+#: apps/core/admin_mixins.py:236
 msgid "All records"
 msgstr "همهٔ رکوردها"
 
-#: apps/core/admin_mixins.py:258
+#: apps/core/admin_mixins.py:265
 msgid "Nothing to restore: no soft-deleted item was selected."
 msgstr "چیزی برای بازگردانی نیست: هیچ رکورد حذف‌شده‌ای انتخاب نشده است."
 
-#: apps/core/admin_mixins.py:273
+#: apps/core/admin_mixins.py:280
 msgid "Restored %(count)s record(s)."
 msgstr "%(count)s رکورد بازگردانی شد."
 
@@ -1419,12 +1419,12 @@ msgstr "%(count)s رکورد بازگردانی شد."
 msgid "Emmett Group admin"
 msgstr "پنل مدیریت گروه امیت"
 
-#: apps/core/admin_theme.py:40 config/settings/base.py:282
+#: apps/core/admin_theme.py:40 config/settings/base.py:305
 msgid "Emmett Admin"
 msgstr "پنل مدیریت امیت"
 
 #: apps/core/admin_theme.py:41 apps/core/tests/test_i18n_tooling.py:147
-#: apps/core/tests/test_i18n_tooling.py:153 config/settings/base.py:296
+#: apps/core/tests/test_i18n_tooling.py:153 config/settings/base.py:319
 #: templates/admin/index.html:7
 msgid "Dashboard"
 msgstr "داشبورد"
@@ -1559,19 +1559,19 @@ msgstr "کانسپت هوش مصنوعی"
 msgid "Name"
 msgstr "نام"
 
-#: config/settings/base.py:283
+#: config/settings/base.py:306
 msgid "Emmett Group"
 msgstr "گروه امیت"
 
-#: config/settings/base.py:290
+#: config/settings/base.py:313
 msgid "Sign in to the Emmett admin panel"
 msgstr "ورود به پنل مدیریت امیت"
 
-#: config/settings/base.py:298
+#: config/settings/base.py:321
 msgid "View public site"
 msgstr "مشاهدهٔ سایت عمومی"
 
-#: config/settings/base.py:304
+#: config/settings/base.py:327
 msgid "Change password"
 msgstr "تغییر گذرواژه"
 
@@ -1639,3 +1639,260 @@ msgstr "نرخ تبدیل (برنده‌شده به کل سرنخ‌ها): %(rat
 #: apps/core/tests/test_i18n_tooling.py:149
 msgid "Export"
 msgstr "خروجی"
+
+#: apps/accounts/admin.py:87
+msgid "2FA"
+msgstr "ورود دو مرحله‌ای"
+
+#: apps/accounts/admin.py:99
+msgid "Disable two-factor authentication (support reset)"
+msgstr "غیرفعال‌کردن ورود دو مرحله‌ای (بازنشانی توسط پشتیبانی)"
+
+#: apps/accounts/admin.py:120
+msgid "Clear login lockout"
+msgstr "رفع قفل ورود"
+
+#: apps/accounts/admin.py:116
+msgid "Disabled two-factor authentication for %(count)s user(s)."
+msgstr "ورود دو مرحله‌ای برای %(count)s کاربر غیرفعال شد."
+
+#: apps/accounts/admin.py:131
+msgid "Cleared login lockout for %(count)s user(s)."
+msgstr "قفل ورود %(count)s کاربر رفع شد."
+
+#: apps/accounts/twofa_views.py:103
+msgid "Two-factor authentication is now active."
+msgstr "ورود دو مرحله‌ای اکنون فعال است."
+
+#: apps/accounts/twofa_views.py:72
+msgid "Two-factor authentication setup"
+msgstr "راه‌اندازی ورود دو مرحله‌ای"
+
+#: apps/accounts/twofa_views.py:89
+msgid "No pending enrollment was found. Start again."
+msgstr "درخواست راه‌اندازی نیمه‌کاره‌ای یافت نشد؛ از ابتدا شروع کنید."
+
+#: apps/accounts/twofa_views.py:92
+msgid "That code is not valid. Check your authenticator app and try again."
+msgstr ""
+"این کد معتبر نیست؛ اپلیکیشن Authenticator را بررسی کنید و دوباره تلاش کنید."
+
+#: apps/accounts/twofa_views.py:125
+msgid "Two-factor authentication"
+msgstr "ورود دو مرحله‌ای"
+
+#: apps/accounts/twofa_views.py:137
+msgid "Too many invalid codes. Wait a few minutes and try again."
+msgstr "کد نامعتبر بیش از حد؛ چند دقیقه صبر کنید و دوباره تلاش کنید."
+
+#: apps/accounts/twofa_views.py:156
+msgid "That recovery code is not valid."
+msgstr "این کد بازیابی معتبر نیست."
+
+#: apps/accounts/twofa_views.py:190
+msgid "Two-factor authentication status"
+msgstr "وضعیت ورود دو مرحله‌ای"
+
+#: apps/accounts/twofa_views.py:213
+msgid "Two-factor authentication was disabled for your account."
+msgstr "ورود دو مرحله‌ای برای حساب شما غیرفعال شد."
+
+#: apps/accounts/twofa_views.py:220
+msgid "New recovery codes were generated."
+msgstr "کدهای بازیابی تازه ساخته شد."
+
+#: apps/accounts/twofa_views.py:240
+msgid "Recovery codes"
+msgstr "کدهای بازیابی"
+
+#: apps/accounts/twofa_views.py:166
+msgid "That code is not valid. %(count)s attempt(s) left."
+msgstr "این کد معتبر نیست. %(count)s تلاش باقی مانده است."
+
+#: apps/accounts/twofa_views.py:205
+msgid "Verify a code before disabling two-factor authentication."
+msgstr "پیش از غیرفعال‌کردن ورود دو مرحله‌ای، یک کد را تأیید کنید."
+
+#: apps/accounts/twofa_views.py:151
+msgid "Recovery code accepted. %(count)s code(s) left."
+msgstr "کد بازیابی پذیرفته شد. %(count)s کد باقی مانده است."
+
+#: apps/core/admin.py:267
+msgid "Organization (structured data)"
+msgstr "سازمان (داده‌های ساخت‌یافته)"
+
+#: apps/core/admin.py:313
+msgid "Activate selected redirects"
+msgstr "فعال‌کردن ریدایرکت‌های انتخاب‌شده"
+
+#: apps/core/admin.py:318
+msgid "Deactivate selected redirects"
+msgstr "غیرفعال‌کردن ریدایرکت‌های انتخاب‌شده"
+
+#: apps/core/admin.py:323
+msgid "Reset hit counters"
+msgstr "بازنشانی شمارندهٔ بازدید"
+
+#: apps/core/admin.py:361
+msgid "Question"
+msgstr "پرسش"
+
+#: apps/core/admin.py:261
+msgid ""
+"Defaults used by the public site when a page has no SEO values of its own."
+msgstr "مقادیر پیش‌فرض سایت عمومی برای صفحه‌هایی که مقدار SEO اختصاصی ندارند."
+
+#: apps/core/admin.py:275
+msgid "Used by the Organization JSON-LD block on the home page."
+msgstr "در بلوک JSON-LD سازمان در صفحهٔ اصلی استفاده می‌شود."
+
+#: apps/core/admin.py:334
+msgid "Updated %(count)s redirect(s)."
+msgstr "%(count)s ریدایرکت به‌روزرسانی شد."
+
+#: apps/core/middleware.py:81
+msgid ""
+"Too many failed sign-in attempts. Try again in about %(minutes)s minute(s)."
+msgstr ""
+"تلاش‌های ناموفق ورود بیش از حد مجاز بود؛ حدود %(minutes)s دقیقهٔ دیگر دوباره"
+" تلاش کنید."
+
+#: apps/core/models.py:382
+msgid "default meta title"
+msgstr "عنوان متای پیش‌فرض"
+
+#: apps/core/models.py:389
+msgid "default meta description"
+msgstr "توضیح متای پیش‌فرض"
+
+#: apps/core/models.py:396
+msgid "Google Search Console verification code"
+msgstr "کد تأیید Google Search Console"
+
+#: apps/core/models.py:403
+msgid "Twitter/X handle"
+msgstr "نام کاربری توییتر/X"
+
+#: apps/core/models.py:406
+msgid "legal organization name"
+msgstr "نام حقوقی سازمان"
+
+#: apps/core/models.py:409
+msgid "organization address"
+msgstr "نشانی سازمان"
+
+#: apps/core/models.py:412
+msgid "organization same-as URLs"
+msgstr "نشانی‌های رسمی سازمان (sameAs)"
+
+#: apps/core/models.py:490
+msgid "301 — Permanent"
+msgstr "۳۰۱ — دائمی"
+
+#: apps/core/models.py:491
+msgid "302 — Temporary"
+msgstr "۳۰۲ — موقت"
+
+#: apps/core/models.py:492
+msgid "410 — Removed permanently"
+msgstr "۴۱۰ — حذف دائمی"
+
+#: apps/core/models.py:502
+msgid "from path"
+msgstr "مسیر مبدأ"
+
+#: apps/core/models.py:504
+msgid "target"
+msgstr "مقصد"
+
+#: apps/core/models.py:511
+msgid "status code"
+msgstr "کد وضعیت"
+
+#: apps/core/models.py:513
+msgid "hit count"
+msgstr "شمار بازدید"
+
+#: apps/core/models.py:514
+msgid "note"
+msgstr "یادداشت"
+
+#: apps/core/models.py:517
+msgid "Redirect"
+msgstr "ریدایرکت"
+
+#: apps/core/models.py:518
+msgid "Redirects"
+msgstr "ریدایرکت‌ها"
+
+#: apps/core/models.py:567
+msgid "page path"
+msgstr "مسیر صفحه"
+
+#: apps/core/models.py:568
+msgid "question"
+msgstr "پرسش"
+
+#: apps/core/models.py:569
+msgid "answer"
+msgstr "پاسخ"
+
+#: apps/core/models.py:573
+msgid "FAQ item"
+msgstr "پرسش متداول"
+
+#: apps/core/models.py:574
+msgid "FAQ items"
+msgstr "پرسش‌های متداول"
+
+#: apps/core/models.py:386
+msgid "Used for pages without their own SEO title."
+msgstr "برای صفحه‌های بدون عنوان SEO اختصاصی استفاده می‌شود."
+
+#: apps/core/models.py:393
+msgid ""
+"Aim for 120–160 characters; longer text is truncated by search engines."
+msgstr ""
+"بین ۱۲۰ تا ۱۶۰ نویسه بنویسید؛ متن بلندتر توسط موتورهای جست‌وجو بریده می‌شود."
+
+#: apps/core/models.py:400
+msgid "Content value of the google-site-verification meta tag."
+msgstr "محتوای تگ متای google-site-verification."
+
+#: apps/core/models.py:403
+msgid "Example: @emmett"
+msgstr "نمونه: emmett@"
+
+#: apps/core/models.py:415
+msgid "Public profile URLs used in JSON-LD, e.g. LinkedIn or GitHub."
+msgstr "نشانی نمایه‌های عمومی برای JSON-LD، مثلاً LinkedIn یا GitHub."
+
+#: apps/core/models.py:419
+msgid "default Open Graph image"
+msgstr "تصویر Open Graph پیش‌فرض"
+
+#: apps/core/models.py:424
+msgid ""
+"Used by social cards when a page has no image of its own (1200×630 "
+"recommended)."
+msgstr ""
+"برای کارت‌های شبکه‌های اجتماعی وقتی صفحه تصویر اختصاصی ندارد (اندازهٔ "
+"پیشنهادی ۱۲۰۰×۶۳۰)."
+
+#: apps/core/models.py:508
+msgid "Relative path (e.g. /services/web/) or an absolute https:// URL."
+msgstr "مسیر نسبی (مثلاً /services/web/) یا نشانی کامل https://."
+
+#: apps/core/models.py:536
+msgid "A redirect with this status code needs a target."
+msgstr "ریدایرکتی با این کد وضعیت باید مقصد داشته باشد."
+
+#: apps/core/models.py:538
+msgid "The target must start with / or https://."
+msgstr "مقصد باید با / یا https:// آغاز شود."
+
+#: apps/core/seo.py:169
+msgid ""
+"Paste the verification code here after adding the property in Search "
+"Console."
+msgstr "پس از افزودن دارایی در Search Console، کد تأیید را اینجا وارد کنید."

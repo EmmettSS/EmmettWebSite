@@ -450,7 +450,7 @@ erDiagram
 
 ---
 
-## ۱۰. فهرست ADRهای این فاز
+## ۱۰. فهرست ADRها (فاز ۱ تا ۷)
 
 | شماره | عنوان |
 |---|---|
@@ -476,6 +476,9 @@ erDiagram
 | [ADR-0028](docs/adr/0028-admin-dashboard-and-workflow.md) | داشبورد KPI، گردش‌کار انتشار و قابلیت‌های عملیاتی ادمین |
 | [ADR-0029](docs/adr/0029-export-import-strategy.md) | صادرات/واردات داده با `django-import-export` |
 | [ADR-0030](docs/adr/0030-i18n-tooling-and-translation-management.md) | ابزار i18n پروژه و مدیریت ترجمه در ادمین |
+| [ADR-0031](docs/adr/0031-seo-rendering-and-managed-urls.md) | معماری SEO: رندر در Next.js، دادهٔ ادمین از Django، دامنه از env | 
+| [ADR-0032](docs/adr/0032-performance-budget-and-asset-strategy.md) | بودجهٔ کارایی، تصویر مدرن، فونت خودمیزبان و سقف کوئری |
+| [ADR-0033](docs/adr/0033-security-hardening-2fa-backup-secrets.md) | سخت‌سازی امنیتی: CSP، ۲FA ادمین، قفل ورود، بکاپ و رازها |
 
 ### ۱۰.۱. لایهٔ ادمین (فاز ۶) — نمای کلی
 
@@ -494,6 +497,32 @@ erDiagram
 قابل‌بازگردانی داشته باشد، هر ادمین باید `search_fields` و `resource_class` صریح داشته
 باشد، واردات یا فعال است یا صریحاً خاموش، و اکشن‌های گروهی فقط به‌صورت unbound ثبت
 می‌شوند (قرارداد فراخوانی جنگو).
+
+---
+
+## ۱۰.۲. لایهٔ SEO / کارایی / امنیت (فاز ۷) — نمای کلی
+
+```
+مرز رندر و دادهٔ SEO (ADR-0031)
+Next.js (منبع حقیقت URL و رندر)                 Django (داده + ادمین + فید سازگاری)
+├── app/sitemap.ts        ← /api/v1/seo/sitemap/    ├── core.seo (تجمیع + کش)
+├── app/robots.ts         ← SEO_NOINDEX_PATHS        ├── core.SiteSettings / Redirect / FAQItem
+├── lib/seo/metadata.ts   ← /api/v1/seo/settings/    ├── /api/v1/seo/{settings,sitemap,redirects,faq}
+├── lib/seo/json-ld.ts    ← /api/v1/seo/faq/          ├── RedirectFallbackMiddleware (۳۰۱/۳۰۲/۴۱۰)
+├── [locale]/opengraph-image.tsx (۱۲۰۰×۶۳۰)          └── feeds: /api/v1/blog|academy/rss/
+└── proxy.ts: handleManagedRedirect + nonce CSP + hreflang/canonical
+
+کارایی (ADR-0032)                  امنیت (ADR-0033)
+├── next/image + AVIF/WebP          ├── SecurityHeadersMiddleware (CSP دو‌سیاستی، Referrer، COOP)
+├── font-display: swap + self-host  ├── AdminTwoFactorMiddleware + accounts.twofa (TOTP/Static)
+├── کش لایه‌ای (Map/Route/cache)     ├── LoginLockout (cache) + AuditLog رویدادهای امنیتی
+└── سقف کوئری در test_performance   └── backup_db (VACUUM INTO | mysqldump | dumpdata)
+```
+
+قواعد قفل‌شدهٔ این لایه: هیچ URL مطلقی جز از `PUBLIC_SITE_URL` ساخته نمی‌شود؛ هیچ صفحهٔ
+noindex در sitemap نمی‌آید؛ هیچ متادیتای صفحه‌ای hard-code نمی‌شود (gettext/پیام‌ها)؛ مسیرهای
+خصوصی هم `noindex` و هم `Disallow` هستند؛ و در production نبود ۲FA/CSP/بکاپ/راز معتبر با
+System Check (`emmett_admin.W008`–`W013`) هشدار داده می‌شود.
 
 ---
 

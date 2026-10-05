@@ -17,6 +17,7 @@ from typing import Any
 from django.conf import settings
 from django.contrib import admin, messages
 from django.contrib.admin.models import LogEntry
+from django.core.cache import cache
 from django.http import HttpRequest
 from django.utils.translation import gettext_lazy as _
 from modeltranslation.admin import TranslationAdmin
@@ -30,14 +31,26 @@ from apps.core.admin_mixins import (
     RecordStateFilter,
     SoftDeleteAdminMixin,
 )
-from apps.core.models import AuditLog, Media, SearchIndexEntry, SiteSettings, Translation, log_action
+from apps.core.models import (
+    AuditLog,
+    FAQItem,
+    Media,
+    Redirect,
+    SearchIndexEntry,
+    SiteSettings,
+    Translation,
+    log_action,
+)
 from apps.core.resources import (
     AuditLogResource,
+    FAQItemResource,
     LogEntryResource,
     MediaResource,
+    RedirectResource,
     SearchIndexEntryResource,
     TranslationResource,
 )
+from apps.core.seo import invalidate_sitemap_cache
 
 # ---------------------------------------------------------------------------
 # لاگ‌ها
@@ -121,9 +134,7 @@ class LogEntryAdmin(ImportDisabledMixin, EmmettImportExportAdmin):
 
 
 @admin.register(Media)
-class MediaAdmin(
-    ImportDisabledMixin, SoftDeleteAdminMixin, TranslationAdmin[Media], EmmettImportExportAdmin
-):
+class MediaAdmin(ImportDisabledMixin, SoftDeleteAdminMixin, TranslationAdmin[Media], EmmettImportExportAdmin):
     """رسانه + نرم‌حذف قابل‌بازگردانی (ADR-0012): پیش از این، حذف یک ردیف رسانه
     آن را برای همیشه از دید پنل پنهان می‌کرد چون فیلتر «وضعیت رکورد» و اکشن
     «بازگردانی» وجود نداشت (کشف‌شده با تست سطح ادمین فاز ۶)."""
@@ -186,9 +197,7 @@ class TranslationEntryAdmin(EmmettImportExportAdmin):
         keys = {(entry.namespace, entry.key) for entry in queryset}
         for namespace, key in sorted(keys):
             existing = set(
-                Translation.objects.filter(namespace=namespace, key=key).values_list(
-                    "locale", flat=True
-                )
+                Translation.objects.filter(namespace=namespace, key=key).values_list("locale", flat=True)
             )
             for locale, _label in settings.LANGUAGES:
                 if locale in existing:
@@ -224,15 +233,137 @@ class TranslationEntryAdmin(EmmettImportExportAdmin):
 
 @admin.register(SiteSettings)
 class SiteSettingsAdmin(TranslationAdmin[SiteSettings], EmmettAdminDefaults):
-    """Singleton — فقط یک ردیف (pk=1) مجاز است (ADR-0001/ADR-0003)."""
+    """Singleton — فقط یک ردیف (pk=1) مجاز است (ADR-0001/ADR-0003).
+
+    فاز ۷: بخش «SEO» به این صفحه اضافه شد تا پیش‌فرض‌های متا، کد تأیید
+    Search Console و اطلاعات سازمان (برای JSON-LD) بدون کد قابل‌ویرایش باشند
+    (ADR-0031).
+    """
 
     list_display = ("site_name", "default_locale", "contact_email", "contact_phone", "maintenance_mode")
+    fieldsets = (
+        (None, {"fields": ("site_name", "default_locale", "maintenance_mode")}),
+        (_("Contact"), {"fields": ("contact_email", "contact_phone", "social_links")}),
+        (
+            _("SEO"),
+            {
+                "fields": (
+                    "meta_title",
+                    "meta_description",
+                    "og_default_image",
+                    "search_console_verification",
+                    "twitter_handle",
+                ),
+                "description": _(
+                    "Defaults used by the public site when a page has no SEO values of its own."
+                ),
+            },
+        ),
+        (
+            _("Organization (structured data)"),
+            {
+                "classes": ("collapse",),
+                "fields": (
+                    "organization_legal_name",
+                    "organization_address",
+                    "organization_same_as",
+                ),
+                "description": _("Used by the Organization JSON-LD block on the home page."),
+            },
+        ),
+    )
 
     def has_add_permission(self, request: HttpRequest) -> bool:
         return not SiteSettings.objects.exists()
 
     def has_delete_permission(self, request: HttpRequest, obj: SiteSettings | None = None) -> bool:
         return False
+
+    def save_model(self, request: HttpRequest, obj: SiteSettings, form: Any, change: bool) -> None:
+        super().save_model(request, obj, form, change)
+        # کش sitemap/settings باید فوراً باطل شود؛ وگرنه تا ۱۵ دقیقه مقدار قدیمی
+        # در فرانت دیده می‌شود (باگ کلاسیک کش محتوا).
+        invalidate_sitemap_cache()
+        log_action(
+            action="core.site_settings_updated",
+            actor=request.user if request.user.is_authenticated else None,
+            target=obj,
+            metadata={"changed_fields": sorted(form.changed_data)},
+        )
+
+
+@admin.register(Redirect)
+class RedirectAdmin(SoftDeleteAdminMixin, EmmettImportExportAdmin):
+    """ریدایرکت‌های مدیریت‌شده (۳۰۱/۳۰۲/۴۱۰) — ADR-0031."""
+
+    resource_class = RedirectResource
+    list_display = ("from_path", "target", "status_code", "is_deleted", "hit_count", "is_active")
+    list_display_links = ("from_path",)
+    list_editable = ("is_active", "target")
+    list_filter = ("status_code", "is_active", RecordStateFilter)
+    search_fields = ("from_path", "target", "note")
+    readonly_fields = ("hit_count", "created_at", "updated_at", "deleted_at")
+    date_hierarchy = "created_at"
+    actions = ("activate_selected", "deactivate_selected", "reset_hit_counts")
+
+    @admin.action(description=_("Activate selected redirects"), permissions=["change"])
+    def activate_selected(self, request: HttpRequest, queryset: Any) -> None:
+        updated = queryset.update(is_active=True)
+        self._after_change(request, "redirects_activated", updated)
+
+    @admin.action(description=_("Deactivate selected redirects"), permissions=["change"])
+    def deactivate_selected(self, request: HttpRequest, queryset: Any) -> None:
+        updated = queryset.update(is_active=False)
+        self._after_change(request, "redirects_deactivated", updated)
+
+    @admin.action(description=_("Reset hit counters"), permissions=["change"])
+    def reset_hit_counts(self, request: HttpRequest, queryset: Any) -> None:
+        updated = queryset.update(hit_count=0)
+        self._after_change(request, "redirects_hit_counts_reset", updated)
+
+    def _after_change(self, request: HttpRequest, action: str, updated: int) -> None:
+        log_action(
+            action=f"core.{action}",
+            actor=request.user if request.user.is_authenticated else None,
+            metadata={"updated": updated},
+        )
+        self.message_user(request, _("Updated %(count)s redirect(s).") % {"count": updated}, messages.SUCCESS)
+
+    def save_model(self, request: HttpRequest, obj: Redirect, form: Any, change: bool) -> None:
+        super().save_model(request, obj, form, change)
+        # نگاشت کش‌شدهٔ ۳۰۱ها باید باطل شود، وگرنه تغییر تا ۵ دقیقه اعمال نمی‌شود.
+        cache.delete("seo:redirects:map:v1")
+        log_action(
+            action="core.redirect_saved",
+            actor=request.user if request.user.is_authenticated else None,
+            target=obj,
+            metadata={"from_path": obj.from_path, "to": obj.target, "status": obj.status_code},
+        )
+
+
+@admin.register(FAQItem)
+class FAQItemAdmin(TranslationAdmin[FAQItem], SoftDeleteAdminMixin, EmmettImportExportAdmin):
+    """پرسش‌های متداول — منبع JSON-LD نوع ``FAQPage`` و بخش FAQ صفحات."""
+
+    resource_class = FAQItemResource
+    list_display = ("path", "short_question", "order", "is_active", "is_deleted")
+    list_display_links = ("short_question",)
+    list_editable = ("order", "is_active")
+    list_filter = ("path", "is_active", RecordStateFilter)
+    search_fields = ("path", "question_fa", "question_en", "answer_fa", "answer_en")
+    readonly_fields = ("created_at", "updated_at", "deleted_at")
+    ordering = ("path", "order")
+
+    @admin.display(description=_("Question"))
+    def short_question(self, obj: FAQItem) -> str:
+        text = str(obj.question or "").strip()
+        return text if len(text) <= 70 else f"{text[:69]}…"
+
+    def save_model(self, request: HttpRequest, obj: FAQItem, form: Any, change: bool) -> None:
+        super().save_model(request, obj, form, change)
+        from apps.core.seo import invalidate_sitemap_cache
+
+        invalidate_sitemap_cache()
 
 
 @admin.register(SearchIndexEntry)

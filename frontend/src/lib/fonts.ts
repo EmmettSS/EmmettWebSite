@@ -13,6 +13,13 @@
  * خوداستقرار `@fontsource/*` (فایل‌های واقعی woff2 در node_modules، نصب‌شده
  * از npm registry) و `@import` مستقیم در `globals.css` بارگذاری می‌شوند.
  * این تصمیم و جایگزین next/font در ADR-0018 مستند شده است.
+ *
+ * **بودجهٔ بارگذاری (ADR-0032، فاز ۷):** همهٔ فایل‌های ``@fontsource`` با
+ * ``font-display: swap`` ، اعلام می‌شوند (خروجی خود پکیج، قابل بازبینی در
+ * ``node_modules/@fontsource/<family>/<weight>.css``) تا متن هرگز با FOIT پنهان
+ * نشود؛ وزن ۷۰۰ فونت فارسی هم در ``[locale]/layout.tsx`` با ``<link rel="preload">``
+ * از ``public/fonts/`` پیش‌بارگذاری می‌شود تا LCP متن فارسی به انتظار شبکه
+ * گره نخورد. هیچ فونتی از CDN خارجی لود نمی‌شود (CSP ``font-src 'self'``).
  */
 
 export const FONT_FAMILY_FA = "Vazirmatn";

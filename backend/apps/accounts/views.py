@@ -25,6 +25,7 @@ from apps.accounts.serializers import (
     RegisterSerializer,
 )
 from apps.core.models import log_action
+from apps.core.security import LoginLockout
 from apps.core.throttling import AuthRateThrottle
 from apps.core.utils.request import get_client_ip
 
@@ -78,6 +79,28 @@ class LoginView(APIView):
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data["email"]
+        ip_address_for_lockout = get_client_ip(request._request) or ""
+
+        # قفل موقت پس از تلاش‌های ناموفق (ADR-0033): پاسخ ۴۲۹ + ``Retry-After``
+        # تا کلاینت بداند چه زمانی دوباره تلاش کند (و پیام فارسی برای کاربر).
+        lock_state = LoginLockout().state(email=email, ip=ip_address_for_lockout)
+        if lock_state.locked:
+            log_action(
+                action="auth.login_blocked",
+                metadata={"email": email, "retry_after": lock_state.retry_after},
+                ip_address=ip_address_for_lockout,
+                user_agent=request._request.META.get("HTTP_USER_AGENT", "")[:500],
+            )
+            response = Response(
+                {
+                    "detail": "تلاش‌های ناموفق بیش از حد مجاز بود. لطفاً چند دقیقه بعد دوباره تلاش کنید.",
+                    "retry_after": lock_state.retry_after,
+                },
+                status=status.HTTP_429_TOO_MANY_REQUESTS,
+            )
+            response["Retry-After"] = str(lock_state.retry_after)
+            return response
+
         user = authenticate(
             request._request,
             username=email,

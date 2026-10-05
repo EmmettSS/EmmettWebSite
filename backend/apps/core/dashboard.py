@@ -164,9 +164,7 @@ def _collect_numbers() -> dict[str, Any]:
     )
 
     artifacts = AIContentArtifact.objects.aggregate(
-        pending=Count(
-            "id", filter=Q(status=AIContentArtifact.Status.DRAFT, is_stale=False)
-        ),
+        pending=Count("id", filter=Q(status=AIContentArtifact.Status.DRAFT, is_stale=False)),
         approved=Count("id", filter=Q(status=AIContentArtifact.Status.APPROVED, is_stale=False)),
     )
 
@@ -362,8 +360,8 @@ def build_dashboard(request: Any = None) -> DashboardData:
             value=int(users["total"]),
             icon="fas fa-users",
             hints=(
-                f'{_("Staff")}: {_format_number(int(users["staff"]), locale)}',
-                f'{_("New (30 days)")}: {_format_number(int(users["new_30d"]), locale)}',
+                f"{_('Staff')}: {_format_number(int(users['staff']), locale)}",
+                f"{_('New (30 days)')}: {_format_number(int(users['new_30d']), locale)}",
             ),
             url="admin:accounts_user_changelist",
             link_label=str(_("View users")),
@@ -373,9 +371,9 @@ def build_dashboard(request: Any = None) -> DashboardData:
             value=total_ai,
             icon="fas fa-robot",
             hints=(
-                f'{_("Last 30 days")}: {_format_number(int(ai_requests["last_30d"]), locale)}',
-                f'{_("Blocked by guardrail")}: {_format_number(int(ai_requests["blocked"]), locale)}',
-                f'{_("Cache hit rate")}: {_format_number(cache_hit_rate, locale)}%',
+                f"{_('Last 30 days')}: {_format_number(int(ai_requests['last_30d']), locale)}",
+                f"{_('Blocked by guardrail')}: {_format_number(int(ai_requests['blocked']), locale)}",
+                f"{_('Cache hit rate')}: {_format_number(cache_hit_rate, locale)}%",
             ),
             url="admin:ai_engine_airequest_changelist",
             link_label=str(_("View AI audit")),
@@ -385,9 +383,9 @@ def build_dashboard(request: Any = None) -> DashboardData:
             value=int(contacts["total"]),
             icon="fas fa-handshake",
             hints=(
-                f'{_("Leads in pipeline")}: {_format_number(total_leads, locale)}',
-                f'{_("Won")}: {_format_number(int(leads["won"]), locale)}',
-                f'{_("Conversion")}: {_format_number(conversion_rate, locale)}%',
+                f"{_('Leads in pipeline')}: {_format_number(total_leads, locale)}",
+                f"{_('Won')}: {_format_number(int(leads['won']), locale)}",
+                f"{_('Conversion')}: {_format_number(conversion_rate, locale)}%",
             ),
             url="admin:leads_lead_changelist",
             link_label=str(_("View pipeline")),
@@ -397,9 +395,9 @@ def build_dashboard(request: Any = None) -> DashboardData:
             value=int(enrollments["total"]),
             icon="fas fa-graduation-cap",
             hints=(
-                f'{_("Published courses")}: {_format_number(int(courses["published"]), locale)}',
-                f'{_("Active")}: {_format_number(int(enrollments["active"]), locale)}',
-                f'{_("Average progress")}: {_format_number(average_progress, locale)}%',
+                f"{_('Published courses')}: {_format_number(int(courses['published']), locale)}",
+                f"{_('Active')}: {_format_number(int(enrollments['active']), locale)}",
+                f"{_('Average progress')}: {_format_number(average_progress, locale)}%",
             ),
             url="admin:academy_enrollment_changelist",
             link_label=str(_("View enrollments")),
@@ -409,8 +407,8 @@ def build_dashboard(request: Any = None) -> DashboardData:
             value=int(enrollments["last_30d"]) + int(contacts["last_30d"]),
             icon="fas fa-chart-line",
             hints=(
-                f'{_("New enrollments")}: {_format_number(int(enrollments["last_30d"]), locale)}',
-                f'{_("New contacts")}: {_format_number(int(contacts["last_30d"]), locale)}',
+                f"{_('New enrollments')}: {_format_number(int(enrollments['last_30d']), locale)}",
+                f"{_('New contacts')}: {_format_number(int(contacts['last_30d']), locale)}",
                 str(_("No financial model exists in this phase.")),
             ),
             url="admin:leads_contact_changelist",
@@ -421,8 +419,8 @@ def build_dashboard(request: Any = None) -> DashboardData:
             value=int(artifacts["pending"]),
             icon="fas fa-file-signature",
             hints=(
-                f'{_("Approved")}: {_format_number(int(artifacts["approved"]), locale)}',
-                f'{_("Newsletter subscribers")}: {_format_number(int(newsletter["confirmed"]), locale)}',
+                f"{_('Approved')}: {_format_number(int(artifacts['approved']), locale)}",
+                f"{_('Newsletter subscribers')}: {_format_number(int(newsletter['confirmed']), locale)}",
             ),
             url="admin:ai_engine_aicontentartifact_changelist",
             link_label=str(_("Review summaries")),
@@ -471,9 +469,7 @@ def build_dashboard(request: Any = None) -> DashboardData:
         )
     )
 
-    audit_rows = (
-        AuditLog.objects.select_related("actor").order_by("-created_at")[:ACTIVITY_LIMIT]
-    )
+    audit_rows = AuditLog.objects.select_related("actor").order_by("-created_at")[:ACTIVITY_LIMIT]
     audit_activity = tuple(
         AuditActivity(
             action=row.action,

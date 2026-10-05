@@ -5,6 +5,9 @@ import { CreativeAdvisorForm } from "@/components/organisms/creative-advisor-for
 import { Link } from "@/i18n/navigation";
 import type { AppLocale } from "@/i18n/routing";
 import { getCatalogs } from "@/lib/api/server";
+import { getSeoSettingsOrDefaults } from "@/lib/api/seo";
+import { buildPageMetadata } from "@/lib/seo/metadata";
+import { getPublicSiteUrl, toAppLocale } from "@/lib/seo/site";
 
 export async function generateMetadata({
   params,
@@ -13,7 +16,16 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "ai" });
-  return { title: t("advisorTitle"), description: t("advisorDescription") };
+  const settings = await getSeoSettingsOrDefaults();
+  return buildPageMetadata({
+    locale: toAppLocale(locale),
+    path: "/advisor",
+    title: t("advisorTitle"),
+    description: t("advisorDescription"),
+    settings,
+    siteUrl: getPublicSiteUrl(),
+    noindex: true,
+  });
 }
 
 export default async function CreativeAdvisorPage({

@@ -18,4 +18,18 @@ def localized_path(locale: str, path: str) -> str:
     return f"/{locale}{path}"
 
 
-__all__ = ["localized_path"]
+def absolute_localized_url(locale: str, path: str) -> str:
+    """URL مطلق یک مسیر بومی‌سازی‌شده روی دامنهٔ عمومی (``PUBLIC_SITE_URL``).
+
+    در فیدهای RSS (بلاگ/آکادمی) و JSON-LD لازم است: ``<link>`` نسبی برای
+    خواننده‌های فید نامعتبر است و Google برای ``item`` ساخت‌یافته URL مطلق
+    می‌خواهد (ADR-0031).
+    """
+
+    from django.conf import settings
+
+    base = str(settings.PUBLIC_SITE_URL).rstrip("/")
+    return f"{base}{localized_path(locale, path)}"
+
+
+__all__ = ["absolute_localized_url", "localized_path"]

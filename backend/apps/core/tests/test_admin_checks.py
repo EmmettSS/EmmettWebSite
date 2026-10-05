@@ -74,9 +74,7 @@ class TestThemeChecks:
         assert "emmett_admin.E003" in _ids(emmett_checks.check_admin_theme_paths())
 
     def test_missing_static_asset_is_reported(self, monkeypatch: Any) -> None:
-        monkeypatch.setitem(
-            ADMIN_THEME_ASSETS, "does_not_exist", "brand/does-not-exist.png"
-        )
+        monkeypatch.setitem(ADMIN_THEME_ASSETS, "does_not_exist", "brand/does-not-exist.png")
 
         assert "emmett_admin.E004" in _ids(emmett_checks.check_admin_theme_assets())
 

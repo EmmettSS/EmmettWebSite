@@ -30,7 +30,7 @@ class TestPythonExtraction:
     def test_extracts_gettext_calls(self, tmp_path: Path) -> None:
         source = tmp_path / "sample.py"
         source.write_text(
-            'from django.utils.translation import gettext_lazy as _\n'
+            "from django.utils.translation import gettext_lazy as _\n"
             'TITLE = _("Dashboard")\n'
             'OTHER = gettext("Settings")\n',
             encoding="utf-8",
@@ -72,9 +72,7 @@ class TestTemplateExtraction:
             encoding="utf-8",
         )
 
-        assert set(i18n.extract_from_template(template, root=tmp_path).messages) == {
-            "Welcome, %(name)s"
-        }
+        assert set(i18n.extract_from_template(template, root=tmp_path).messages) == {"Welcome, %(name)s"}
 
     def test_blocktrans_plural(self, tmp_path: Path) -> None:
         template = tmp_path / "plural.html"
@@ -90,7 +88,7 @@ class TestTemplateExtraction:
     def test_commented_out_strings_are_ignored(self, tmp_path: Path) -> None:
         template = tmp_path / "commented.html"
         template.write_text(
-            "{% comment %}{% trans \"Hidden\" %}{% endcomment %}{# {% trans \"Also hidden\" %} #}",
+            '{% comment %}{% trans "Hidden" %}{% endcomment %}{# {% trans "Also hidden" %} #}',
             encoding="utf-8",
         )
 

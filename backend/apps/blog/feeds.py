@@ -9,7 +9,8 @@ from django.contrib.syndication.views import Feed
 from django.utils.translation import get_language
 
 from apps.blog.models import BlogPost
-from apps.core.utils.urls import localized_path
+from apps.core.feeds import LocalizedFeedMixin
+from apps.core.utils.urls import absolute_localized_url
 
 if TYPE_CHECKING:
     # ``Feed`` در django-stubs ``Generic[_Item, _Object]`` است، اما در زمان
@@ -20,7 +21,7 @@ else:
     _FeedBase = Feed
 
 
-class LatestBlogPostsFeed(_FeedBase):
+class LatestBlogPostsFeed(LocalizedFeedMixin, _FeedBase):
     description = "آخرین مطالب بلاگ Emmett"
 
     @staticmethod
@@ -31,7 +32,9 @@ class LatestBlogPostsFeed(_FeedBase):
         return "Emmett Blog"
 
     def link(self) -> str:
-        return localized_path(self._locale(), "/blog/")
+        # URL مطلق لازم است: ``<link>`` نسبی در RSS نامعتبر و برای خواننده‌ها
+        # بی‌معناست (دامنه از ``PUBLIC_SITE_URL`` می‌آید — ADR-0031).
+        return absolute_localized_url(self._locale(), "/blog/")
 
     def items(self) -> list[BlogPost]:
         return list(
@@ -47,7 +50,7 @@ class LatestBlogPostsFeed(_FeedBase):
         return str(item.excerpt)
 
     def item_link(self, item: BlogPost) -> str:
-        return localized_path(self._locale(), f"/blog/{item.slug}/")
+        return absolute_localized_url(self._locale(), f"/blog/{item.slug}/")
 
     def item_pubdate(self, item: BlogPost) -> datetime | None:
         return item.published_at

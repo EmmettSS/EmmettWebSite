@@ -6,6 +6,10 @@ import { Link } from "@/i18n/navigation";
 import type { AppLocale } from "@/i18n/routing";
 import { Card, CardHeader, CardTitle, CardDescription, CardMedia } from "@/components/molecules/card";
 import { getBlogPosts } from "@/lib/api/server";
+import { getSeoSettingsOrDefaults } from "@/lib/api/seo";
+import { buildPageMetadata } from "@/lib/seo/metadata";
+import { getPublicSiteUrl, toAppLocale } from "@/lib/seo/site";
+import Image from "next/image";
 
 export async function generateMetadata({
   params,
@@ -14,7 +18,16 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "blog" });
-  return { title: t("title"), description: t("description") };
+  const settings = await getSeoSettingsOrDefaults();
+  return buildPageMetadata({
+    locale: toAppLocale(locale),
+    path: "/blog",
+    title: t("title"),
+    description: t("description"),
+    settings,
+    siteUrl: getPublicSiteUrl(),
+    rssPath: "/blog/rss",
+  });
 }
 
 function formatDate(locale: string, iso: string | null) {
@@ -45,9 +58,8 @@ export default async function BlogPage({
           </h1>
           <p className="mt-3 text-base text-muted-foreground">{t("description")}</p>
         </div>
-        {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- مسیر فید RSS یک صفحهٔ Next نیست، دانلود فایل است */}
         <a
-          href="/api/v1/blog/rss/"
+          href={locale === "fa" ? "/blog/rss" : "/en/blog/rss"}
           className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
         >
           <Rss aria-hidden="true" className="size-4" />
@@ -64,10 +76,11 @@ export default async function BlogPage({
               <Card className="h-full overflow-hidden">
                 {post.cover_image_url ? (
                   <CardMedia>
-                    {/* eslint-disable-next-line @next/next/no-img-element -- دامنهٔ تصاویر از بک‌اند پویاست */}
-                    <img
+                    <Image
                       src={post.cover_image_url}
                       alt=""
+                      fill
+                      sizes="(max-width: 768px) 100vw, 33vw"
                       className="aspect-video w-full object-cover"
                     />
                   </CardMedia>

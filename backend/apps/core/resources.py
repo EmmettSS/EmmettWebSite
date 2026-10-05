@@ -77,9 +77,7 @@ class EmmettResource(resources.ModelResource):  # type: ignore[misc]
         """
 
         import_fields = [
-            field
-            for field in super().get_import_fields()
-            if field.column_name != SCHEMA_VERSION_FIELD
+            field for field in super().get_import_fields() if field.column_name != SCHEMA_VERSION_FIELD
         ]
 
         return import_fields
@@ -143,7 +141,9 @@ from django.contrib.admin.models import LogEntry  # noqa: E402
 
 from apps.core.models import (  # noqa: E402
     AuditLog,
+    FAQItem,
     Media,
+    Redirect,
     SearchIndexEntry,
     Translation,
 )
@@ -228,6 +228,39 @@ class SearchIndexEntryResource(EmmettResource):
             "updated_at",
         )
         export_order = fields
+
+
+class RedirectResource(EmmettResource):
+    """صادرات/واردات ریدایرکت‌ها — کلید پایدار ``from_path`` (ADR-0029/0031)."""
+
+    class Meta:
+        model = Redirect
+        fields = ("schema_version", "from_path", "target", "status_code", "is_active", "note")
+        export_order = fields
+        import_id_fields = ("from_path",)
+        skip_unchanged = True
+        report_skipped = True
+
+
+class FAQItemResource(EmmettResource):
+    """صادرات/واردات پرسش‌های متداول — کلید ``(path, order)``."""
+
+    class Meta:
+        model = FAQItem
+        fields = (
+            "schema_version",
+            "path",
+            "question_fa",
+            "question_en",
+            "answer_fa",
+            "answer_en",
+            "order",
+            "is_active",
+        )
+        export_order = fields
+        import_id_fields = ("path", "order")
+        skip_unchanged = True
+        report_skipped = True
 
 
 class LogEntryResource(EmmettResource):

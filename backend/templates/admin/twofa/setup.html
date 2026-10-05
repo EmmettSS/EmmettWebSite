@@ -1,0 +1,31 @@
+{% extends "admin/twofa/_base.html" %}
+{% load i18n %}
+
+{% block twofa_content %}
+    <p>
+        {% translate "Scan the QR code with an authenticator app (Google Authenticator, Aegis, 1Password, …), then enter the 6-digit code to confirm." %}
+    </p>
+
+    <div class="row align-items-center g-3">
+        <div class="col-12 col-md-5 text-center">
+            <img src="{{ qr_data_uri }}" alt="{% translate 'TOTP QR code' %}" width="240" height="240" class="img-fluid border rounded bg-white p-2">
+        </div>
+        <div class="col-12 col-md-7">
+            <p class="mb-1">{% translate "Cannot scan? Enter this key manually:" %}</p>
+            <p><code class="user-select-all">{{ secret_key }}</code></p>
+            <p class="mb-1 text-muted small">{% translate "Issuer" %}: {{ issuer }}</p>
+            <p class="text-muted small text-break"><code>{{ otpauth_url }}</code></p>
+        </div>
+    </div>
+
+    <form method="post" class="mt-4" autocomplete="off">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next }}">
+        <div class="mb-3">
+            <label class="form-label" for="id_token">{% translate "6-digit code" %}</label>
+            <input class="form-control" id="id_token" name="token" inputmode="numeric" autocomplete="one-time-code"
+                   pattern="[0-9\s]*" maxlength="8" required autofocus>
+        </div>
+        <button type="submit" class="btn btn-primary">{% translate "Activate two-factor authentication" %}</button>
+    </form>
+{% endblock %}

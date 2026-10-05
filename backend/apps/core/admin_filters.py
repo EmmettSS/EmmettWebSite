@@ -31,9 +31,7 @@ class RelatedPresenceFilter(admin.SimpleListFilter):
     yes_label = _("Has related items")
     no_label = _("No related items")
 
-    def lookups(
-        self, request: HttpRequest, model_admin: admin.ModelAdmin[Any]
-    ) -> list[tuple[str, Any]]:
+    def lookups(self, request: HttpRequest, model_admin: admin.ModelAdmin[Any]) -> list[tuple[str, Any]]:
         return [("yes", self.yes_label), ("no", self.no_label)]
 
     def queryset(self, request: HttpRequest, queryset: QuerySet[Any]) -> QuerySet[Any]:
@@ -61,9 +59,7 @@ class TranslationCompletenessFilter(admin.SimpleListFilter):
     title = _("translation completeness")
     parameter_name = "completeness"
 
-    def lookups(
-        self, request: HttpRequest, model_admin: admin.ModelAdmin[Any]
-    ) -> list[tuple[str, Any]]:
+    def lookups(self, request: HttpRequest, model_admin: admin.ModelAdmin[Any]) -> list[tuple[str, Any]]:
         return [
             ("missing_fa", _("Missing Persian (fa)")),
             ("missing_en", _("Missing English (en)")),

@@ -2,7 +2,10 @@
   "metadata": {
     "siteName": "Emmett",
     "defaultTitle": "Emmett — Software Engineering Studio",
-    "defaultDescription": "Emmett is an engineering studio that solves difficult, systems-level problems with the same rigor an architecture practice brings to a building."
+    "defaultDescription": "Emmett is an engineering studio that solves difficult, systems-level problems with the same rigor an architecture practice brings to a building.",
+    "ogTitle": "Emmett",
+    "ogSubtitle": "Engineering studio — design and build of complex systems",
+    "ogBrand": "EMMETT"
   },
   "common": {
     "skipToContent": "Skip to main content",
@@ -132,7 +135,8 @@
     "enroll": "Enroll in this course",
     "enrolled": "You're enrolled in this course",
     "enrollRequiresLogin": "Sign in to enroll",
-    "backToList": "Back to academy"
+    "backToList": "Back to academy",
+    "rssFeed": "Courses RSS feed"
   },
   "blog": {
     "title": "Library",

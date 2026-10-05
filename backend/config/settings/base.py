@@ -42,6 +42,12 @@ THIRD_PARTY_APPS = [
     "django_filters",
     "django_structlog",
     "import_export",
+    # دو مرحله‌ای‌سازی اختیاری ادمین (فاز ۷، ADR-0033). پکیج سبک است و فقط
+    # مدل‌های دستگاه (TOTP/Static) و verify/otp_required را می‌آورد؛
+    # پیاده‌سازی خودی رمزنگارانه انجام نمی‌شود (دلیل در ADR-0033).
+    "django_otp",
+    "django_otp.plugins.otp_totp",
+    "django_otp.plugins.otp_static",
 ]
 
 LOCAL_APPS = [
@@ -77,8 +83,26 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    # ``OTPMiddleware`` صفت ``is_verified()`` را به کاربر و ``otp_device`` را
+    # به request اضافه می‌کند؛ بدون آن اجبار ۲FA ادمین قابل تشخیص نیست.
+    "django_otp.middleware.OTPMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    # سخت‌سازی هدرهای امنیتی (CSP/Referrer/Permissions) برای پاسخ‌های جنگو —
+    # فرانت‌اند CSP خودش را با nonce در ``frontend/src/proxy.ts`` می‌سازد
+    # (ADR-0033). جای این middleware قبل از کلیک‌جکینگ نیست؛ هر جای پس از
+    # AuthenticationMiddleware کار می‌کند، ولی اینجا نگه داشته شده تا در
+    # ``process_response`` (برعکس ترتیب درخواست) دیرترین هدرها را بنویسد.
+    "apps.core.middleware.SecurityHeadersMiddleware",
+    # توقف brute-force فرم ورود ادمین (۴۲۹ + Retry-After) — پیش از ۲FA، چون
+    # اولین قدم حمله همان فرم ورود است.
+    "apps.core.middleware.AdminLoginLockoutMiddleware",
+    # اجبار دو مرحله‌ای ادمین (پس از احراز هویت و پیام‌ها؛ قبل از ریدایرکت).
+    "apps.core.middleware.AdminTwoFactorMiddleware",
+    # نگاشت ۳۰۱/۳۰۲/۴۱۰ مدیریت‌شده از ادمین: فقط برای مسیرهایی که جنگو خودش
+    # ۴۰۴ می‌دهد (ادمین/مدیا/API قدیمی). ویترین عمومی توسط Next.js و
+    # ``frontend/src/proxy.ts`` ریدایرکت می‌شود (ADR-0031).
+    "apps.core.middleware.RedirectFallbackMiddleware",
     "django_structlog.middlewares.RequestMiddleware",
 ]
 
@@ -435,6 +459,83 @@ IMPORT_EXPORT_SKIP_ADMIN_LOG = False
 IMPORT_EXPORT_EXPORT_PERMISSION_CODE = "view"
 IMPORT_EXPORT_IMPORT_PERMISSION_CODE = "add"
 IMPORT_EXPORT_IMPORT_IGNORE_BLANK_LINES = True
+
+# ---------------------------------------------------------------------------
+# SEO (فاز ۷ — ADR-0031)
+# ---------------------------------------------------------------------------
+# صفحه‌های ثابت ویترین که در sitemap می‌آیند و «مسیر بومی‌سازی‌نشده» دارند
+# (پیشوند ``/en`` را فرانت‌اند اضافه می‌کند). ترتیب، اولویت/تناوب را تعیین می‌کند.
+SEO_STATIC_PAGES: tuple[tuple[str, str, str], ...] = (
+    ("/", "1.0", "weekly"),
+    ("/services", "0.9", "weekly"),
+    ("/projects", "0.9", "weekly"),
+    ("/products", "0.7", "monthly"),
+    ("/academy", "0.9", "weekly"),
+    ("/blog", "0.9", "daily"),
+    ("/about", "0.6", "monthly"),
+    ("/contact", "0.6", "monthly"),
+    ("/design-system", "0.2", "yearly"),
+)
+# مسیرهایی که هرگز نباید ایندکس شوند (در robots.txt و متاتگ noindex استفاده می‌شود).
+SEO_NOINDEX_PATHS: tuple[str, ...] = (
+    "/profile",
+    "/search",
+    "/advisor",
+    "/estimate",
+    "/admin",
+    "/api",
+    "/i18n",
+    "/media",
+)
+SEO_SITEMAP_CACHE_SECONDS = env.int("SEO_SITEMAP_CACHE_SECONDS", default=900)
+SEO_REDIRECTS_CACHE_SECONDS = env.int("SEO_REDIRECTS_CACHE_SECONDS", default=300)
+# شمارش بازدید ریدایرکت‌ها روی هاست اشتراکی یک نوشتن اضافه در هر درخواست است؛
+# پیش‌فرض روشن است چون جدول کوچک و ایندکس‌دار است، ولی قابل خاموش‌کردن.
+SEO_COUNT_REDIRECT_HITS = env.bool("SEO_COUNT_REDIRECT_HITS", default=True)
+
+# ---------------------------------------------------------------------------
+# Security headers (فاز ۷ — ADR-0033)
+# ---------------------------------------------------------------------------
+# CSP سراسری برای پاسخ‌های جنگو (API/ادمین). فرانت‌اند Next.js سیاست
+# nonce-based خودش را در ``src/proxy.ts`` می‌سازد.
+CSP_ENABLED = env.bool("DJANGO_CSP_ENABLED", default=True)
+CSP_REPORT_ONLY = env.bool("DJANGO_CSP_REPORT_ONLY", default=False)
+CSP_REPORT_URI = env("DJANGO_CSP_REPORT_URI", default="")
+# ``frame-ancestors`` در dev باز می‌ماند تا پیش‌نمایش داخل iframe کار کند؛ در
+# production با DJANGO_FRAME_ANCESTORS='none' قفل می‌شود.
+CSP_FRAME_ANCESTORS = env.list("DJANGO_FRAME_ANCESTORS", default=["'self'"] if DEBUG else ["'none'"])
+CSP_EXTRA_IMG_SRC = env.list("DJANGO_CSP_IMG_SRC", default=[])
+SECURITY_REFERRER_POLICY = env("DJANGO_REFERRER_POLICY", default="strict-origin-when-cross-origin")
+SECURITY_PERMISSIONS_POLICY = env(
+    "DJANGO_PERMISSIONS_POLICY", default="camera=(), microphone=(), geolocation=()"
+)
+
+# ---------------------------------------------------------------------------
+# محافظت از ورود (lockout) — فاز ۷، ADR-0033
+# ---------------------------------------------------------------------------
+LOGIN_LOCKOUT_ENABLED = env.bool("LOGIN_LOCKOUT_ENABLED", default=True)
+LOGIN_LOCKOUT_MAX_ATTEMPTS = env.int("LOGIN_LOCKOUT_MAX_ATTEMPTS", default=5)
+LOGIN_LOCKOUT_WINDOW_SECONDS = env.int("LOGIN_LOCKOUT_WINDOW_SECONDS", default=900)
+LOGIN_LOCKOUT_DURATION_SECONDS = env.int("LOGIN_LOCKOUT_DURATION_SECONDS", default=900)
+
+# ---------------------------------------------------------------------------
+# دو مرحله‌ای‌سازی ادمین (فاز ۷، ADR-0033)
+# ---------------------------------------------------------------------------
+# اختیاری برای کاربر، ولی وقتی روشن باشد همهٔ staff باید دستگاه تأییدشده داشته
+# باشند. در production پیش‌فرض روشن است (ر.ک. production.py).
+ADMIN_2FA_REQUIRED = env.bool("ADMIN_2FA_REQUIRED", default=False)
+ADMIN_2FA_ISSUER = env("ADMIN_2FA_ISSUER", default="Emmett")
+# django-otp نام صادرکننده را فقط از این تنظیم در URL ``otpauth://`` می‌گذارد؛
+# بدون آن، اپلیکیشن Authenticator فقط ایمیل کاربر را نشان می‌دهد (کشف‌شده در تست).
+OTP_TOTP_ISSUER = ADMIN_2FA_ISSUER
+ADMIN_2FA_RECOVERY_CODE_COUNT = env.int("ADMIN_2FA_RECOVERY_CODE_COUNT", default=8)
+
+# ---------------------------------------------------------------------------
+# پشتیبان‌گیری (فاز ۷ — ADR-0033)
+# ---------------------------------------------------------------------------
+BACKUP_DIR = env("BACKUP_DIR", default=str(BASE_DIR / "backups"))
+BACKUP_RETENTION = env.int("BACKUP_RETENTION", default=7)
+BACKUP_INCLUDE_MEDIA = env.bool("BACKUP_INCLUDE_MEDIA", default=True)
 
 # ---------------------------------------------------------------------------
 # Structured logging (structlog + django-structlog)

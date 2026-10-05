@@ -1,0 +1,22 @@
+{% extends "admin/twofa/_base.html" %}
+{% load i18n %}
+
+{% block twofa_content %}
+    {% if codes %}
+        <p class="alert alert-warning" role="alert">
+            {% translate "These codes are shown only once. Store them in a safe place; each code works a single time." %}
+        </p>
+        <ul class="list-group mb-4" dir="ltr">
+            {% for code in codes %}
+                <li class="list-group-item font-monospace user-select-all">{{ code }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="alert alert-info" role="alert">
+            {% translate "No new codes to display. You can generate a fresh set from the status page." %}
+        </p>
+    {% endif %}
+
+    <p class="text-muted">{% blocktranslate count counter=remaining %}One recovery code left.{% plural %}{{ counter }} recovery codes left.{% endblocktranslate %}</p>
+    <a class="btn btn-primary" href="{% url 'admin:index' %}">{% translate "Back to dashboard" %}</a>
+{% endblock %}

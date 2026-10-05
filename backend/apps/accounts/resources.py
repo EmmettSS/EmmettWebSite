@@ -38,9 +38,7 @@ class ProfileResource(EmmettResource):
     class Meta:
         model = Profile
         # ``Profile`` در modeltranslation ثبت نشده است؛ پس فقط ستون‌های پایه.
-        fields = i18n_fields(
-            ("user", "avatar", "locale_preference", "job_title", "company_name", "bio"), ()
-        )
+        fields = i18n_fields(("user", "avatar", "locale_preference", "job_title", "company_name", "bio"), ())
         export_order = fields
         import_id_fields = ("user",)
         skip_unchanged = True

@@ -6,6 +6,12 @@ import { Breadcrumb } from "@/components/molecules/breadcrumb";
 import { Badge } from "@/components/ui/badge";
 import type { AppLocale } from "@/i18n/routing";
 import { getService } from "@/lib/api/server";
+import { getSeoSettingsOrDefaults } from "@/lib/api/seo";
+import { buildPageMetadata } from "@/lib/seo/metadata";
+import { getPublicSiteUrl, toAppLocale } from "@/lib/seo/site";
+import { JsonLd } from "@/components/seo/json-ld";
+import { getFaqForPath } from "@/lib/api/seo";
+import { breadcrumbJsonLd, faqJsonLd, serviceJsonLd } from "@/lib/seo/json-ld";
 
 interface PageParams {
   locale: string;
@@ -20,10 +26,15 @@ export async function generateMetadata({
   const { locale, slug } = await params;
   const service = await getService(locale, slug);
   if (!service) return {};
-  return {
+  const settings = await getSeoSettingsOrDefaults();
+  return buildPageMetadata({
+    locale: toAppLocale(locale),
+    path: `/services/${slug}`,
     title: service.meta_title || service.title,
     description: service.meta_description || service.summary,
-  };
+    settings,
+    siteUrl: getPublicSiteUrl(),
+  });
 }
 
 export default async function ServiceDetailPage({
@@ -38,8 +49,27 @@ export default async function ServiceDetailPage({
   const service = await getService(locale, slug);
   if (!service) notFound();
 
+  const settings = await getSeoSettingsOrDefaults();
+  const siteUrl = getPublicSiteUrl();
+  const appLocale = toAppLocale(locale);
+  const crumbs = [
+    { name: t("title"), path: "/services" },
+    { name: service.title, path: `/services/${slug}` },
+  ];
+  const faqItems = await getFaqForPath(`/services/${slug}`, locale);
+
   return (
     <article className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-10">
+      <JsonLd
+        data={serviceJsonLd(
+          { name: service.title, description: service.summary, path: `/services/${slug}` },
+          settings,
+          siteUrl,
+          appLocale,
+        )}
+      />
+      <JsonLd data={breadcrumbJsonLd(crumbs, siteUrl, appLocale)} />
+      <JsonLd data={faqJsonLd(faqItems)} />
       <Breadcrumb
         items={[
           { label: t("title"), href: "/services" },
