@@ -17,6 +17,10 @@
   نبود آن خطای `emmett_admin.W007` است.
 - **hreflang `fa-IR`/`en`/`x-default` + canonical خودارجاع** روی همهٔ صفحات عمومی و متادیتای
   پویا از `SiteSettings` (`buildPageMetadata`)؛ ۱۴ صفحه از این مسیر عبور کردند.
+- **هدر `Link` هم‌منبع با متاتگ‌ها:** هدر `rel="alternate"` که `next-intl` می‌ساخت کد کوتاه
+  `fa` داشت؛ `alternateLinks` خاموش و هدر در `src/proxy.ts` از همان `languageAlternates`
+  ساخته می‌شود (`fa-IR`/`en`/`x-default` و از `PUBLIC_SITE_URL`، نه هدر `Host`)؛ برای
+  مسیرهای noindex هیچ هدر hreflang ساخته نمی‌شود.
 - **JSON-LD شش‌نوعه:** `Organization`+`WebSite` (ریشه)، `Article` (بلاگ/پروژه)، `Course`،
   `Service`، `BreadcrumbList` و `FAQPage` (FAQ از ادمین، با اندپوینت `/api/v1/seo/faq/?path=`).
 - **OG/Twitter پویا** با تصویر ۱۲۰۰×۶۳۰ که متنش از کاتالوگ پیام‌ها می‌آید؛ رندر تصویر با
@@ -31,6 +35,9 @@
   نرمال‌سازی یکسان کلید در دو طرف + شمارش بازدید و کش.
 - **RSS/Atom بلاگ و دوره** روی `/blog/rss` و `/academy/rss` (+ مسیر سازگاری
   `/api/v1/blog/rss/`)؛ مسیر قدیمی `rss.xml` با ۳۰۱ به مسیر جدید می‌رود.
+- **`atom:link rel="self"` فیدها** از `PUBLIC_SITE_URL` ساخته می‌شود
+  (`LocalizedFeedMixin.feed_url`)؛ پیش‌فرض جنگو دامنهٔ داخلی/هدر `Host` را در فید
+  می‌نوشت (لو رفتن آدرس داخلی) و با تست قفل شد.
 - **تأیید Search Console** از ادمین (`search_console_verification`) با هشدار `W010` در
   production و متای مربوطه در فرانت.
 
@@ -53,12 +60,17 @@
   `default-src 'self'` + `unsafe-inline` (اجبار Jazzmin)؛ با `DJANGO_CSP_REPORT_ONLY` و
   `DJANGO_CSP_REPORT_URI` قابل انتقال به حالت گزارش. Referrer، Permissions-Policy
   (`camera=(), microphone=(), geolocation=()`) و COOP `same-origin` سراسری.
-  `X-Frame-Options`/`frame-ancestors` عمداً در dev باز است تا پیش‌نمایش iframe بشکند نشود.
+  `X-Frame-Options`/`frame-ancestors` عمداً در dev باز است تا پیش‌نمایش iframe نشکند؛
+  پاسخ‌های API در همهٔ محیط‌ها `frame-ancestors 'none'` می‌گیرند و مقدار **خالی**
+  `DJANGO_FRAME_ANCESTORS` (حالت `.env.example`) به دایرکتیو تهی منجر نمی‌شود و به
+  پیش‌فرض dev `'self'` / prod `'none'` برمی‌گردد.
 - **۲FA ادمین** (`django-otp==1.7.3` + `qrcode==8.2`): TOTP با QR درون `data:`، کلید
   Base32 برای ورود دستی (`device.key` هگز است — باگ کشف و رفع شد)، کدهای بازیابی
   یک‌بارمصرف، و قفل موقت صفحهٔ تأیید پس از `OTP_MAX_ATTEMPTS`.
 - **قفل ورود ضد brute-force** روی cache با پنجره/آستانه/مدت از env؛ پاسخ API `429` +
   `Retry-After`؛ کلیدها با هش ایمیل و IP تا هم حملهٔ حساب‌محور و هم IP-محور گرفته شود.
+  تست «نبود شناسهٔ خام در کلید cache» مستقل از backend است (spy روی `cache.set`) تا با
+  `FileBasedCache` پیشنهادی `.env.example` هم معتبر بماند.
 - **دو یافتهٔ امنیتی رفع‌شده:** کد بازیابی تهی ⇒ بای‌پس ۲FA، و اتکا به `cache.ttl()` ⇒
   قفل ورود عملاً بی‌اثر؛ هر دو با تست موفق/ناموفق قفل شده‌اند.
 - **Audit Log** رویدادهای امنیتی (`auth.account_locked`, `auth.login_blocked`,
@@ -79,13 +91,13 @@
 - هیچ وابستگی **فرانت‌اند** جدیدی اضافه نشد (SEO/OG با امکانات خود Next.js).
 
 ### اعتبارسنجی (اعداد واقعی)
-- بک‌اند: **485 passed** (`pytest -q`, ۷۸ ثانیه) شامل ۲۳ تست امنیت، ۲۲ تست ۲FA، ۹ تست
-  بکاپ، ۱۸ تست SEO API، ۲۵ تست ریدایرکت، ۱۸ تست بودجهٔ کوئری و ۵ تست فید؛
+- بک‌اند: **486 passed** (`pytest -q`, ~۷۷ ثانیه) شامل ۲۳ تست امنیت، ۲۲ تست ۲FA، ۹ تست
+  بکاپ، ۱۸ تست SEO API، ۲۵ تست ریدایرکت، ۱۸ تست بودجهٔ کوئری و ۶ تست فید؛
   `ruff check .` = All checks passed؛ `mypy apps config` (strict) = بدون خطا در ۲۴۰ فایل؛
   `manage.py check` بدون خطا؛ `makemigrations --check` = بدون تغییر؛ `i18n.py check` سبز.
-- فرانت: `npx tsc --noEmit` تمیز، `eslint` صفر مشکل، `vitest run` = ۴۲ تست در ۸ فایل سبز،
+- فرانت: `npx tsc --noEmit` تمیز، `eslint` صفر مشکل، `vitest run` = ۴۵ تست در ۸ فایل سبز،
   `next build` = ۳۱ صفحه بدون خطا و رندر موفق تصاویر OG دوزبانه (بررسی چشمی/حجمی).
-- `ruff format --check` روی فایل‌های همین فاز اجرا و اعمال شد؛ ۱۷ فایل قدیمی خارج از دامنهٔ
+- `ruff format --check` روی فایل‌های همین فاز معتبر است؛ ۱۷ فایل قدیمی خارج از دامنهٔ
   فاز همچنان unformatted است (سیاست از فاز ۵: بدون diff نامرتبط).
 
 ### محدودیت‌های محیط/تحویل

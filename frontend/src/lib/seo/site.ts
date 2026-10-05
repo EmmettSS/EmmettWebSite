@@ -89,6 +89,41 @@ export function languageAlternates(
 }
 
 /**
+ * پیشوند زبان را از مسیر برمی‌دارد (معکوس ``localePath``).
+ *
+ * ``stripLocalePrefix("/en/blog")`` ⇒ ``{ locale: "en", path: "/blog" }`` و
+ * ``stripLocalePrefix("/blog")`` ⇒ ``{ locale: "fa", path: "/blog" }``.
+ */
+export function stripLocalePrefix(pathname: string): { locale: AppLocale; path: string } {
+  const normalized = normalizePath(pathname);
+  const [first, ...rest] = normalized.split("/").filter(Boolean);
+  if (first && isAppLocale(first)) {
+    return { locale: first, path: rest.length ? `/${rest.join("/")}` : "/" };
+  }
+  return { locale: routing.defaultLocale, path: normalized };
+}
+
+/**
+ * هدر ``Link`` صفحه‌ها با ``rel="alternate"`` برای هر زبان.
+ *
+ * ``next-intl`` این هدر را با کد کوتاه زبان (``fa``) می‌ساخت که با
+ * ``<link rel="alternate" hreflang="fa-IR">`` ناسازگار است؛ اینجا هر دو از
+ * یک منبع (``languageAlternates``) ساخته می‌شوند تا دقیقاً ``fa-IR``/``en``/
+ * ``x-default`` باشد (معیار پذیرش فاز ۷). هدر برای مسیرهای noindex ساخته
+ * نمی‌شود تا hreflang به صفحهٔ noindex اشاره نکند.
+ */
+export function buildAlternateLinkHeader(
+  pathname: string,
+  siteUrl: string = getPublicSiteUrl(),
+): string | null {
+  const { path } = stripLocalePrefix(pathname);
+  if (isNoindexPath(path)) return null;
+  return Object.entries(languageAlternates(path, siteUrl))
+    .map(([language, url]) => `<${url}>; rel="alternate"; hreflang="${language}"`)
+    .join(", ");
+}
+
+/**
  * مسیرهای noindex از تنظیمات ادمین + مسیرهای سیستمی.
  *
  * مشترک بین ``robots.ts`` (Disallow) و متاتگ ``robots`` صفحه‌ها؛ اگر یک مسیر
@@ -101,6 +136,8 @@ export const SYSTEM_NOINDEX_PATHS = [
   "/media",
   "/profile",
   "/search",
+  // نتیجهٔ مشاورهٔ هر کاربر اختصاصی است؛ robots.txt هم همین را Disallow می‌کند.
+  "/advisor/results",
 ];
 
 export function mergeNoindexPaths(fromAdmin: string[]): string[] {

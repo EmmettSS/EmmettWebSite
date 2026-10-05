@@ -181,13 +181,28 @@ class TestLoginLockoutUnit:
         assert state.locked is False
         assert LoginLockout().state(email="a@example.com").locked is False
 
-    def test_no_raw_identifier_is_stored_in_cache_keys(self) -> None:
+    def test_no_raw_identifier_is_stored_in_cache_keys(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """کلیدهای cache باید هش باشند، نه ایمیل/IP خام.
+
+        ``cache`` در dev می‌تواند ``LocMemCache`` یا ``FileBasedCache`` باشد
+        (``.env.example`` دومی را انتخاب می‌کند) و فقط اولی ``_cache`` دارد؛
+        پس به‌جای خواندن ساختار داخلی، فراخوانی ``set`` را می‌گیریم.
+        """
+
         email = "secret-person@example.com"
+        written_keys: list[str] = []
+        original_set = cache.set
+
+        def spy_set(key: str, value: Any, timeout: int | None = None, **kwargs: Any) -> Any:
+            written_keys.append(key)
+            return original_set(key, value, timeout=timeout, **kwargs)
+
+        monkeypatch.setattr(cache, "set", spy_set)
+
         LoginLockout().record_failure(email=email, ip="203.0.113.9")
 
-        keys = list(getattr(cache, "_cache", {}).keys())
-        assert keys, "شمارنده باید در cache نوشته شود"
-        assert all(email not in key for key in keys)
+        assert written_keys, "شمارنده باید در cache نوشته شود"
+        assert all(email not in key for key in written_keys)
 
 
 # ---------------------------------------------------------------------------

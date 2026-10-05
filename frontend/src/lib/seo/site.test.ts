@@ -2,11 +2,13 @@ import { describe, expect, it } from "vitest";
 
 import {
   absoluteUrl,
+  buildAlternateLinkHeader,
   isNoindexPath,
   languageAlternates,
   localePath,
   mergeNoindexPaths,
   normalizePath,
+  stripLocalePrefix,
   toAppLocale,
 } from "@/lib/seo/site";
 
@@ -40,6 +42,29 @@ describe("SEO path helpers", () => {
       en: "https://emmett.example/en/services",
       "x-default": "https://emmett.example/services",
     });
+  });
+
+  it("builds a fa-IR/en/x-default Link header from PUBLIC_SITE_URL", () => {
+    expect(buildAlternateLinkHeader("/contact", "https://emmett.example")).toBe(
+      '<https://emmett.example/contact>; rel="alternate"; hreflang="fa-IR", ' +
+        '<https://emmett.example/en/contact>; rel="alternate"; hreflang="en", ' +
+        '<https://emmett.example/contact>; rel="alternate"; hreflang="x-default"',
+    );
+    // مسیر با پیشوند زبان باید به همان جفت دوزبانه نگاشت شود.
+    expect(buildAlternateLinkHeader("/en/contact", "https://emmett.example")).toBe(
+      buildAlternateLinkHeader("/contact", "https://emmett.example"),
+    );
+  });
+
+  it("omits the Link header for noindex paths", () => {
+    expect(buildAlternateLinkHeader("/profile", "https://emmett.example")).toBeNull();
+    expect(buildAlternateLinkHeader("/en/search", "https://emmett.example")).toBeNull();
+  });
+
+  it("strips the locale prefix the way localePath adds it", () => {
+    expect(stripLocalePrefix("/en/blog/a")).toEqual({ locale: "en", path: "/blog/a" });
+    expect(stripLocalePrefix("/en")).toEqual({ locale: "en", path: "/" });
+    expect(stripLocalePrefix("/blog/a")).toEqual({ locale: "fa", path: "/blog/a" });
   });
 
   it("falls back to Persian for unknown locales", () => {

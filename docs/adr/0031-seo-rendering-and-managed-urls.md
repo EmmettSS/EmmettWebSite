@@ -44,7 +44,11 @@ canonical، متای پویا و RSS. تا فاز ۶ هیچ‌کدام از ای
    آن را خطا می‌گیرد (W007).
 3. **hreflang و canonical از یک تابع واحد** (`localePath`/`alternatesFor`) می‌آیند:
    فارسی بدون پیشوند، انگلیسی زیر `/en` (ADR-0004)، `fa-IR`/`en`/`x-default`، و canonical
-   همیشه خودارجاع.
+   همیشه خودارجاع. همان تابع، هدر ``Link`` را هم می‌سازد (``buildAlternateLinkHeader``) تا
+   هدر و متاتگ‌های HTML یک منبع داشته باشند؛ هدر ``Link`` پیش‌فرض ``next-intl`` کد کوتاه
+   ``fa`` می‌نوشت و برای مسیرهای noindex هم ساخته نمی‌شود.
+   فیدهای جنگو هم ``atom:link rel="self"`` را از ``PUBLIC_SITE_URL`` می‌سازند
+   (``LocalizedFeedMixin.feed_url``) و نه از دامنهٔ داخلی/هدر ``Host``.
 4. **JSON-LD شش‌نوعه روی همهٔ صفحات عمومی** (پاسخ ۶): `Organization`+`WebSite` در ریشه،
    `Article` (بلاگ/پروژه)، `Course`، `Service`، `BreadcrumbList` و `FAQPage` — همه از یک
    کامپوننت سروری `JsonLd` با `application/ld+json` تزریق می‌شوند و با تست قفل شده‌اند.
@@ -74,7 +78,7 @@ canonical، متای پویا و RSS. تا فاز ۶ هیچ‌کدام از ای
 
 ## ۵. اعتبارسنجی
 
-- `frontend/src/lib/seo/{site,json-ld,metadata,redirects}.test.ts` — ۴۲ تست (hreflang،
+- `frontend/src/lib/seo/{site,json-ld,metadata,redirects}.test.ts` — ۴۵ تست (hreflang،
   canonical، OG/Twitter، شش نوع JSON-LD، نرمال‌سازی ریدایرکت).
 - `backend/apps/core/tests/{test_seo_api,test_redirects,test_feeds}.py` — ۴۸ تست
   (شمارش کوئری، اعتبار payload، بدون noindex در sitemap، شمارش hit).

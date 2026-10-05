@@ -23,6 +23,7 @@ else:
 
 class LatestBlogPostsFeed(LocalizedFeedMixin, _FeedBase):
     description = "آخرین مطالب بلاگ Emmett"
+    public_feed_path = "/blog/rss"
 
     @staticmethod
     def _locale() -> str:

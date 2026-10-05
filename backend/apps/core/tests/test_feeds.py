@@ -43,6 +43,19 @@ class TestBlogFeed:
         body = response.content.decode()
         assert "https://emmett.example/en/blog/rss-post-en/" in body
 
+    def test_atom_self_link_points_to_the_public_feed(self, client: Client, settings: Any) -> None:
+        """``atom:link rel="self"`` نباید دامنهٔ داخلی/هدر Host را لو بدهد."""
+
+        settings.PUBLIC_SITE_URL = "https://emmett.example"
+        BlogPostFactory(slug="self-link-post")
+
+        response = client.get("/api/v1/blog/rss/", HTTP_HOST="127.0.0.1:8000")
+
+        body = response.content.decode()
+        assert 'rel="self"' in body
+        assert 'href="https://emmett.example/blog/rss"' in body
+        assert "127.0.0.1:8000" not in body
+
     def test_drafts_are_not_in_the_feed(self, client: Client) -> None:
         BlogPostFactory(slug="published-post")
         BlogPostFactory(slug="draft-post", status=PublishableModel.Status.DRAFT)

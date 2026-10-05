@@ -9,6 +9,7 @@ import {
   resolveRedirect,
   resolveTarget,
 } from "@/lib/seo/redirects";
+import { buildAlternateLinkHeader } from "@/lib/seo/site";
 
 const intlMiddleware = createMiddleware(routing);
 
@@ -86,6 +87,13 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
   const requestWithCsp = new NextRequest(request, { headers: requestHeaders });
   const response = intlMiddleware(requestWithCsp);
   response.headers.set("Content-Security-Policy", contentSecurityPolicy);
+
+  // hreflang در هدر: با تگ‌های HTML هم‌منبع است (fa-IR/en/x-default) و مثل
+  // متادیتا از ``PUBLIC_SITE_URL`` ساخته می‌شود، نه از هدر قابل‌جعل Host.
+  const alternateLinks = buildAlternateLinkHeader(request.nextUrl.pathname);
+  if (alternateLinks && !response.headers.has("Link")) {
+    response.headers.set("Link", alternateLinks);
+  }
   return response;
 }
 

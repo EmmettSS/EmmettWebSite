@@ -503,7 +503,12 @@ CSP_REPORT_ONLY = env.bool("DJANGO_CSP_REPORT_ONLY", default=False)
 CSP_REPORT_URI = env("DJANGO_CSP_REPORT_URI", default="")
 # ``frame-ancestors`` در dev باز می‌ماند تا پیش‌نمایش داخل iframe کار کند؛ در
 # production با DJANGO_FRAME_ANCESTORS='none' قفل می‌شود.
-CSP_FRAME_ANCESTORS = env.list("DJANGO_FRAME_ANCESTORS", default=["'self'"] if DEBUG else ["'none'"])
+# توجه: مقدار خالی در ``.env`` (همان حالتی که ``.env.example`` دارد) نباید به
+# دایرکتیو تهی ``frame-ancestors`` منجر شود؛ ``env.list`` برای رشتهٔ خالی
+# لیست خالی برمی‌گرداند، پس صریحاً به پیش‌فرض dev/prod برمی‌گردیم. اگر قرار است
+# هیچ دامنه‌ای مجاز نباشد، مقدار صریح ``'none'`` باید ست شود.
+_DEFAULT_CSP_FRAME_ANCESTORS = ["'self'"] if DEBUG else ["'none'"]
+CSP_FRAME_ANCESTORS = env.list("DJANGO_FRAME_ANCESTORS", default=[]) or _DEFAULT_CSP_FRAME_ANCESTORS
 CSP_EXTRA_IMG_SRC = env.list("DJANGO_CSP_IMG_SRC", default=[])
 SECURITY_REFERRER_POLICY = env("DJANGO_REFERRER_POLICY", default="strict-origin-when-cross-origin")
 SECURITY_PERMISSIONS_POLICY = env(

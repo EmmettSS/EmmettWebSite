@@ -56,6 +56,10 @@ def build_csp_policy(*, is_admin: bool = False) -> str:
     """
 
     img_src = ["'self'", "data:", "blob:", *list(settings.CSP_EXTRA_IMG_SRC)]
+    # پاسخ‌های API هرگز نباید قاب شوند؛ ``CSP_FRAME_ANCESTORS`` فقط برای ادمین
+    # (HTML) اعمال می‌شود تا در dev پیش‌نمایش داخل iframe کار کند و در prod
+    # مقدار ``'none'`` بگیرد.
+    frame_ancestors = (list(settings.CSP_FRAME_ANCESTORS) if is_admin else ["'none'"]) or ["'none'"]
     directives: list[str] = [
         "default-src 'self'" if is_admin else "default-src 'none'",
         "img-src " + " ".join(img_src),
@@ -63,7 +67,7 @@ def build_csp_policy(*, is_admin: bool = False) -> str:
         "object-src 'none'",
         "base-uri 'self'",
         "form-action 'self'",
-        "frame-ancestors " + " ".join(settings.CSP_FRAME_ANCESTORS),
+        "frame-ancestors " + " ".join(frame_ancestors),
     ]
 
     if is_admin:

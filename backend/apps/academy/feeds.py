@@ -27,6 +27,7 @@ else:
 
 class LatestCoursesFeed(LocalizedFeedMixin, _FeedBase):
     description = "آخرین دوره‌های آکادمی Emmett"
+    public_feed_path = "/academy/rss"
 
     @staticmethod
     def _locale() -> str:

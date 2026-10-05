@@ -67,4 +67,4 @@
   (شامل «بار دوم = صفر کوئری» برای مسیرهای کش‌شده).
 - `apps/core/tests/test_admin_surface.py::TestPublicAssetHints` — دو تست: فرمت‌های مدرن
   تصویر در `next.config.ts` و نبود `<img>` خام در صفحات عمومی.
-- `frontend`: `npm run build` (۳۱ صفحه، build موفق) + `npx vitest run` (۴۲ تست).
+- `frontend`: `npm run build` (۳۱ صفحه، build موفق) + `npx vitest run` (۴۵ تست).
