@@ -2,6 +2,99 @@
 
 فرمت این فایل بر اساس [Keep a Changelog](https://keepachangelog.com/) است. هر فاز پروژه یک بخش مستقل دارد.
 
+## [فاز ۶ — Admin Customization در سطح SaaS] — 2026-10-05
+
+فاز ۶ بر پایهٔ چهار پاسخ صریح مالک محصول پیاده‌سازی شد: **Jazzmin + لایهٔ RTL اختصاصی**
+(`jazzmin_plus_rtl`)، **بدون مدل مالی جدید** (`no_money_model`)، **بدون وضعیت/فیلد جدید و
+بدون migration** (`no_migration`) و **`django-import-export`** برای صادرات/واردات
+(`django_import_export`). تصمیم‌ها در `ADR-0027` تا `ADR-0030` ثبت شده‌اند.
+
+### افزوده‌شده
+
+- **تم و برند:** `django-jazzmin==3.0.5` + `backend/static/admin_theme/` شامل
+  `emmett-admin.css` (توکن‌های `#5b62e0`/`#1fae6e`، کارت KPI، پیل وضعیت، سایدبار)،
+  `emmett-rtl.css` (۱۰۶ قاعدهٔ کاملاً اسکوپ‌شده زیر `html[dir="rtl"]`) و
+  `emmett-admin.js`؛ فونت وزیرمتن خودمیزبان (۸ فایل `woff2` + مجوز OFL) و دارایی‌های
+  برند (`brand/emmett-wordmark.png`, favicon). `core.checks` با شش System Check:
+  ترتیب `jazzmin` (E001)، نبود `import_export` (E002)، مسیر قالب (E003)، دارایی استاتیک
+  گم‌شده (E004)، تازگی ترجمهٔ کامپایل‌شده (W005)، ارجاع CDN فونت (W006) و
+  `PUBLIC_SITE_URL` در حالت `--deploy` (W007).
+- **داشبورد:** قالب `templates/admin/index.html` + `apps/core/dashboard.py` با KPI
+  (کاربران، درخواست‌های AI، Lead و نرخ تبدیل، دوره/ثبت‌نام، سیگنال‌های فروش بدون مدل مالی،
+  خلاصه‌های در انتظار تأیید)، نمودار SVG درون‌خطی ۸ هفته‌ای، قیف فروش، وضعیت محتوا و
+  ویجت‌های «اقدامات اخیر» (AuditLog + LogEntry کاربر جاری)؛ کش‌شده با
+  `ADMIN_DASHBOARD_CACHE_SECONDS` و سقف کوئری قفل‌شده در تست (۱۷).
+- **گردش‌کار و عملیات ادمین:** `apps/core/admin_mixins.py` (`EmmettAdminDefaults`,
+  `PublishWorkflowMixin`, `SoftDeleteAdminMixin`, `RecordStateFilter`,
+  `ExportFormatsMixin`, `ImportDisabledMixin`, `EmmettImportExportAdmin`,
+  `render_status_pill`)، `apps/core/admin_filters.py` (`RelatedPresenceFilter`,
+  `TranslationCompletenessFilter`) و بازنویسی ادمین ۱۰ اپ با inline هوشمند،
+  autocomplete، `list_editable`، `date_hierarchy` و جست‌وجوی دوزبانه (`title_fa`+`title_en`).
+- **کاتالوگ/پرامپت AI در ادمین:** نسخه‌دار با کلید تغییرناپذیر پس از ساخت، ستون
+  «نسخهٔ مؤثر»، اکشن بایگانی نسخه‌های قدیمی، approve/reject خلاصه‌ها، revoke اشتراک عمومی
+  و ثبت هر تغییر در `AuditLog`.
+- **صادرات/واردات:** `django-import-export==4.4.1` با منابع صریح برای هر مدل
+  (`apps/<app>/resources.py`)، فرمت‌های CSV/TSV/JSON، واردات دو مرحله‌ای، کلیدهای پایدار
+  (slug/order/feature+locale+version/…) و نرمال‌سازی «خالی = None» در `EmmettResource.skip_row`
+  برای idempotency واقعی.
+- **مستندات:** `docs/admin-guide-fa.md` (راهنمای گام‌به‌گام فارسی پنل)، `ARCHITECTURE.md`
+  به‌روزرسانی شد و چهار ADR جدید (`0027` تم/RTL، `0028` داشبورد/گردش‌کار، `0029`
+  صادرات/واردات، `0030` ابزار i18n).
+
+### رفع باگ (یافته‌شده با تست‌های ساختاری فاز ۶)
+
+- **اکشن‌های گروهی ۵۰۰ می‌دادند:** اکشن‌های mixin به‌صورت متد bound در `get_actions`
+  ثبت می‌شدند، ولی Django در `response_action` آن‌ها را `func(self, request, queryset)`
+  صدا می‌زند → همهٔ اکشن‌های انتشار/بازگردانی با `TypeError` می‌شکستند. اصلاح: ثبت
+  unbound (`getattr(self.__class__, name)`) + تست رگرسیون POST واقعی روی changelist.
+- **نرم‌حذف بدون بازگردانی:** مدل‌های `BaseModel` که mixin بازگردانی نداشتند
+  (پیکربندی‌های `ai_engine`، `portfolio.CaseStudy`، `core.Media`) رکورد حذف‌شده را برای همیشه
+  از دید پنل پنهان می‌کردند؛ mixin/فیلتر «وضعیت رکورد» اضافه شد.
+- **`core.Translation` با `deleted_at`:** این مدل (جدول key-value سبک) برخلاف فرض اولیه
+  `BaseModel` نیست؛ اعمال `SoftDeleteAdminMixin`/`RecordStateFilter` روی آن
+  `FieldError: Cannot resolve keyword 'deleted_at'` می‌داد و حذف شد.
+- **`core.SearchIndexEntry` بدون `resource_class`:** صادرات آن به resource خودکار پکیج
+  وابسته بود (ستون‌های بی‌ثبات)؛ `SearchIndexEntryResource` صریح اضافه شد.
+- **`list_editable` و ستون وضعیت:** در ادمین‌هایی که وضعیت با ستون رنگی نمایش داده
+  می‌شود، فیلد خام `status` از `list_editable` حذف شده است؛ قاعدهٔ جنگو (`admin.E123`)
+  اجازهٔ ویرایش ستونی را نمی‌دهد که در `list_display` نیست. صحت همهٔ ادمین‌ها با
+  `manage.py check` (بدون خطا) و تست‌های فاز ۶ تأیید شده است.
+
+### سخت‌سازی
+
+- `IMPORT_EXPORT_USE_TRANSACTIONS=True`، escape فرمول/کاراکتر غیرمجاز در CSV و
+  `IMPORT_EXPORT_SKIP_ADMIN_LOG=False` (واردات در `admin.LogEntry` ثبت می‌شود).
+  علاوه بر آن، چون پکیج برای **صادرات** هیچ ردی حسابرسی نمی‌سازد،
+  `EmmettImportExportAdmin.export_action` هر صادرات فایل را در `AuditLog` با تعداد
+  ردیف‌ها، فرمت و نام فایل ثبت می‌کند (`<app>.<Model>.exported`).
+- مجوز صادرات/واردات روی `view`/`add` جنگو؛ دادهٔ کاربر/لید/لاگ فقط‌صادرات.
+- اکشن‌ها مجوز `change` می‌خواهند و هر اقدام گروهی (انتشار/بایگانی/بازگردانی/ترجمه)
+  در `AuditLog` ثبت می‌شود.
+
+### اعتبارسنجی فاز ۶
+
+- بک‌اند: **۳۶۵ تست passed** (۲۵۷ تست قبلی + ۱۰۸ تست جدید فاز ۶)؛ `ruff check .`
+  بدون خطا؛ `mypy apps config` بدون خطا (۲۲۲ فایل، strict)؛
+  `manage.py check` بدون خطا؛ `makemigrations --check --dry-run` → «No changes detected».
+- تست‌های فاز ۶: `test_admin_dashboard.py` ۱۵، `test_admin_workflow.py` ۱۴،
+  `test_admin_exchange.py` ۱۸، `test_admin_theme.py` ۱۳، `test_admin_checks.py` ۱۲،
+  `test_i18n_tooling.py` ۱۵، `test_admin_search_filters.py` ۸، `test_admin_surface.py` ۱۳.
+- i18n: `python scripts/i18n.py check` سبز؛ **۳۹۸ پیام**، فارسی **۱۰۰٪** ترجمه‌شده؛
+  `.mo` هر دو زبان کامپایل و در Git نگه‌داری می‌شود؛ متن رابط ادمین در زبان `en`
+  همان متن منبع (انگلیسی) برمی‌گرداند (طراحی ADR-0030).
+- `manage.py check --deploy` با تنظیمات production فقط دو هشدار مورد انتظار می‌دهد:
+  `W007` (چون `PUBLIC_SITE_URL` در محیط تست، مقدار پیش‌فرض است) و `security.W009`
+  (کلید موقت تست)؛ هیچ خطای دیگری وجود ندارد.
+
+### محدودیت‌های محیط/تحویل
+
+- بررسی بصری مرورگری (اسکرول افقی صفر در همهٔ صفحات، Lighthouse) در sandbox ممکن
+  نیست؛ به‌جای آن، درستی RTL با تست‌های ساختاری روی CSS/قالب (اسکوپ‌بودن همهٔ ۱۰۶ قاعده،
+  بارگذاری `admin/css/rtl.css` فقط در فارسی، نبود CDN) و SMOKE دستی روی پیش‌نمایش
+  زندهٔ پنل بررسی شد.
+- هیچ مدل مالی و هیچ وضعیت `review` اضافه نشده است (تصمیم صریح مالک محصول)؛ «فروش»
+  در داشبورد با سیگنال‌های Lead/ثبت‌نام نمایش داده می‌شود و به بخش لیدها لینک دارد.
+
 ## [فاز ۵ — موتور AI و مشاور ایده‌پرداز] — 2026-10-05
 
 فاز ۵ بر پایهٔ Plan و `ADR-0026` تأییدشده پیاده‌سازی شد؛ جزئیات طراحی و

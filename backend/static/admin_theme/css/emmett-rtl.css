@@ -1,0 +1,418 @@
+/* ==========================================================================
+   Emmett Admin — لایهٔ RTL (فاز ۶، ADR-0027)
+   --------------------------------------------------------------------------
+   قواعد این فایل **فقط** با اسکوپ html[dir="rtl"] اعمال می‌شوند؛ بنابراین پنل
+   انگلیسی (LTR) هیچ تغییری نمی‌بیند و نیازی به نسخهٔ جداگانهٔ CSS نیست.
+
+   چرا این فایل لازم است؟ Bootstrap 5 و AdminLTE 4 فقط در نسخهٔ LTR همراه
+   Jazzmin توزیع می‌شوند (فایل bootstrap.rtl.css همراه بسته نیست). در نتیجه
+   هر جایی که مقدار فیزیکی left/right/padding-left/... استفاده شده، باید
+   آینه شود. Django خودش برای مدل‌ادمین‌ها ``admin/css/rtl.css`` دارد که در
+   قالب base_site.html ما (پروژه) و در حالت LANGUAGE_BIDI بارگذاری می‌شود؛
+   این فایل لایهٔ RTL پوستهٔ AdminLTE/Jazzmin + اجزای اختصاصی ما را پوشش می‌دهد.
+
+   اصل کار: تا حد امکان از ویژگی‌های منطقی CSS (inline-start/inline-end)
+   استفاده شده تا رفتار در هر دو جهت درست باشد و فقط جایی که مقدار فیزیکی
+   اجبار شده (به‌خاطر CSS بالادستی) از left/right صریح استفاده شده است.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   ۱) پوستهٔ ادمین: سایدبار، برند، منوی کناری
+   --------------------------------------------------------------------------
+   نکته: «.app-wrapper» در AdminLTE 4 یک CSS Grid با grid-template-areas است؛
+   محور inline در شبکه جهت‌آگاه است، پس در dir="rtl" ستون اول (سایدبار) خودبه‌خود
+   سمت راست قرار می‌گیرد. اینجا فقط جزئیات فیزیکیِ باقی‌مانده اصلاح می‌شود. */
+html[dir="rtl"] .app-sidebar {
+  border-inline-end: 1px solid var(--emmett-hairline-dark);
+}
+
+html[dir="rtl"] .sidebar-menu .nav-link p {
+  padding-left: 0;
+  padding-inline-start: 0.5rem;
+}
+
+html[dir="rtl"] .nav-indent .sidebar-menu .nav-treeview,
+html[dir="rtl"] .nav-compact .nav-indent .nav-treeview .nav-item,
+html[dir="rtl"] .sidebar-mini.sidebar-collapse.nav-indent .app-sidebar:hover .nav-treeview .nav-item {
+  padding-left: 0;
+  padding-inline-start: 0.5rem;
+}
+
+html[dir="rtl"] .sidebar-menu .nav-compact.nav-indent .nav-treeview,
+html[dir="rtl"] .sidebar-mini.sidebar-collapse.nav-indent .app-sidebar:hover .nav-treeview {
+  padding-inline-start: 0;
+}
+
+/* آیکون/بَج انتهای ردیف منو و پیکان کشویی */
+html[dir="rtl"] .sidebar-menu .nav-link > .nav-arrow,
+html[dir="rtl"] .sidebar-menu .nav-link > .nav-badge,
+html[dir="rtl"] .sidebar-menu .nav-link > p > .nav-arrow,
+html[dir="rtl"] .sidebar-menu .nav-link > p > .nav-badge {
+  right: auto !important;
+  left: 1rem !important;
+}
+
+html[dir="rtl"] .sidebar-menu .menu-open > .nav-link .nav-arrow {
+  transform: translateY(-50%) rotate(-90deg);
+}
+
+html[dir="rtl"] .app-sidebar .nav-link.active {
+  box-shadow: inset -3px 0 0 var(--emmett-emerald);
+}
+
+/* برند/لوگو */
+html[dir="rtl"] .brand-text,
+html[dir="rtl"] .sidebar-brand .brand-text {
+  margin-left: 0;
+  margin-inline-end: 0.5rem;
+}
+
+html[dir="rtl"] .logo-xl,
+html[dir="rtl"] .logo-xl.brand-image-xl {
+  left: auto;
+  right: 12px;
+  inset-inline-start: 12px;
+}
+
+html[dir="rtl"] .logo-xs.brand-image-xl {
+  left: auto;
+  right: 16px;
+  inset-inline-start: 16px;
+}
+
+html[dir="rtl"] .sidebar-brand .brand-link .brand-image,
+html[dir="rtl"] .sidebar-brand .brand-link .brand-image-xs,
+html[dir="rtl"] .sidebar-brand .brand-link .brand-image-xl {
+  float: right;
+}
+
+/* --------------------------------------------------------------------------
+   ۲) کلاس‌های فیزیکی Bootstrap 5 که در قالب‌های Jazzmin استفاده شده‌اند
+   (با grep روی قالب‌ها تعیین شده: me-1/me-2/ms-2/ms-auto/float-end/float-sm-end/text-start)
+   -------------------------------------------------------------------------- */
+html[dir="rtl"] .me-1 {
+  margin-right: 0 !important;
+  margin-left: 0.25rem !important;
+}
+
+html[dir="rtl"] .me-2 {
+  margin-right: 0 !important;
+  margin-left: 0.5rem !important;
+}
+
+html[dir="rtl"] .me-3 {
+  margin-right: 0 !important;
+  margin-left: 1rem !important;
+}
+
+html[dir="rtl"] .ms-1 {
+  margin-left: 0 !important;
+  margin-right: 0.25rem !important;
+}
+
+html[dir="rtl"] .ms-2 {
+  margin-left: 0 !important;
+  margin-right: 0.5rem !important;
+}
+
+html[dir="rtl"] .ms-3 {
+  margin-left: 0 !important;
+  margin-right: 1rem !important;
+}
+
+html[dir="rtl"] .ms-auto {
+  margin-left: 0 !important;
+  margin-right: auto !important;
+}
+
+html[dir="rtl"] .me-auto {
+  margin-right: 0 !important;
+  margin-left: auto !important;
+}
+
+html[dir="rtl"] .float-end {
+  float: left !important;
+}
+
+html[dir="rtl"] .float-start {
+  float: right !important;
+}
+
+html[dir="rtl"] .text-start {
+  text-align: right !important;
+}
+
+html[dir="rtl"] .text-end {
+  text-align: left !important;
+}
+
+@media (min-width: 576px) {
+  html[dir="rtl"] .float-sm-end {
+    float: left !important;
+  }
+
+  html[dir="rtl"] .float-sm-start {
+    float: right !important;
+  }
+}
+
+/* منوهای کشویی Bootstrap در RTL باید از لبهٔ چپ عنصر باز شوند */
+html[dir="rtl"] .dropdown-menu-end {
+  right: auto !important;
+  left: 0 !important;
+  text-align: right;
+}
+
+html[dir="rtl"] .dropdown-menu {
+  text-align: right;
+}
+
+html[dir="rtl"] .dropdown-menu-lg-end {
+  right: auto;
+  left: 0;
+}
+
+/* ورودی جست‌وجوی نوار بالا */
+html[dir="rtl"] .navbar-search-block .form-control-navbar {
+  text-align: right;
+}
+
+/* --------------------------------------------------------------------------
+   ۳) اجزای Django admin در بستر Jazzmin
+   -------------------------------------------------------------------------- */
+
+/* نوار اقدام گروهی (bulk actions) — قالب admin/actions.html ما */
+html[dir="rtl"] #changelist .actions {
+  padding-left: 0;
+  padding-inline-start: 1rem;
+}
+
+html[dir="rtl"] #changelist .actions label {
+  padding-right: 0;
+  padding-inline-end: 0.5rem;
+}
+
+html[dir="rtl"] #changelist .actions .button {
+  margin-left: 0;
+  margin-inline-start: 0.5rem;
+}
+
+/* دکمه‌های عملیات شیء (Add/History/View on site) */
+html[dir="rtl"] .object-tools,
+html[dir="rtl"] ul.object-tools {
+  float: left;
+  padding-right: 0;
+  padding-inline-start: 0;
+}
+
+html[dir="rtl"] .object-tools li {
+  float: right;
+  margin-left: 0;
+  margin-right: 0.6rem;
+}
+
+/* سطر دکمه‌های ذخیره در فرم‌ها */
+html[dir="rtl"] .submit-row {
+  text-align: left;
+}
+
+html[dir="rtl"] .submit-row input,
+html[dir="rtl"] .submit-row a {
+  margin-left: 0;
+  margin-right: 0.5rem;
+}
+
+html[dir="rtl"] .submit-row .deletelink-box {
+  float: right;
+}
+
+/* فیلترهای کنار فهرست (Django 5.2) */
+html[dir="rtl"] #changelist-filter {
+  border-left: none;
+  border-right: 1px solid var(--bs-border-color);
+}
+
+html[dir="rtl"] #changelist-filter li.selected {
+  border-left: none;
+  border-right: 5px solid var(--emmett-indigo);
+  padding-left: 0;
+  padding-right: 0.6rem;
+  margin-inline: 0;
+}
+
+/* صفحه‌بندی */
+html[dir="rtl"] .paginator a,
+html[dir="rtl"] .paginator .this-page {
+  margin-left: 0;
+  margin-right: 0.25rem;
+}
+
+/* Related widget (آیکون‌های افزودن/ویرایش/حذف کنار کلیدهای خارجی) */
+html[dir="rtl"] .related-widget-wrapper .related-widget-wrapper-link {
+  margin-left: 0;
+  margin-inline-end: 0.25rem;
+}
+
+html[dir="rtl"] .related-widget-wrapper-link {
+  padding-left: 0;
+  padding-inline-start: 0.25rem;
+}
+
+/* ویجت تاریخ/ساعت */
+html[dir="rtl"] .datetime input.vDateField,
+html[dir="rtl"] .datetime input.vTimeField {
+  margin-left: 0;
+  margin-inline-end: 0.5rem;
+}
+
+html[dir="rtl"] .datetimeshortcuts a {
+  margin-left: 0;
+  margin-inline-start: 0.25rem;
+}
+
+/* Inlineهای جدولی: سلول «رکورد اصلی» و ستون‌ها */
+html[dir="rtl"] .inline-group .tabular tr.has_original td {
+  padding-left: 0.6rem;
+  padding-inline-start: 0.6rem;
+}
+
+html[dir="rtl"] .inline-group .tabular tr.has_original td.original p {
+  right: auto;
+  left: 0.6rem;
+  inset-inline-start: 0.6rem;
+  text-align: right;
+}
+
+html[dir="rtl"] .inline-related h3 .inline_label,
+html[dir="rtl"] .inline-related h3 span.delete {
+  margin-left: 0;
+  margin-inline-end: 0.5rem;
+}
+
+/* فیلدست‌های بازشو */
+html[dir="rtl"] fieldset.collapse a.collapse-toggle::before {
+  content: "▸";
+}
+
+html[dir="rtl"] fieldset.collapse a.collapse-toggle.collapsed::before {
+  content: "◂";
+}
+
+/* پیام‌های فرم و آیکون راهنما */
+html[dir="rtl"] .help,
+html[dir="rtl"] p.help,
+html[dir="rtl"] span.help {
+  text-align: right;
+}
+
+html[dir="rtl"] form .aligned ul.errorlist li {
+  text-align: right;
+}
+
+/* --------------------------------------------------------------------------
+   ۴) تب‌های ترجمهٔ modeltranslation (روی Jazzmin کلاس‌های nav-tabs می‌گیرند)
+   -------------------------------------------------------------------------- */
+html[dir="rtl"] .ui-tabs .ui-tabs-nav {
+  padding: 5px 10px 0 0;
+}
+
+html[dir="rtl"] .ui-tabs .ui-tabs-nav li a {
+  float: right;
+}
+
+html[dir="rtl"] .ui-tabs .ui-tabs-panel h3 {
+  text-align: right;
+}
+
+/* --------------------------------------------------------------------------
+   ۵) Select2 (فیلدهای جست‌وجو/انتخاب چندگانهٔ Django admin)
+   -------------------------------------------------------------------------- */
+html[dir="rtl"] .select2-container--default .select2-selection--single {
+  text-align: right;
+}
+
+html[dir="rtl"] .select2-container--default .select2-selection--single .select2-selection__arrow {
+  right: auto;
+  left: 4px;
+}
+
+html[dir="rtl"] .select2-container--default .select2-selection--single .select2-selection__rendered {
+  padding-left: 20px;
+  padding-right: 8px;
+  text-align: right;
+}
+
+html[dir="rtl"] .select2-container--default .select2-selection--multiple .select2-selection__choice {
+  float: right;
+  margin-right: 0;
+  margin-left: 5px;
+}
+
+html[dir="rtl"] .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+  margin-right: 0;
+  margin-left: 4px;
+}
+
+html[dir="rtl"] .select2-container--default .select2-search--inline .select2-search__field {
+  text-align: right;
+}
+
+html[dir="rtl"] .select2-container--default .select2-results__option {
+  text-align: right;
+}
+
+html[dir="rtl"] .select2-container--default .select2-selection--multiple .select2-selection__clear {
+  float: left;
+}
+
+/* --------------------------------------------------------------------------
+   ۶) «جزیره‌های LTR»: داده‌هایی که ماهیتاً لاتین‌اند (شماره، ایمیل، slug، کد)
+   باید در فرم فارسی هم چپ‌به‌راست بمانند تا قابل‌خواندن باشند.
+   -------------------------------------------------------------------------- */
+html[dir="rtl"] input[type="email"],
+html[dir="rtl"] input[type="url"],
+html[dir="rtl"] input[type="tel"],
+html[dir="rtl"] input[type="number"],
+html[dir="rtl"] input[type="password"],
+html[dir="rtl"] .vSlugField,
+html[dir="rtl"] .vURLField,
+html[dir="rtl"] .vIntegerField,
+html[dir="rtl"] .vDecimalField,
+html[dir="rtl"] .vFloatField,
+html[dir="rtl"] input.vDateField,
+html[dir="rtl"] input.vTimeField,
+html[dir="rtl"] code,
+html[dir="rtl"] kbd,
+html[dir="rtl"] samp,
+html[dir="rtl"] pre,
+html[dir="rtl"] .emmett-ltr {
+  direction: ltr;
+  text-align: right;
+}
+
+/* کدها و JSON در فرم‌های ادمین (JSONField/Textarea فنی) */
+html[dir="rtl"] .field-config textarea,
+html[dir="rtl"] .field-social_links textarea,
+html[dir="rtl"] .field-metrics textarea,
+html[dir="rtl"] .field-technology_stack textarea,
+html[dir="rtl"] .field-system_prompt textarea {
+  direction: ltr;
+  text-align: left;
+}
+
+/* --------------------------------------------------------------------------
+   ۷) کامپوننت‌های اختصاصی داشبورد در RTL
+   -------------------------------------------------------------------------- */
+html[dir="rtl"] .emmett-chart__bar {
+  border-radius: var(--emmett-radius-sm) var(--emmett-radius-sm) 0 0;
+}
+
+html[dir="rtl"] .emmett-legend__dot {
+  margin-inline-end: 0;
+  margin-inline-start: 0.35rem;
+}
+
+html[dir="rtl"] .emmett-kpi__link i,
+html[dir="rtl"] .emmett-quick-links i {
+  transform: scaleX(-1);
+}

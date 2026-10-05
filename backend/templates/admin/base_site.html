@@ -1,0 +1,39 @@
+{% extends "admin/base.html" %}
+{% comment %}
+  ---------------------------------------------------------------------------
+  base_site.html پروژهٔ امیت (فاز ۶، ADR-0027)
+  ---------------------------------------------------------------------------
+  این قالب، قالب base_site پیش‌فرض Jazzmin را بازنویسی می‌کند تا شکاف واقعی
+  زیر پر شود: Jazzmin روی <html> صفت dir="rtl" می‌گذارد (بر اساس زبان فعال)،
+  اما استایل‌شیت رسمی راست‌چین Django را بارگذاری نمی‌کند. نتیجه بدون این
+  قالب: صفحه‌های Django-admin (فهرست‌ها، فیلترها، فرم‌ها، inlineها) در حالت
+  فارسی نیم‌بند و ناهم‌تراز دیده می‌شوند.
+
+  لایهٔ RTL اختصاصی امیت (admin_theme/css/emmett-rtl.css) از طریق @import
+  داخل emmett-admin.css بارگذاری می‌شود تا صفحهٔ ورود (که این قالب را
+  نمی‌گیرد) هم پوشش داده شود؛ قواعد آن کاملاً به html[dir="rtl"] مقید است و
+  در پنل انگلیسی هیچ اثری ندارد.
+{% endcomment %}
+{% load i18n static %}
+
+{% get_current_language_bidi as LANGUAGE_BIDI %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    {% if LANGUAGE_BIDI %}
+        {# استایل‌شیت رسمی راست‌چین Django admin (ADR-0027) #}
+        <link rel="stylesheet" href="{% static 'admin/css/rtl.css' %}">
+        <link rel="stylesheet" href="{% static 'admin/css/responsive_rtl.css' %}" media="(max-width: 1024px)">
+    {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+    {{ block.super }}
+    {# preload فقط برای دو subset پرکاربرد فونت، برای بهبود LCP (قانون ۱۹) #}
+    <link rel="preload" as="font" type="font/woff2" crossorigin
+          href="{% static 'admin_theme/fonts/vazirmatn-arabic-400-normal.woff2' %}">
+    {% if not LANGUAGE_BIDI %}
+        <link rel="preload" as="font" type="font/woff2" crossorigin
+              href="{% static 'admin_theme/fonts/vazirmatn-latin-400-normal.woff2' %}">
+    {% endif %}
+{% endblock %}

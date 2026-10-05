@@ -465,9 +465,35 @@ erDiagram
 | [ADR-0009](docs/adr/0009-ai-engine-data-architecture.md) | معماری دادهٔ ai_engine و Guardrail |
 | [ADR-0010](docs/adr/0010-dependency-management.md) | مدیریت وابستگی‌ها و محیط اجرا (requirements.txt) |
 
-تصمیمات implementation تا فاز ۵ در ADRهای بعدی ثبت شده‌اند؛ scope نهایی AI در
+تصمیمات implementation تا فاز ۶ در ADRهای بعدی ثبت شده‌اند؛ scope نهایی AI در
 [ADR-0026](docs/adr/0026-ai-engine-implementation-and-creative-advisor.md) است و
-بخش طراحی اولیهٔ AI در ADR-0009 را supersede می‌کند.
+بخش طراحی اولیهٔ AI در ADR-0009 را supersede می‌کند. لایهٔ ادمین (فاز ۶) در چهار ADR
+ثبت شده است:
+
+| شماره | عنوان |
+|---|---|
+| [ADR-0027](docs/adr/0027-admin-theme-and-rtl.md) | تم اختصاصی ادمین، برند امیت و لایهٔ RTL |
+| [ADR-0028](docs/adr/0028-admin-dashboard-and-workflow.md) | داشبورد KPI، گردش‌کار انتشار و قابلیت‌های عملیاتی ادمین |
+| [ADR-0029](docs/adr/0029-export-import-strategy.md) | صادرات/واردات داده با `django-import-export` |
+| [ADR-0030](docs/adr/0030-i18n-tooling-and-translation-management.md) | ابزار i18n پروژه و مدیریت ترجمه در ادمین |
+
+### ۱۰.۱. لایهٔ ادمین (فاز ۶) — نمای کلی
+
+```
+ادمین (فارسی پیش‌فرض / انگلیسی)
+├── تم و برند: jazzmin + static/admin_theme/{css,js,fonts}  → ADR-0027
+├── داشبورد: templates/admin/index.html + apps/core/dashboard.py (کش‌شده، SVG درون‌خطی)
+├── گردش‌کار: apps/core/admin_mixins.py (PublishWorkflow / SoftDelete / ExportFormats)  → ADR-0028
+├── ترجمه: core.Translation + TranslationCompletenessFilter + scripts/i18n.py  → ADR-0030
+├── پیکربندی AI: ai_engine (Catalog/Prompt/Guardrail با کلید تغییرناپذیر و AuditLog)
+├── صادرات/واردات: django-import-export (CSV/TSV/JSON، واردات دو مرحله‌ای)  → ADR-0029
+└── حسابرسی: core.AuditLog (رخدادهای حساس) + admin.LogEntry (تاریخچهٔ ادمین)
+```
+
+قواعد اجباری این لایه (با تست ساختاری قفل شده‌اند): هر مدل `BaseModel` باید نرم‌حذف
+قابل‌بازگردانی داشته باشد، هر ادمین باید `search_fields` و `resource_class` صریح داشته
+باشد، واردات یا فعال است یا صریحاً خاموش، و اکشن‌های گروهی فقط به‌صورت unbound ثبت
+می‌شوند (قرارداد فراخوانی جنگو).
 
 ---
 

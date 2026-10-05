@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  نشان برداری امیت (فاز ۶، ADR-0027).
+
+  هندسه دقیقاً همان اسلش نشان‌نوشت مرجع است و با نسبت‌های به‌کاررفته در
+  ``backend/scripts/generate_brand_assets.py`` (MARK_SLASH/MARK_RADIUS_RATIO)
+  یکسان نگه داشته می‌شود؛ نسخهٔ رستری (favicon و emmett-logo-192.png) از همین
+  هندسه ساخته شده است. رنگ‌ها توکن‌های برند ADR-0017 هستند.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192"
+     role="img" aria-label="Emmett">
+  <title>Emmett Group</title>
+  <rect x="0" y="0" width="192" height="192" rx="42.24" ry="42.24" fill="#0b0c0e"/>
+  <polygon points="115.2,36.48 141.12,36.48 76.8,155.52 50.88,155.52" fill="#5b62e0"/>
+  <rect x="44" y="60" width="9" height="72" rx="4.5" fill="#1fae6e"/>
+</svg>

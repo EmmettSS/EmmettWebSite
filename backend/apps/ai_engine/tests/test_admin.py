@@ -5,19 +5,19 @@ from django.contrib import admin as django_admin
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.http import HttpRequest
-from django.test import RequestFactory
 
 from apps.accounts.models import User
 from apps.ai_engine.admin import AIContentArtifactAdmin, AISuggestionAdmin
 from apps.ai_engine.models import AIContentArtifact, AISuggestion
+from apps.core.tests.admin_helpers import admin_request
 
 pytestmark = pytest.mark.django_db
 
 
 def _admin_request(user: User) -> HttpRequest:
-    request = RequestFactory().get("/admin/ai_engine/aisuggestion/")
-    request.user = user
-    return request
+    """درخواست ادمین با لایهٔ پیام فعال (اکشن‌ها بازخورد می‌دهند)."""
+
+    return admin_request(user, "/admin/ai_engine/aisuggestion/", method="get")
 
 
 def _staff_user(email: str) -> User:

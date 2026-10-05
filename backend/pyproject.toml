@@ -23,9 +23,17 @@ disable_error_code = ["django-manager-missing"]
 module = "*.migrations.*"
 ignore_errors = true
 
-# django-environ هنوز stub رسمی ندارد.
+# django-jazzmin و django-import-export (فاز ۶ — ADR-0028/ADR-0029) هیچ
+# ``py.typed``/stub ندارند. تنها جایی که مستقیماً از کلاس‌هایشان ارث‌بری می‌کنیم
+# با ``# type: ignore[misc]`` علامت‌گذاری شده تا محدودیت صریح و قابل‌ردیابی باشد.
 [[tool.mypy.overrides]]
-module = "environ.*"
+module = ["import_export.*", "jazzmin.*"]
+ignore_missing_imports = true
+
+# django-environ هنوز stub رسمی ندارد؛ polib (ابزار i18n فاز ۶، فقط dev) هم
+# فاقد stub است و فقط در ``scripts/i18n.py`` و تست ابزار i18n استفاده می‌شود.
+[[tool.mypy.overrides]]
+module = ["environ.*", "polib.*"]
 ignore_missing_imports = true
 
 # Markdown/nh3/jdatetime/django-filter (فاز ۴) هیچ‌کدام stub رسمی/py.typed

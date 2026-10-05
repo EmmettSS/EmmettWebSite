@@ -1,28 +1,62 @@
+"""ادمین اپ ``accounts`` — کاربران، پروفایل‌ها، علاقه‌مندی‌ها (فاز ۶).
+
+نکات طراحی:
+
+* ``User`` از ``UserAdmin`` جنگو ارث می‌برد؛ فاز ۶ به آن پیش‌فرض‌های امیت
+  (``EmmettAdminDefaults``)، فیلتر نقش، ستون‌های خوانا و صادرات CSV افزود.
+* حذف کاربر هرگز گروهی انجام نمی‌شود؛ فقط از صفحهٔ خود کاربر و با تأییدیهٔ
+  ``DELETE`` (رفتار پیش‌فرض جنگو) ممکن است — چون به محتوای وابسته (مقالات،
+  ثبت‌نام‌ها) گره خورده است.
+* علاقه‌مندی‌ها (``Favorite`` — محتوای رابطه‌ای) فقط صادر می‌شوند (ADR-0029).
+"""
+
 from __future__ import annotations
+
+from typing import Any
 
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
+from django.http import HttpRequest
+from django.utils.translation import gettext_lazy as _
 
 from apps.accounts.models import Favorite, Profile, User
+from apps.accounts.resources import FavoriteResource, ProfileResource, UserResource
+from apps.core.admin_mixins import (
+    EmmettImportExportAdmin,
+    ImportDisabledMixin,
+    RecordStateFilter,
+    SoftDeleteAdminMixin,
+)
 
 
 @admin.register(User)
-class UserAdmin(DjangoUserAdmin[User]):
+class UserAdmin(DjangoUserAdmin[User], ImportDisabledMixin, EmmettImportExportAdmin):
+    """کاربران سامانه — ایمیل به‌جای username (ADR-0006).
+
+    ترتیب ارث‌بری عمدی است: ``DjangoUserAdmin`` اول می‌آید تا ``fieldsets``/
+    ``add_fieldsets``/``get_form`` خودش برنده باشد؛ mixinهای امیت بعد از آن
+    قرار می‌گیرند و فقط چیزهایی را اضافه می‌کنند که ``UserAdmin`` جنگو ندارد
+    (اکشن‌ها، برندینگ، صادرات). صادرات «فقط خروجی» است و واردات کاربر به‌کل
+    بسته است (ADR-0029) — رمز/نقش هرگز از فایل قابل تنظیم نیست.
+    """
+
+    resource_class = UserResource
     ordering = ("-date_joined",)
-    list_display = ("email", "role", "is_staff", "is_active", "is_phone_verified", "date_joined")
-    list_filter = ("role", "is_staff", "is_active", "is_phone_verified")
+    list_display = ("email", "full_name", "role", "is_staff", "is_active", "date_joined", "last_login")
+    list_display_links = ("email",)
+    list_filter = ("role", "is_staff", "is_active", "is_phone_verified", "date_joined")
     search_fields = ("email", "phone", "first_name", "last_name")
     readonly_fields = ("public_id", "created_at", "updated_at", "last_login", "date_joined")
-
+    date_hierarchy = "date_joined"
     fieldsets = (
         (None, {"fields": ("email", "password")}),
-        ("اطلاعات شخصی", {"fields": ("first_name", "last_name", "phone", "is_phone_verified")}),
+        (_("Personal information"), {"fields": ("first_name", "last_name", "phone", "is_phone_verified")}),
         (
-            "نقش و دسترسی",
+            _("Role and permissions"),
             {"fields": ("role", "is_active", "is_staff", "is_superuser", "groups", "user_permissions")},
         ),
-        ("تاریخ‌ها", {"fields": ("last_login", "date_joined", "created_at", "updated_at")}),
-        ("شناسهٔ عمومی", {"fields": ("public_id",)}),
+        (_("Timeline"), {"fields": ("last_login", "date_joined", "created_at", "updated_at")}),
+        (_("Public identifier"), {"classes": ("collapse",), "fields": ("public_id",)}),
     )
     add_fieldsets = (
         (
@@ -34,16 +68,38 @@ class UserAdmin(DjangoUserAdmin[User]):
         ),
     )
 
+    @admin.display(description=_("Full name"), ordering="last_name")
+    def full_name(self, obj: User) -> str:
+        return obj.get_full_name() or "—"
+
+    def get_actions(self, request: HttpRequest) -> dict[str, Any]:
+        """«حذف گروهی» عمداً برداشته شده است — کاربر با محتوای وابسته گره دارد."""
+
+        actions = super().get_actions(request)
+        actions.pop("delete_selected", None)
+        return actions
+
 
 @admin.register(Profile)
-class ProfileAdmin(admin.ModelAdmin[Profile]):
-    list_display = ("user", "locale_preference", "job_title", "company_name")
-    search_fields = ("user__email", "job_title", "company_name")
-    autocomplete_fields = ("user",)
+class ProfileAdmin(SoftDeleteAdminMixin, EmmettImportExportAdmin):
+    resource_class = ProfileResource
+    list_display = ("user", "job_title", "company_name", "locale_preference", "has_bio")
+    list_filter = ("locale_preference", RecordStateFilter)
+    search_fields = ("user__email", "job_title", "company_name", "bio")
+    autocomplete_fields = ("user", "avatar")
+    list_select_related = ("user",)
+
+    @admin.display(boolean=True, description=_("Biography"))
+    def has_bio(self, obj: Profile) -> bool:
+        return bool((obj.bio or "").strip())
 
 
 @admin.register(Favorite)
-class FavoriteAdmin(admin.ModelAdmin[Favorite]):
+class FavoriteAdmin(ImportDisabledMixin, EmmettImportExportAdmin, SoftDeleteAdminMixin):
+    resource_class = FavoriteResource
     list_display = ("user", "content_type", "object_id", "created_at")
-    list_filter = ("content_type",)
+    list_filter = ("content_type", "created_at", RecordStateFilter)
     search_fields = ("user__email",)
+    autocomplete_fields = ("user",)
+    date_hierarchy = "created_at"
+    list_select_related = ("user", "content_type")
