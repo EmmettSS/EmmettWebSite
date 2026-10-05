@@ -8,6 +8,12 @@ import { Link } from "@/i18n/navigation";
 import { CommentForm } from "@/components/organisms/comment-form";
 import type { AppLocale } from "@/i18n/routing";
 import { getBlogPost } from "@/lib/api/server";
+import { JsonLd } from "@/components/seo/json-ld";
+import { getSeoSettingsOrDefaults } from "@/lib/api/seo";
+import { articleJsonLd, breadcrumbJsonLd } from "@/lib/seo/json-ld";
+import { buildPageMetadata } from "@/lib/seo/metadata";
+import { getPublicSiteUrl, toAppLocale } from "@/lib/seo/site";
+import Image from "next/image";
 
 interface PageParams {
   locale: string;
@@ -22,10 +28,21 @@ export async function generateMetadata({
   const { locale, slug } = await params;
   const post = await getBlogPost(locale, slug);
   if (!post) return {};
-  return {
+  const settings = await getSeoSettingsOrDefaults();
+  return buildPageMetadata({
+    locale: toAppLocale(locale),
+    path: `/blog/${slug}`,
     title: post.meta_title || post.title,
     description: post.meta_description || post.excerpt,
-  };
+    imageUrl: post.cover_image_url,
+    settings,
+    siteUrl: getPublicSiteUrl(),
+    type: "article",
+    publishedTime: post.published_at,
+    authors: post.author_name ? [post.author_name] : [],
+    tags: post.tags.map((tag) => tag.name),
+    rssPath: "/blog/rss",
+  });
 }
 
 function formatDate(locale: string, iso: string | null) {
@@ -49,8 +66,31 @@ export default async function BlogPostPage({
 
   const approvedComments = post.comments.filter((comment) => comment.status === "approved");
 
+  const settings = await getSeoSettingsOrDefaults();
+  const siteUrl = getPublicSiteUrl();
+  const appLocale = toAppLocale(locale);
+  const crumbs = [{ name: t("title"), path: "/blog" }, { name: post.title, path: `/blog/${slug}` }];
+
   return (
     <article className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-10">
+      <JsonLd
+        data={articleJsonLd(
+          {
+            title: post.title,
+            description: post.excerpt,
+            path: `/blog/${slug}`,
+            imageUrl: post.cover_image_url,
+            publishedAt: post.published_at,
+            authorName: post.author_name,
+            section: t("title"),
+            tags: post.tags.map((tag) => tag.name),
+          },
+          settings,
+          siteUrl,
+          appLocale,
+        )}
+      />
+      <JsonLd data={breadcrumbJsonLd(crumbs, siteUrl, appLocale)} />
       <Breadcrumb items={[{ label: t("title"), href: "/blog" }, { label: post.title }]} className="mb-8" />
 
       <header>
@@ -81,8 +121,16 @@ export default async function BlogPostPage({
       </header>
 
       {post.cover_image_url ? (
-        // eslint-disable-next-line @next/next/no-img-element -- دامنهٔ تصاویر از بک‌اند پویاست
-        <img src={post.cover_image_url} alt="" className="mt-8 w-full rounded-lg object-cover" />
+        <div className="relative mt-8 aspect-video w-full overflow-hidden rounded-lg">
+          <Image
+            src={post.cover_image_url}
+            alt=""
+            fill
+            sizes="(max-width: 768px) 100vw, 768px"
+            priority
+            className="object-cover"
+          />
+        </div>
       ) : null}
 
       {post.toc.length > 0 ? (

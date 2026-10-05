@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from .base import *  # noqa: F401,F403
-from .base import env
+from .base import SECURITY_REFERRER_POLICY, env
 
 DEBUG = False
 
@@ -27,3 +27,7 @@ SECURE_HSTS_SECONDS = env.int("DJANGO_SECURE_HSTS_SECONDS", default=31536000)
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+SECURE_REFERRER_POLICY = SECURITY_REFERRER_POLICY
+# در production پیش‌فرض دو مرحله‌ای روشن است (با env قابل خاموش‌کردن برای
+# گذار اولیه)؛ check اختصاصی ``emmett_admin.W008`` خاموش‌بودن آن را هشدار می‌دهد.
+ADMIN_2FA_REQUIRED = env.bool("ADMIN_2FA_REQUIRED", default=True)

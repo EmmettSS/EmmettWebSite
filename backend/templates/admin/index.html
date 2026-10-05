@@ -1,0 +1,170 @@
+{% extends "admin/base_site.html" %}
+{% comment %}
+  ---------------------------------------------------------------------------
+  داشبورد اختصاصی ادمین امیت (فاز ۶، ADR-0028)
+  ---------------------------------------------------------------------------
+  جایگزین صفحهٔ پیش‌فرض index ادمین: آمار زندهٔ محصول (کاربر، AI، لید، دوره)،
+  نمودار میله‌ای خالص CSS (بدون JS/CDN)، آخرین رخدادهای حسابرسی و لینک‌های
+  دسترسی سریع — و سپس فهرست کامل بخش‌ها بر اساس app_list استاندارد Django
+  (همان context مستند view ادمین؛ هیچ override غیررسمی در کار نیست).
+
+  داده‌ها از inclusion tag «emmett_dashboard» می‌آید (apps/core/dashboard.py)
+  که با کش کوتاه‌مدت و تعداد کوئری محدود ساخته می‌شود (قانون ۱۵).
+{% endcomment %}
+{% load i18n emmett_admin %}
+
+{% block bodyclass %}{{ block.super }} emmett-dashboard-page{% endblock %}
+
+{% block content_title %}{% trans "Dashboard" %}{% endblock %}
+
+{% block content %}
+    {% emmett_dashboard as dashboard %}
+
+    <div class="emmett-dashboard">
+        <div class="emmett-dashboard__header">
+            <p class="emmett-dashboard__greeting">
+                {% blocktrans with name=request.user.get_short_name|default:request.user.email %}Welcome, {{ name }}{% endblocktrans %}
+            </p>
+            <p class="emmett-dashboard__hint">
+                {% trans "Statistics are cached briefly; reload to refresh." %}
+                {% if dashboard.generated_at %}· {{ dashboard.generated_at|emmett_datetime }}{% endif %}
+            </p>
+        </div>
+
+        <div class="emmett-kpi-grid">
+            {% for kpi in dashboard.kpis %}
+                <article class="emmett-kpi">
+                    <div class="emmett-kpi__head">
+                        <span class="emmett-kpi__icon" aria-hidden="true"><i class="{{ kpi.icon }}"></i></span>
+                        <span>{{ kpi.label }}</span>
+                    </div>
+                    <div class="emmett-kpi__value">{{ kpi.value|emmett_number }}</div>
+                    {% if kpi.hints %}
+                        <ul class="emmett-kpi__hints">
+                            {% for hint in kpi.hints %}
+                                <li>{{ hint }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                    {% if kpi.url %}
+                        <a class="emmett-kpi__link" href="{{ kpi.url }}">
+                            {{ kpi.link_label }} <i class="fas fa-arrow-left" aria-hidden="true"></i>
+                        </a>
+                    {% endif %}
+                </article>
+            {% endfor %}
+        </div>
+
+        <div class="emmett-panel-grid">
+            {% for chart in dashboard.charts %}
+                <section class="emmett-panel" aria-labelledby="emmett-chart-{{ forloop.counter }}">
+                    <h2 class="emmett-panel__title" id="emmett-chart-{{ forloop.counter }}">{{ chart.title }}</h2>
+                    <div class="emmett-chart" role="img" aria-label="{{ chart.title }}">
+                        {% for point in chart.points %}
+                            <div class="emmett-chart__bar{% if chart.accent %} emmett-chart__bar--accent{% endif %}"
+                                 style="height: {{ point.percent }}%"
+                                 title="{{ point.label }}: {{ point.value|emmett_number }}"
+                                 aria-label="{{ point.label }}: {{ point.value|emmett_number }}"></div>
+                        {% endfor %}
+                    </div>
+                    <div class="emmett-chart__labels" aria-hidden="true">
+                        {% for point in chart.points %}<span>{{ point.label }}</span>{% endfor %}
+                    </div>
+                </section>
+            {% endfor %}
+
+            <section class="emmett-panel" aria-labelledby="emmett-funnel-title">
+                <h2 class="emmett-panel__title" id="emmett-funnel-title">{% trans "Sales pipeline (leads)" %}</h2>
+                <ul class="emmett-legend">
+                    {% for item in dashboard.pipeline %}
+                        <li>
+                            <span class="emmett-pill emmett-pill--{{ item.tone }}">{{ item.label }}</span>
+                            {{ item.value|emmett_number }}
+                        </li>
+                    {% endfor %}
+                </ul>
+                <p class="emmett-dashboard__hint mt-3 mb-0">
+                    {% blocktrans with rate=dashboard.conversion_rate|emmett_number %}Conversion rate (Won / all leads): {{ rate }}%{% endblocktrans %}
+                </p>
+            </section>
+
+            <section class="emmett-panel" aria-labelledby="emmett-content-title">
+                <h2 class="emmett-panel__title" id="emmett-content-title">{% trans "Content by publication status" %}</h2>
+                <ul class="emmett-activity">
+                    {% for row in dashboard.content_status %}
+                        <li>
+                            <span>{{ row.label }}</span>
+                            <span class="emmett-pill emmett-pill--draft">{{ row.draft|emmett_number }}</span>
+                            <span class="emmett-pill emmett-pill--published">{{ row.published|emmett_number }}</span>
+                            <span class="emmett-pill emmett-pill--archived">{{ row.archived|emmett_number }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <p class="emmett-dashboard__hint mt-2 mb-0">
+                    {% trans "Order: draft · published · archived" %}
+                </p>
+            </section>
+
+            <section class="emmett-panel" aria-labelledby="emmett-audit-title">
+                <h2 class="emmett-panel__title" id="emmett-audit-title">{% trans "Latest sensitive actions (audit log)" %}</h2>
+                <ul class="emmett-activity">
+                    {% for entry in dashboard.audit_activity %}
+                        <li>
+                            <span class="emmett-ltr">{{ entry.action }}</span>
+                            <span>{{ entry.actor }}</span>
+                            <time datetime="{{ entry.created_at|date:'c' }}">{{ entry.created_at|emmett_datetime }}</time>
+                        </li>
+                    {% empty %}
+                        <li>{% trans "No audit events yet." %}</li>
+                    {% endfor %}
+                </ul>
+                <a class="emmett-kpi__link" href="{% url 'admin:core_auditlog_changelist' %}">
+                    {% trans "View full audit log" %} <i class="fas fa-arrow-left" aria-hidden="true"></i>
+                </a>
+            </section>
+
+            <section class="emmett-panel" aria-labelledby="emmett-adminlog-title">
+                <h2 class="emmett-panel__title" id="emmett-adminlog-title">{% trans "My recent changes" %}</h2>
+                <ul class="emmett-activity">
+                    {% for entry in dashboard.admin_activity %}
+                        <li>
+                            <span>{{ entry.object_repr }}</span>
+                            <span class="emmett-pill emmett-pill--{{ entry.tone }}">{{ entry.action_label }}</span>
+                            <time datetime="{{ entry.action_time|date:'c' }}">{{ entry.action_time|emmett_datetime }}</time>
+                        </li>
+                    {% empty %}
+                        <li>{% trans "No admin changes yet." %}</li>
+                    {% endfor %}
+                </ul>
+                <a class="emmett-kpi__link" href="{% url 'admin:admin_logentry_changelist' %}">
+                    {% trans "View admin activity log" %} <i class="fas fa-arrow-left" aria-hidden="true"></i>
+                </a>
+            </section>
+        </div>
+
+        <section class="emmett-panel" aria-labelledby="emmett-apps-title">
+            <h2 class="emmett-panel__title" id="emmett-apps-title">{% trans "All sections" %}</h2>
+            <div class="emmett-panel-grid">
+                {% for app in app_list %}
+                    <div>
+                        <h3 class="emmett-panel__title">{{ app.name }}</h3>
+                        <ul class="emmett-activity">
+                            {% for model in app.models %}
+                                <li>
+                                    {% if model.admin_url %}<a href="{{ model.admin_url }}">{{ model.name }}</a>{% else %}<span>{{ model.name }}</span>{% endif %}
+                                    {% if model.add_url %}
+                                        <a class="emmett-kpi__link ms-auto" href="{{ model.add_url }}">{% trans "Add" %}</a>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% empty %}
+                    <p>{% trans "You do not have permission to view any section." %}</p>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+{% endblock %}
+
+{% block sidebar %}{{ block.super }}{% endblock %}

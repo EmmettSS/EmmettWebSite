@@ -3,6 +3,9 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { ProfileView } from "@/components/organisms/profile-view";
 import type { AppLocale } from "@/i18n/routing";
+import { getSeoSettingsOrDefaults } from "@/lib/api/seo";
+import { buildPageMetadata } from "@/lib/seo/metadata";
+import { getPublicSiteUrl, toAppLocale } from "@/lib/seo/site";
 
 export async function generateMetadata({
   params,
@@ -11,7 +14,15 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "profile" });
-  return { title: t("title") };
+  const settings = await getSeoSettingsOrDefaults();
+  return buildPageMetadata({
+    locale: toAppLocale(locale),
+    path: "/profile",
+    title: t("title"),
+    settings,
+    siteUrl: getPublicSiteUrl(),
+    noindex: true,
+  });
 }
 
 export default async function ProfilePage({

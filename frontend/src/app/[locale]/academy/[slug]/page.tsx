@@ -8,6 +8,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { EnrollButton } from "@/components/organisms/enroll-button";
 import type { AppLocale } from "@/i18n/routing";
 import { getCourse } from "@/lib/api/server";
+import { JsonLd } from "@/components/seo/json-ld";
+import { getSeoSettingsOrDefaults } from "@/lib/api/seo";
+import { breadcrumbJsonLd, courseJsonLd } from "@/lib/seo/json-ld";
+import { buildPageMetadata } from "@/lib/seo/metadata";
+import { getPublicSiteUrl, toAppLocale } from "@/lib/seo/site";
 
 interface PageParams {
   locale: string;
@@ -22,10 +27,17 @@ export async function generateMetadata({
   const { locale, slug } = await params;
   const course = await getCourse(locale, slug);
   if (!course) return {};
-  return {
+  const settings = await getSeoSettingsOrDefaults();
+  return buildPageMetadata({
+    locale: toAppLocale(locale),
+    path: `/academy/${slug}`,
     title: course.meta_title || course.title,
     description: course.meta_description || course.summary,
-  };
+    imageUrl: course.cover_image_url,
+    settings,
+    siteUrl: getPublicSiteUrl(),
+    rssPath: "/academy/rss",
+  });
 }
 
 export default async function CourseDetailPage({
@@ -40,8 +52,33 @@ export default async function CourseDetailPage({
   const course = await getCourse(locale, slug);
   if (!course) notFound();
 
+  const settings = await getSeoSettingsOrDefaults();
+  const siteUrl = getPublicSiteUrl();
+  const appLocale = toAppLocale(locale);
+  const crumbs = [
+    { name: t("title"), path: "/academy" },
+    { name: course.title, path: `/academy/${slug}` },
+  ];
+
   return (
     <article className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-10">
+      <JsonLd
+        data={courseJsonLd(
+          {
+            name: course.title,
+            description: course.summary,
+            path: `/academy/${slug}`,
+            imageUrl: course.cover_image_url,
+            level: t(`levels.${course.level}`),
+            durationHours: Number(course.duration_hours) || 0,
+            instructorName: course.instructor?.name ?? null,
+          },
+          settings,
+          siteUrl,
+          appLocale,
+        )}
+      />
+      <JsonLd data={breadcrumbJsonLd(crumbs, siteUrl, appLocale)} />
       <Breadcrumb
         items={[{ label: t("title"), href: "/academy" }, { label: course.title }]}
         className="mb-8"

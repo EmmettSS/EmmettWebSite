@@ -450,7 +450,7 @@ erDiagram
 
 ---
 
-## ۱۰. فهرست ADRهای این فاز
+## ۱۰. فهرست ADRها (فاز ۱ تا ۷)
 
 | شماره | عنوان |
 |---|---|
@@ -465,9 +465,64 @@ erDiagram
 | [ADR-0009](docs/adr/0009-ai-engine-data-architecture.md) | معماری دادهٔ ai_engine و Guardrail |
 | [ADR-0010](docs/adr/0010-dependency-management.md) | مدیریت وابستگی‌ها و محیط اجرا (requirements.txt) |
 
-تصمیمات implementation تا فاز ۵ در ADRهای بعدی ثبت شده‌اند؛ scope نهایی AI در
+تصمیمات implementation تا فاز ۶ در ADRهای بعدی ثبت شده‌اند؛ scope نهایی AI در
 [ADR-0026](docs/adr/0026-ai-engine-implementation-and-creative-advisor.md) است و
-بخش طراحی اولیهٔ AI در ADR-0009 را supersede می‌کند.
+بخش طراحی اولیهٔ AI در ADR-0009 را supersede می‌کند. لایهٔ ادمین (فاز ۶) در چهار ADR
+ثبت شده است:
+
+| شماره | عنوان |
+|---|---|
+| [ADR-0027](docs/adr/0027-admin-theme-and-rtl.md) | تم اختصاصی ادمین، برند امیت و لایهٔ RTL |
+| [ADR-0028](docs/adr/0028-admin-dashboard-and-workflow.md) | داشبورد KPI، گردش‌کار انتشار و قابلیت‌های عملیاتی ادمین |
+| [ADR-0029](docs/adr/0029-export-import-strategy.md) | صادرات/واردات داده با `django-import-export` |
+| [ADR-0030](docs/adr/0030-i18n-tooling-and-translation-management.md) | ابزار i18n پروژه و مدیریت ترجمه در ادمین |
+| [ADR-0031](docs/adr/0031-seo-rendering-and-managed-urls.md) | معماری SEO: رندر در Next.js، دادهٔ ادمین از Django، دامنه از env | 
+| [ADR-0032](docs/adr/0032-performance-budget-and-asset-strategy.md) | بودجهٔ کارایی، تصویر مدرن، فونت خودمیزبان و سقف کوئری |
+| [ADR-0033](docs/adr/0033-security-hardening-2fa-backup-secrets.md) | سخت‌سازی امنیتی: CSP، ۲FA ادمین، قفل ورود، بکاپ و رازها |
+
+### ۱۰.۱. لایهٔ ادمین (فاز ۶) — نمای کلی
+
+```
+ادمین (فارسی پیش‌فرض / انگلیسی)
+├── تم و برند: jazzmin + static/admin_theme/{css,js,fonts}  → ADR-0027
+├── داشبورد: templates/admin/index.html + apps/core/dashboard.py (کش‌شده، SVG درون‌خطی)
+├── گردش‌کار: apps/core/admin_mixins.py (PublishWorkflow / SoftDelete / ExportFormats)  → ADR-0028
+├── ترجمه: core.Translation + TranslationCompletenessFilter + scripts/i18n.py  → ADR-0030
+├── پیکربندی AI: ai_engine (Catalog/Prompt/Guardrail با کلید تغییرناپذیر و AuditLog)
+├── صادرات/واردات: django-import-export (CSV/TSV/JSON، واردات دو مرحله‌ای)  → ADR-0029
+└── حسابرسی: core.AuditLog (رخدادهای حساس) + admin.LogEntry (تاریخچهٔ ادمین)
+```
+
+قواعد اجباری این لایه (با تست ساختاری قفل شده‌اند): هر مدل `BaseModel` باید نرم‌حذف
+قابل‌بازگردانی داشته باشد، هر ادمین باید `search_fields` و `resource_class` صریح داشته
+باشد، واردات یا فعال است یا صریحاً خاموش، و اکشن‌های گروهی فقط به‌صورت unbound ثبت
+می‌شوند (قرارداد فراخوانی جنگو).
+
+---
+
+## ۱۰.۲. لایهٔ SEO / کارایی / امنیت (فاز ۷) — نمای کلی
+
+```
+مرز رندر و دادهٔ SEO (ADR-0031)
+Next.js (منبع حقیقت URL و رندر)                 Django (داده + ادمین + فید سازگاری)
+├── app/sitemap.ts        ← /api/v1/seo/sitemap/    ├── core.seo (تجمیع + کش)
+├── app/robots.ts         ← SEO_NOINDEX_PATHS        ├── core.SiteSettings / Redirect / FAQItem
+├── lib/seo/metadata.ts   ← /api/v1/seo/settings/    ├── /api/v1/seo/{settings,sitemap,redirects,faq}
+├── lib/seo/json-ld.ts    ← /api/v1/seo/faq/          ├── RedirectFallbackMiddleware (۳۰۱/۳۰۲/۴۱۰)
+├── [locale]/opengraph-image.tsx (۱۲۰۰×۶۳۰)          └── feeds: /api/v1/blog|academy/rss/
+└── proxy.ts: handleManagedRedirect + nonce CSP + hreflang/canonical
+
+کارایی (ADR-0032)                  امنیت (ADR-0033)
+├── next/image + AVIF/WebP          ├── SecurityHeadersMiddleware (CSP دو‌سیاستی، Referrer، COOP)
+├── font-display: swap + self-host  ├── AdminTwoFactorMiddleware + accounts.twofa (TOTP/Static)
+├── کش لایه‌ای (Map/Route/cache)     ├── LoginLockout (cache) + AuditLog رویدادهای امنیتی
+└── سقف کوئری در test_performance   └── backup_db (VACUUM INTO | mysqldump | dumpdata)
+```
+
+قواعد قفل‌شدهٔ این لایه: هیچ URL مطلقی جز از `PUBLIC_SITE_URL` ساخته نمی‌شود؛ هیچ صفحهٔ
+noindex در sitemap نمی‌آید؛ هیچ متادیتای صفحه‌ای hard-code نمی‌شود (gettext/پیام‌ها)؛ مسیرهای
+خصوصی هم `noindex` و هم `Disallow` هستند؛ و در production نبود ۲FA/CSP/بکاپ/راز معتبر با
+System Check (`emmett_admin.W008`–`W013`) هشدار داده می‌شود.
 
 ---
 

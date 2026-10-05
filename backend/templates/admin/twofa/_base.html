@@ -1,0 +1,46 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% comment %}
+قالب پایهٔ صفحه‌های ۲FA ادمین (فاز ۷ — ADR-0033).
+از ``admin/base_site.html`` ارث می‌برد تا تم/برند/RTL جازمین و زبان فعال
+دقیقاً مثل بقیهٔ پنل باشد؛ هیچ CSS/JS اضافه‌ای لازم نیست و CSP ادمین هم
+دست‌نخورده می‌ماند (بدون اسکریپت درون‌خطی).
+{% endcomment %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'admin_theme/css/emmett-admin.css' %}">
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} emmett-2fa{% endblock %}
+
+{% block breadcrumbs %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'admin:index' %}">{% translate "Home" %}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ title }}</li>
+    </ol>
+{% endblock %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8">
+            <div class="card card-outline card-primary">
+                <div class="card-header">
+                    <h2 class="card-title mb-0">{{ title }}</h2>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags|default:'info' }}" role="alert">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                    {% block twofa_content %}{% endblock %}
+                </div>
+            </div>
+            <p class="text-muted small">
+                {% translate "Two-factor authentication protects the admin panel even if a password leaks." %}
+            </p>
+        </div>
+    </div>
+{% endblock %}

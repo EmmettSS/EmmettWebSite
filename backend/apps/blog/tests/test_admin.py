@@ -4,7 +4,6 @@ from typing import cast
 
 import pytest
 from django.contrib.admin.sites import AdminSite
-from django.test import RequestFactory
 
 from apps.accounts.models import User
 from apps.accounts.tests.factories import UserFactory
@@ -12,6 +11,7 @@ from apps.blog.admin import CommentAdmin
 from apps.blog.models import Comment
 from apps.blog.tests.factories import BlogPostFactory, CommentFactory
 from apps.core.models import AuditLog
+from apps.core.tests.admin_helpers import admin_request
 
 pytestmark = pytest.mark.django_db
 
@@ -28,8 +28,7 @@ class TestCommentModerationAuditLog:
         comment = cast(
             Comment, CommentFactory(post=post, author=UserFactory(), status=Comment.Status.PENDING)
         )
-        request = RequestFactory().post("/admin/blog/comment/")
-        request.user = moderator
+        request = admin_request(moderator, "/admin/blog/comment/")
 
         comment_admin = self._admin()
         queryset = Comment.objects.filter(pk=comment.pk)
@@ -48,8 +47,7 @@ class TestCommentModerationAuditLog:
         comment = cast(
             Comment, CommentFactory(post=post, author=UserFactory(), status=Comment.Status.PENDING)
         )
-        request = RequestFactory().post("/admin/blog/comment/")
-        request.user = moderator
+        request = admin_request(moderator, "/admin/blog/comment/")
 
         comment_admin = self._admin()
         comment_admin.reject_comments(request, Comment.objects.filter(pk=comment.pk))
@@ -59,8 +57,7 @@ class TestCommentModerationAuditLog:
 
     def test_action_on_empty_queryset_does_not_log(self) -> None:
         moderator = cast(User, UserFactory(is_staff=True, role=User.Role.ADMIN))
-        request = RequestFactory().post("/admin/blog/comment/")
-        request.user = moderator
+        request = admin_request(moderator, "/admin/blog/comment/")
 
         comment_admin = self._admin()
         comment_admin.approve_comments(request, Comment.objects.none())

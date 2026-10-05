@@ -19,6 +19,7 @@ from typing import Any, cast
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 from django.utils.text import slugify
@@ -162,9 +163,7 @@ class AuditLog(BaseModel):
         help_text=_("کاربری که عملیات را انجام داده؛ خالی یعنی سیستم/کاربر مهمان."),
     )
     action = models.CharField(_("action"), max_length=100, db_index=True)
-    target_content_type = models.ForeignKey(
-        ContentType, null=True, blank=True, on_delete=models.SET_NULL
-    )
+    target_content_type = models.ForeignKey(ContentType, null=True, blank=True, on_delete=models.SET_NULL)
     target_object_id = models.CharField(max_length=64, null=True, blank=True)
     target = GenericForeignKey("target_content_type", "target_object_id")
     metadata = models.JSONField(_("metadata"), default=dict, blank=True)
@@ -273,9 +272,7 @@ def media_upload_path(instance: Media, filename: str) -> str:
     ext = os.path.splitext(filename)[1].lower()
     base_name = slugify(os.path.splitext(filename)[0])[:60] or "file"
     today = timezone.now()
-    return (
-        f"{instance.media_type}/{today:%Y}/{today:%m}/{uuid.uuid4().hex}_{base_name}{ext}"
-    )
+    return f"{instance.media_type}/{today:%Y}/{today:%m}/{uuid.uuid4().hex}_{base_name}{ext}"
 
 
 class Media(BaseModel):
@@ -286,9 +283,7 @@ class Media(BaseModel):
         DOCUMENT = "document", _("Document")
         VIDEO = "video", _("Video")
 
-    file = models.FileField(
-        _("file"), upload_to=media_upload_path, validators=[media_extension_validator]
-    )
+    file = models.FileField(_("file"), upload_to=media_upload_path, validators=[media_extension_validator])
     media_type = models.CharField(_("media type"), max_length=20, choices=MediaType.choices)
     alt_text = models.CharField(_("alt text"), max_length=255, blank=True, default="")
     caption = models.CharField(_("caption"), max_length=255, blank=True, default="")
@@ -355,9 +350,7 @@ class Translation(models.Model):
         verbose_name = _("Translation")
         verbose_name_plural = _("Translations")
         constraints = [
-            models.UniqueConstraint(
-                fields=["namespace", "key", "locale"], name="unique_translation_entry"
-            )
+            models.UniqueConstraint(fields=["namespace", "key", "locale"], name="unique_translation_entry")
         ]
 
     def __str__(self) -> str:
@@ -374,6 +367,53 @@ class SiteSettings(models.Model):
     social_links = models.JSONField(_("social links"), default=dict, blank=True)
     maintenance_mode = models.BooleanField(_("maintenance mode"), default=False)
 
+    # ------------------------------------------------------------------
+    # SEO (فاز ۷، ADR-0031) — همه از ادمین قابل تنظیم، بدون hard-code در فرانت.
+    # ------------------------------------------------------------------
+    meta_title = models.CharField(
+        _("default meta title"),
+        max_length=200,
+        blank=True,
+        default="",
+        help_text=_("Used for pages without their own SEO title."),
+    )
+    meta_description = models.CharField(
+        _("default meta description"),
+        max_length=320,
+        blank=True,
+        default="",
+        help_text=_("Aim for 120–160 characters; longer text is truncated by search engines."),
+    )
+    search_console_verification = models.CharField(
+        _("Google Search Console verification code"),
+        max_length=200,
+        blank=True,
+        default="",
+        help_text=_("Content value of the google-site-verification meta tag."),
+    )
+    twitter_handle = models.CharField(
+        _("Twitter/X handle"), max_length=50, blank=True, default="", help_text=_("Example: @emmett")
+    )
+    organization_legal_name = models.CharField(
+        _("legal organization name"), max_length=200, blank=True, default=""
+    )
+    organization_address = models.CharField(_("organization address"), max_length=300, blank=True, default="")
+    organization_same_as = models.JSONField(
+        _("organization same-as URLs"),
+        default=list,
+        blank=True,
+        help_text=_("Public profile URLs used in JSON-LD, e.g. LinkedIn or GitHub."),
+    )
+    og_default_image = models.ForeignKey(
+        "core.Media",
+        verbose_name=_("default Open Graph image"),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+        help_text=_("Used by social cards when a page has no image of its own (1200×630 recommended)."),
+    )
+
     class Meta:
         verbose_name = _("Site Settings")
         verbose_name_plural = _("Site Settings")
@@ -384,6 +424,13 @@ class SiteSettings(models.Model):
     def save(self, *args: Any, **kwargs: Any) -> None:
         self.pk = 1
         super().save(*args, **kwargs)
+        # هر تغییر تنظیمات سایت (از ادمین یا کد) باید کش SEO را باطل کند؛ در غیر
+        # این صورت فرانت تا ۱۵ دقیقه مقدار قدیمی (متا/تأیید Search Console) را
+        # نشان می‌دهد. واردات درون‌تابعی است تا حلقهٔ import ایجاد نشود.
+        from django.core.cache import cache as _cache
+
+        _cache.delete("seo:settings:v1")
+        _cache.delete("seo:sitemap:entries:v1")
 
     def delete(self, *args: Any, **kwargs: Any) -> tuple[int, dict[str, int]]:  # pragma: no cover
         return 0, {}
@@ -427,6 +474,111 @@ class SearchIndexEntry(models.Model):
         return f"[{self.locale}] {self.content_type}#{self.object_id}: {self.title}"
 
 
+class RedirectStatus(models.IntegerChoices):
+    """کدهای وضعیت مجاز در جدول ریدایرکت (ADR-0031)."""
+
+    MOVED_PERMANENTLY = 301, _("301 — Permanent")
+    FOUND = 302, _("302 — Temporary")
+    GONE = 410, _("410 — Removed permanently")
+
+
+class Redirect(BaseModel):
+    """ریدایرکت مدیریت‌شده از ادمین (۳۰۱/۳۰۲/۴۱۰) — بدون تغییر کد برای مدیر محتوا.
+
+    ``from_path`` عمداً **بدون** کوئری‌استرینگ و اسلش پایانیِ اضافه ذخیره می‌شود
+    (نرمال‌سازی در ``clean()``) تا نگاشت «مسیر → مقصد» یکتا و قابل‌کش باشد.
+    """
+
+    from_path = models.CharField(_("from path"), max_length=255, unique=True, db_index=True)
+    target = models.CharField(
+        _("target"),
+        max_length=500,
+        blank=True,
+        default="",
+        help_text=_("Relative path (e.g. /services/web/) or an absolute https:// URL."),
+    )
+    status_code = models.PositiveSmallIntegerField(
+        _("status code"), choices=RedirectStatus.choices, default=RedirectStatus.MOVED_PERMANENTLY
+    )
+    hit_count = models.PositiveBigIntegerField(_("hit count"), default=0, editable=False)
+    note = models.CharField(_("note"), max_length=200, blank=True, default="")
+
+    class Meta(BaseModel.Meta):
+        verbose_name = _("Redirect")
+        verbose_name_plural = _("Redirects")
+        ordering = ["from_path"]
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(from_path__startswith="/"), name="redirect_from_path_is_rooted"
+            ),
+            models.CheckConstraint(
+                condition=models.Q(status_code__in=[301, 302, 410]), name="redirect_status_is_supported"
+            ),
+        ]
+
+    def __str__(self) -> str:  # pragma: no cover
+        return f"{self.from_path} → {self.target or '(gone)'} [{self.status_code}]"
+
+    def save(self, *args: Any, **kwargs: Any) -> None:
+        self.from_path = normalize_redirect_path(self.from_path)
+        super().save(*args, **kwargs)
+
+    # ترتیب متدها مطابق راهنمای سبک جنگو: ``Meta`` → متد جادویی → ``save`` →
+    # متدهای سفارشی؛ بنابراین ``clean`` بعد از ``save`` می‌آید (DJ012).
+    def clean(self) -> None:
+        """نرمال‌سازی مسیر مبدأ و اعتبارسنجی مقصد (۳۱۰ نیازمند مقصد است)."""
+
+        super().clean()
+        self.from_path = normalize_redirect_path(self.from_path)
+        self.target = (self.target or "").strip()
+        needs_target = self.status_code in {
+            RedirectStatus.MOVED_PERMANENTLY,
+            RedirectStatus.FOUND,
+        }
+        if needs_target and not self.target:
+            raise ValidationError({"target": _("A redirect with this status code needs a target.")})
+        if self.target and not (self.target.startswith("/") or self.target.startswith("https://")):
+            raise ValidationError({"target": _("The target must start with / or https://.")})
+
+
+def normalize_redirect_path(value: str) -> str:
+    """مسیر را به شکل مقایسه‌پذیر درمی‌آورد: اسلش آغازین، بدون اسلش پایانی، بدون کوئری."""
+
+    path = (value or "").strip().split("?", 1)[0].split("#", 1)[0]
+    if not path.startswith("/"):
+        path = f"/{path}"
+    if len(path) > 1 and path.endswith("/"):
+        path = path.rstrip("/") or "/"
+    return path
+
+
+class FAQItem(BaseModel):
+    """پرسش متداول دوزبانه — منبع JSON-LD نوع ``FAQPage`` و بخش پرسش‌های هر صفحه.
+
+    ``path`` مسیر صفحهٔ میزبان است (مثلاً ``/services/web-development``) و با
+    ``normalize_redirect_path`` نرمال می‌شود تا «/services/x/» و «/services/x»
+    دو ردیف متفاوت نشوند.
+    """
+
+    path = models.CharField(_("page path"), max_length=255, db_index=True)
+    question = models.CharField(_("question"), max_length=300)
+    answer = models.TextField(_("answer"))
+    order = models.PositiveIntegerField(_("order"), default=0, db_index=True)
+
+    class Meta(BaseModel.Meta):
+        verbose_name = _("FAQ item")
+        verbose_name_plural = _("FAQ items")
+        ordering = ["path", "order", "id"]
+        indexes = [models.Index(fields=["path", "order"])]
+
+    def __str__(self) -> str:  # pragma: no cover
+        return f"{self.path}: {self.question}"
+
+    def save(self, *args: Any, **kwargs: Any) -> None:
+        self.path = normalize_redirect_path(self.path)
+        super().save(*args, **kwargs)
+
+
 __all__ = [
     "BaseQuerySet",
     "BaseManager",
@@ -442,4 +594,8 @@ __all__ = [
     "Translation",
     "SiteSettings",
     "SearchIndexEntry",
+    "RedirectStatus",
+    "Redirect",
+    "normalize_redirect_path",
+    "FAQItem",
 ]

@@ -18,6 +18,18 @@ from rest_framework.views import APIView
 
 from apps.core.logging import get_logger
 from apps.core.search import search as run_search
+from apps.core.seo import (
+    SITEMAP_SECTIONS,
+    build_faq_payload,
+    build_seo_settings_payload,
+    build_sitemap_entries,
+)
+from apps.core.seo_serializers import (
+    FAQItemSerializer,
+    RedirectEntrySerializer,
+    SEOSettingsSerializer,
+    SitemapEntrySerializer,
+)
 
 logger = get_logger(__name__)
 
@@ -98,8 +110,94 @@ class GlobalSearchView(APIView):
                 "query": query,
                 "locale": locale,
                 "count": len(results),
-                "results": [
-                    {**asdict(r), "public_id": str(r.public_id)} for r in results
-                ],
+                "results": [{**asdict(r), "public_id": str(r.public_id)} for r in results],
             }
         )
+
+
+class SEOSettingsView(APIView):
+    """تنظیمات SEO سایت (پیش‌فرض‌های متا، سازمان، تأیید Search Console).
+
+    مصرف‌کننده: ``frontend/src/lib/seo`` برای ``metadataBase``، متاتگ
+    ``google-site-verification`` و JSON-LD نوع ``Organization``/``WebSite``.
+    """
+
+    permission_classes = [AllowAny]
+    authentication_classes: list[type] = []
+
+    @extend_schema(
+        responses={200: SEOSettingsSerializer},
+        description="تنظیمات SEO قابل‌ویرایش از ادمین (کش‌شده).",
+        tags=["seo"],
+    )
+    def get(self, request: Request) -> Response:
+        return Response(build_seo_settings_payload())
+
+
+class SEOSitemapView(APIView):
+    """فهرست URLهای عمومی برای ساخت ``sitemap.xml`` در فرانت‌اند.
+
+    چرا endpoint و نه ``django.contrib.sitemaps``؟ چون HTML عمومی توسط
+    Next.js سرو می‌شود و sitemap هم باید از همان دامنه و همان مسیرهای
+    بومی‌سازی‌شده بیاید (ADR-0031). این endpoint فقط دادهٔ خام و کش‌شده
+    می‌دهد و بخش‌بندی (``section``) را برای sitemap index برمی‌گرداند.
+    """
+
+    permission_classes = [AllowAny]
+    authentication_classes: list[type] = []
+
+    @extend_schema(
+        responses={200: SitemapEntrySerializer(many=True)},
+        description="URLهای عمومی منتشرشده + صفحه‌های ثابت، با lastmod/changefreq/priority.",
+        tags=["seo"],
+    )
+    def get(self, request: Request) -> Response:
+        return Response({"results": build_sitemap_entries(), "sections": list(SITEMAP_SECTIONS)})
+
+
+class SEORedirectsView(APIView):
+    """نگاشت ریدایرکت‌های فعال (۳۰۱/۳۰۲/۴۱۰) برای middleware فرانت‌اند."""
+
+    permission_classes = [AllowAny]
+    authentication_classes: list[type] = []
+
+    @extend_schema(
+        responses={200: RedirectEntrySerializer(many=True)},
+        description="ریدایرکت‌های فعال مدیریت‌شده از ادمین (کش‌شده در بک‌اند و فرانت).",
+        tags=["seo"],
+    )
+    def get(self, request: Request) -> Response:
+        from apps.core.models import Redirect
+
+        rows = (
+            Redirect.objects.filter(is_active=True)
+            .only("from_path", "target", "status_code", "updated_at")
+            .order_by("from_path")
+        )
+        return Response({"results": [RedirectEntrySerializer(row).data for row in rows]})
+
+
+class SEOFAQView(APIView):
+    """پرسش‌های متداول یک مسیر (برای بخش FAQ و JSON-LD نوع ``FAQPage``)."""
+
+    permission_classes = [AllowAny]
+    authentication_classes: list[type] = []
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="path",
+                type=OpenApiTypes.STR,
+                required=True,
+                description="مسیر صفحه؛ مثال: /services/web-development",
+            )
+        ],
+        responses={200: FAQItemSerializer(many=True)},
+        description="پرسش‌های متداول فعال همان مسیر در زبان درخواست (Accept-Language).",
+        tags=["seo"],
+    )
+    def get(self, request: Request) -> Response:
+        path = str(request.query_params.get("path", "") or "").strip()
+        if not path:
+            return Response({"detail": "پارامتر path الزامی است."}, status=400)
+        return Response({"results": build_faq_payload(path, locale=get_language())})

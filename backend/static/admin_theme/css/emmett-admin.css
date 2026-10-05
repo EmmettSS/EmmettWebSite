@@ -1,0 +1,645 @@
+/* ==========================================================================
+   Emmett Admin Theme — فاز ۶ (ADR-0027)
+   --------------------------------------------------------------------------
+   این فایل تنها لایهٔ «برند» روی Jazzmin/AdminLTE/Bootstrap است:
+   1) فونت خوداستقرار Vazirmatn (self-hosted — ADR-0018، بدون CDN)
+   2) توکن‌های رنگ/شعاع/فونت برند (هم‌سان با توکن‌های فرانت‌اند، ADR-0017)
+   3) نگاشت توکن‌ها به متغیرهای Bootstrap 5 / AdminLTE 4
+   4) کامپوننت‌های اختصاصی داشبورد ادمین (کارت KPI، نمودار میله‌ای CSS، برچسب وضعیت)
+   5) رفع باگ‌های کوچک چیدمان (لوگو، جدول، فیلتر، فرم)
+
+   قانون RTL در این پروژه: «مدیریت در سطح کامپوننت، نه CSS hack». به همین دلیل
+   تمام قواعد راست‌چین‌سازی در فایل جداگانهٔ emmett-rtl.css و با اسکوپ
+   html[dir="rtl"] نگه‌داری می‌شوند تا این فایل کاملاً جهت‌مستقل (direction-agnostic)
+   بماند و LTR انگلیسی هیچ‌گاه تحت تأثیر قرار نگیرد.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   ۱) فونت Vazirmatn — خوداستقرار با unicode-range دقیق هر subset
+   (فایل‌ها از @fontsource/vazirmatn@5.3.0؛ مجوز SIL OFL 1.1 در
+   fonts/LICENSE-Vazirmatn-OFL.txt). با unicode-range، مرورگر فقط subset لازم
+   را دانلود می‌کند: کاربر فارسی فقط arabic را، محتوای لاتین فقط latin را.
+   -------------------------------------------------------------------------- */
+@font-face {
+  font-family: "Vazirmatn";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/vazirmatn-arabic-400-normal.woff2") format("woff2");
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF,
+    U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
+}
+@font-face {
+  font-family: "Vazirmatn";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("../fonts/vazirmatn-arabic-500-normal.woff2") format("woff2");
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF,
+    U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
+}
+@font-face {
+  font-family: "Vazirmatn";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("../fonts/vazirmatn-arabic-600-normal.woff2") format("woff2");
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF,
+    U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
+}
+@font-face {
+  font-family: "Vazirmatn";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("../fonts/vazirmatn-arabic-700-normal.woff2") format("woff2");
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF,
+    U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
+}
+@font-face {
+  font-family: "Vazirmatn";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/vazirmatn-latin-400-normal.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
+    U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Vazirmatn";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("../fonts/vazirmatn-latin-500-normal.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
+    U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Vazirmatn";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("../fonts/vazirmatn-latin-600-normal.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
+    U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Vazirmatn";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("../fonts/vazirmatn-latin-700-normal.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
+    U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* --------------------------------------------------------------------------
+   ۲) توکن‌های برند امیت (هم‌سان با frontend/src/app/globals.css — ADR-0017)
+   -------------------------------------------------------------------------- */
+:root {
+  --emmett-indigo: #5b62e0;
+  --emmett-indigo-strong: #4046c8;
+  --emmett-indigo-soft: #ececfa;
+  --emmett-emerald: #1fae6e;
+  --emmett-emerald-soft: #e4f6ee;
+  --emmett-obsidian: #0b0c0e;
+  --emmett-graphite: #131417;
+  --emmett-slate: #1a1c20;
+  --emmett-warm-white: #f6f4f0;
+  --emmett-ivory: #efebe4;
+  --emmett-soft-gray: #e7e5e1;
+  --emmett-hairline-light: #dad7d1;
+  --emmett-hairline-dark: #2e3034;
+  --emmett-amber: #b8860b;
+  --emmett-amber-soft: #fdf3dd;
+  --emmett-danger: #b3433d;
+  --emmett-danger-soft: #fbeceb;
+  --emmett-muted-blue: #4c6e91;
+  --emmett-font-family: "Vazirmatn", ui-sans-serif, system-ui, "Segoe UI", Tahoma, sans-serif;
+  --emmett-radius-sm: 0.25rem;
+  --emmett-radius-md: 0.5rem;
+  --emmett-radius-lg: 1rem;
+  --emmett-sidebar-width: 272px;
+}
+
+/* نگاشت به Bootstrap 5 (متغیرهای CSS رسمی) — تنها منبع حقیقت رنگ‌ها */
+:root,
+[data-bs-theme="light"] {
+  --bs-primary: var(--emmett-indigo);
+  --bs-primary-rgb: 91, 98, 224;
+  --bs-link-color: var(--emmett-indigo);
+  --bs-link-color-rgb: 91, 98, 224;
+  --bs-link-hover-color: var(--emmett-indigo-strong);
+  --bs-body-font-family: var(--emmett-font-family);
+  --bs-body-bg: var(--emmett-warm-white);
+  --bs-body-color: #16171a;
+  --bs-secondary-bg: var(--emmett-soft-gray);
+  --bs-border-color: var(--emmett-hairline-light);
+  --bs-border-radius: var(--emmett-radius-md);
+  --bs-border-radius-sm: var(--emmett-radius-sm);
+  --bs-border-radius-lg: var(--emmett-radius-lg);
+  --bs-focus-ring-color: rgb(91 98 224 / 35%);
+}
+
+[data-bs-theme="dark"] {
+  --bs-primary: #8189f0;
+  --bs-primary-rgb: 129, 137, 240;
+  --bs-link-color: #9aa1f5;
+  --bs-body-font-family: var(--emmett-font-family);
+  --bs-body-bg: var(--emmett-obsidian);
+  --bs-body-color: #f2f1ee;
+  --bs-secondary-bg: var(--emmett-slate);
+  --bs-border-color: var(--emmett-hairline-dark);
+}
+
+html,
+body {
+  font-family: var(--emmett-font-family);
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* --------------------------------------------------------------------------
+   ۳) پوستهٔ ادمین (AdminLTE 4): سایدبار تیرهٔ برند + هدر روشن
+   -------------------------------------------------------------------------- */
+.app-sidebar {
+  /* سایدبار همیشه تیره (انتخاب طراحی: کنتراست و حس SaaS) — مستقل از تم. */
+  background-color: var(--emmett-obsidian);
+  --lte-sidebar-color: rgb(242 241 238 / 78%);
+  --lte-sidebar-hover-bg: rgb(91 98 224 / 18%);
+  --lte-sidebar-hover-color: #fff;
+  --lte-sidebar-menu-active-bg: rgb(91 98 224 / 26%);
+  --lte-sidebar-menu-active-color: #fff;
+  --lte-sidebar-active-color: #fff;
+  --lte-sidebar-submenu-color: rgb(242 241 238 / 62%);
+  --lte-sidebar-submenu-hover-color: #fff;
+  --lte-sidebar-submenu-hover-bg: rgb(91 98 224 / 14%);
+  --lte-sidebar-submenu-active-color: #fff;
+  --lte-sidebar-submenu-active-bg: rgb(91 98 224 / 22%);
+  --lte-sidebar-header-color: rgb(242 241 238 / 45%);
+  border-inline-end: 1px solid var(--emmett-hairline-dark);
+}
+
+.app-sidebar .nav-link.active,
+.app-sidebar .nav-link:hover {
+  border-radius: var(--emmett-radius-md);
+}
+
+.app-sidebar .nav-link.active {
+  box-shadow: inset 3px 0 0 var(--emmett-emerald);
+}
+
+.app-header {
+  background-color: #fff;
+  box-shadow: 0 1px 0 rgb(11 12 14 / 4%);
+}
+
+[data-bs-theme="dark"] .app-header {
+  background-color: var(--emmett-slate);
+}
+
+/* نشان‌نوشت برند: هم در سایدبار و هم در صفحهٔ ورود */
+.brand-link .emmett-brand-logo,
+.app-sidebar .brand-image {
+  max-height: 40px;
+  width: auto;
+  border-radius: var(--emmett-radius-sm);
+}
+
+.brand-link {
+  border-bottom: 1px solid rgb(255 255 255 / 8%);
+}
+
+.app-footer {
+  background-color: transparent;
+  color: var(--bs-secondary-color);
+}
+
+/* دکمه‌ها و فرم‌ها */
+.btn {
+  border-radius: var(--emmett-radius-md);
+  font-weight: 500;
+}
+
+.btn-primary {
+  --bs-btn-bg: var(--emmett-indigo);
+  --bs-btn-border-color: var(--emmett-indigo);
+  --bs-btn-hover-bg: var(--emmett-indigo-strong);
+  --bs-btn-hover-border-color: var(--emmett-indigo-strong);
+  --bs-btn-active-bg: var(--emmett-indigo-strong);
+  --bs-btn-active-border-color: var(--emmett-indigo-strong);
+  --bs-btn-disabled-bg: var(--emmett-indigo);
+  --bs-btn-disabled-border-color: var(--emmett-indigo);
+}
+
+.btn-success {
+  --bs-btn-bg: var(--emmett-emerald);
+  --bs-btn-border-color: var(--emmett-emerald);
+  --bs-btn-hover-bg: #178c58;
+  --bs-btn-hover-border-color: #178c58;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--emmett-indigo);
+  box-shadow: 0 0 0 0.2rem rgb(91 98 224 / 22%);
+}
+
+/* کارت‌ها، مودال‌ها، هدرها */
+.card {
+  border-radius: var(--emmett-radius-lg);
+  border-color: var(--bs-border-color);
+  box-shadow: 0 1px 2px rgb(11 12 14 / 4%);
+}
+
+.card-title,
+h1, h2, h3, h4, h5 {
+  font-weight: 600;
+}
+
+h1.h3,
+.app-content-header h3 {
+  font-size: 1.35rem;
+  letter-spacing: -0.01em;
+}
+
+/* جدول‌ها و فیلترها */
+#result_list thead th {
+  background-color: var(--emmett-ivory);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+[data-bs-theme="dark"] #result_list thead th {
+  background-color: var(--emmett-graphite);
+}
+
+#result_list tbody tr:hover {
+  background-color: rgb(91 98 224 / 5%);
+}
+
+#changelist-filter h2 {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--bs-secondary-color);
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+  background-color: var(--emmett-indigo-soft);
+  border-color: var(--emmett-indigo);
+  color: #16171a;
+}
+
+.select2-container--default .select2-results__option--highlighted {
+  background-color: var(--emmett-indigo) !important;
+}
+
+/* --------------------------------------------------------------------------
+   ۴) داشبورد اختصاصی امیت (templates/admin/index.html + core/dashboard.py)
+   -------------------------------------------------------------------------- */
+.emmett-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.emmett-dashboard__header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.emmett-dashboard__greeting {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.emmett-dashboard__hint {
+  margin: 0;
+  color: var(--bs-secondary-color);
+  font-size: 0.85rem;
+}
+
+.emmett-kpi-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+}
+
+.emmett-kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem 1.1rem;
+  background-color: var(--bs-body-bg);
+  border: 1px solid var(--bs-border-color);
+  border-radius: var(--emmett-radius-lg);
+  box-shadow: 0 1px 2px rgb(11 12 14 / 4%);
+  block-size: 100%;
+}
+
+.emmett-kpi__head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--bs-secondary-color);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.emmett-kpi__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--emmett-radius-md);
+  background-color: var(--emmett-indigo-soft);
+  color: var(--emmett-indigo-strong);
+}
+
+[data-bs-theme="dark"] .emmett-kpi__icon {
+  background-color: rgb(91 98 224 / 22%);
+  color: #aab0f7;
+}
+
+.emmett-kpi__value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.emmett-kpi__hints {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.8rem;
+  color: var(--bs-secondary-color);
+}
+
+.emmett-kpi__link {
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.emmett-panel-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.emmett-panel {
+  padding: 1rem 1.1rem;
+  background-color: var(--bs-body-bg);
+  border: 1px solid var(--bs-border-color);
+  border-radius: var(--emmett-radius-lg);
+}
+
+.emmett-panel__title {
+  margin: 0 0 0.85rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+/* نمودار میله‌ای خالص CSS — بدون JS و بدون CDN (الزام فاز ۶ برای حذف گوگل‌چارت) */
+.emmett-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.4rem;
+  height: 132px;
+  padding-block-start: 0.5rem;
+}
+
+.emmett-chart__bar {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 8px;
+  border-radius: var(--emmett-radius-sm) var(--emmett-radius-sm) 0 0;
+  background-color: var(--emmett-indigo);
+  transition: opacity 0.15s ease-in-out;
+}
+
+.emmett-chart__bar--accent {
+  background-color: var(--emmett-emerald);
+}
+
+.emmett-chart__bar:hover {
+  opacity: 0.8;
+}
+
+.emmett-chart__labels {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+  font-size: 0.7rem;
+  color: var(--bs-secondary-color);
+}
+
+.emmett-chart__labels span {
+  flex: 1 1 0;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.emmett-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.8rem;
+}
+
+.emmett-legend__dot {
+  display: inline-block;
+  width: 0.6rem;
+  height: 0.6rem;
+  margin-inline-end: 0.35rem;
+  border-radius: 50%;
+  background-color: var(--emmett-indigo);
+}
+
+.emmett-activity {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.85rem;
+}
+
+.emmett-activity li {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+  padding-block: 0.4rem;
+  border-bottom: 1px solid var(--bs-border-color);
+}
+
+.emmett-activity li:last-child {
+  border-bottom: none;
+}
+
+.emmett-activity time {
+  color: var(--bs-secondary-color);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.emmett-quick-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.emmett-quick-links a {
+  display: inline-flex;
+  gap: 0.35rem;
+  align-items: center;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid var(--bs-border-color);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  text-decoration: none;
+}
+
+.emmett-quick-links a:hover {
+  border-color: var(--emmett-indigo);
+  background-color: var(--emmett-indigo-soft);
+}
+
+/* --------------------------------------------------------------------------
+   ۵) برچسب‌های وضعیت محتوا (core/admin_mixins.py::status_badge)
+   -------------------------------------------------------------------------- */
+.emmett-pill {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.emmett-pill--published,
+.emmett-pill--approved,
+.emmett-pill--won,
+.emmett-pill--completed {
+  background-color: var(--emmett-emerald-soft);
+  color: #14734a;
+}
+
+.emmett-pill--draft,
+.emmett-pill--pending,
+.emmett-pill--new,
+.emmett-pill--contacted {
+  background-color: var(--emmett-amber-soft);
+  color: #7a5a06;
+}
+
+.emmett-pill--archived,
+.emmett-pill--lost,
+.emmett-pill--cancelled,
+.emmett-pill--rejected {
+  background-color: var(--emmett-danger-soft);
+  color: #8c322d;
+}
+
+.emmett-pill--qualified,
+.emmett-pill--proposal,
+.emmett-pill--active {
+  background-color: var(--emmett-indigo-soft);
+  color: var(--emmett-indigo-strong);
+}
+
+.emmett-pill--deleted {
+  background-color: #e9e9e9;
+  color: #555;
+}
+
+[data-bs-theme="dark"] .emmett-pill {
+  background-color: rgb(255 255 255 / 12%);
+  color: #f2f1ee;
+}
+
+/* --------------------------------------------------------------------------
+   ۶) صفحهٔ ورود (registration/base.html از Jazzmin)
+   -------------------------------------------------------------------------- */
+.login-page,
+.register-page {
+  background:
+    radial-gradient(1200px 520px at 15% -10%, rgb(91 98 224 / 32%), transparent),
+    radial-gradient(900px 420px at 100% 110%, rgb(31 174 110 / 22%), transparent),
+    var(--emmett-obsidian);
+}
+
+.login-box .card,
+.register-box .card {
+  border: 1px solid rgb(255 255 255 / 8%);
+  background-color: rgb(19 20 23 / 92%);
+  color: #f2f1ee;
+  backdrop-filter: blur(6px);
+}
+
+.login-logo img,
+.register-logo img {
+  max-height: 72px;
+  width: auto;
+}
+
+.login-card-body,
+.register-card-body {
+  color: #f2f1ee;
+}
+
+.login-box .form-control {
+  background-color: rgb(255 255 255 / 6%);
+  border-color: rgb(255 255 255 / 14%);
+  color: #f2f1ee;
+}
+
+.login-box .form-control::placeholder {
+  color: rgb(242 241 238 / 45%);
+}
+
+/* --------------------------------------------------------------------------
+   ۷) دسترس‌پذیری و چاپ
+   -------------------------------------------------------------------------- */
+a:focus-visible,
+.btn:focus-visible,
+.nav-link:focus-visible {
+  outline: 2px solid var(--emmett-emerald);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .emmett-chart__bar,
+  .btn {
+    transition: none;
+  }
+}
+
+@media print {
+  .app-sidebar,
+  .app-header,
+  .app-footer {
+    display: none !important;
+  }
+}

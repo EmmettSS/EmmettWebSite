@@ -6,6 +6,11 @@ import type { AppLocale } from "@/i18n/routing";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardDescription, CardMedia } from "@/components/molecules/card";
 import { getCourses } from "@/lib/api/server";
+import { getSeoSettingsOrDefaults } from "@/lib/api/seo";
+import { buildPageMetadata } from "@/lib/seo/metadata";
+import { getPublicSiteUrl, toAppLocale } from "@/lib/seo/site";
+import Image from "next/image";
+import { Rss } from "lucide-react";
 
 export async function generateMetadata({
   params,
@@ -14,7 +19,16 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "academy" });
-  return { title: t("title"), description: t("description") };
+  const settings = await getSeoSettingsOrDefaults();
+  return buildPageMetadata({
+    locale: toAppLocale(locale),
+    path: "/academy",
+    title: t("title"),
+    description: t("description"),
+    settings,
+    siteUrl: getPublicSiteUrl(),
+    rssPath: "/academy/rss",
+  });
 }
 
 export default async function AcademyPage({
@@ -31,9 +45,20 @@ export default async function AcademyPage({
 
   return (
     <div className="mx-auto max-w-(--breakpoint-xl) px-4 py-16 sm:px-6 lg:px-10">
-      <header className="max-w-2xl">
-        <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">{t("title")}</h1>
-        <p className="mt-3 text-base text-muted-foreground">{t("description")}</p>
+      <header className="flex flex-wrap items-start justify-between gap-4">
+        <div className="max-w-2xl">
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">{t("title")}</h1>
+          <p className="mt-3 text-base text-muted-foreground">{t("description")}</p>
+        </div>
+        {/* مسیر فید یک Route Handler است (خروجی XML)؛ لینک ساده کافی است و
+            از ``<link rel="alternate">`` متادیتا هم کشف می‌شود. */}
+        <a
+          href={locale === "fa" ? "/academy/rss" : "/en/academy/rss"}
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <Rss aria-hidden="true" className="size-4" />
+          {t("rssFeed")}
+        </a>
       </header>
 
       {courses.length === 0 ? (
@@ -45,10 +70,11 @@ export default async function AcademyPage({
               <Card className="h-full overflow-hidden">
                 {course.cover_image_url ? (
                   <CardMedia>
-                    {/* eslint-disable-next-line @next/next/no-img-element -- دامنهٔ تصاویر از بک‌اند پویاست */}
-                    <img
+                    <Image
                       src={course.cover_image_url}
                       alt=""
+                      fill
+                      sizes="(max-width: 768px) 100vw, 33vw"
                       className="aspect-video w-full object-cover"
                     />
                   </CardMedia>

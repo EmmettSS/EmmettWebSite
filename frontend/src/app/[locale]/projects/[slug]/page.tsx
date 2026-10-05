@@ -6,6 +6,12 @@ import { Breadcrumb } from "@/components/molecules/breadcrumb";
 import { Badge } from "@/components/ui/badge";
 import type { AppLocale } from "@/i18n/routing";
 import { getProject } from "@/lib/api/server";
+import { JsonLd } from "@/components/seo/json-ld";
+import { getSeoSettingsOrDefaults } from "@/lib/api/seo";
+import { articleJsonLd, breadcrumbJsonLd } from "@/lib/seo/json-ld";
+import { buildPageMetadata } from "@/lib/seo/metadata";
+import { getPublicSiteUrl, toAppLocale } from "@/lib/seo/site";
+import Image from "next/image";
 
 interface PageParams {
   locale: string;
@@ -20,10 +26,17 @@ export async function generateMetadata({
   const { locale, slug } = await params;
   const project = await getProject(locale, slug);
   if (!project) return {};
-  return {
+  const settings = await getSeoSettingsOrDefaults();
+  return buildPageMetadata({
+    locale: toAppLocale(locale),
+    path: `${project.is_product ? "/products" : "/projects"}/${slug}`,
     title: project.meta_title || project.title,
     description: project.meta_description || project.summary,
-  };
+    imageUrl: project.cover_image_url,
+    settings,
+    siteUrl: getPublicSiteUrl(),
+    type: "article",
+  });
 }
 
 export default async function ProjectDetailPage({
@@ -41,8 +54,34 @@ export default async function ProjectDetailPage({
   const listHref = project.is_product ? "/products" : "/projects";
   const listLabel = project.is_product ? t("products") : t("title");
 
+  const settings = await getSeoSettingsOrDefaults();
+  const siteUrl = getPublicSiteUrl();
+  const appLocale = toAppLocale(locale);
+  const crumbs = [
+    { name: listLabel, path: listHref },
+    { name: project.title, path: `${listHref}/${slug}` },
+  ];
+
   return (
     <article className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-10">
+      <JsonLd
+        data={articleJsonLd(
+          {
+            title: project.title,
+            description: project.summary,
+            path: `${listHref}/${slug}`,
+            imageUrl: project.cover_image_url,
+            publishedAt: null,
+            authorName: null,
+            section: listLabel,
+            tags: project.tags.map((tag) => tag.name),
+          },
+          settings,
+          siteUrl,
+          appLocale,
+        )}
+      />
+      <JsonLd data={breadcrumbJsonLd(crumbs, siteUrl, appLocale)} />
       <Breadcrumb
         items={[{ label: listLabel, href: listHref }, { label: project.title }]}
         className="mb-8"
@@ -86,19 +125,34 @@ export default async function ProjectDetailPage({
       </header>
 
       {project.cover_image_url ? (
-        // eslint-disable-next-line @next/next/no-img-element -- دامنهٔ تصاویر از بک‌اند پویاست
-        <img
-          src={project.cover_image_url}
-          alt=""
-          className="mt-8 w-full rounded-lg object-cover"
-        />
+        <div className="relative mt-8 aspect-video w-full overflow-hidden rounded-lg">
+          <Image
+            src={project.cover_image_url}
+            alt=""
+            fill
+            sizes="(max-width: 768px) 100vw, 768px"
+            priority
+            className="object-cover"
+          />
+        </div>
       ) : null}
 
       {project.gallery_urls.length > 0 ? (
         <div className="mt-6 grid grid-cols-2 gap-4">
           {project.gallery_urls.map((url) => (
-            // eslint-disable-next-line @next/next/no-img-element -- دامنهٔ تصاویر از بک‌اند پویاست
-            <img key={url} src={url} alt="" className="rounded-lg object-cover" />
+            <div
+              key={url}
+              className="relative aspect-video overflow-hidden rounded-lg"
+            >
+              <Image
+                src={url}
+                alt=""
+                fill
+                sizes="(max-width: 768px) 100vw, 33vw"
+                loading="lazy"
+                className="object-cover"
+              />
+            </div>
           ))}
         </div>
       ) : null}

@@ -12,6 +12,13 @@ export const routing = defineRouting({
   localeCookie: {
     name: "NEXT_LOCALE",
   },
+  /**
+   * هدر ``Link`` را خودمان در ``src/proxy.ts`` می‌سازیم تا زبان‌ها
+   * ``fa-IR``/``en``/``x-default`` باشند (پیش‌فرض next-intl کد کوتاه ``fa``
+   * می‌نویسد). متاتگ‌های ``<link rel="alternate">`` از Metadata API می‌آیند و
+   * مستقل از این تنظیم هستند.
+   */
+  alternateLinks: false,
 });
 
 export type AppLocale = (typeof routing.locales)[number];

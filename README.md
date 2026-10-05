@@ -8,12 +8,29 @@
 ├── backend/                    # Django 5.2 + DRF — فاز ۲ تا ۵
 ├── legacy-frontend-reference/  # اسکلت قدیمی React/Vite — فقط مرجع بصری، کد مستقیم استفاده نمی‌شود
 ├── docs/adr/                   # تصمیمات معماری (Architecture Decision Records)
+├── docs/admin-guide-fa.md       # راهنمای فارسی پنل مدیریت (فاز ۶ + بخش‌های SEO/۲FA فاز ۷)
 ├── ARCHITECTURE.md             # معماری کلی سیستم
 ├── DISCOVERY.md                # یافته‌های فاز کشف
 └── CHANGELOG.md                # تاریخچهٔ کامل تغییرات به‌تفکیک فاز
 ```
 
-> وضعیت فعلی (فاز ۵ پیاده‌سازی شده؛ جزئیات در `CHANGELOG.md` و `ADR-0026`): اپ مرکزی `ai_engine` با provider adapter سازگار با OpenAI، Catalogهای قابل‌مدیریت در DB، guardrail، audit یک‌ساله، cache و rate limit پیاده‌سازی شده است. مشاور ایده‌پرداز، نتیجهٔ عمومیِ قابل‌لغو و اتصال Lead، تخمین‌گر زمانِ بدون قیمت، و خلاصه‌ساز بلاگ با تأیید ادمین در دسترس‌اند. مسیرهای `/advisor`، `/advisor/results/[token]` و `/estimate` در هر دو زبان اضافه شده‌اند. AI به‌صورت پیش‌فرض غیرفعال است؛ برای فعال‌سازی فقط تنظیمات محیطی را در `.env` مقصد وارد کنید و هیچ کلیدی را در Git یا گفتگو قرار ندهید. تست‌ها و اعتبارسنجی‌های فاز ۵ در انتهای `CHANGELOG.md` ثبت شده‌اند.
+> وضعیت فعلی (فاز ۷ پیاده‌سازی شده؛ جزئیات در `CHANGELOG.md` و `ADR-0031`–`ADR-0033`):
+> **SEO در لایهٔ Next.js** ساخته می‌شود (sitemap/robots پویا، hreflang `fa-IR`/`en`/`x-default`
+> با canonical خودارجاع، JSON-LD شش‌نوعه، OG پویا با تصویر ۱۲۰۰×۶۳۰، RSS/Atom بلاگ و دوره)
+> و Django فقط منبع داده/ادمین است؛ دامنهٔ canonical تنها از `PUBLIC_SITE_URL` می‌آید.
+> **کارایی** با معیار جانشین اندازه‌گیری‌پذیر تضمین شده است: تصویر AVIF/WebP با `next/image`،
+> فونت خودمیزبان با `font-display: swap` و سقف تعداد کوئری هر endpoint در تست‌ها.
+> **امنیت**: CSP دو‌سیاستی (API سخت / ادمین سازگار Jazzmin)، 2FA اختیاری/اجباری ادمین با
+> TOTP + کد بازیابی، قفل ورود ضدbrute-force با پاسخ `429`، Audit Log رویدادهای امنیتی و
+> دستور `backup_db` با fallback چند-strategy.
+>
+> وضعیت قبلی (فاز ۶؛ جزئیات در `ADR-0027`–`ADR-0030`):
+> پنل مدیریت Django حالا یک **پنل SaaS فارسی/انگلیسی** است: تم اختصاصی امیت با RTL واقعی
+> و فونت خودمیزبان، داشبورد KPI کش‌شده با نمودار SVG درون‌خطی، گردش‌کار گروهی انتشار
+> (Draft→Published→Archived) با ثبت `AuditLog`، مدیریت ترجمه‌ها و کاتالوگ/پرامپت‌های AI
+> در ادمین، صادرات/واردات CSV/JSON/TSV با تست idempotency، نرم‌حذف/بازگردانی و جست‌وجو/فیلتر
+> پیشرفته. هیچ مدل مالی و هیچ فیلد/وضعیت جدیدی در این فاز اضافه نشده است. راهنمای کاربری
+> پنل: [`docs/admin-guide-fa.md`](docs/admin-guide-fa.md).
 
 برای معماری کامل و دلایل هر تصمیم، به `ARCHITECTURE.md` و `docs/adr/` مراجعه کنید.
 
@@ -90,6 +107,10 @@ source .venv/bin/activate
 coverage run -m pytest && coverage report -m   # تست‌ها + پوشش
 mypy apps config                                # mypy --strict (قانون ۷)
 ruff check .                                    # lint
+python manage.py check                          # System Checkها (emmett_admin.E001–W013)
+python manage.py check --deploy                 # هشدارهای مخصوص production (۲FA/CSP/بکاپ/راز)
+python scripts/i18n.py check                     # یکسانی .po و تازگی .mo (ADR-0030)
+python manage.py backup_db --keep 7              # پشتیبان دیتابیس (+مدیا) — ADR-0033
 ```
 
 ### مستندات API
@@ -102,6 +123,50 @@ ruff check .                                    # lint
 
 راهنمای کامل‌تر توسعهٔ بک‌اند (ساختار اپ‌ها، امنیت/حسابرسی، محدودیت‌های
 شناخته‌شده) در [`backend/README.md`](backend/README.md).
+
+### پنل مدیریت (Admin) — فاز ۶
+
+پنل مدیریت (`/admin/`) برای استفادهٔ روزمرهٔ تیم محتوا/فروش آماده شده است:
+
+- **تم و RTL:** Jazzmin + لایهٔ RTL/برند اختصاصی امیت (`#5b62e0`/`#1fae6e`)، فونت
+  وزیرمتن خودمیزبان و بدون هیچ CDN (`ADR-0027`).
+- **داشبورد KPI:** کاربران، درخواست‌های AI، Leadها و نرخ تبدیل، دوره‌ها/ثبت‌نام‌ها،
+  سیگنال‌های فروش (بدون مدل مالی) و خلاصه‌های در انتظار تأیید + نمودار ۸ هفته‌ای
+  و ویجت‌های اقدامات اخیر (`ADR-0028`).
+- **گردش‌کار انتشار:** اکشن‌های گروهی انتشار/بازگشت به پیش‌نویس/بایگانی با ستون وضعیت
+  رنگی و ثبت `AuditLog` برای هر اقدام؛ بدون وضعیت `review` و بدون migration (`ADR-0028`).
+- **ترجمه و i18n:** مدیریت `core.Translation` با فیلتر «کامل‌بودن ترجمه» و اکشن ساخت
+  ردیف زبان غایب؛ ابزار `python scripts/i18n.py {extract,compile,check,stats}` و
+  System Check برای تازگی `.mo` (`ADR-0030`).
+- **Catalog/Prompt AI:** نسخه‌دار، با کلید تغییرناپذیر پس از ساخت و اکشن بایگانی
+  نسخه‌های قدیمی؛ هر تغییر در `AuditLog` (`ADR-0026`/`ADR-0028`).
+- **صادرات/واردات:** `django-import-export` با CSV/JSON/TSV، واردات دو مرحله‌ای
+  (پیش‌نمایش → تأیید)، escape فرمول در CSV و کلیدهای پایدار برای idempotency (`ADR-0029`).
+- **نرم‌حذف/بازگردانی، جست‌وجوی دوزبانه، autocomplete و فیلترهای پیشرفته** روی همهٔ
+  مدل‌های محتوایی.
+
+راهنمای گام‌به‌گام فارسی: [`docs/admin-guide-fa.md`](docs/admin-guide-fa.md).
+
+### SEO، کارایی و امنیت (فاز ۷)
+
+- **ابزار پیکربندی‌محور (نه کد):** متای پیش‌فرض، کد تأیید Search Console، FAQ هر صفحه،
+  ریدایرکت‌های ۳۰۱/۳۰۲/۴۱۰ و دو شبکهٔ اجتماعی در ادمین ویرایش می‌شوند
+  (`Site settings`, `Redirects`, `FAQ items`) و از API به فرانت می‌رسند (`ADR-0031`).
+- **دامنه:** فقط `PUBLIC_SITE_URL` (env) — نه hard-code، نه هدر `Host`. در
+  `manage.py check --deploy` خالی/پیش‌فرض‌بودن آن خطا است (`W007`).
+- **نقشهٔ خودکار:** `sitemap.xml` و `robots.txt` در Next.js ساخته می‌شوند؛ مسیرهای خصوصی
+  (`/admin`, `/api`, `/profile`, `/search`, `/advisor/results/*`) هم `noindex` هستند و هم
+  از sitemap حذف می‌شوند.
+- **فیدها:** `/blog/rss` و `/academy/rss` (RSS 2.0 + `atom:link`)؛ مسیر قدیمی
+  `/api/v1/blog/rss/` هم برای سازگاری حفظ شده است.
+- **۲FA ادمین:** `/admin/2fa/setup|verify|status|recovery` — TOTP با QR درون `data:`
+  (بدون CDN)، کلید Base32 برای ورود دستی، کدهای بازیابی یک‌بارمصرف و قفل موقت پس از
+  چند کد نامعتبر. در production `ADMIN_2FA_REQUIRED=True` پیش‌فرض است (`ADR-0033`).
+- **بکاپ:** `python manage.py backup_db` — روی SQLite با `VACUUM INTO` (سازگار با قفل
+  pytest/سایت زنده)، روی MySQL با `mysqldump` و در نبودش fallback به `dumpdata`؛
+  خروجی `gz` + `manifest-{stamp}.json` + هرس خودکار بر اساس `BACKUP_RETENTION`.
+- **مستندسازی:** تصمیم‌ها در `docs/adr/0031`–`0033`؛ چک‌لیست استقرار و راهنمای ۲FA/SEO
+  در [`docs/admin-guide-fa.md`](docs/admin-guide-fa.md).
 
 ### دادهٔ نمایشی (Seed)
 

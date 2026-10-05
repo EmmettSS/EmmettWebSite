@@ -8,6 +8,13 @@ djangorestframework-stubs==3.18.1
 types-PyMySQL==1.1.0.20250711
 types-requests==2.32.4.20250913    # stub رسمی برای requests (ADR-0024 — Kavenegar adapter)
 
+# --- ابزار ترجمه (فاز ۶ — ADR-0030) ---
+# باینری‌های gettext (xgettext/msgfmt) روی هاست cPanel و در این sandbox در دسترس
+# نیستند. polib یک پیاده‌سازی خالص پایتون برای خواندن/نوشتن .po و کامپایل .mo
+# است؛ فقط ابزار توسعه است و در production لازم نیست (خروجی .mo در مخزن commit
+# می‌شود). استخراج msgid هم با ast خودِ پایتون انجام می‌شود (scripts/i18n.py).
+polib==1.2.0
+
 # --- تست ---
 pytest==9.1.1
 pytest-django==4.14.0

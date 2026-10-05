@@ -1,0 +1,1888 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Emmett Website\n"
+"Report-Msgid-Bugs-To: \n"
+"Language-Team: Emmett English\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: apps/academy/apps.py:9 apps/taxonomy/models.py:18
+msgid "Academy"
+msgstr ""
+
+#: apps/academy/models.py:26 apps/leads/models.py:29
+#: apps/taxonomy/models.py:23 apps/taxonomy/models.py:43
+msgid "name"
+msgstr ""
+
+#: apps/academy/models.py:27 apps/academy/models.py:49
+#: apps/academy/models.py:82 apps/blog/models.py:18 apps/core/models.py:467
+#: apps/portfolio/models.py:25 apps/services/models.py:17
+msgid "title"
+msgstr ""
+
+#: apps/academy/models.py:28 apps/accounts/models.py:114
+#: apps/company/models.py:26
+msgid "bio"
+msgstr ""
+
+#: apps/academy/models.py:34
+msgid "Instructor"
+msgstr ""
+
+#: apps/academy/models.py:35
+msgid "Instructors"
+msgstr ""
+
+#: apps/academy/models.py:50 apps/blog/models.py:19
+#: apps/portfolio/models.py:26 apps/services/models.py:18
+#: apps/taxonomy/models.py:24 apps/taxonomy/models.py:44
+msgid "slug"
+msgstr ""
+
+#: apps/academy/models.py:51 apps/academy/models.py:83
+#: apps/ai_engine/models.py:303 apps/portfolio/models.py:27
+#: apps/services/models.py:19
+msgid "summary"
+msgstr ""
+
+#: apps/academy/models.py:52 apps/services/models.py:20
+msgid "description (Markdown)"
+msgstr ""
+
+#: apps/academy/models.py:57
+msgid "level"
+msgstr ""
+
+#: apps/academy/models.py:58
+msgid "duration (hours)"
+msgstr ""
+
+#: apps/academy/models.py:64 apps/company/models.py:57
+#: apps/portfolio/models.py:49 apps/services/models.py:30
+msgid "is featured"
+msgstr ""
+
+#: apps/academy/models.py:65 apps/academy/models.py:87
+#: apps/ai_engine/models.py:24 apps/ai_engine/models.py:56
+#: apps/company/models.py:31 apps/company/models.py:58 apps/core/models.py:570
+#: apps/portfolio/models.py:50 apps/services/models.py:29
+msgid "order"
+msgstr ""
+
+#: apps/academy/models.py:68
+msgid "Course"
+msgstr ""
+
+#: apps/academy/models.py:69 apps/core/dashboard.py:470
+msgid "Courses"
+msgstr ""
+
+#: apps/academy/models.py:84 apps/blog/models.py:21
+msgid "content (Markdown)"
+msgstr ""
+
+#: apps/academy/models.py:86
+msgid "video URL"
+msgstr ""
+
+#: apps/academy/models.py:88
+msgid "duration (minutes)"
+msgstr ""
+
+#: apps/academy/models.py:90
+msgid "is preview"
+msgstr ""
+
+#: apps/academy/models.py:94
+msgid "Lesson"
+msgstr ""
+
+#: apps/academy/models.py:95
+msgid "Lessons"
+msgstr ""
+
+#: apps/academy/models.py:129 apps/ai_engine/models.py:181
+#: apps/blog/models.py:66 apps/core/models.py:229 apps/leads/models.py:118
+msgid "status"
+msgstr ""
+
+#: apps/academy/models.py:131
+msgid "enrolled at"
+msgstr ""
+
+#: apps/academy/models.py:132 apps/ai_engine/models.py:196
+msgid "completed at"
+msgstr ""
+
+#: apps/academy/models.py:133
+msgid "progress percent"
+msgstr ""
+
+#: apps/academy/models.py:136
+msgid "Enrollment"
+msgstr ""
+
+#: apps/academy/models.py:137
+msgid "Enrollments"
+msgstr ""
+
+#: apps/academy/models.py:44
+msgid "Beginner"
+msgstr ""
+
+#: apps/academy/models.py:45
+msgid "Intermediate"
+msgstr ""
+
+#: apps/academy/models.py:46
+msgid "Advanced"
+msgstr ""
+
+#: apps/academy/models.py:90
+msgid "قابل‌مشاهده بدون نیاز به ورود/خرید."
+msgstr "Visible without signing in or purchasing."
+
+#: apps/academy/models.py:116 apps/ai_engine/admin.py:304
+#: apps/core/dashboard.py:401
+msgid "Active"
+msgstr ""
+
+#: apps/academy/models.py:117 apps/ai_engine/models.py:174
+msgid "Completed"
+msgstr ""
+
+#: apps/academy/models.py:118
+msgid "Cancelled"
+msgstr ""
+
+#: apps/academy/models.py:123 apps/accounts/models.py:104
+#: apps/accounts/models.py:138 apps/company/models.py:18
+msgid "user"
+msgstr ""
+
+#: apps/accounts/apps.py:9
+msgid "Accounts"
+msgstr ""
+
+#: apps/accounts/models.py:72
+msgid "email address"
+msgstr ""
+
+#: apps/accounts/models.py:74
+msgid "phone number"
+msgstr ""
+
+#: apps/accounts/models.py:80
+msgid "role"
+msgstr ""
+
+#: apps/accounts/models.py:81
+msgid "phone verified"
+msgstr ""
+
+#: apps/accounts/models.py:83 apps/core/models.py:79 apps/core/models.py:141
+msgid "created at"
+msgstr ""
+
+#: apps/accounts/models.py:84 apps/core/models.py:80 apps/core/models.py:142
+#: apps/core/models.py:353 apps/core/models.py:471
+msgid "updated at"
+msgstr ""
+
+#: apps/accounts/models.py:92
+msgid "User"
+msgstr ""
+
+#: apps/accounts/models.py:93 apps/core/dashboard.py:361
+msgid "Users"
+msgstr ""
+
+#: apps/accounts/models.py:116 apps/leads/models.py:135
+msgid "locale preference"
+msgstr ""
+
+#: apps/accounts/models.py:118
+msgid "job title"
+msgstr ""
+
+#: apps/accounts/models.py:119
+msgid "company name"
+msgstr ""
+
+#: apps/accounts/models.py:122
+msgid "Profile"
+msgstr ""
+
+#: apps/accounts/models.py:123
+msgid "Profiles"
+msgstr ""
+
+#: apps/accounts/models.py:145
+msgid "Favorite"
+msgstr ""
+
+#: apps/accounts/models.py:146
+msgid "Favorites"
+msgstr ""
+
+#: apps/accounts/models.py:66
+msgid "Admin"
+msgstr ""
+
+#: apps/accounts/models.py:67
+msgid "Editor"
+msgstr ""
+
+#: apps/accounts/models.py:68
+msgid "Student"
+msgstr ""
+
+#: apps/accounts/models.py:69
+msgid "Client"
+msgstr ""
+
+#: apps/accounts/models.py:78
+msgid "برای توسعهٔ آیندهٔ اعلان/OTP پیامکی (Kavenegar)."
+msgstr "Reserved for future SMS notification and OTP delivery (Kavenegar)."
+
+#: apps/accounts/models.py:108
+msgid "avatar"
+msgstr ""
+
+#: apps/accounts/models.py:36
+msgid "ایمیل الزامی است."
+msgstr "An email address is required."
+
+#: apps/accounts/models.py:55
+msgid "ابرکاربر باید is_staff=True داشته باشد."
+msgstr "A superuser must also have is_staff=True."
+
+#: apps/accounts/models.py:57
+msgid "ابرکاربر باید is_superuser=True داشته باشد."
+msgstr "The user must be a superuser (is_superuser=True)."
+
+#: apps/ai_engine/apps.py:9
+msgid "AI Engine"
+msgstr ""
+
+#: apps/ai_engine/models.py:20
+msgid "catalog key"
+msgstr ""
+
+#: apps/ai_engine/models.py:21 apps/ai_engine/models.py:53
+msgid "Persian label"
+msgstr ""
+
+#: apps/ai_engine/models.py:22 apps/ai_engine/models.py:54
+msgid "English label"
+msgstr ""
+
+#: apps/ai_engine/models.py:23 apps/ai_engine/models.py:55
+msgid "public"
+msgstr ""
+
+#: apps/ai_engine/models.py:27
+msgid "Catalog"
+msgstr ""
+
+#: apps/ai_engine/models.py:28
+msgid "Catalogs"
+msgstr ""
+
+#: apps/ai_engine/models.py:52
+msgid "option key"
+msgstr ""
+
+#: apps/ai_engine/models.py:57 apps/core/models.py:171
+msgid "metadata"
+msgstr ""
+
+#: apps/ai_engine/models.py:60
+msgid "Catalog Option"
+msgstr ""
+
+#: apps/ai_engine/models.py:61
+msgid "Catalog Options"
+msgstr ""
+
+#: apps/ai_engine/models.py:101 apps/ai_engine/models.py:179
+msgid "feature"
+msgstr ""
+
+#: apps/ai_engine/models.py:102 apps/ai_engine/models.py:180
+#: apps/ai_engine/models.py:216 apps/ai_engine/models.py:302
+#: apps/core/models.py:342 apps/core/models.py:466
+msgid "locale"
+msgstr ""
+
+#: apps/ai_engine/models.py:103
+msgid "version"
+msgstr ""
+
+#: apps/ai_engine/models.py:104
+msgid "system prompt"
+msgstr ""
+
+#: apps/ai_engine/models.py:107
+msgid "AI Prompt Template"
+msgstr ""
+
+#: apps/ai_engine/models.py:108
+msgid "AI Prompt Templates"
+msgstr ""
+
+#: apps/ai_engine/models.py:130
+msgid "rule key"
+msgstr ""
+
+#: apps/ai_engine/models.py:131
+msgid "rule type"
+msgstr ""
+
+#: apps/ai_engine/models.py:132 apps/ai_engine/models.py:245
+msgid "Persian description"
+msgstr ""
+
+#: apps/ai_engine/models.py:133 apps/ai_engine/models.py:246
+msgid "English description"
+msgstr ""
+
+#: apps/ai_engine/models.py:134
+msgid "severity"
+msgstr ""
+
+#: apps/ai_engine/models.py:135
+msgid "rule configuration"
+msgstr ""
+
+#: apps/ai_engine/models.py:138
+msgid "AI Guardrail Rule"
+msgstr ""
+
+#: apps/ai_engine/models.py:139
+msgid "AI Guardrail Rules"
+msgstr ""
+
+#: apps/ai_engine/models.py:153 apps/ai_engine/models.py:258
+msgid "minimum working days"
+msgstr ""
+
+#: apps/ai_engine/models.py:154
+msgid "Persian note"
+msgstr ""
+
+#: apps/ai_engine/models.py:155
+msgid "English note"
+msgstr ""
+
+#: apps/ai_engine/models.py:158
+msgid "Estimation Rule"
+msgstr ""
+
+#: apps/ai_engine/models.py:159
+msgid "Estimation Rules"
+msgstr ""
+
+#: apps/ai_engine/models.py:182
+msgid "structured input"
+msgstr ""
+
+#: apps/ai_engine/models.py:183
+msgid "request hash"
+msgstr ""
+
+#: apps/ai_engine/models.py:185
+msgid "requester pseudonym"
+msgstr ""
+
+#: apps/ai_engine/models.py:187
+msgid "provider"
+msgstr ""
+
+#: apps/ai_engine/models.py:188
+msgid "model"
+msgstr ""
+
+#: apps/ai_engine/models.py:189
+msgid "prompt version"
+msgstr ""
+
+#: apps/ai_engine/models.py:190
+msgid "latency (ms)"
+msgstr ""
+
+#: apps/ai_engine/models.py:191
+msgid "input tokens"
+msgstr ""
+
+#: apps/ai_engine/models.py:192
+msgid "output tokens"
+msgstr ""
+
+#: apps/ai_engine/models.py:193
+msgid "cache hit"
+msgstr ""
+
+#: apps/ai_engine/models.py:194
+msgid "safe error code"
+msgstr ""
+
+#: apps/ai_engine/models.py:195 apps/ai_engine/models.py:223
+msgid "guardrail flags"
+msgstr ""
+
+#: apps/ai_engine/models.py:199
+msgid "AI Request Audit"
+msgstr ""
+
+#: apps/ai_engine/models.py:200
+msgid "AI Request Audits"
+msgstr ""
+
+#: apps/ai_engine/models.py:217
+msgid "output version"
+msgstr ""
+
+#: apps/ai_engine/models.py:219
+msgid "share token hash"
+msgstr ""
+
+#: apps/ai_engine/models.py:221
+msgid "share revoked at"
+msgstr ""
+
+#: apps/ai_engine/models.py:222
+msgid "displayable"
+msgstr ""
+
+#: apps/ai_engine/models.py:226
+msgid "AI Suggestion"
+msgstr ""
+
+#: apps/ai_engine/models.py:227
+msgid "AI Suggestions"
+msgstr ""
+
+#: apps/ai_engine/models.py:242
+msgid "position"
+msgstr ""
+
+#: apps/ai_engine/models.py:243
+msgid "Persian title"
+msgstr ""
+
+#: apps/ai_engine/models.py:244
+msgid "English title"
+msgstr ""
+
+#: apps/ai_engine/models.py:247
+msgid "Persian benefit"
+msgstr ""
+
+#: apps/ai_engine/models.py:248
+msgid "English benefit"
+msgstr ""
+
+#: apps/ai_engine/models.py:267
+msgid "AI Concept"
+msgstr ""
+
+#: apps/ai_engine/models.py:268
+msgid "AI Concepts"
+msgstr ""
+
+#: apps/ai_engine/models.py:304
+msgid "source content hash"
+msgstr ""
+
+#: apps/ai_engine/models.py:305
+msgid "review status"
+msgstr ""
+
+#: apps/ai_engine/models.py:306
+msgid "stale"
+msgstr ""
+
+#: apps/ai_engine/models.py:314
+msgid "reviewed at"
+msgstr ""
+
+#: apps/ai_engine/models.py:317
+msgid "AI Content Artifact"
+msgstr ""
+
+#: apps/ai_engine/models.py:318
+msgid "AI Content Artifacts"
+msgstr ""
+
+#: apps/ai_engine/models.py:94 apps/ai_engine/models.py:168
+msgid "Creative advisor"
+msgstr ""
+
+#: apps/ai_engine/models.py:95 apps/ai_engine/models.py:170
+msgid "Blog summary"
+msgstr ""
+
+#: apps/ai_engine/models.py:98
+msgid "Persian"
+msgstr ""
+
+#: apps/ai_engine/models.py:99
+msgid "English"
+msgstr ""
+
+#: apps/ai_engine/models.py:122
+msgid "Blocked terms"
+msgstr ""
+
+#: apps/ai_engine/models.py:123
+msgid "Output policy"
+msgstr ""
+
+#: apps/ai_engine/models.py:126
+msgid "Low"
+msgstr ""
+
+#: apps/ai_engine/models.py:127
+msgid "Medium"
+msgstr ""
+
+#: apps/ai_engine/models.py:128
+msgid "High"
+msgstr ""
+
+#: apps/ai_engine/models.py:169
+msgid "Project estimator"
+msgstr ""
+
+#: apps/ai_engine/models.py:173 apps/blog/models.py:53
+msgid "Pending"
+msgstr ""
+
+#: apps/ai_engine/models.py:175
+msgid "Failed"
+msgstr ""
+
+#: apps/ai_engine/models.py:176
+msgid "Blocked"
+msgstr ""
+
+#: apps/ai_engine/models.py:290 apps/core/models.py:224
+msgid "Draft"
+msgstr ""
+
+#: apps/ai_engine/models.py:291 apps/blog/models.py:54
+#: apps/core/dashboard.py:424
+msgid "Approved"
+msgstr ""
+
+#: apps/ai_engine/models.py:292 apps/blog/models.py:55
+msgid "Rejected"
+msgstr ""
+
+#: apps/ai_engine/models.py:39
+msgid "Catalog keys cannot be changed after creation."
+msgstr ""
+
+#: apps/ai_engine/models.py:80
+msgid ""
+"Catalog option keys and their catalog cannot be changed after creation."
+msgstr ""
+
+#: apps/blog/apps.py:9 apps/taxonomy/models.py:17
+msgid "Blog"
+msgstr ""
+
+#: apps/blog/models.py:20
+msgid "excerpt"
+msgstr ""
+
+#: apps/blog/models.py:31
+msgid "reading time (minutes)"
+msgstr ""
+
+#: apps/blog/models.py:32
+msgid "view count"
+msgstr ""
+
+#: apps/blog/models.py:35
+msgid "Blog Post"
+msgstr ""
+
+#: apps/blog/models.py:36 apps/core/dashboard.py:469
+msgid "Blog Posts"
+msgstr ""
+
+#: apps/blog/models.py:64 apps/core/models.py:468
+msgid "body"
+msgstr ""
+
+#: apps/blog/admin.py:85 apps/blog/models.py:70
+msgid "Comment"
+msgstr ""
+
+#: apps/blog/models.py:71
+msgid "Comments"
+msgstr ""
+
+#: apps/company/apps.py:9
+msgid "Company"
+msgstr ""
+
+#: apps/company/models.py:24
+msgid "full name"
+msgstr ""
+
+#: apps/company/models.py:25
+msgid "role title"
+msgstr ""
+
+#: apps/company/models.py:30 apps/core/models.py:375
+msgid "social links"
+msgstr ""
+
+#: apps/company/models.py:34
+msgid "Team Member"
+msgstr ""
+
+#: apps/company/models.py:35
+msgid "Team Members"
+msgstr ""
+
+#: apps/company/models.py:43
+msgid "author name"
+msgstr ""
+
+#: apps/company/models.py:44
+msgid "author role"
+msgstr ""
+
+#: apps/company/models.py:45
+msgid "author company"
+msgstr ""
+
+#: apps/company/models.py:49
+msgid "quote"
+msgstr ""
+
+#: apps/company/models.py:61
+msgid "Testimonial"
+msgstr ""
+
+#: apps/company/models.py:62
+msgid "Testimonials"
+msgstr ""
+
+#: apps/core/apps.py:13
+msgid "Core"
+msgstr ""
+
+#: apps/core/models.py:81
+msgid "is active"
+msgstr ""
+
+#: apps/core/models.py:82
+msgid "deleted at"
+msgstr ""
+
+#: apps/core/models.py:165
+msgid "action"
+msgstr ""
+
+#: apps/core/models.py:172 apps/leads/models.py:56
+msgid "IP address"
+msgstr ""
+
+#: apps/core/models.py:173 apps/leads/models.py:57
+msgid "user agent"
+msgstr ""
+
+#: apps/core/models.py:176
+msgid "Audit Log"
+msgstr ""
+
+#: apps/core/models.py:177
+msgid "Audit Logs"
+msgstr ""
+
+#: apps/core/models.py:231
+msgid "published at"
+msgstr ""
+
+#: apps/core/models.py:249
+msgid "meta title"
+msgstr ""
+
+#: apps/core/models.py:250
+msgid "meta description"
+msgstr ""
+
+#: apps/core/models.py:260
+msgid "canonical path"
+msgstr ""
+
+#: apps/core/models.py:291
+msgid "file"
+msgstr ""
+
+#: apps/core/models.py:293
+msgid "media type"
+msgstr ""
+
+#: apps/core/models.py:294
+msgid "alt text"
+msgstr ""
+
+#: apps/core/models.py:295
+msgid "caption"
+msgstr ""
+
+#: apps/core/models.py:296
+msgid "width"
+msgstr ""
+
+#: apps/core/models.py:297
+msgid "height"
+msgstr ""
+
+#: apps/core/models.py:298
+msgid "file size (bytes)"
+msgstr ""
+
+#: apps/core/models.py:299
+msgid "MIME type"
+msgstr ""
+
+#: apps/core/models.py:300
+msgid "checksum (sha256)"
+msgstr ""
+
+#: apps/academy/admin.py:83 apps/blog/admin.py:57 apps/core/models.py:311
+#: apps/core/models.py:312 apps/portfolio/admin.py:63
+msgid "Media"
+msgstr ""
+
+#: apps/core/models.py:340
+msgid "namespace"
+msgstr ""
+
+#: apps/core/models.py:341
+msgid "key"
+msgstr ""
+
+#: apps/core/models.py:343
+msgid "value"
+msgstr ""
+
+#: apps/core/models.py:344
+msgid "is HTML"
+msgstr ""
+
+#: apps/core/models.py:356
+msgid "Translation"
+msgstr ""
+
+#: apps/core/models.py:357
+msgid "Translations"
+msgstr ""
+
+#: apps/core/models.py:371
+msgid "site name"
+msgstr ""
+
+#: apps/core/models.py:372
+msgid "default locale"
+msgstr ""
+
+#: apps/core/models.py:373
+msgid "contact email"
+msgstr ""
+
+#: apps/core/models.py:374
+msgid "contact phone"
+msgstr ""
+
+#: apps/core/models.py:376
+msgid "maintenance mode"
+msgstr ""
+
+#: apps/core/models.py:428 apps/core/models.py:429
+msgid "Site Settings"
+msgstr ""
+
+#: apps/core/models.py:463
+msgid "content type"
+msgstr ""
+
+#: apps/core/models.py:464
+msgid "object id"
+msgstr ""
+
+#: apps/core/models.py:465
+msgid "public id"
+msgstr ""
+
+#: apps/core/models.py:469
+msgid "URL path"
+msgstr ""
+
+#: apps/core/models.py:470
+msgid "category label"
+msgstr ""
+
+#: apps/core/models.py:474
+msgid "Search Index Entry"
+msgstr ""
+
+#: apps/core/models.py:475
+msgid "Search Index Entries"
+msgstr ""
+
+#: apps/core/models.py:158
+msgid "actor"
+msgstr ""
+
+#: apps/core/models.py:163
+msgid "کاربری که عملیات را انجام داده؛ خالی یعنی سیستم/کاربر مهمان."
+msgstr "User who performed the action; empty means system or guest."
+
+#: apps/core/models.py:225
+msgid "Published"
+msgstr ""
+
+#: apps/core/models.py:226
+msgid "Archived"
+msgstr ""
+
+#: apps/core/models.py:253
+msgid "OG image"
+msgstr ""
+
+#: apps/core/models.py:264
+msgid ""
+"در صورت خالی بودن، مسیر پیش‌فرض صفحه به‌عنوان canonical استفاده می‌شود."
+msgstr ""
+"When left empty, the page's default path is used as the canonical URL."
+
+#: apps/core/models.py:286
+msgid "Image"
+msgstr ""
+
+#: apps/core/models.py:287
+msgid "Document"
+msgstr ""
+
+#: apps/core/models.py:288
+msgid "Video"
+msgstr ""
+
+#: apps/core/models.py:303
+msgid "uploaded by"
+msgstr ""
+
+#: apps/core/models.py:347
+msgid "updated by"
+msgstr ""
+
+#: apps/core/validators.py:78 apps/core/validators.py:81
+msgid "محتوای فایل با پسوند اعلام‌شده مطابقت ندارد."
+msgstr "The file content does not match the declared extension."
+
+#: apps/core/validators.py:60
+msgid "حجم فایل بیش از حد مجاز (%(max)s مگابایت) است."
+msgstr "File size exceeds the allowed limit (%(max)s MB)."
+
+#: apps/core/dashboard.py:384 apps/leads/apps.py:9 apps/leads/models.py:125
+msgid "Leads"
+msgstr ""
+
+#: apps/leads/models.py:30 apps/leads/models.py:133
+msgid "email"
+msgstr ""
+
+#: apps/leads/models.py:31 apps/leads/models.py:134
+msgid "phone"
+msgstr ""
+
+#: apps/leads/models.py:53
+msgid "message"
+msgstr ""
+
+#: apps/leads/models.py:54
+msgid "source"
+msgstr ""
+
+#: apps/leads/models.py:55
+msgid "consent given"
+msgstr ""
+
+#: apps/core/admin.py:250 apps/leads/models.py:60
+msgid "Contact"
+msgstr ""
+
+#: apps/leads/models.py:61
+msgid "Contacts"
+msgstr ""
+
+#: apps/leads/models.py:120
+msgid "priority score"
+msgstr ""
+
+#: apps/leads/models.py:121
+msgid "notes"
+msgstr ""
+
+#: apps/leads/models.py:124
+msgid "Lead"
+msgstr ""
+
+#: apps/leads/models.py:136
+msgid "is confirmed"
+msgstr ""
+
+#: apps/leads/models.py:140
+msgid "subscribed at"
+msgstr ""
+
+#: apps/leads/models.py:141
+msgid "unsubscribed at"
+msgstr ""
+
+#: apps/leads/models.py:144
+msgid "Newsletter Subscription"
+msgstr ""
+
+#: apps/leads/models.py:145
+msgid "Newsletter Subscriptions"
+msgstr ""
+
+#: apps/leads/models.py:24
+msgid "Website Form"
+msgstr ""
+
+#: apps/leads/models.py:25
+msgid "AI Assistant"
+msgstr ""
+
+#: apps/leads/models.py:26
+msgid "Referral"
+msgstr ""
+
+#: apps/leads/models.py:34
+msgid "project type"
+msgstr ""
+
+#: apps/leads/models.py:41
+msgid "budget range"
+msgstr ""
+
+#: apps/leads/models.py:48
+msgid "timeline"
+msgstr ""
+
+#: apps/core/dashboard.py:450 apps/leads/models.py:85
+msgid "New"
+msgstr ""
+
+#: apps/core/dashboard.py:451 apps/leads/models.py:86
+msgid "Contacted"
+msgstr ""
+
+#: apps/core/dashboard.py:452 apps/leads/models.py:87
+msgid "Qualified"
+msgstr ""
+
+#: apps/core/dashboard.py:453 apps/leads/models.py:88
+msgid "Proposal"
+msgstr ""
+
+#: apps/core/dashboard.py:389 apps/core/dashboard.py:454
+#: apps/leads/models.py:89
+msgid "Won"
+msgstr ""
+
+#: apps/core/dashboard.py:455 apps/leads/models.py:90
+msgid "Lost"
+msgstr ""
+
+#: apps/leads/models.py:78
+msgid "Select an option from the correct catalog."
+msgstr ""
+
+#: apps/portfolio/apps.py:9 apps/taxonomy/models.py:19
+msgid "Portfolio"
+msgstr ""
+
+#: apps/portfolio/models.py:28
+msgid "client name"
+msgstr ""
+
+#: apps/portfolio/models.py:42
+msgid "year"
+msgstr ""
+
+#: apps/portfolio/models.py:44
+msgid "is product"
+msgstr ""
+
+#: apps/portfolio/models.py:53
+msgid "Project"
+msgstr ""
+
+#: apps/core/dashboard.py:468 apps/portfolio/models.py:54
+msgid "Projects"
+msgstr ""
+
+#: apps/portfolio/models.py:63
+msgid "challenge (Markdown)"
+msgstr ""
+
+#: apps/portfolio/models.py:65
+msgid "approach (Markdown)"
+msgstr ""
+
+#: apps/portfolio/models.py:67
+msgid "architecture notes (Markdown)"
+msgstr ""
+
+#: apps/portfolio/models.py:69
+msgid "technology stack"
+msgstr ""
+
+#: apps/portfolio/models.py:70
+msgid "implementation notes (Markdown)"
+msgstr ""
+
+#: apps/portfolio/models.py:72
+msgid "result (Markdown)"
+msgstr ""
+
+#: apps/portfolio/models.py:74
+msgid "metrics"
+msgstr ""
+
+#: apps/portfolio/models.py:77
+msgid "Case Study"
+msgstr ""
+
+#: apps/portfolio/models.py:78
+msgid "Case Studies"
+msgstr ""
+
+#: apps/portfolio/models.py:33
+msgid "برای فیلتر «صنعت»."
+msgstr "Used to filter by industry."
+
+#: apps/portfolio/models.py:36
+msgid "برای فیلتر «تکنولوژی»."
+msgstr "Used to filter by technology."
+
+#: apps/portfolio/models.py:47
+msgid ""
+"مثلاً Pentestor/CRM — محصولات داخلی که به شکل Project نمایش داده می‌شوند."
+msgstr "For example Pentestor/CRM — in-house products surfaced as projects."
+
+#: apps/core/dashboard.py:467 apps/services/apps.py:9
+#: apps/services/models.py:34
+msgid "Services"
+msgstr ""
+
+#: apps/services/models.py:22
+msgid "description (HTML, cached)"
+msgstr ""
+
+#: apps/services/models.py:25
+msgid "icon"
+msgstr ""
+
+#: apps/services/models.py:33 apps/taxonomy/models.py:20
+msgid "Service"
+msgstr ""
+
+#: apps/services/models.py:25
+msgid "نام آیکون lucide-react."
+msgstr "lucide-react icon name."
+
+#: apps/taxonomy/apps.py:9
+msgid "Taxonomy"
+msgstr ""
+
+#: apps/taxonomy/models.py:28
+msgid "scope"
+msgstr ""
+
+#: apps/taxonomy/models.py:31
+msgid "Category"
+msgstr ""
+
+#: apps/taxonomy/models.py:32
+msgid "Categories"
+msgstr ""
+
+#: apps/taxonomy/models.py:47
+msgid "Tag"
+msgstr ""
+
+#: apps/taxonomy/models.py:48
+msgid "Tags"
+msgstr ""
+
+#: apps/academy/admin.py:28
+msgid "enrollment"
+msgstr ""
+
+#: apps/academy/admin.py:82
+msgid "Course details"
+msgstr ""
+
+#: apps/academy/admin.py:84 apps/portfolio/admin.py:65
+#: apps/services/admin.py:31
+msgid "Categories and ordering"
+msgstr ""
+
+#: apps/academy/admin.py:85 apps/ai_engine/admin.py:167 apps/blog/admin.py:59
+#: apps/portfolio/admin.py:68 apps/services/admin.py:32
+msgid "Publication"
+msgstr ""
+
+#: apps/academy/admin.py:86 apps/blog/admin.py:60 apps/core/admin.py:252
+#: apps/portfolio/admin.py:69 apps/services/admin.py:33
+msgid "SEO"
+msgstr ""
+
+#: apps/academy/admin.py:88 apps/blog/admin.py:62 apps/portfolio/admin.py:71
+#: apps/services/admin.py:35
+msgid "Technical details"
+msgstr ""
+
+#: apps/academy/admin.py:120 apps/ai_engine/admin.py:373
+#: apps/leads/admin.py:84
+msgid "Status"
+msgstr ""
+
+#: apps/accounts/admin.py:63
+msgid "Personal information"
+msgstr ""
+
+#: apps/accounts/admin.py:65
+msgid "Role and permissions"
+msgstr ""
+
+#: apps/accounts/admin.py:68
+msgid "Timeline"
+msgstr ""
+
+#: apps/accounts/admin.py:69
+msgid "Public identifier"
+msgstr ""
+
+#: apps/accounts/admin.py:83
+msgid "Full name"
+msgstr ""
+
+#: apps/accounts/admin.py:152
+msgid "Biography"
+msgstr ""
+
+#: apps/ai_engine/admin.py:96
+msgid "Options"
+msgstr ""
+
+#: apps/ai_engine/admin.py:166
+msgid "Prompt"
+msgstr ""
+
+#: apps/ai_engine/admin.py:175
+msgid "Active version"
+msgstr ""
+
+#: apps/ai_engine/admin.py:194
+msgid "Archive superseded versions of the same feature and locale"
+msgstr ""
+
+#: apps/ai_engine/admin.py:235
+msgid "Descriptions"
+msgstr ""
+
+#: apps/ai_engine/admin.py:236
+msgid "Configuration"
+msgstr ""
+
+#: apps/ai_engine/admin.py:302
+msgid "Public share"
+msgstr ""
+
+#: apps/ai_engine/admin.py:306
+msgid "Revoke public share links for selected suggestions"
+msgstr ""
+
+#: apps/ai_engine/admin.py:377
+msgid "Approve selected summaries for public display"
+msgstr ""
+
+#: apps/ai_engine/admin.py:397
+msgid "Reject selected summaries"
+msgstr ""
+
+#: apps/ai_engine/admin.py:220
+msgid "Archived %(count)s superseded prompt version(s)."
+msgstr ""
+
+#: apps/ai_engine/admin.py:304
+msgid "Revoked"
+msgstr ""
+
+#: apps/ai_engine/admin.py:310
+msgid "Nothing to revoke: no active share link was selected."
+msgstr ""
+
+#: apps/ai_engine/admin.py:319
+msgid "Revoked %(count)s share link(s)."
+msgstr ""
+
+#: apps/ai_engine/admin.py:381
+msgid "Nothing to approve: selected summaries are stale."
+msgstr ""
+
+#: apps/ai_engine/admin.py:394
+msgid "Approved %(count)s summarie(s)."
+msgstr ""
+
+#: apps/ai_engine/admin.py:401
+msgid "Nothing to reject: no summary was selected."
+msgstr ""
+
+#: apps/ai_engine/admin.py:414
+msgid "Rejected %(count)s summarie(s)."
+msgstr ""
+
+#: apps/blog/admin.py:58
+msgid "Authoring"
+msgstr ""
+
+#: apps/blog/admin.py:90
+msgid "Moderation status"
+msgstr ""
+
+#: apps/blog/admin.py:94
+msgid "Approve selected comments"
+msgstr ""
+
+#: apps/blog/admin.py:98
+msgid "Reject selected comments"
+msgstr ""
+
+#: apps/blog/admin.py:107
+msgid "Nothing to moderate: no comment was selected."
+msgstr ""
+
+#: apps/blog/admin.py:117
+msgid "Moderated %(count)s comment(s)."
+msgstr ""
+
+#: apps/company/admin.py:30 apps/company/admin.py:49
+msgid "Ordering"
+msgstr ""
+
+#: apps/company/admin.py:31
+msgid "Links"
+msgstr ""
+
+#: apps/company/admin.py:48
+msgid "Quote"
+msgstr ""
+
+#: apps/core/admin.py:112
+msgid "Change summary"
+msgstr ""
+
+#: apps/core/admin.py:179
+msgid "Value"
+msgstr ""
+
+#: apps/core/admin.py:194
+msgid "Create the missing language row for selected entries"
+msgstr ""
+
+#: apps/core/admin.py:230
+msgid "All selected entries already exist in both languages."
+msgstr ""
+
+#: apps/core/admin.py:226
+msgid "Created %(count)s translation row(s)."
+msgstr ""
+
+#: apps/core/admin_filters.py:31
+msgid "Has related items"
+msgstr ""
+
+#: apps/core/admin_filters.py:32
+msgid "No related items"
+msgstr ""
+
+#: apps/core/admin_filters.py:61
+msgid "translation completeness"
+msgstr ""
+
+#: apps/core/admin_filters.py:68
+msgid "Missing Persian (fa)"
+msgstr ""
+
+#: apps/core/admin_filters.py:69
+msgid "Missing English (en)"
+msgstr ""
+
+#: apps/core/admin_filters.py:70
+msgid "Registered in both languages"
+msgstr ""
+
+#: apps/core/admin_mixins.py:226
+msgid "record state"
+msgstr ""
+
+#: apps/core/admin_mixins.py:117 apps/core/tests/test_i18n_tooling.py:148
+#: apps/core/tests/test_i18n_tooling.py:154
+msgid "Publish selected content"
+msgstr ""
+
+#: apps/core/admin_mixins.py:150
+msgid "Return selected content to draft"
+msgstr ""
+
+#: apps/core/admin_mixins.py:174
+msgid "Archive selected content"
+msgstr ""
+
+#: apps/core/admin_mixins.py:196
+msgid "Publication status"
+msgstr ""
+
+#: apps/core/admin_mixins.py:261
+msgid "Restore selected records"
+msgstr ""
+
+#: apps/core/admin_mixins.py:284
+msgid "Deleted?"
+msgstr ""
+
+#: apps/core/admin_mixins.py:129
+msgid "Nothing to do: the selected items are already published."
+msgstr ""
+
+#: apps/core/admin_mixins.py:146
+msgid "Published %(count)s item(s)."
+msgstr ""
+
+#: apps/core/admin_mixins.py:158
+msgid "Nothing to do: the selected items are already drafts."
+msgstr ""
+
+#: apps/core/admin_mixins.py:170
+msgid "Returned %(count)s item(s) to draft."
+msgstr ""
+
+#: apps/core/admin_mixins.py:182
+msgid "Nothing to do: the selected items are already archived."
+msgstr ""
+
+#: apps/core/admin_mixins.py:192
+msgid "Archived %(count)s item(s)."
+msgstr ""
+
+#: apps/core/admin_mixins.py:234
+msgid "Active only"
+msgstr ""
+
+#: apps/core/admin_mixins.py:235
+msgid "Soft-deleted only"
+msgstr ""
+
+#: apps/core/admin_mixins.py:236
+msgid "All records"
+msgstr ""
+
+#: apps/core/admin_mixins.py:265
+msgid "Nothing to restore: no soft-deleted item was selected."
+msgstr ""
+
+#: apps/core/admin_mixins.py:280
+msgid "Restored %(count)s record(s)."
+msgstr ""
+
+#: apps/core/admin_theme.py:39
+msgid "Emmett Group admin"
+msgstr ""
+
+#: apps/core/admin_theme.py:40 config/settings/base.py:305
+msgid "Emmett Admin"
+msgstr ""
+
+#: apps/core/admin_theme.py:41 apps/core/tests/test_i18n_tooling.py:147
+#: apps/core/tests/test_i18n_tooling.py:153 config/settings/base.py:319
+#: templates/admin/index.html:7
+msgid "Dashboard"
+msgstr ""
+
+#: apps/core/dashboard.py:319
+msgid "Added"
+msgstr ""
+
+#: apps/core/dashboard.py:320 apps/core/dashboard.py:325
+msgid "Changed"
+msgstr ""
+
+#: apps/core/dashboard.py:321
+msgid "Deleted"
+msgstr ""
+
+#: apps/core/dashboard.py:434
+msgid "AI requests per week"
+msgstr ""
+
+#: apps/core/dashboard.py:440
+msgid "New contacts per week"
+msgstr ""
+
+#: apps/core/dashboard.py:369
+msgid "View users"
+msgstr ""
+
+#: apps/core/dashboard.py:372
+msgid "AI requests"
+msgstr ""
+
+#: apps/core/dashboard.py:381
+msgid "View AI audit"
+msgstr ""
+
+#: apps/core/dashboard.py:393
+msgid "View pipeline"
+msgstr ""
+
+#: apps/core/dashboard.py:396
+msgid "Academy enrollments"
+msgstr ""
+
+#: apps/core/dashboard.py:405
+msgid "View enrollments"
+msgstr ""
+
+#: apps/core/dashboard.py:408
+msgid "Sales signals (30 days)"
+msgstr ""
+
+#: apps/core/dashboard.py:417
+msgid "View contacts"
+msgstr ""
+
+#: apps/core/dashboard.py:420
+msgid "Pending AI summaries"
+msgstr ""
+
+#: apps/core/dashboard.py:428
+msgid "Review summaries"
+msgstr ""
+
+#: apps/core/dashboard.py:414
+msgid "No financial model exists in this phase."
+msgstr ""
+
+#: apps/core/dashboard.py:365
+msgid "Staff"
+msgstr ""
+
+#: apps/core/dashboard.py:366
+msgid "New (30 days)"
+msgstr ""
+
+#: apps/core/dashboard.py:376
+msgid "Last 30 days"
+msgstr ""
+
+#: apps/core/dashboard.py:377
+msgid "Blocked by guardrail"
+msgstr ""
+
+#: apps/core/dashboard.py:378
+msgid "Cache hit rate"
+msgstr ""
+
+#: apps/core/dashboard.py:388
+msgid "Leads in pipeline"
+msgstr ""
+
+#: apps/core/dashboard.py:390
+msgid "Conversion"
+msgstr ""
+
+#: apps/core/dashboard.py:400
+msgid "Published courses"
+msgstr ""
+
+#: apps/core/dashboard.py:402
+msgid "Average progress"
+msgstr ""
+
+#: apps/core/dashboard.py:412
+msgid "New enrollments"
+msgstr ""
+
+#: apps/core/dashboard.py:413
+msgid "New contacts"
+msgstr ""
+
+#: apps/core/dashboard.py:425
+msgid "Newsletter subscribers"
+msgstr ""
+
+#: apps/core/dashboard.py:480
+msgid "System"
+msgstr ""
+
+#: apps/leads/admin.py:28
+msgid "lead"
+msgstr ""
+
+#: apps/leads/admin.py:34
+msgid "AI concept"
+msgstr ""
+
+#: apps/leads/admin.py:59
+msgid "Name"
+msgstr ""
+
+#: config/settings/base.py:306
+msgid "Emmett Group"
+msgstr ""
+
+#: config/settings/base.py:313
+msgid "Sign in to the Emmett admin panel"
+msgstr ""
+
+#: config/settings/base.py:321
+msgid "View public site"
+msgstr ""
+
+#: config/settings/base.py:327
+msgid "Change password"
+msgstr ""
+
+#: templates/admin/index.html:18
+msgid "Statistics are cached briefly; reload to refresh."
+msgstr ""
+
+#: templates/admin/index.html:66
+msgid "Sales pipeline (leads)"
+msgstr ""
+
+#: templates/admin/index.html:81
+msgid "Content by publication status"
+msgstr ""
+
+#: templates/admin/index.html:93
+msgid "Order: draft · published · archived"
+msgstr ""
+
+#: templates/admin/index.html:98
+msgid "Latest sensitive actions (audit log)"
+msgstr ""
+
+#: templates/admin/index.html:107
+msgid "No audit events yet."
+msgstr ""
+
+#: templates/admin/index.html:111
+msgid "View full audit log"
+msgstr ""
+
+#: templates/admin/index.html:116
+msgid "My recent changes"
+msgstr ""
+
+#: templates/admin/index.html:125
+msgid "No admin changes yet."
+msgstr ""
+
+#: templates/admin/index.html:129
+msgid "View admin activity log"
+msgstr ""
+
+#: templates/admin/index.html:135
+msgid "All sections"
+msgstr ""
+
+#: templates/admin/index.html:145
+msgid "Add"
+msgstr ""
+
+#: templates/admin/index.html:152
+msgid "You do not have permission to view any section."
+msgstr ""
+
+#: templates/admin/index.html:15
+msgid "Welcome, %(name)s"
+msgstr ""
+
+#: templates/admin/index.html:76
+msgid "Conversion rate (Won / all leads): %(rate)s%"
+msgstr ""
+
+#: apps/core/tests/test_i18n_tooling.py:149
+msgid "Export"
+msgstr ""
+
+#: apps/accounts/admin.py:87
+msgid "2FA"
+msgstr ""
+
+#: apps/accounts/admin.py:99
+msgid "Disable two-factor authentication (support reset)"
+msgstr ""
+
+#: apps/accounts/admin.py:120
+msgid "Clear login lockout"
+msgstr ""
+
+#: apps/accounts/admin.py:116
+msgid "Disabled two-factor authentication for %(count)s user(s)."
+msgstr ""
+
+#: apps/accounts/admin.py:131
+msgid "Cleared login lockout for %(count)s user(s)."
+msgstr ""
+
+#: apps/accounts/twofa_views.py:103
+msgid "Two-factor authentication is now active."
+msgstr ""
+
+#: apps/accounts/twofa_views.py:72
+msgid "Two-factor authentication setup"
+msgstr ""
+
+#: apps/accounts/twofa_views.py:89
+msgid "No pending enrollment was found. Start again."
+msgstr ""
+
+#: apps/accounts/twofa_views.py:92
+msgid "That code is not valid. Check your authenticator app and try again."
+msgstr ""
+
+#: apps/accounts/twofa_views.py:125
+msgid "Two-factor authentication"
+msgstr ""
+
+#: apps/accounts/twofa_views.py:137
+msgid "Too many invalid codes. Wait a few minutes and try again."
+msgstr ""
+
+#: apps/accounts/twofa_views.py:156
+msgid "That recovery code is not valid."
+msgstr ""
+
+#: apps/accounts/twofa_views.py:190
+msgid "Two-factor authentication status"
+msgstr ""
+
+#: apps/accounts/twofa_views.py:213
+msgid "Two-factor authentication was disabled for your account."
+msgstr ""
+
+#: apps/accounts/twofa_views.py:220
+msgid "New recovery codes were generated."
+msgstr ""
+
+#: apps/accounts/twofa_views.py:240
+msgid "Recovery codes"
+msgstr ""
+
+#: apps/accounts/twofa_views.py:166
+msgid "That code is not valid. %(count)s attempt(s) left."
+msgstr ""
+
+#: apps/accounts/twofa_views.py:205
+msgid "Verify a code before disabling two-factor authentication."
+msgstr ""
+
+#: apps/accounts/twofa_views.py:151
+msgid "Recovery code accepted. %(count)s code(s) left."
+msgstr ""
+
+#: apps/core/admin.py:267
+msgid "Organization (structured data)"
+msgstr ""
+
+#: apps/core/admin.py:313
+msgid "Activate selected redirects"
+msgstr ""
+
+#: apps/core/admin.py:318
+msgid "Deactivate selected redirects"
+msgstr ""
+
+#: apps/core/admin.py:323
+msgid "Reset hit counters"
+msgstr ""
+
+#: apps/core/admin.py:361
+msgid "Question"
+msgstr ""
+
+#: apps/core/admin.py:261
+msgid ""
+"Defaults used by the public site when a page has no SEO values of its own."
+msgstr ""
+
+#: apps/core/admin.py:275
+msgid "Used by the Organization JSON-LD block on the home page."
+msgstr ""
+
+#: apps/core/admin.py:334
+msgid "Updated %(count)s redirect(s)."
+msgstr ""
+
+#: apps/core/middleware.py:81
+msgid ""
+"Too many failed sign-in attempts. Try again in about %(minutes)s minute(s)."
+msgstr ""
+
+#: apps/core/models.py:382
+msgid "default meta title"
+msgstr ""
+
+#: apps/core/models.py:389
+msgid "default meta description"
+msgstr ""
+
+#: apps/core/models.py:396
+msgid "Google Search Console verification code"
+msgstr ""
+
+#: apps/core/models.py:403
+msgid "Twitter/X handle"
+msgstr ""
+
+#: apps/core/models.py:406
+msgid "legal organization name"
+msgstr ""
+
+#: apps/core/models.py:409
+msgid "organization address"
+msgstr ""
+
+#: apps/core/models.py:412
+msgid "organization same-as URLs"
+msgstr ""
+
+#: apps/core/models.py:490
+msgid "301 — Permanent"
+msgstr ""
+
+#: apps/core/models.py:491
+msgid "302 — Temporary"
+msgstr ""
+
+#: apps/core/models.py:492
+msgid "410 — Removed permanently"
+msgstr ""
+
+#: apps/core/models.py:502
+msgid "from path"
+msgstr ""
+
+#: apps/core/models.py:504
+msgid "target"
+msgstr ""
+
+#: apps/core/models.py:511
+msgid "status code"
+msgstr ""
+
+#: apps/core/models.py:513
+msgid "hit count"
+msgstr ""
+
+#: apps/core/models.py:514
+msgid "note"
+msgstr ""
+
+#: apps/core/models.py:517
+msgid "Redirect"
+msgstr ""
+
+#: apps/core/models.py:518
+msgid "Redirects"
+msgstr ""
+
+#: apps/core/models.py:567
+msgid "page path"
+msgstr ""
+
+#: apps/core/models.py:568
+msgid "question"
+msgstr ""
+
+#: apps/core/models.py:569
+msgid "answer"
+msgstr ""
+
+#: apps/core/models.py:573
+msgid "FAQ item"
+msgstr ""
+
+#: apps/core/models.py:574
+msgid "FAQ items"
+msgstr ""
+
+#: apps/core/models.py:386
+msgid "Used for pages without their own SEO title."
+msgstr ""
+
+#: apps/core/models.py:393
+msgid ""
+"Aim for 120–160 characters; longer text is truncated by search engines."
+msgstr ""
+
+#: apps/core/models.py:400
+msgid "Content value of the google-site-verification meta tag."
+msgstr ""
+
+#: apps/core/models.py:403
+msgid "Example: @emmett"
+msgstr ""
+
+#: apps/core/models.py:415
+msgid "Public profile URLs used in JSON-LD, e.g. LinkedIn or GitHub."
+msgstr ""
+
+#: apps/core/models.py:419
+msgid "default Open Graph image"
+msgstr ""
+
+#: apps/core/models.py:424
+msgid ""
+"Used by social cards when a page has no image of its own (1200×630 "
+"recommended)."
+msgstr ""
+
+#: apps/core/models.py:508
+msgid "Relative path (e.g. /services/web/) or an absolute https:// URL."
+msgstr ""
+
+#: apps/core/models.py:536
+msgid "A redirect with this status code needs a target."
+msgstr ""
+
+#: apps/core/models.py:538
+msgid "The target must start with / or https://."
+msgstr ""
+
+#: apps/core/seo.py:169
+msgid ""
+"Paste the verification code here after adding the property in Search "
+"Console."
+msgstr ""

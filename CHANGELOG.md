@@ -2,6 +2,207 @@
 
 فرمت این فایل بر اساس [Keep a Changelog](https://keepachangelog.com/) است. هر فاز پروژه یک بخش مستقل دارد.
 
+## [فاز ۷ — SEO، کارایی و امنیت] — 2026-10-05
+
+دامنهٔ فاز طبق واگذاری صریح مالک محصول («اگر تمام نشده تمام کن سپس گزارش بده»؛
+پاسخ ۱: SEO در Next.js، پاسخ ۲: دامنه از env، پاسخ ۶: JSON-LD روی همهٔ بخش‌ها،
+پاسخ ۹: مجوز افزودن وابستگی تصویر، پاسخ ۱۰: معیار جانشین Lighthouse، پاسخ ۱۴:
+۲FA با پکیج آماده) در سه محور اجرا شد و تصمیم‌ها در `ADR-0031`–`ADR-0033` ثبت شدند.
+
+### SEO (`ADR-0031`)
+- **منبع حقیقت URL و رندر در Next.js:** `src/lib/seo/{site,metadata,json-ld,redirects,feed,types}.ts`،
+  `src/app/sitemap.ts`، `src/app/robots.ts`، `src/app/[locale]/opengraph-image.tsx` و
+  `src/app/[locale]/{blog,academy}/rss/route.ts`. جنگو فقط داده/ادمین/فید سازگاری است.
+- **دامنه از `PUBLIC_SITE_URL`** (نه hard-code، نه هدر `Host`)؛ در حالت `check --deploy`
+  نبود آن خطای `emmett_admin.W007` است.
+- **hreflang `fa-IR`/`en`/`x-default` + canonical خودارجاع** روی همهٔ صفحات عمومی و متادیتای
+  پویا از `SiteSettings` (`buildPageMetadata`)؛ ۱۴ صفحه از این مسیر عبور کردند.
+- **هدر `Link` هم‌منبع با متاتگ‌ها:** هدر `rel="alternate"` که `next-intl` می‌ساخت کد کوتاه
+  `fa` داشت؛ `alternateLinks` خاموش و هدر در `src/proxy.ts` از همان `languageAlternates`
+  ساخته می‌شود (`fa-IR`/`en`/`x-default` و از `PUBLIC_SITE_URL`، نه هدر `Host`)؛ برای
+  مسیرهای noindex هیچ هدر hreflang ساخته نمی‌شود.
+- **JSON-LD شش‌نوعه:** `Organization`+`WebSite` (ریشه)، `Article` (بلاگ/پروژه)، `Course`،
+  `Service`، `BreadcrumbList` و `FAQPage` (FAQ از ادمین، با اندپوینت `/api/v1/seo/faq/?path=`).
+- **OG/Twitter پویا** با تصویر ۱۲۰۰×۶۳۰ که متنش از کاتالوگ پیام‌ها می‌آید؛ روی همهٔ
+  صفحه‌ها `og:image` تضمین می‌شود (اگر ادمین تصویر پیش‌فرض نداده باشد، تصویر پویا همان
+  locale وصل می‌شود؛ در بازبینی نهایی کشف شد که صفحه‌های دارای متادیتای صریح تصویر
+  نداشتند). رندر تصویر با
+  `satori` دو سازگاری لازم داشت که در build کشف و رفع شد: نبود پشتیبانی از قالب `wOF2`
+  (استفاده از نسخهٔ `.woff`) و نیاز به `direction: rtl` + زیرمجموعهٔ فونت لاتین برای متن‌های
+  دوزبانه (بدون آن، نشان برند و نیم‌فاصله به‌هم‌ریخته رندر می‌شد).
+- **sitemap/robots پویا** با `dynamic = "force-dynamic"` (چون API ممکن است در build خالی
+  باشد)؛ مسیرهای noindex (`/profile`, `/search`, `/advisor`, `/estimate`, `/admin`, `/api`,
+  `/i18n`, `/media`) از sitemap حذف و در robots Disallow می‌شوند.
+- **ریدایرکت‌های مدیریت‌شده (۳۰۱/۳۰۲/۴۱۰)** از ادمین، در لبهٔ Next (`src/proxy.ts`) و در
+  جنگو (`RedirectFallbackMiddleware`)؛ ۴۱۰ صفحهٔ HTML با `X-Robots-Tag: noindex` و
+  نرمال‌سازی یکسان کلید در دو طرف + شمارش بازدید و کش.
+- **RSS/Atom بلاگ و دوره** روی `/blog/rss` و `/academy/rss` (+ مسیر سازگاری
+  `/api/v1/blog/rss/`)؛ مسیر قدیمی `rss.xml` با ۳۰۱ به مسیر جدید می‌رود.
+- **`atom:link rel="self"` فیدها** از `PUBLIC_SITE_URL` ساخته می‌شود
+  (`LocalizedFeedMixin.feed_url`)؛ پیش‌فرض جنگو دامنهٔ داخلی/هدر `Host` را در فید
+  می‌نوشت (لو رفتن آدرس داخلی) و با تست قفل شد.
+- **تأیید Search Console** از ادمین (`search_console_verification`) با هشدار `W010` در
+  production و متای مربوطه در فرانت.
+
+### کارایی (`ADR-0032`)
+- **معیار جانشین Lighthouse** (Lighthouse واقعی در sandbox بدون Chromium ممکن نیست):
+  نبود `<img>` خام + AVIF/WebP + `sizes`، `font-display: swap` و فونت خودمیزبان،
+  صفر وابستگی ثالث در مسیر بحرانی، و **سقف کوئری در تست**.
+- **تصویر:** هر ۷ تگ `<img>` خام با `next/image` جایگزین شد (کاور بلاگ با `priority`،
+  گالری پروژه با `fill`/`sizes`/lazy) و `next.config.ts` فرمت‌های `image/avif`/`image/webp`،
+  `deviceSizes` پروژه و `minimumCacheTTL` سی‌روزه را اعلام می‌کند.
+- **کش لایه‌ای:** `seo:sitemap:entries:v1`, `seo:settings:v1`, `seo:redirects:map:v1` +
+  `revalidate` در فرانت؛ بار دوم sitemap و settings صفر کوئری است (قفل‌شده در تست).
+- **فونت:** وزیرمتن ۷۰۰ برای وزن تیتر و `swap` برای همه؛ بودجهٔ بارگذاری در
+  `src/lib/fonts.ts` مستند شد.
+- **N+1:** هر endpoint عمومی با `select_related`/`prefetch_related` صریح؛ سقف‌ها در
+  `test_performance_budget.py` (فهرست‌ها ≤ ۶ برای ۳ و ۱۲ آیتم، detail ≤ ۱۴، sitemap ≤ ۱۲).
+
+### امنیت (`ADR-0033`)
+- **CSP دو‌سیاستی:** API/غیرادمین `default-src 'none'; script-src 'self'` و ادمین
+  `default-src 'self'` + `unsafe-inline` (اجبار Jazzmin)؛ با `DJANGO_CSP_REPORT_ONLY` و
+  `DJANGO_CSP_REPORT_URI` قابل انتقال به حالت گزارش. Referrer، Permissions-Policy
+  (`camera=(), microphone=(), geolocation=()`) و COOP `same-origin` سراسری.
+  `X-Frame-Options`/`frame-ancestors` عمداً در dev باز است تا پیش‌نمایش iframe نشکند؛
+  پاسخ‌های API در همهٔ محیط‌ها `frame-ancestors 'none'` می‌گیرند و مقدار **خالی**
+  `DJANGO_FRAME_ANCESTORS` (حالت `.env.example`) به دایرکتیو تهی منجر نمی‌شود و به
+  پیش‌فرض dev `'self'` / prod `'none'` برمی‌گردد.
+- **۲FA ادمین** (`django-otp==1.7.3` + `qrcode==8.2`): TOTP با QR درون `data:`، کلید
+  Base32 برای ورود دستی (`device.key` هگز است — باگ کشف و رفع شد)، کدهای بازیابی
+  یک‌بارمصرف، و قفل موقت صفحهٔ تأیید پس از `OTP_MAX_ATTEMPTS`.
+- **قفل ورود ضد brute-force** روی cache با پنجره/آستانه/مدت از env؛ پاسخ API `429` +
+  `Retry-After`؛ کلیدها با هش ایمیل و IP تا هم حملهٔ حساب‌محور و هم IP-محور گرفته شود.
+  تست «نبود شناسهٔ خام در کلید cache» مستقل از backend است (spy روی `cache.set`) تا با
+  `FileBasedCache` پیشنهادی `.env.example` هم معتبر بماند.
+- **دو یافتهٔ امنیتی رفع‌شده:** کد بازیابی تهی ⇒ بای‌پس ۲FA، و اتکا به `cache.ttl()` ⇒
+  قفل ورود عملاً بی‌اثر؛ هر دو با تست موفق/ناموفق قفل شده‌اند.
+- **Audit Log** رویدادهای امنیتی (`auth.account_locked`, `auth.login_blocked`,
+  `auth.2fa_*`) بدون IP خام و بدون راز.
+- **بکاپ:** `manage.py backup_db` — SQLite با `VACUUM INTO` (+ `busy_timeout`)، MySQL با
+  `mysqldump` و fallback به `dumpdata`، مدیا `tar.gz`، `manifest-{stamp}.json` و
+  هرس بر اساس `BACKUP_RETENTION`؛ رویه در راهنمای ادمین توضیح داده شده است.
+- **رازها:** همه از `.env` با django-environ؛ کلیدهای فاز ۷ به `.env.example` اضافه شدند
+  (`DJANGO_CSP_*`, `DJANGO_FRAME_ANCESTORS`, `LOGIN_LOCKOUT_*`, `ADMIN_2FA_*`,
+  `BACKUP_*`, `SEO_*`, `PUBLIC_SITE_URL`).
+- **System Checkهای تازه:** `emmett_admin.W008` (CSP خاموش)، `W009` (۲FA اجباری خاموش در
+  production)، `W010` (کد Search Console)، `W011`/`W012` (پوشهٔ بکاپ)، `W013` (ضعف/نمونه‌بودن
+  `SECRET_KEY`).
+
+### وابستگی‌های افزوده (قانون ۶ — توجیه مکتوب)
+- `django-otp==1.7.3` و `qrcode==8.2` **بک‌اند** (۲FA و QR SVG بدون CDN/Pillow)؛
+  پیش‌تر کد ۲FA بدون ثبت در `requirements.txt` نوشته شده بود که در همین فاز اصلاح شد.
+- هیچ وابستگی **فرانت‌اند** جدیدی اضافه نشد (SEO/OG با امکانات خود Next.js).
+
+### اعتبارسنجی (اعداد واقعی)
+- بک‌اند: **486 passed** (`pytest -q`, ~۷۷ ثانیه) شامل ۲۳ تست امنیت، ۲۲ تست ۲FA، ۹ تست
+  بکاپ، ۱۸ تست SEO API، ۲۵ تست ریدایرکت، ۱۸ تست بودجهٔ کوئری و ۶ تست فید؛
+  `ruff check .` = All checks passed؛ `mypy apps config` (strict) = بدون خطا در ۲۴۰ فایل؛
+  `manage.py check` بدون خطا؛ `makemigrations --check` = بدون تغییر؛ `i18n.py check` سبز.
+- فرانت: `npx tsc --noEmit` تمیز، `eslint` صفر مشکل، `vitest run` = ۴۶ تست در ۸ فایل سبز،
+  `next build` = ۳۱ صفحه بدون خطا و رندر موفق تصاویر OG دوزبانه (بررسی چشمی/حجمی).
+- `ruff format --check` روی فایل‌های همین فاز معتبر است؛ ۱۷ فایل قدیمی خارج از دامنهٔ
+  فاز همچنان unformatted است (سیاست از فاز ۵: بدون diff نامرتبط).
+
+### محدودیت‌های محیط/تحویل
+- Lighthouse واقعی (هدف ≥۹۵) و Playwright در این محیط قابل اجرا نیستند (نبود Chromium)؛
+  معیار جانشین بالا مبنای پذیرش است و اجرای یک‌بارهٔ Lighthouse روی دامنهٔ مقصد در
+  چک‌لیست استقرار راهنمای ادمین آمده است.
+- `PUBLIC_SITE_URL` تا تعیین دامنهٔ نهایی روی مقدار dev است؛ تنها نقطهٔ تغییر دامنه همان
+  env var است (نه کد).
+
+## [فاز ۶ — Admin Customization در سطح SaaS] — 2026-10-05
+
+فاز ۶ بر پایهٔ چهار پاسخ صریح مالک محصول پیاده‌سازی شد: **Jazzmin + لایهٔ RTL اختصاصی**
+(`jazzmin_plus_rtl`)، **بدون مدل مالی جدید** (`no_money_model`)، **بدون وضعیت/فیلد جدید و
+بدون migration** (`no_migration`) و **`django-import-export`** برای صادرات/واردات
+(`django_import_export`). تصمیم‌ها در `ADR-0027` تا `ADR-0030` ثبت شده‌اند.
+
+### افزوده‌شده
+
+- **تم و برند:** `django-jazzmin==3.0.5` + `backend/static/admin_theme/` شامل
+  `emmett-admin.css` (توکن‌های `#5b62e0`/`#1fae6e`، کارت KPI، پیل وضعیت، سایدبار)،
+  `emmett-rtl.css` (۱۰۶ قاعدهٔ کاملاً اسکوپ‌شده زیر `html[dir="rtl"]`) و
+  `emmett-admin.js`؛ فونت وزیرمتن خودمیزبان (۸ فایل `woff2` + مجوز OFL) و دارایی‌های
+  برند (`brand/emmett-wordmark.png`, favicon). `core.checks` با شش System Check:
+  ترتیب `jazzmin` (E001)، نبود `import_export` (E002)، مسیر قالب (E003)، دارایی استاتیک
+  گم‌شده (E004)، تازگی ترجمهٔ کامپایل‌شده (W005)، ارجاع CDN فونت (W006) و
+  `PUBLIC_SITE_URL` در حالت `--deploy` (W007).
+- **داشبورد:** قالب `templates/admin/index.html` + `apps/core/dashboard.py` با KPI
+  (کاربران، درخواست‌های AI، Lead و نرخ تبدیل، دوره/ثبت‌نام، سیگنال‌های فروش بدون مدل مالی،
+  خلاصه‌های در انتظار تأیید)، نمودار SVG درون‌خطی ۸ هفته‌ای، قیف فروش، وضعیت محتوا و
+  ویجت‌های «اقدامات اخیر» (AuditLog + LogEntry کاربر جاری)؛ کش‌شده با
+  `ADMIN_DASHBOARD_CACHE_SECONDS` و سقف کوئری قفل‌شده در تست (۱۷).
+- **گردش‌کار و عملیات ادمین:** `apps/core/admin_mixins.py` (`EmmettAdminDefaults`,
+  `PublishWorkflowMixin`, `SoftDeleteAdminMixin`, `RecordStateFilter`,
+  `ExportFormatsMixin`, `ImportDisabledMixin`, `EmmettImportExportAdmin`,
+  `render_status_pill`)، `apps/core/admin_filters.py` (`RelatedPresenceFilter`,
+  `TranslationCompletenessFilter`) و بازنویسی ادمین ۱۰ اپ با inline هوشمند،
+  autocomplete، `list_editable`، `date_hierarchy` و جست‌وجوی دوزبانه (`title_fa`+`title_en`).
+- **کاتالوگ/پرامپت AI در ادمین:** نسخه‌دار با کلید تغییرناپذیر پس از ساخت، ستون
+  «نسخهٔ مؤثر»، اکشن بایگانی نسخه‌های قدیمی، approve/reject خلاصه‌ها، revoke اشتراک عمومی
+  و ثبت هر تغییر در `AuditLog`.
+- **صادرات/واردات:** `django-import-export==4.4.1` با منابع صریح برای هر مدل
+  (`apps/<app>/resources.py`)، فرمت‌های CSV/TSV/JSON، واردات دو مرحله‌ای، کلیدهای پایدار
+  (slug/order/feature+locale+version/…) و نرمال‌سازی «خالی = None» در `EmmettResource.skip_row`
+  برای idempotency واقعی.
+- **مستندات:** `docs/admin-guide-fa.md` (راهنمای گام‌به‌گام فارسی پنل)، `ARCHITECTURE.md`
+  به‌روزرسانی شد و چهار ADR جدید (`0027` تم/RTL، `0028` داشبورد/گردش‌کار، `0029`
+  صادرات/واردات، `0030` ابزار i18n).
+
+### رفع باگ (یافته‌شده با تست‌های ساختاری فاز ۶)
+
+- **اکشن‌های گروهی ۵۰۰ می‌دادند:** اکشن‌های mixin به‌صورت متد bound در `get_actions`
+  ثبت می‌شدند، ولی Django در `response_action` آن‌ها را `func(self, request, queryset)`
+  صدا می‌زند → همهٔ اکشن‌های انتشار/بازگردانی با `TypeError` می‌شکستند. اصلاح: ثبت
+  unbound (`getattr(self.__class__, name)`) + تست رگرسیون POST واقعی روی changelist.
+- **نرم‌حذف بدون بازگردانی:** مدل‌های `BaseModel` که mixin بازگردانی نداشتند
+  (پیکربندی‌های `ai_engine`، `portfolio.CaseStudy`، `core.Media`) رکورد حذف‌شده را برای همیشه
+  از دید پنل پنهان می‌کردند؛ mixin/فیلتر «وضعیت رکورد» اضافه شد.
+- **`core.Translation` با `deleted_at`:** این مدل (جدول key-value سبک) برخلاف فرض اولیه
+  `BaseModel` نیست؛ اعمال `SoftDeleteAdminMixin`/`RecordStateFilter` روی آن
+  `FieldError: Cannot resolve keyword 'deleted_at'` می‌داد و حذف شد.
+- **`core.SearchIndexEntry` بدون `resource_class`:** صادرات آن به resource خودکار پکیج
+  وابسته بود (ستون‌های بی‌ثبات)؛ `SearchIndexEntryResource` صریح اضافه شد.
+- **`list_editable` و ستون وضعیت:** در ادمین‌هایی که وضعیت با ستون رنگی نمایش داده
+  می‌شود، فیلد خام `status` از `list_editable` حذف شده است؛ قاعدهٔ جنگو (`admin.E123`)
+  اجازهٔ ویرایش ستونی را نمی‌دهد که در `list_display` نیست. صحت همهٔ ادمین‌ها با
+  `manage.py check` (بدون خطا) و تست‌های فاز ۶ تأیید شده است.
+
+### سخت‌سازی
+
+- `IMPORT_EXPORT_USE_TRANSACTIONS=True`، escape فرمول/کاراکتر غیرمجاز در CSV و
+  `IMPORT_EXPORT_SKIP_ADMIN_LOG=False` (واردات در `admin.LogEntry` ثبت می‌شود).
+  علاوه بر آن، چون پکیج برای **صادرات** هیچ ردی حسابرسی نمی‌سازد،
+  `EmmettImportExportAdmin.export_action` هر صادرات فایل را در `AuditLog` با تعداد
+  ردیف‌ها، فرمت و نام فایل ثبت می‌کند (`<app>.<Model>.exported`).
+- مجوز صادرات/واردات روی `view`/`add` جنگو؛ دادهٔ کاربر/لید/لاگ فقط‌صادرات.
+- اکشن‌ها مجوز `change` می‌خواهند و هر اقدام گروهی (انتشار/بایگانی/بازگردانی/ترجمه)
+  در `AuditLog` ثبت می‌شود.
+
+### اعتبارسنجی فاز ۶
+
+- بک‌اند: **۳۶۵ تست passed** (۲۵۷ تست قبلی + ۱۰۸ تست جدید فاز ۶)؛ `ruff check .`
+  بدون خطا؛ `mypy apps config` بدون خطا (۲۲۲ فایل، strict)؛
+  `manage.py check` بدون خطا؛ `makemigrations --check --dry-run` → «No changes detected».
+- تست‌های فاز ۶: `test_admin_dashboard.py` ۱۵، `test_admin_workflow.py` ۱۴،
+  `test_admin_exchange.py` ۱۸، `test_admin_theme.py` ۱۳، `test_admin_checks.py` ۱۲،
+  `test_i18n_tooling.py` ۱۵، `test_admin_search_filters.py` ۸، `test_admin_surface.py` ۱۳.
+- i18n: `python scripts/i18n.py check` سبز؛ **۳۹۸ پیام**، فارسی **۱۰۰٪** ترجمه‌شده؛
+  `.mo` هر دو زبان کامپایل و در Git نگه‌داری می‌شود؛ متن رابط ادمین در زبان `en`
+  همان متن منبع (انگلیسی) برمی‌گرداند (طراحی ADR-0030).
+- `manage.py check --deploy` با تنظیمات production فقط دو هشدار مورد انتظار می‌دهد:
+  `W007` (چون `PUBLIC_SITE_URL` در محیط تست، مقدار پیش‌فرض است) و `security.W009`
+  (کلید موقت تست)؛ هیچ خطای دیگری وجود ندارد.
+
+### محدودیت‌های محیط/تحویل
+
+- بررسی بصری مرورگری (اسکرول افقی صفر در همهٔ صفحات، Lighthouse) در sandbox ممکن
+  نیست؛ به‌جای آن، درستی RTL با تست‌های ساختاری روی CSS/قالب (اسکوپ‌بودن همهٔ ۱۰۶ قاعده،
+  بارگذاری `admin/css/rtl.css` فقط در فارسی، نبود CDN) و SMOKE دستی روی پیش‌نمایش
+  زندهٔ پنل بررسی شد.
+- هیچ مدل مالی و هیچ وضعیت `review` اضافه نشده است (تصمیم صریح مالک محصول)؛ «فروش»
+  در داشبورد با سیگنال‌های Lead/ثبت‌نام نمایش داده می‌شود و به بخش لیدها لینک دارد.
+
 ## [فاز ۵ — موتور AI و مشاور ایده‌پرداز] — 2026-10-05
 
 فاز ۵ بر پایهٔ Plan و `ADR-0026` تأییدشده پیاده‌سازی شد؛ جزئیات طراحی و

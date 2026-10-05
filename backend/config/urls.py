@@ -7,7 +7,13 @@ from django.contrib import admin
 from django.urls import URLPattern, URLResolver, include, path
 
 urlpatterns: list[URLPattern | URLResolver] = [
+    # ۲FA ادمین باید پیش از الگوهای عمومی ادمین ثبت شود (ADR-0033).
+    path("admin/2fa/", include("apps.accounts.twofa_urls")),
     path("admin/", admin.site.urls),
+    # تغییر زبان از داخل پنل ادمین (کلید زبان در Jazzmin) و از API.
+    # بدون این مسیر، رندر قالب ادمین با ``NoReverseMatch: set_language``
+    # شکست می‌خورد — کشف‌شده با تست رندر صفحهٔ داشبورد (فاز ۶).
+    path("i18n/", include("django.conf.urls.i18n")),
     path("api/v1/", include("apps.api.urls")),
 ]
 

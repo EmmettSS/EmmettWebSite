@@ -19,6 +19,7 @@ from apps.core.views import GlobalSearchView, HealthCheckView
 urlpatterns = [
     path("health/", HealthCheckView.as_view(), name="health-check"),
     path("search/", GlobalSearchView.as_view(), name="global-search"),
+    path("seo/", include("apps.core.urls")),
     path("schema/", SpectacularAPIView.as_view(), name="schema"),
     path("schema/swagger-ui/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
     path("schema/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),

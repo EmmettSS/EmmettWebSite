@@ -114,6 +114,10 @@ pytest                                  # کل تست‌ها (pytest-django + fa
 pytest --cov=apps --cov-report=term     # نیاز به نصب جداگانهٔ pytest-cov
 ruff check apps config                  # لینت
 mypy apps config                        # type-check سخت‌گیرانه (strict)
+python manage.py check                  # System Checkها (E001–W013)
+python manage.py check --deploy         # هشدارهای مخصوص production (۲FA/CSP/بکاپ/راز)
+python manage.py makemigrations --check --dry-run
+python scripts/i18n.py check            # یکسانی .po و تازگی .mo (ADR-0030)
 ```
 
 همهٔ این دستورها باید روی کد فعلی تمیز اجرا شوند (Quality Gate این ریپو).
@@ -137,6 +141,20 @@ mypy apps config                        # type-check سخت‌گیرانه (stri
   پسوند + بررسی سرنام (magic bytes) + سقف حجم روی `core.Media` — `ADR-0005`.
   هنگام دیپلوی production، `backend/deploy/media.htaccess.example` باید در
   `backend/media/.htaccess` کپی شود.
+- هدرهای امنیتی (فاز ۷): `core.middleware.SecurityHeadersMiddleware` برای پاسخ‌های
+  جنگو CSP دو‌سیاستی می‌سازد (API سخت، ادمین سازگار با Jazzmin) به‌همراه Referrer،
+  Permissions-Policy و COOP — `ADR-0033`. `X-Frame-Options`/`frame-ancestors` عمداً
+  در dev باز است تا پیش‌نمایش iframe کار کند؛ در production با `DJANGO_FRAME_ANCESTORS`
+  تنظیم شود.
+- محافظت از ورود (فاز ۷): `core.security.LoginLockout` روی cache با پنجره/آستانه/مدت
+  از env؛ پاسخ `429` + `Retry-After`؛ رویدادها در `AuditLog` — `ADR-0033`.
+- ۲FA ادمین (فاز ۷): `django-otp` (TOTP + کد بازیابی) + `apps/accounts/twofa.py`؛
+  در production با `ADMIN_2FA_REQUIRED=True` اجباری است و System Check `W009` خاموش‌بودن
+  آن را هشدار می‌دهد — `ADR-0033`.
+- بکاپ (فاز ۷): `python manage.py backup_db` (SQLite: `VACUUM INTO`؛ MySQL: `mysqldump`
+  با fallback `dumpdata`) + manifest و هرس خودکار؛ مسیر `BACKUP_DIR` — `ADR-0033`.
+- SEO (فاز ۷): منبع دادهٔ sitemap/robots/hreflang/JSON-LD روی `/api/v1/seo/*` است؛ رندر
+  در Next.js انجام می‌شود و دامنهٔ canonical فقط از `PUBLIC_SITE_URL` می‌آید — `ADR-0031`.
 
 ## محدودیت‌های شناخته‌شده (صریحاً مستند، نه فراموش‌شده)
 
@@ -145,6 +163,11 @@ mypy apps config                        # type-check سخت‌گیرانه (stri
   فراخوانی `instance.delete()`/`instance.restore()` تکی پوشش داده شده.
 - CI/CD (GitHub Actions) هنوز تنظیم نشده — دستورات بالا باید فعلاً به‌صورت
   دستی قبل از هر PR اجرا شوند.
+- `ruff format --check` روی ۱۷ فایل قدیمی خارج از دامنهٔ فازهای اخیر همچنان
+  unformatted است؛ فایل‌های هر فاز فرمت می‌شوند تا diff نامرتبط ساخته نشود.
+- Lighthouse واقعی (هدف ≥۹۵) در محیط توسعه قابل اجرا نیست (نبود Chromium)؛ معیار
+  جانشین در `ADR-0032` تعریف و در تست‌ها قفل شده است و اجرای واقعی روی دامنهٔ مقصد
+  در چک‌لیست استقرار `docs/admin-guide-fa.md` آمده است.
 - `AI_ENABLED` در نمونهٔ `.env` خاموش است و provider واقعی تا واردکردن امن
   تنظیمات env و آزمون دسترسی staging فعال نمی‌شود. دسترسی شبکهٔ هاست مقصد به
   provider و زمان‌بندی cron برای purge audit/تولید خلاصه باید در staging/production

@@ -4,6 +4,9 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ProjectEstimatorForm } from "@/components/organisms/project-estimator-form";
 import type { AppLocale } from "@/i18n/routing";
 import { getCatalogs } from "@/lib/api/server";
+import { getSeoSettingsOrDefaults } from "@/lib/api/seo";
+import { buildPageMetadata } from "@/lib/seo/metadata";
+import { getPublicSiteUrl, toAppLocale } from "@/lib/seo/site";
 
 export async function generateMetadata({
   params,
@@ -12,7 +15,16 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "ai" });
-  return { title: t("estimatorTitle"), description: t("estimatorDescription") };
+  const settings = await getSeoSettingsOrDefaults();
+  return buildPageMetadata({
+    locale: toAppLocale(locale),
+    path: "/estimate",
+    title: t("estimatorTitle"),
+    description: t("estimatorDescription"),
+    settings,
+    siteUrl: getPublicSiteUrl(),
+    noindex: true,
+  });
 }
 
 export default async function ProjectEstimatorPage({
