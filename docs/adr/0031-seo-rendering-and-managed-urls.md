@@ -78,7 +78,7 @@ canonical، متای پویا و RSS. تا فاز ۶ هیچ‌کدام از ای
 
 ## ۵. اعتبارسنجی
 
-- `frontend/src/lib/seo/{site,json-ld,metadata,redirects}.test.ts` — ۴۵ تست (hreflang،
+- `frontend/src/lib/seo/{site,json-ld,metadata,redirects}.test.ts` — ۴۶ تست (hreflang،
   canonical، OG/Twitter، شش نوع JSON-LD، نرمال‌سازی ریدایرکت).
 - `backend/apps/core/tests/{test_seo_api,test_redirects,test_feeds}.py` — ۴۸ تست
   (شمارش کوئری، اعتبار payload، بدون noindex در sitemap، شمارش hit).

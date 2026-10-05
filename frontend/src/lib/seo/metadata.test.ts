@@ -101,6 +101,32 @@ describe("buildPageMetadata", () => {
     expect(metadata.robots).toMatchObject({ index: false, follow: false });
   });
 
+  it("falls back to the dynamic per-locale OG image when no admin image exists", () => {
+    const withoutImage: SeoSettings = { ...settings, default_og_image: "" };
+    const fa = buildPageMetadata({
+      locale: "fa",
+      path: "/services",
+      title: "خدمات",
+      description: "توضیح",
+      settings: withoutImage,
+      siteUrl,
+    });
+    const en = buildPageMetadata({
+      locale: "en",
+      path: "/services",
+      title: "Services",
+      description: "Desc",
+      settings: withoutImage,
+      siteUrl,
+    });
+    const faImages = (fa.openGraph?.images ?? []) as { url: string }[];
+    const enImages = (en.openGraph?.images ?? []) as { url: string }[];
+
+    expect(faImages[0]?.url).toBe("https://emmett.example/opengraph-image");
+    expect(enImages[0]?.url).toBe("https://emmett.example/en/opengraph-image");
+    expect((fa.twitter as Record<string, unknown>).card).toBe("summary_large_image");
+  });
+
   it("keeps indexable pages crawlable with image previews", () => {
     const metadata = buildPageMetadata({
       locale: "fa",

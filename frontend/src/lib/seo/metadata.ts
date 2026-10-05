@@ -43,15 +43,26 @@ function resolveSiteUrl(settings: SeoSettings, fallback: string): string {
   return (fallback || settings.public_site_url || "").replace(/\/+$/, "");
 }
 
+/**
+ * URL تصویر OG پیش‌فرض همان locale (روت پویا ``opengraph-image``).
+ *
+ * وقتی صفحه ``openGraph`` خودش را تعریف می‌کند، Next تصویر file-convention را
+ * دیگر خودکار اضافه نمی‌کند (باگ کشف‌شده در بازبینی: صفحه‌های متادیتا-دار
+ * ``og:image`` نداشتند). پس اگر ادمین تصویر پیش‌فرض نداده باشد، همان تصویر
+ * پویا صریحاً وصل می‌شود.
+ */
+function localeOgImageUrl(locale: AppLocale, siteUrl: string): string {
+  return absoluteUrl(locale, "/opengraph-image", siteUrl);
+}
+
 export function buildPageMetadata(input: PageSeoInput): Metadata {
   const siteUrl = resolveSiteUrl(input.settings, input.siteUrl);
   const title = input.title?.trim() || input.settings.default_meta_title;
   const description = input.description?.trim() || input.settings.default_meta_description;
   const canonical = absoluteUrl(input.locale, input.path, siteUrl);
-  const image = toAbsoluteMediaUrl(
-    input.imageUrl ?? input.settings.default_og_image,
-    siteUrl,
-  );
+  const image =
+    toAbsoluteMediaUrl(input.imageUrl ?? input.settings.default_og_image, siteUrl) ??
+    localeOgImageUrl(input.locale, siteUrl);
 
   // ``Metadata["openGraph"]`` یک union است (article/website/profile…)؛ برای
   // ساختن تدریجی، شیء را با فیلدهای اختیاری می‌سازیم و در نهایت به همان نوع
