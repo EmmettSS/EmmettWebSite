@@ -20,13 +20,29 @@ export function CreativeAdvisorForm({ catalogs }: CreativeAdvisorFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const requiredCatalogs = ["job_role", "business_size", "city_scale", "budget_range", "team_size", "goal"];
-  const ready = catalogs !== null && requiredCatalogs.every((key) =>
-    catalogs.some((catalog) => catalog.key === key && catalog.options.length > 0),
-  );
+  const requiredCatalogs = [
+    "job_role",
+    "business_size",
+    "city_scale",
+    "budget_range",
+    "team_size",
+    "goal",
+  ];
+  const ready =
+    catalogs !== null &&
+    requiredCatalogs.every((key) =>
+      catalogs.some((catalog) => catalog.key === key && catalog.options.length > 0),
+    );
 
   if (!ready || !catalogs) {
-    return <p role="status" className="rounded-lg border border-border p-4 text-sm text-muted-foreground">{t("catalogUnavailable")}</p>;
+    return (
+      <p
+        role="status"
+        className="rounded-lg border border-border p-4 text-sm text-muted-foreground"
+      >
+        {t("catalogUnavailable")}
+      </p>
+    );
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -65,7 +81,11 @@ export function CreativeAdvisorForm({ catalogs }: CreativeAdvisorFormProps) {
       <p className="rounded-lg border border-border bg-secondary/20 p-4 text-sm leading-6 text-muted-foreground">
         {t("privacyNote")}
       </p>
-      {error ? <p role="alert" className="text-sm text-destructive">{error}</p> : null}
+      {error ? (
+        <p role="alert" className="text-sm text-destructive">
+          {error}
+        </p>
+      ) : null}
       <Button type="submit" size="lg" isLoading={isSubmitting}>
         {isSubmitting ? t("generating") : t("generateIdeas")}
       </Button>

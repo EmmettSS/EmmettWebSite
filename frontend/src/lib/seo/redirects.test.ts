@@ -66,6 +66,6 @@ describe("managed redirects", () => {
     expect(fa).toContain("/search");
     expect(en).toContain('lang="en"');
     expect(en).toContain("/en/search");
-    expect(en).not.toContain("<!doctype html><html lang=\"fa-IR\"");
+    expect(en).not.toContain('<!doctype html><html lang="fa-IR"');
   });
 });

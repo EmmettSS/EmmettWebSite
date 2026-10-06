@@ -71,6 +71,23 @@ exclude = ["migrations", ".venv"]
 select = ["E", "F", "I", "B", "UP", "DJ"]
 ignore = ["DJ001"]
 
+[tool.black]
+line-length = 110
+target-version = ["py311"]
+extend-exclude = '''
+/(
+  migrations
+  | \.venv
+)/
+'''
+
+[tool.bandit]
+exclude_dirs = ["tests", "migrations", ".venv"]
+
 [tool.coverage.run]
 source = ["apps"]
 omit = ["*/migrations/*", "*/tests/*"]
+
+[tool.coverage.report]
+fail_under = 85
+show_missing = true

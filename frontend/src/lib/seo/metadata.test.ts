@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { buildPageMetadata } from "@/lib/seo/metadata";
+import { buildListMetadata, buildPageMetadata, ogImagePath } from "@/lib/seo/metadata";
 import type { SeoSettings } from "@/lib/seo/types";
 
 const siteUrl = "https://emmett.example";
@@ -156,5 +156,32 @@ describe("buildPageMetadata", () => {
     expect(metadata.alternates?.types?.["application/rss+xml"]).toBe(
       "https://emmett.example/en/blog/rss",
     );
+  });
+
+  it("supports article publishedTime, buildListMetadata, and ogImagePath", () => {
+    const articleMeta = buildPageMetadata({
+      locale: "fa",
+      path: "/blog/post-1",
+      title: "مقاله",
+      type: "article",
+      publishedTime: "2026-01-01T00:00:00Z",
+      authors: ["Emmett"],
+      tags: ["Django"],
+      settings: { ...settings, twitter_handle: "" },
+      siteUrl,
+    });
+    expect((articleMeta.openGraph as Record<string, unknown>).publishedTime).toBe(
+      "2026-01-01T00:00:00Z",
+    );
+
+    const listMeta = buildListMetadata({
+      locale: "en",
+      path: "/projects",
+      title: "Projects",
+      settings,
+      siteUrl,
+    });
+    expect(listMeta.title).toBe("Projects");
+    expect(ogImagePath("en", "/opengraph-image")).toBe("/en/opengraph-image");
   });
 });

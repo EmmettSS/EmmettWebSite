@@ -86,9 +86,7 @@ class TestLoginView:
     def test_invalid_password_returns_401(self) -> None:
         UserFactory(email="login2@example.com", password="Str0ngP@ssword!")
         client = APIClient()
-        response = client.post(
-            "/api/v1/auth/login/", {"email": "login2@example.com", "password": "wrong"}
-        )
+        response = client.post("/api/v1/auth/login/", {"email": "login2@example.com", "password": "wrong"})
         assert response.status_code == 401
 
         entry = AuditLog.objects.get(action="auth.login_failed")
@@ -97,9 +95,7 @@ class TestLoginView:
 
     def test_unknown_email_returns_401(self) -> None:
         client = APIClient()
-        response = client.post(
-            "/api/v1/auth/login/", {"email": "nobody@example.com", "password": "whatever"}
-        )
+        response = client.post("/api/v1/auth/login/", {"email": "nobody@example.com", "password": "whatever"})
         assert response.status_code == 401
         assert AuditLog.objects.filter(action="auth.login_failed").exists()
 

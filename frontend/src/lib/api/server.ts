@@ -21,11 +21,7 @@ import type {
  * (هرگز از مرورگر عبور نمی‌کند). هدر ``Accept-Language`` معادل locale درخواستی
  * next-intl را ست می‌کند تا پاسخ API در زبان درست برگردد.
  */
-async function serverFetch<T>(
-  path: string,
-  locale: string,
-  init?: RequestInit,
-): Promise<T | null> {
+async function serverFetch<T>(path: string, locale: string, init?: RequestInit): Promise<T | null> {
   const url = `${getApiBaseUrl()}${path}`;
   try {
     const response = await fetch(url, {
@@ -100,7 +96,10 @@ export const getCatalogs = (locale: string, keys?: string[]) =>
     locale,
   );
 
-export async function getSharedAISuggestion(locale: string, token: string): Promise<AISuggestion | null> {
+export async function getSharedAISuggestion(
+  locale: string,
+  token: string,
+): Promise<AISuggestion | null> {
   const url = `${getApiBaseUrl()}/ai/results/${encodeURIComponent(token)}/`;
   try {
     const response = await fetch(url, {

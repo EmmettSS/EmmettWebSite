@@ -40,6 +40,8 @@ class TeamMember(BaseModel):
 
 
 class Testimonial(BaseModel):
+    __test__ = False
+
     author_name = models.CharField(_("author name"), max_length=150)
     author_role = models.CharField(_("author role"), max_length=150, blank=True, default="")
     author_company = models.CharField(_("author company"), max_length=150, blank=True, default="")

@@ -14,12 +14,13 @@ export function NewsletterForm() {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const formElement = event.currentTarget;
     setStatus("submitting");
-    const email = String(new FormData(event.currentTarget).get("email") ?? "");
+    const email = String(new FormData(formElement).get("email") ?? "");
     try {
       await subscribeNewsletter({ email, locale_preference: locale });
       setStatus("success");
-      event.currentTarget.reset();
+      formElement.reset();
     } catch {
       setStatus("error");
     }

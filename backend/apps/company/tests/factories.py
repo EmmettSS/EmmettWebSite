@@ -16,6 +16,8 @@ class TeamMemberFactory(DjangoModelFactory[TeamMember]):
 
 
 class TestimonialFactory(DjangoModelFactory[Testimonial]):
+    __test__ = False
+
     class Meta:
         model = Testimonial
 

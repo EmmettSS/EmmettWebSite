@@ -40,11 +40,7 @@ export async function generateMetadata({
   });
 }
 
-export default async function CourseDetailPage({
-  params,
-}: {
-  params: Promise<PageParams>;
-}) {
+export default async function CourseDetailPage({ params }: { params: Promise<PageParams> }) {
   const { locale, slug } = await params;
   setRequestLocale(locale as AppLocale);
   const t = await getTranslations("academy");

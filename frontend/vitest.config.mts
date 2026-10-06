@@ -20,6 +20,30 @@ export default defineConfig({
     globals: true,
     css: false,
     exclude: ["node_modules", ".next", "e2e"],
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "json-summary"],
+      include: [
+        "src/lib/**/*.ts",
+        "src/components/ui/**/*.tsx",
+        "src/components/molecules/**/*.tsx",
+        "src/components/organisms/**/*.tsx",
+        "src/components/seo/**/*.tsx",
+      ],
+      exclude: [
+        "src/**/*.test.ts",
+        "src/**/*.test.tsx",
+        "src/lib/api/types.ts",
+        "src/lib/seo/types.ts",
+        "src/components/organisms/profile-view.tsx",
+      ],
+      thresholds: {
+        statements: 85,
+        branches: 78,
+        functions: 85,
+        lines: 85,
+      },
+    },
   },
   resolve: {
     alias: {

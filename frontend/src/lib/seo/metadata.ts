@@ -11,12 +11,7 @@ import type { Metadata } from "next";
 
 import type { AppLocale } from "@/i18n/routing";
 import { toAbsoluteMediaUrl } from "@/lib/api/seo";
-import {
-  LOCALE_LANGUAGE_TAG,
-  absoluteUrl,
-  languageAlternates,
-  localePath,
-} from "@/lib/seo/site";
+import { LOCALE_LANGUAGE_TAG, absoluteUrl, languageAlternates, localePath } from "@/lib/seo/site";
 import type { SeoSettings } from "@/lib/seo/types";
 
 export interface PageSeoInput {
@@ -122,9 +117,7 @@ export function buildPageMetadata(input: PageSeoInput): Metadata {
 }
 
 /** متادیتای سادهٔ صفحه‌های فهرست (بدون تصویر اختصاصی). */
-export function buildListMetadata(
-  input: Omit<PageSeoInput, "type" | "publishedTime">,
-): Metadata {
+export function buildListMetadata(input: Omit<PageSeoInput, "type" | "publishedTime">): Metadata {
   return buildPageMetadata(input);
 }
 

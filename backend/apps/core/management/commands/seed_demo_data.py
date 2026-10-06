@@ -188,9 +188,7 @@ class Command(BaseCommand):
 
     # -- خدمات -----------------------------------------------------------------
 
-    def _create_services(
-        self, categories: dict[str, Category], tags: dict[str, Tag]
-    ) -> dict[str, Service]:
+    def _create_services(self, categories: dict[str, Category], tags: dict[str, Tag]) -> dict[str, Service]:
         data = [
             (
                 "web-development",

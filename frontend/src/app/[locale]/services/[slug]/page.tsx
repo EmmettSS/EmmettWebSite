@@ -37,11 +37,7 @@ export async function generateMetadata({
   });
 }
 
-export default async function ServiceDetailPage({
-  params,
-}: {
-  params: Promise<PageParams>;
-}) {
+export default async function ServiceDetailPage({ params }: { params: Promise<PageParams> }) {
   const { locale, slug } = await params;
   setRequestLocale(locale as AppLocale);
   const t = await getTranslations("services");
@@ -71,10 +67,7 @@ export default async function ServiceDetailPage({
       <JsonLd data={breadcrumbJsonLd(crumbs, siteUrl, appLocale)} />
       <JsonLd data={faqJsonLd(faqItems)} />
       <Breadcrumb
-        items={[
-          { label: t("title"), href: "/services" },
-          { label: service.title },
-        ]}
+        items={[{ label: t("title"), href: "/services" }, { label: service.title }]}
         className="mb-8"
       />
 

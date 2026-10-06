@@ -4,7 +4,13 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import type { AppLocale } from "@/i18n/routing";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardHeader, CardTitle, CardDescription, CardMedia } from "@/components/molecules/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardMedia,
+} from "@/components/molecules/card";
 import { getProjects } from "@/lib/api/server";
 import { getSeoSettingsOrDefaults } from "@/lib/api/seo";
 import { buildPageMetadata } from "@/lib/seo/metadata";
@@ -26,15 +32,10 @@ export async function generateMetadata({
     description: t("productsDescription"),
     settings,
     siteUrl: getPublicSiteUrl(),
-    
   });
 }
 
-export default async function ProductsPage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
+export default async function ProductsPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale as AppLocale);
   const t = await getTranslations("projects");

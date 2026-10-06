@@ -114,22 +114,24 @@ export const enrollInCourse = (courseSlug: string) =>
     body: JSON.stringify({ course_slug: courseSlug }),
   });
 
-export const submitContactForm = (data: {
-  name: string;
-  email: string;
-  phone?: string;
-  project_type: string;
-  budget_range: string;
-  timeline: string;
-  message: string;
-  consent_given: boolean;
-}, locale = "fa") =>
+export const submitContactForm = (
+  data: {
+    name: string;
+    email: string;
+    phone?: string;
+    project_type: string;
+    budget_range: string;
+    timeline: string;
+    message: string;
+    consent_given: boolean;
+  },
+  locale = "fa",
+) =>
   csrfProtectedFetch<{ public_id: string; name: string; created_at: string }>(
     "/leads/contact/",
     { method: "POST", body: JSON.stringify(data) },
     locale,
   );
-
 
 export const createAdvisorSuggestion = (
   data: {

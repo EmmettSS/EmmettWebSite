@@ -38,7 +38,9 @@ export function AIProjectContextFields({ catalogs }: AIProjectContextFieldsProps
             <select
               name={field.name}
               required
-              defaultValue={options.find((option) => option.key === defaultKey)?.key ?? options[0]?.key ?? ""}
+              defaultValue={
+                options.find((option) => option.key === defaultKey)?.key ?? options[0]?.key ?? ""
+              }
               className={selectClassName}
             >
               {options.map((option) => (
@@ -53,7 +55,10 @@ export function AIProjectContextFields({ catalogs }: AIProjectContextFieldsProps
 
       <fieldset className="flex flex-col gap-2">
         <legend className="text-sm font-medium text-foreground">
-          {t("goalsLabel")} <span aria-hidden="true" className="ms-1 text-destructive">*</span>
+          {t("goalsLabel")}{" "}
+          <span aria-hidden="true" className="ms-1 text-destructive">
+            *
+          </span>
         </legend>
         <p id="ai-goals-hint" className="text-xs text-muted-foreground">
           {t("goalsHint")}
@@ -75,8 +80,9 @@ export function AIProjectContextFields({ catalogs }: AIProjectContextFieldsProps
                   disabled={disabled}
                   aria-describedby="ai-goals-hint"
                   onChange={(event) => {
+                    const isChecked = event.currentTarget.checked;
                     setSelectedGoals((current) =>
-                      event.currentTarget.checked
+                      isChecked
                         ? [...current, option.key]
                         : current.filter((key) => key !== option.key),
                     );

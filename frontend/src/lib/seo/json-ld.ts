@@ -68,11 +68,7 @@ function websiteNode(
 }
 
 /** گراف پایهٔ هر صفحه: Organization + WebSite. */
-export function siteJsonLd(
-  settings: SeoSettings,
-  siteUrl: string,
-  locale: AppLocale,
-): JsonLdGraph {
+export function siteJsonLd(settings: SeoSettings, siteUrl: string, locale: AppLocale): JsonLdGraph {
   return {
     "@context": "https://schema.org",
     "@graph": [organizationNode(settings, siteUrl), websiteNode(settings, siteUrl, locale)],
@@ -80,11 +76,7 @@ export function siteJsonLd(
 }
 
 /** BreadcrumbList — ترتیب همان مسیر بصری صفحه است. */
-export function breadcrumbJsonLd(
-  crumbs: Crumb[],
-  siteUrl: string,
-  locale: AppLocale,
-): JsonLdGraph {
+export function breadcrumbJsonLd(crumbs: Crumb[], siteUrl: string, locale: AppLocale): JsonLdGraph {
   return {
     "@context": "https://schema.org",
     "@graph": [

@@ -20,10 +20,7 @@ import { absoluteUrl, getPublicSiteUrl, languageAlternates } from "@/lib/seo/sit
 export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [entries, settings] = await Promise.all([
-    getSitemapEntries(),
-    getSeoSettingsOrDefaults(),
-  ]);
+  const [entries, settings] = await Promise.all([getSitemapEntries(), getSeoSettingsOrDefaults()]);
   const siteUrl = (settings.public_site_url || getPublicSiteUrl()).replace(/\/+$/, "");
 
   const urls: MetadataRoute.Sitemap = [];

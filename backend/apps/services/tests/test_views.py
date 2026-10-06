@@ -26,9 +26,11 @@ class TestServiceViewSet:
         client = APIClient()
         response = client.get("/api/v1/services/")
 
-        slugs = [item["slug"] for item in response.data["results"]] if "results" in response.data else [
-            item["slug"] for item in response.data
-        ]
+        slugs = (
+            [item["slug"] for item in response.data["results"]]
+            if "results" in response.data
+            else [item["slug"] for item in response.data]
+        )
         assert "published-one" in slugs
         assert "draft-one" not in slugs
 

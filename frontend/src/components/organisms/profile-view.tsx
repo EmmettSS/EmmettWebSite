@@ -33,7 +33,10 @@ export function ProfileView() {
     try {
       const profile = await getMe();
       setMe(profile);
-      const [favoritesData, enrollmentsData] = await Promise.all([getFavorites(), getEnrollments()]);
+      const [favoritesData, enrollmentsData] = await Promise.all([
+        getFavorites(),
+        getEnrollments(),
+      ]);
       setFavorites(favoritesData.results);
       setEnrollments(enrollmentsData.results);
     } catch {
@@ -49,7 +52,10 @@ export function ProfileView() {
         const profile = await getMe();
         if (cancelled) return;
         setMe(profile);
-        const [favoritesData, enrollmentsData] = await Promise.all([getFavorites(), getEnrollments()]);
+        const [favoritesData, enrollmentsData] = await Promise.all([
+          getFavorites(),
+          getEnrollments(),
+        ]);
         if (cancelled) return;
         setFavorites(favoritesData.results);
         setEnrollments(enrollmentsData.results);
@@ -121,7 +127,9 @@ export function ProfileView() {
             type="button"
             onClick={() => setTab("login")}
             className={`px-4 py-2.5 text-sm font-medium ${
-              tab === "login" ? "border-b-2 border-primary text-foreground" : "text-muted-foreground"
+              tab === "login"
+                ? "border-b-2 border-primary text-foreground"
+                : "text-muted-foreground"
             }`}
           >
             {t("loginTab")}
@@ -130,7 +138,9 @@ export function ProfileView() {
             type="button"
             onClick={() => setTab("register")}
             className={`px-4 py-2.5 text-sm font-medium ${
-              tab === "register" ? "border-b-2 border-primary text-foreground" : "text-muted-foreground"
+              tab === "register"
+                ? "border-b-2 border-primary text-foreground"
+                : "text-muted-foreground"
             }`}
           >
             {t("registerTab")}
@@ -208,7 +218,9 @@ export function ProfileView() {
                   className="flex items-center justify-between rounded-lg border border-border p-4 transition-colors hover:border-primary"
                 >
                   <span className="font-medium text-foreground">{enrollment.course.title}</span>
-                  <span className="text-sm text-muted-foreground">{enrollment.progress_percent}%</span>
+                  <span className="text-sm text-muted-foreground">
+                    {enrollment.progress_percent}%
+                  </span>
                 </Link>
               </li>
             ))}

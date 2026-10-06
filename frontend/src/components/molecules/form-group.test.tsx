@@ -25,10 +25,7 @@ describe("FormGroup", () => {
     const field = screen.getByLabelText("ایمیل");
     const describedBy = field.getAttribute("aria-describedby");
     expect(describedBy).toBeTruthy();
-    expect(screen.getByText("برای اطلاع‌رسانی استفاده می‌شود")).toHaveAttribute(
-      "id",
-      describedBy,
-    );
+    expect(screen.getByText("برای اطلاع‌رسانی استفاده می‌شود")).toHaveAttribute("id", describedBy);
   });
 
   it("وقتی error دارد، به‌جای hint همان پیام را با role=alert و aria-describedby نشان می‌دهد", () => {

@@ -29,9 +29,7 @@ export function formatDate(
 
   if (locale === "fa") {
     const jalali = instance.calendar("jalali").locale("fa");
-    return options?.withTime
-      ? jalali.format("D MMMM YYYY، HH:mm")
-      : jalali.format("D MMMM YYYY");
+    return options?.withTime ? jalali.format("D MMMM YYYY، HH:mm") : jalali.format("D MMMM YYYY");
   }
 
   const gregorian = instance.calendar("gregory").locale("en");

@@ -4,7 +4,13 @@ import { Rss } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
 import type { AppLocale } from "@/i18n/routing";
-import { Card, CardHeader, CardTitle, CardDescription, CardMedia } from "@/components/molecules/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardMedia,
+} from "@/components/molecules/card";
 import { getBlogPosts } from "@/lib/api/server";
 import { getSeoSettingsOrDefaults } from "@/lib/api/seo";
 import { buildPageMetadata } from "@/lib/seo/metadata";
@@ -37,11 +43,7 @@ function formatDate(locale: string, iso: string | null) {
   }).format(new Date(iso));
 }
 
-export default async function BlogPage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
+export default async function BlogPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale as AppLocale);
   const t = await getTranslations("blog");

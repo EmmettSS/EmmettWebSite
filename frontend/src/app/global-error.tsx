@@ -6,7 +6,12 @@
  * نمی‌تواند از next-intl استفاده کند؛ متن دوزبانهٔ ایستا به‌صورت دستی تکرار
  * شده است. طبق قرارداد Next.js باید خودش ``<html>``/``<body>`` را رندر کند.
  */
-export default function GlobalError({ reset }: { error: Error & { digest?: string }; reset: () => void }) {
+export default function GlobalError({
+  reset,
+}: {
+  error: Error & { digest?: string };
+  reset: () => void;
+}) {
   return (
     <html lang="en">
       <body
@@ -27,8 +32,8 @@ export default function GlobalError({ reset }: { error: Error & { digest?: strin
           Something went wrong / مشکلی پیش آمد
         </h1>
         <p style={{ color: "#6b7280", maxWidth: "32rem" }}>
-          An unexpected error occurred. Please try again. / خطای غیرمنتظره‌ای رخ داد. لطفاً دوباره تلاش
-          کنید.
+          An unexpected error occurred. Please try again. / خطای غیرمنتظره‌ای رخ داد. لطفاً دوباره
+          تلاش کنید.
         </p>
         <button
           type="button"

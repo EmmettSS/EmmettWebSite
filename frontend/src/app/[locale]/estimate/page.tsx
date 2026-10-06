@@ -52,7 +52,9 @@ export default async function ProjectEstimatorPage({
         <h1 className="mt-3 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
           {t("estimatorTitle")}
         </h1>
-        <p className="mt-3 text-base leading-7 text-muted-foreground">{t("estimatorDescription")}</p>
+        <p className="mt-3 text-base leading-7 text-muted-foreground">
+          {t("estimatorDescription")}
+        </p>
       </header>
       <section className="mt-10 rounded-xl border border-border bg-background p-5 sm:p-8">
         <ProjectEstimatorForm catalogs={catalogs} />

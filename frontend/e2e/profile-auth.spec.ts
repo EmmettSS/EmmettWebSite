@@ -34,7 +34,9 @@ test.describe("ثبت‌نام، ورود و پروفایل", () => {
     const enrollButton = page.getByRole("button", { name: "ثبت‌نام در این دوره" });
     await expect(enrollButton).toBeVisible({ timeout: 10_000 });
     await enrollButton.click();
-    await expect(page.getByRole("button", { name: "شما در این دوره ثبت‌نام کرده‌اید" })).toBeVisible({
+    await expect(
+      page.getByRole("button", { name: "شما در این دوره ثبت‌نام کرده‌اید" }),
+    ).toBeVisible({
       timeout: 10_000,
     });
 

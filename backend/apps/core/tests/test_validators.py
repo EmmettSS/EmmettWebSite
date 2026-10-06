@@ -23,9 +23,7 @@ class TestValidateMediaFileSize:
 
     def test_image_over_limit_raises(self, settings: object) -> None:
         cast(django.conf.LazySettings, settings).MEDIA_MAX_IMAGE_SIZE_MB = 1
-        big_file = SimpleUploadedFile(
-            "big.png", b"x" * (2 * 1024 * 1024), content_type="image/png"
-        )
+        big_file = SimpleUploadedFile("big.png", b"x" * (2 * 1024 * 1024), content_type="image/png")
         with pytest.raises(ValidationError):
             validate_media_file_size(big_file, media_type="image")
 
@@ -33,9 +31,7 @@ class TestValidateMediaFileSize:
         s = cast(django.conf.LazySettings, settings)
         s.MEDIA_MAX_IMAGE_SIZE_MB = 1
         s.MEDIA_MAX_DOCUMENT_SIZE_MB = 10
-        doc = SimpleUploadedFile(
-            "doc.pdf", b"x" * (2 * 1024 * 1024), content_type="application/pdf"
-        )
+        doc = SimpleUploadedFile("doc.pdf", b"x" * (2 * 1024 * 1024), content_type="application/pdf")
         validate_media_file_size(doc, media_type="document")  # no raise؛ زیر سقف سند
 
 

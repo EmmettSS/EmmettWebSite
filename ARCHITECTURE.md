@@ -526,18 +526,41 @@ System Check (`emmett_admin.W008`–`W013`) هشدار داده می‌شود.
 
 ---
 
-## ۱۱. معیار پذیرش این فاز
+## ۱۰.۳. لایهٔ کیفیت، CI/CD و استقرار روی cPanel (فاز ۸) — نمای کلی
 
-- [x] ساختار اپ‌های Django بر اساس Modular Monolith تعریف شد.
-- [x] تمام ۲۰ موجودیت درخواستی مدل‌سازی شدند (به‌علاوهٔ مدل‌های کمکی ضروری مثل `Profile`, `GuardrailRule`, `PromptTemplate`, `AuditLog`).
-- [x] ERD در قالب Mermaid ترسیم شد.
-- [x] استراتژی i18n با دلیل مشخص شد.
-- [x] استراتژی تاریخ شمسی/میلادی مشخص شد.
-- [x] استراتژی Media و فایل مشخص شد.
-- [x] استراتژی Cache و Rate Limit مشخص شد.
-- [x] ۱۰ ADR نوشته شد.
-- [ ] **تأیید مالک محصول روی این سند قبل از ورود به فاز ۲ (Implementation).**
+```
+دروازه‌های کیفیت و CI/CD (ADR-0034)
+├── Pre-commit (.pre-commit-config.yaml)
+│   ├── scripts/check_secrets.py (قانون ۵: جلوگیری از نشت راز و فایل .env)
+│   ├── Backend: ruff check + ruff format --check + black --check + mypy --strict + scripts/i18n.py check
+│   ├── Frontend: prettier --check + eslint + tsc --noEmit
+│   └── Git commit-msg: scripts/check_commit_msg.py (Conventional Commits)
+├── GitHub Actions (.github/workflows/ci.yml)
+│   ├── backend-quality / backend-test (Pytest Coverage ≥ 85%)
+│   ├── frontend-quality / frontend-test-build (Vitest Coverage ≥ 85% + next build)
+│   ├── security-scan (Bandit SAST + manage.py check --deploy + npm audit --omit=dev)
+│   └── e2e-and-lighthouse (Playwright E2E + Lighthouse CI ≥ 0.95 via .lighthouserc.json)
+└── توپولوژی استقرار روی هاست cPanel (ADR-0035)
+    ├── Setup Python App (Passenger WSGI → backend/passenger_wsgi.py.example)
+    ├── Setup Node.js App (Passenger Node → Next.js SSR + /api/[...path] proxy)
+    ├── MySQL 8 (utf8mb4_unicode_ci) + FileBasedCache + media/.htaccess
+    └── Cron Jobs (backup_db روزانه، purge_ai_audit هفتگی، generate_blog_summaries روزانه)
+```
 
-## گام بعدی
+> **مستندات فنی یکپارچه (تک‌فایلی):**
+> - نسخهٔ جامع فارسی: [`docs/TECHNICAL_DOCUMENTATION.fa.md`](./docs/TECHNICAL_DOCUMENTATION.fa.md)
+> - نسخهٔ جامع انگلیسی: [`docs/TECHNICAL_DOCUMENTATION.en.md`](./docs/TECHNICAL_DOCUMENTATION.en.md)
 
-پس از تأیید این سند، فاز ۲ (Implementation اسکلت Django: اپ‌ها، مدل‌ها، migrationهای اولیه، تنظیمات SQLite محلی) با یک خلاصهٔ هدف + سؤالات ابهام (در صورت وجود) + معیار پذیرش جدید آغاز می‌شود — طبق چرخهٔ کاری پروژه و فقط در صورت درخواست صریح شما برای آن فاز.
+---
+
+## ۱۱. وضعیت تکمیل فازهای معماری (فاز ۱ تا ۸)
+
+- [x] ساختار اپ‌های Django بر اساس Modular Monolith تعریف و پیاده‌سازی شد (`ADR-0001` تا `ADR-0015`).
+- [x] سیستم طراحی و معماری دوزبانهٔ Next.js 16 پیاده‌سازی شد (`ADR-0016` تا `ADR-0020`).
+- [x] صفحات عمومی، جست‌وجوی تمام‌متن، آداپتور کاوه‌نگار و پروفایل کاربری تکمیل شد (`ADR-0021` تا `ADR-0025`).
+- [x] موتور مرکزی هوش مصنوعی (`ai_engine`) با ورودی‌های Enum و Guardrail ایرانی تکمیل شد (`ADR-0026`).
+- [x] پنل ادمین سطح SaaS، داشبورد KPI، گردش‌کار انتشار و صادرات/واردات تکمیل شد (`ADR-0027` تا `ADR-0030`).
+- [x] سئو، بهینه‌سازی کارایی، سخت‌سازی امنیتی (CSP + 2FA + Lockout) و بکاپ تکمیل شد (`ADR-0031` تا `ADR-0033`).
+- [x] دروازه‌های کیفیت (پوشش تست ≥ ۸۵٪)، هوک‌های Pre-commit، پایپ‌لاین GitHub Actions + Lighthouse CI و مستندات جامع دوزبانه تکمیل شد (`ADR-0034` و `ADR-0035`).
+- [x] بستهٔ نهایی آمادگی استقرار روی cPanel (`DEPLOYMENT.md`، قفل ۱۰۰٪ `requirements.txt`، تنظیمات پروداکشن نهایی و اسکریپت‌های `deploy_backend.sh`، `deploy_frontend.sh` و `restore_backup.sh`) تکمیل شد (`ADR-0036`).
+

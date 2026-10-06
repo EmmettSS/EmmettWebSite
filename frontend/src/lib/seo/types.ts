@@ -43,14 +43,7 @@ export interface SitemapEntry {
   section: "pages" | "services" | "projects" | "blog" | "academy";
   path: string;
   lastmod: string;
-  changefreq:
-    | "always"
-    | "hourly"
-    | "daily"
-    | "weekly"
-    | "monthly"
-    | "yearly"
-    | "never";
+  changefreq: "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never";
   priority: string;
 }
 

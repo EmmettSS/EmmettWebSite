@@ -27,6 +27,12 @@ backend/htmlcov/
 backend/.coverage
 backend/.coverage.*
 backend/*.log
+backend/.cache/
+backend/backups/
+backend/tmp/
+backend/passenger_wsgi.py
+frontend/tmp/
+frontend/server.js
 
 # === آرتیفکت‌های موقت بررسی (تصاویر OG تولیدشده در build و مانند آن) ===
 .arena-tmp/

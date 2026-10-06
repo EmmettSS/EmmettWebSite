@@ -107,7 +107,7 @@ def _literal_string(node: ast.AST, *, source: str, line: int) -> str:
     if isinstance(node, ast.Constant) and isinstance(node.value, str):
         return node.value
     raise ExtractionError(
-        f"{source}:{line}: msgid باید رشتهٔ ثابت باشد (f-string/متغیر مجاز نیست — قانون ۹)."
+        f"{source}:{line}: msgid باید رشتهٔ ثابت باشد (f-string/متغیر مجاز نیست — قانون ۹).",
     )
 
 
@@ -123,9 +123,7 @@ def _extract_from_call(node: ast.Call, *, source: str, result: ExtractionResult)
             return
         singular = _literal_string(node.args[0], source=source, line=node.lineno)
         plural = _literal_string(node.args[1], source=source, line=node.lineno)
-        result.add(
-            Message(msgid=singular, plural_msgid=plural, locations=((source, node.lineno),))
-        )
+        result.add(Message(msgid=singular, plural_msgid=plural, locations=((source, node.lineno),)))
         return
 
     if name in TRANSLATED_FUNCTIONS:
@@ -350,9 +348,7 @@ def command_check(root: Path, locales: Sequence[str]) -> int:
             problems.extend(f"    ~ {msgid}" for msgid in obsolete[:20])
 
         if locale == "fa":
-            untranslated = sorted(
-                entry.msgid for entry in entries.values() if not entry.translated()
-            )
+            untranslated = sorted(entry.msgid for entry in entries.values() if not entry.translated())
             if untranslated:
                 problems.append(f"[{locale}] {len(untranslated)} پیام بدون ترجمهٔ فارسی:")
                 problems.extend(f"    ? {msgid}" for msgid in untranslated[:20])

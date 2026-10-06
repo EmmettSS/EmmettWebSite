@@ -1,5 +1,9 @@
-# Production dependencies — نسخه‌ها Pin شده طبق ADR-0010 برای بازتولیدپذیری دقیق روی هاست cPanel.
+# Production dependencies — نسخه‌ها ۱۰۰٪ Pin شده طبق ADR-0010 و ADR-0036 برای بازتولیدپذیری دقیق روی هاست cPanel.
 # هر وابستگی جدید باید در PR توجیه شود (قانون ۶) و در CHANGELOG.md ثبت شود (قانون ۲۰).
+
+# ===========================================================================
+# ۱) وابستگی‌های مستقیم سطح اول (Direct Production Dependencies)
+# ===========================================================================
 
 # --- Core framework ---
 Django==5.2.17                     # فریم‌ورک اصلی — ADR-0011 (LTS تا ۲۰۲۸)
@@ -14,9 +18,7 @@ django-environ==0.14.0             # خواندن تنظیمات از .env — �
 # --- i18n محتوای مدل‌محور ---
 django-modeltranslation==0.20.6    # ADR-0003
 
-# --- امنیت / Rate limiting ---
-
-# --- CORS (فقط برای توسعهٔ محلی frontend/backend روی پورت‌های جدا؛ در prod همان‌-مبدأ) ---
+# --- CORS (در توسعه برای پورت‌های مجزا؛ در پروداکشن هم‌مبدأ) ---
 django-cors-headers==4.9.0
 
 # --- فیلترینگ استاندارد DRF ---
@@ -32,16 +34,12 @@ PyMySQL==1.2.3
 Pillow==12.3.0
 
 # --- پنل ادمین (فاز ۶ — ADR-0027) ---
-django-jazzmin==3.0.5                # تم ادمین روی AdminLTE 4/Bootstrap 5 با پشتیبانی Django 5.2
-# --- تبادل دادهٔ ادمین (فاز ۶ — ADR-0029) ---
-django-import-export==4.4.1          # صادرات/واردات CSV/JSON/TSV برای ۲۰ مدل (بدون وابستگی سنگین)
+django-jazzmin==3.0.5
 
-# --- احراز هویت دو مرحله‌ای ادمین (فاز ۷ — ADR-0032) ---
-# django-otp: پیاده‌سازی استاندارد TOTP/statically-issued tokens روی جنگو؛
-#   انتخابی برای ادمین (``ADMIN_2FA_REQUIRED``) و بدون وابستگی سنگین.
-# qrcode: تولید QR به‌صورت SVG درون ``data:`` — بدون CDN و بدون Pillow
-#   (فقط ``qrcode.image.svg`` استفاده می‌شود) تا enrollment روی هاست اشتراکی
-#   کاملاً آفلاین و سبک بماند.
+# --- تبادل دادهٔ ادمین (فاز ۶ — ADR-0029) ---
+django-import-export==4.4.1
+
+# --- احراز هویت دو مرحله‌ای ادمین (فاز ۷ — ADR-0033) ---
 django-otp==1.7.3
 qrcode==8.2
 
@@ -52,14 +50,33 @@ jdatetime==6.1.0
 structlog==26.1.0
 django-structlog==10.1.0
 
-# --- Markdown → HTML برای محتوای طولانی (ADR-0022: Markdown همه‌جا) ---
+# --- Markdown → HTML پاک‌سازی‌شده ضد XSS (ADR-0022، قانون ۱۶) ---
 Markdown==3.9
-
-# --- پاک‌سازی HTML تولیدشده از Markdown قبل از ذخیره/نمایش (ضد XSS — قانون ۱۶)؛
-#     nh3 (بایندینگ Rust/ammonia) انتخاب شد چون bleach دیگر نگه‌داری نمی‌شود ---
 nh3==0.3.7
 
-# --- کلاینت HTTP برای ارسال پیامک از طریق REST API کاوه‌نگار (ADR-0024)؛
-#     به‌جای SDK رسمی kavenegar (نگهداری‌نشده/وابستگی اضافه)، یک adapter نازک
-#     با requests روی REST API مستند Kavenegar نوشته شده است ---
+# --- کلاینت HTTP برای آداپتور پیامک کاوه‌نگار و درگاه هوش مصنوعی (ADR-0024، ADR-0026) ---
 requests==2.32.5
+
+# ===========================================================================
+# ۲) زیر-وابستگی‌های زمان اجرا (Pinned Transitive Runtime Dependencies — ADR-0036)
+# ===========================================================================
+asgiref==3.12.1
+attrs==26.1.0
+certifi==2026.7.22
+charset-normalizer==3.5.2
+diff-match-patch==20241021
+django-ipware==8.0.0
+idna==3.20
+inflection==0.5.1
+jalali_core==1.0.0
+jsonschema==4.26.0
+jsonschema-specifications==2025.9.1
+python-ipware==4.1.1
+PyYAML==6.0.3
+referencing==0.37.0
+rpds-py==2026.9.1
+sqlparse==0.6.0
+tablib==3.10.0
+typing_extensions==4.16.0
+uritemplate==4.2.0
+urllib3==2.8.0

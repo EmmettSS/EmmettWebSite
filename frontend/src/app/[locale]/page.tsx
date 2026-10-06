@@ -6,11 +6,7 @@ import type { AppLocale } from "@/i18n/routing";
 import { getFaqForPath } from "@/lib/api/seo";
 import { faqJsonLd } from "@/lib/seo/json-ld";
 
-export default async function HomePage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
+export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale as AppLocale);
 
