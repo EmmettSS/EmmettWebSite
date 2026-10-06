@@ -38,10 +38,7 @@ export function buildRedirectMap(redirects: SeoRedirect[]): Map<string, SeoRedir
   return map;
 }
 
-export function resolveRedirect(
-  path: string,
-  map: Map<string, SeoRedirect>,
-): SeoRedirect | null {
+export function resolveRedirect(path: string, map: Map<string, SeoRedirect>): SeoRedirect | null {
   return map.get(normalizeRedirectKey(path)) ?? null;
 }
 

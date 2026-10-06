@@ -61,7 +61,10 @@ export default async function CreativeAdvisorPage({
 
       <p className="mt-6 text-sm leading-6 text-muted-foreground">{t("preliminaryDisclaimer")}</p>
       <p className="mt-4 text-sm text-muted-foreground">
-        {t("estimatorPrompt")} <Link href="/estimate" className="font-medium text-primary underline underline-offset-4">{t("estimatorLink")}</Link>
+        {t("estimatorPrompt")}{" "}
+        <Link href="/estimate" className="font-medium text-primary underline underline-offset-4">
+          {t("estimatorLink")}
+        </Link>
       </p>
     </div>
   );

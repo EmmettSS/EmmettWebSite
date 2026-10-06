@@ -8,7 +8,14 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/molecules/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/molecules/card";
 import { FormGroup } from "@/components/molecules/form-group";
 import { Breadcrumb } from "@/components/molecules/breadcrumb";
 import { formatNumber } from "@/lib/format/number";
@@ -197,7 +204,10 @@ export default function DesignSystemPage() {
           <div className="flex flex-col gap-1 rounded-md border border-border p-4">
             <dt className="font-technical text-xs text-muted-foreground">{t("sampleAmount")}</dt>
             <dd className="text-lg">
-              {formatNumber(1234567.5, locale, { style: "currency", currency: locale === "fa" ? "IRR" : "USD" })}
+              {formatNumber(1234567.5, locale, {
+                style: "currency",
+                currency: locale === "fa" ? "IRR" : "USD",
+              })}
             </dd>
           </div>
           <div className="flex flex-col gap-1 rounded-md border border-border p-4">

@@ -122,3 +122,87 @@ def test_blog_artifact_hash_matches_source_but_audit_has_no_source_text() -> Non
     assert artifact.content_type == ContentType.objects.get_for_model(post)
     audit = AIRequest.objects.get(feature=AIRequest.Feature.BLOG_SUMMARY)
     assert _localized_content(post, "en") not in json.dumps(audit.input_payload, ensure_ascii=False)
+
+
+def test_blog_summary_error_paths_record_audit_status() -> None:
+    from apps.ai_engine.guardrails.service import GuardrailViolation
+    from apps.ai_engine.pipelines.errors import AIOutputBlocked, AIOutputInvalid, AIRequestError
+    from apps.ai_engine.providers.base import ProviderError, ProviderUnavailable
+
+    post = _published_post()
+
+    with patch(
+        "apps.ai_engine.pipelines.blog_summary.get_provider",
+        side_effect=ProviderUnavailable("disabled"),
+    ):
+        with pytest.raises(AIRequestError):
+            generate_blog_summary(post=post, locale="fa")
+
+    with patch(
+        "apps.ai_engine.pipelines.blog_summary.get_provider",
+        side_effect=ProviderError("network_failure"),
+    ):
+        with pytest.raises(AIRequestError):
+            generate_blog_summary(post=post, locale="fa")
+
+    class BadJsonProvider(FakeSummaryProvider):
+        def complete(self, *, system_prompt: str, user_message: str, max_tokens: int) -> ProviderCompletion:
+            return ProviderCompletion(
+                content=json.dumps({"wrong_key": "value"}),
+                provider_name=self.provider_name,
+                model_name=self.model_name,
+                input_tokens=10,
+                output_tokens=10,
+            )
+
+    with patch("apps.ai_engine.pipelines.blog_summary.get_provider", return_value=BadJsonProvider()):
+        with pytest.raises(AIOutputInvalid):
+            generate_blog_summary(post=post, locale="fa")
+
+    with (
+        patch("apps.ai_engine.pipelines.blog_summary.get_provider", return_value=FakeSummaryProvider()),
+        patch(
+            "apps.ai_engine.pipelines.blog_summary.enforce_generated_text",
+            side_effect=GuardrailViolation(["blocked_term"]),
+        ),
+    ):
+        with pytest.raises(AIOutputBlocked):
+            generate_blog_summary(post=post, locale="fa")
+
+
+def test_generate_blog_summaries_and_seed_ai_engine_commands() -> None:
+    from io import StringIO
+
+    from django.core.management import call_command
+    from django.core.management.base import CommandError
+
+    post = _published_post()
+    provider = FakeSummaryProvider()
+
+    seed_out = StringIO()
+    call_command("seed_ai_engine", stdout=seed_out)
+    assert "AI engine bootstrap complete" in seed_out.getvalue()
+
+    with pytest.raises(CommandError):
+        call_command("generate_blog_summaries", limit=0)
+
+    out = StringIO()
+    with patch("apps.ai_engine.pipelines.blog_summary.get_provider", return_value=provider):
+        call_command(
+            "generate_blog_summaries",
+            post_public_id=str(post.public_id),
+            locale="fa",
+            stdout=out,
+        )
+    assert "1 drafts, 0 skipped, 0 failed" in out.getvalue()
+
+    # اجرای دوباره بدون --force باید skip شود.
+    out_skip = StringIO()
+    with patch("apps.ai_engine.pipelines.blog_summary.get_provider", return_value=provider):
+        call_command(
+            "generate_blog_summaries",
+            post_public_id=str(post.public_id),
+            locale="fa",
+            stdout=out_skip,
+        )
+    assert "0 drafts, 1 skipped, 0 failed" in out_skip.getvalue()

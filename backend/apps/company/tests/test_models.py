@@ -28,9 +28,7 @@ class TestTeamMemberModel:
 
 class TestTestimonialModel:
     def test_str_combines_author_and_company(self) -> None:
-        testimonial = cast(
-            Testimonial, TestimonialFactory(author_name="علی", author_company="شرکت الف")
-        )
+        testimonial = cast(Testimonial, TestimonialFactory(author_name="علی", author_company="شرکت الف"))
         assert str(testimonial) == "علی — شرکت الف"
 
     def test_is_featured_defaults_to_false(self) -> None:

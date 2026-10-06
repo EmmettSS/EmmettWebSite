@@ -42,7 +42,10 @@ const settings: SeoSettings = {
   search_console_help: "",
 };
 
-function nodeAt(graph: { "@graph": Record<string, unknown>[] }, index = 0): Record<string, unknown> {
+function nodeAt(
+  graph: { "@graph": Record<string, unknown>[] },
+  index = 0,
+): Record<string, unknown> {
   return graph["@graph"][index] as Record<string, unknown>;
 }
 

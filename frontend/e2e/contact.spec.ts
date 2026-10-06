@@ -19,7 +19,9 @@ test.describe("فرم تماس", () => {
     await page.goto("/contact");
     await page.getByRole("button", { name: "ارسال پیام" }).click();
     // مرورگر باید فیلد name را invalid علامت بزند (required native validation)
-    const isValid = await page.getByLabel("نام").evaluate((el) => (el as HTMLInputElement).checkValidity());
+    const isValid = await page
+      .getByLabel("نام")
+      .evaluate((el) => (el as HTMLInputElement).checkValidity());
     expect(isValid).toBe(false);
   });
 

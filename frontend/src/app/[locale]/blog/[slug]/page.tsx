@@ -52,11 +52,7 @@ function formatDate(locale: string, iso: string | null) {
   }).format(new Date(iso));
 }
 
-export default async function BlogPostPage({
-  params,
-}: {
-  params: Promise<PageParams>;
-}) {
+export default async function BlogPostPage({ params }: { params: Promise<PageParams> }) {
   const { locale, slug } = await params;
   setRequestLocale(locale as AppLocale);
   const t = await getTranslations("blog");
@@ -69,7 +65,10 @@ export default async function BlogPostPage({
   const settings = await getSeoSettingsOrDefaults();
   const siteUrl = getPublicSiteUrl();
   const appLocale = toAppLocale(locale);
-  const crumbs = [{ name: t("title"), path: "/blog" }, { name: post.title, path: `/blog/${slug}` }];
+  const crumbs = [
+    { name: t("title"), path: "/blog" },
+    { name: post.title, path: `/blog/${slug}` },
+  ];
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-10">
@@ -91,7 +90,10 @@ export default async function BlogPostPage({
         )}
       />
       <JsonLd data={breadcrumbJsonLd(crumbs, siteUrl, appLocale)} />
-      <Breadcrumb items={[{ label: t("title"), href: "/blog" }, { label: post.title }]} className="mb-8" />
+      <Breadcrumb
+        items={[{ label: t("title"), href: "/blog" }, { label: post.title }]}
+        className="mb-8"
+      />
 
       <header>
         <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">

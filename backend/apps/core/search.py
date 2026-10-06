@@ -135,9 +135,11 @@ def _search_sqlite(query: str, locale: str, limit: int) -> list[SearchResult]:
 def _search_fallback(query: str, locale: str, limit: int) -> list[SearchResult]:
     """پشتیبان ساده برای backendهای ناشناخته (مثلاً در تست‌های غیرمعمول)."""
 
-    qs = SearchIndexEntry.objects.filter(locale=locale).filter(
-        **{"title__icontains": query}
-    ).order_by("-updated_at")[:limit]
+    qs = (
+        SearchIndexEntry.objects.filter(locale=locale)
+        .filter(**{"title__icontains": query})
+        .order_by("-updated_at")[:limit]
+    )
     return [
         SearchResult(
             content_type=e.content_type,

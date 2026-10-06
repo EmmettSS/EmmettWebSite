@@ -21,7 +21,13 @@ export interface IconProps extends Omit<React.SVGAttributes<SVGSVGElement>, "ref
  * رعایت دسترس‌پذیری (قانون ۱۸): بدون `label`، آیکون از ساختار درخت دسترس‌پذیری
  * حذف می‌شود؛ با `label`، به‌عنوان تصویر معنادار معرفی می‌شود.
  */
-export function Icon({ icon: LucideIconComponent, size = "md", label, className, ...props }: IconProps) {
+export function Icon({
+  icon: LucideIconComponent,
+  size = "md",
+  label,
+  className,
+  ...props
+}: IconProps) {
   return (
     <LucideIconComponent
       className={cn(sizeMap[size], className)}

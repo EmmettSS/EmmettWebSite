@@ -85,9 +85,7 @@ def custom_exception_handler(exc: Exception, context: dict[str, Any]) -> Respons
 
     details = response.data if isinstance(response.data, (dict, list)) else None
     message = (
-        str(exc)
-        if not isinstance(exc, drf_exceptions.ValidationError)
-        else "یک یا چند فیلد نامعتبر است."
+        str(exc) if not isinstance(exc, drf_exceptions.ValidationError) else "یک یا چند فیلد نامعتبر است."
     )
 
     response.data = {

@@ -38,9 +38,7 @@ class TestNewsletterThrottleEnforced:
     def test_fourth_request_in_same_day_is_throttled(self, settings: object) -> None:
         client = APIClient()
         for index in range(3):
-            response = client.post(
-                "/api/v1/leads/newsletter/", {"email": f"sub{index}@example.com"}
-            )
+            response = client.post("/api/v1/leads/newsletter/", {"email": f"sub{index}@example.com"})
             assert response.status_code == 201
 
         fourth = client.post("/api/v1/leads/newsletter/", {"email": "sub4@example.com"})

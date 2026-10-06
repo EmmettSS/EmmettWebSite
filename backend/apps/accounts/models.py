@@ -145,9 +145,7 @@ class Favorite(BaseModel):
         verbose_name = _("Favorite")
         verbose_name_plural = _("Favorites")
         constraints = [
-            models.UniqueConstraint(
-                fields=["user", "content_type", "object_id"], name="unique_user_favorite"
-            )
+            models.UniqueConstraint(fields=["user", "content_type", "object_id"], name="unique_user_favorite")
         ]
 
     def __str__(self) -> str:  # pragma: no cover

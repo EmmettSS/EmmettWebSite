@@ -95,7 +95,11 @@ class GlobalSearchView(APIView):
     @extend_schema(
         parameters=[
             OpenApiParameter("q", OpenApiTypes.STR, description="عبارت جست‌وجو"),
-            OpenApiParameter("locale", OpenApiTypes.STR, description="fa یا en؛ پیش‌فرض بر اساس زبان درخواست"),
+            OpenApiParameter(
+                "locale",
+                OpenApiTypes.STR,
+                description="fa یا en؛ پیش‌فرض بر اساس زبان درخواست",
+            ),
             OpenApiParameter("limit", OpenApiTypes.INT, description="حداکثر تعداد نتیجه (سقف ۵۰)"),
         ],
         responses=OpenApiTypes.OBJECT,

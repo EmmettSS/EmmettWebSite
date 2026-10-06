@@ -159,18 +159,26 @@ MODELTRANSLATION_LANGUAGES = ("fa", "en")
 MODELTRANSLATION_FALLBACK_LANGUAGES = ("fa", "en")
 
 # ---------------------------------------------------------------------------
-# Static / Media (ADR-0005)
+# Static / Media (ADR-0005, ADR-0036)
 # ---------------------------------------------------------------------------
-STATIC_URL = "static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"
+STATIC_URL = "/static/"
+STATIC_ROOT = Path(env("DJANGO_STATIC_ROOT", default=str(BASE_DIR / "staticfiles")))
 # دارایی‌های استاتیک خودِ پروژه (برند، تم ادمین، فونت) — خارج از پوشهٔ اپ‌ها
 # (فاز ۶، ADR-0027). در production با ``collectstatic`` در ``STATIC_ROOT``
-# جمع می‌شوند و با WhiteNoise سرو می‌شوند؛ نیاز به تنظیم جداگانهٔ Apache نیست.
+# جمع می‌شوند و با WhiteNoise یا مستقیم توسط Apache سرو می‌شوند.
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
-MEDIA_URL = "media/"
-MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_URL = "/media/"
+MEDIA_ROOT = Path(env("DJANGO_MEDIA_ROOT", default=str(BASE_DIR / "media")))
 
 # محدودیت حجم آپلود ``core.Media`` طبق ADR-0005 — قابل تنظیم بدون دیپلوی مجدد.
 MEDIA_MAX_IMAGE_SIZE_MB = env.int("MEDIA_MAX_IMAGE_SIZE_MB", default=5)
@@ -189,7 +197,7 @@ if CACHE_BACKEND == "filebased":
     CACHES = {
         "default": {
             "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
-            "LOCATION": env("CACHE_LOCATION", default="/tmp/emmett-django-cache"),
+            "LOCATION": env("CACHE_LOCATION", default=str(BASE_DIR / ".cache" / "django-cache")),
             "TIMEOUT": 300,
         }
     }
@@ -221,10 +229,17 @@ X_FRAME_OPTIONS = "DENY"
 SECURE_CONTENT_TYPE_NOSNIFF = True
 
 # ---------------------------------------------------------------------------
-# Email (fallback — کانال اصلی اعلان Kavenegar است؛ ر.ک. DISCOVERY.md)
+# Email (fallback — کانال اصلی اعلان Kavenegar است؛ ر.ک. DISCOVERY.md و ADR-0036)
 # ---------------------------------------------------------------------------
 EMAIL_BACKEND = env("EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend")
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="noreply@emmett.example")
+EMAIL_HOST = env("EMAIL_HOST", default="localhost")
+EMAIL_PORT = env.int("EMAIL_PORT", default=587)
+EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
+EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
+EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", default=False)
+EMAIL_TIMEOUT = env.int("EMAIL_TIMEOUT", default=10)
 
 # --- SMS (ADR-0024) — اگر KAVENEGAR_API_KEY خالی باشد، به‌صورت خودکار
 # ConsoleSMSBackend (فقط لاگ، بدون تماس شبکه‌ای واقعی) انتخاب می‌شود. ---

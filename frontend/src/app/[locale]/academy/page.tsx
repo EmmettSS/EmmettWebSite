@@ -4,7 +4,13 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import type { AppLocale } from "@/i18n/routing";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardHeader, CardTitle, CardDescription, CardMedia } from "@/components/molecules/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardMedia,
+} from "@/components/molecules/card";
 import { getCourses } from "@/lib/api/server";
 import { getSeoSettingsOrDefaults } from "@/lib/api/seo";
 import { buildPageMetadata } from "@/lib/seo/metadata";
@@ -31,11 +37,7 @@ export async function generateMetadata({
   });
 }
 
-export default async function AcademyPage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
+export default async function AcademyPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale as AppLocale);
   const t = await getTranslations("academy");
@@ -47,7 +49,9 @@ export default async function AcademyPage({
     <div className="mx-auto max-w-(--breakpoint-xl) px-4 py-16 sm:px-6 lg:px-10">
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div className="max-w-2xl">
-          <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">{t("title")}</h1>
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+            {t("title")}
+          </h1>
           <p className="mt-3 text-base text-muted-foreground">{t("description")}</p>
         </div>
         {/* مسیر فید یک Route Handler است (خروجی XML)؛ لینک ساده کافی است و

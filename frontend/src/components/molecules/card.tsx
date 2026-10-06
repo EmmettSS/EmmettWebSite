@@ -35,16 +35,32 @@ export function CardMedia({ className, ...props }: HTMLAttributes<HTMLDivElement
 }
 
 export function CardHeader({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
-  return <div data-slot="card-header" className={cn("flex flex-col gap-1.5 p-6", className)} {...props} />;
+  return (
+    <div
+      data-slot="card-header"
+      className={cn("flex flex-col gap-1.5 p-6", className)}
+      {...props}
+    />
+  );
 }
 
 export function CardTitle({ className, ...props }: HTMLAttributes<HTMLHeadingElement>) {
-  return <h3 data-slot="card-title" className={cn("text-lg font-medium leading-6", className)} {...props} />;
+  return (
+    <h3
+      data-slot="card-title"
+      className={cn("text-lg font-medium leading-6", className)}
+      {...props}
+    />
+  );
 }
 
 export function CardDescription({ className, ...props }: HTMLAttributes<HTMLParagraphElement>) {
   return (
-    <p data-slot="card-description" className={cn("text-sm text-muted-foreground", className)} {...props} />
+    <p
+      data-slot="card-description"
+      className={cn("text-sm text-muted-foreground", className)}
+      {...props}
+    />
   );
 }
 

@@ -1,0 +1,80 @@
+# پیکربندی Pre-commit پروژهٔ امیت (فاز ۸ — ADR-0034)
+# نصب:
+#   backend/.venv/bin/pre-commit install
+#   backend/.venv/bin/pre-commit install --hook-type commit-msg
+# اجرای دستی روی کل ریپو:
+#   backend/.venv/bin/pre-commit run --all-files
+
+default_install_hook_types: [pre-commit, commit-msg]
+default_stages: [pre-commit]
+
+repos:
+  - repo: local
+    hooks:
+      - id: check-secrets
+        name: "Security: بررسی عدم وجود راز و فایل .env (قانون ۵)"
+        entry: python3 scripts/check_secrets.py
+        language: system
+        pass_filenames: true
+
+      - id: backend-ruff-check
+        name: "Backend: Ruff Lint"
+        entry: bash -c 'cd backend && .venv/bin/ruff check .'
+        language: system
+        files: ^backend/.*\.py$
+        pass_filenames: false
+
+      - id: backend-ruff-format
+        name: "Backend: Ruff Format Check"
+        entry: bash -c 'cd backend && .venv/bin/ruff format --check .'
+        language: system
+        files: ^backend/.*\.py$
+        pass_filenames: false
+
+      - id: backend-black-check
+        name: "Backend: Black Format Check"
+        entry: bash -c 'cd backend && .venv/bin/black --check .'
+        language: system
+        files: ^backend/.*\.py$
+        pass_filenames: false
+
+      - id: backend-mypy-strict
+        name: "Backend: mypy --strict (قانون ۷)"
+        entry: bash -c 'cd backend && .venv/bin/mypy apps config'
+        language: system
+        files: ^backend/.*\.py$
+        pass_filenames: false
+
+      - id: backend-i18n-check
+        name: "Backend: بررسی پوشش و تازگی ترجمه‌های gettext (قانون ۹)"
+        entry: bash -c 'cd backend && .venv/bin/python scripts/i18n.py check'
+        language: system
+        files: ^backend/(apps|templates|locale)/
+        pass_filenames: false
+
+      - id: frontend-prettier-check
+        name: "Frontend: Prettier Format Check"
+        entry: npm --prefix frontend run format:check
+        language: system
+        files: ^frontend/(src|e2e|messages)/
+        pass_filenames: false
+
+      - id: frontend-eslint
+        name: "Frontend: ESLint"
+        entry: npm --prefix frontend run lint
+        language: system
+        files: ^frontend/(src|e2e)/.*\.(ts|tsx)$
+        pass_filenames: false
+
+      - id: frontend-typecheck
+        name: "Frontend: TypeScript Strict Check (قانون ۷)"
+        entry: npm --prefix frontend run typecheck
+        language: system
+        files: ^frontend/(src|e2e)/.*\.(ts|tsx)$
+        pass_filenames: false
+
+      - id: conventional-commits
+        name: "Git: بررسی ساختار Conventional Commits"
+        entry: python3 scripts/check_commit_msg.py
+        language: system
+        stages: [commit-msg]

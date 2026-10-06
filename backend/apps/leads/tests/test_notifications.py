@@ -90,9 +90,10 @@ class TestNotifyNewContact:
         s.LEADS_NOTIFICATION_EMAIL = ""
         contact = cast(Contact, ContactFactory())
 
-        with patch("apps.leads.notifications.get_sms_backend") as mock_get_backend, patch(
-            "apps.leads.notifications.send_mail"
-        ) as mock_send_mail:
+        with (
+            patch("apps.leads.notifications.get_sms_backend") as mock_get_backend,
+            patch("apps.leads.notifications.send_mail") as mock_send_mail,
+        ):
             notify_new_contact(contact)
 
         mock_get_backend.assert_not_called()

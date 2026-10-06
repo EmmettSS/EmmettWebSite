@@ -22,7 +22,7 @@ export async function generateMetadata({
     locale: toAppLocale(locale),
     path: "/search",
     title: t("title"),
-    
+
     settings,
     siteUrl: getPublicSiteUrl(),
     noindex: true,
@@ -46,7 +46,9 @@ export default async function SearchPage({
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 lg:px-10">
-      <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">{t("title")}</h1>
+      <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+        {t("title")}
+      </h1>
 
       <div className="mt-6">
         <SearchBox initialQuery={query} />

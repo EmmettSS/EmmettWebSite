@@ -291,6 +291,17 @@ class ExportFormatsMixin:
     به‌خاطر نبود وابستگی سبکِ سازگار با هاست اشتراکی هدف حذف شده‌اند.
     """
 
+    def get_resource_classes(self, request: HttpRequest | None = None) -> list[Any]:
+        """تبدیل بی‌صدا و سازگار ``resource_class`` به ``resource_classes`` برای import_export 4.x."""
+
+        explicit_classes = getattr(self, "resource_classes", None)
+        if explicit_classes:
+            return list(explicit_classes)
+        single_class = getattr(self, "resource_class", None)
+        if single_class is not None:
+            return [single_class]
+        return []
+
     def get_export_formats(self) -> list[Any]:
         from apps.core.resources import emmett_export_formats
 

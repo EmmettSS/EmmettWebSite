@@ -39,11 +39,7 @@ export async function generateMetadata({
   });
 }
 
-export default async function ProjectDetailPage({
-  params,
-}: {
-  params: Promise<PageParams>;
-}) {
+export default async function ProjectDetailPage({ params }: { params: Promise<PageParams> }) {
   const { locale, slug } = await params;
   setRequestLocale(locale as AppLocale);
   const t = await getTranslations("projects");
@@ -140,10 +136,7 @@ export default async function ProjectDetailPage({
       {project.gallery_urls.length > 0 ? (
         <div className="mt-6 grid grid-cols-2 gap-4">
           {project.gallery_urls.map((url) => (
-            <div
-              key={url}
-              className="relative aspect-video overflow-hidden rounded-lg"
-            >
+            <div key={url} className="relative aspect-video overflow-hidden rounded-lg">
               <Image
                 src={url}
                 alt=""

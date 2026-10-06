@@ -78,7 +78,9 @@ export function CommentForm({ postSlug }: CommentFormProps) {
         {status === "sent" ? (
           <p className="text-xs text-muted-foreground">{t("commentPending")}</p>
         ) : null}
-        {status === "error" ? <p className="text-xs text-destructive">{t("commentPending")}</p> : null}
+        {status === "error" ? (
+          <p className="text-xs text-destructive">{t("commentPending")}</p>
+        ) : null}
       </div>
     </form>
   );

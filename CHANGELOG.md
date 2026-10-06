@@ -1,6 +1,67 @@
 # Changelog
 
-فرمت این فایل بر اساس [Keep a Changelog](https://keepachangelog.com/) است. هر فاز پروژه یک بخش مستقل دارد.
+فرمت این فایل بر اساس [Keep a Changelog](https://keepachangelog.com/) و استاندارد **[Conventional Commits](https://www.conventionalcommits.org/)** (`feat`, `fix`, `security`, `perf`, `docs`, `test`, `ci`, `chore`) است. هر فاز پروژه یک بخش مستقل دارد.
+
+---
+
+## [فاز ۹ — آمادگی استقرار روی cPanel (Deployment Readiness)] — 2026-10-06
+
+دامنهٔ فاز ۹ بر اساس چهار تصمیم مصوب مالک محصول اجرا شد: **توپولوژی دامنهٔ واحد هم‌مبدأ (`single_domain_only`)**، **نگه‌داشتن فایل‌های ورودی Passenger فقط به‌صورت `.example` (`example_only`)**، **مجموعهٔ کامل اسکریپت‌های خودکار استقرار و بازیابی (`full_scripts_suite`)**، و **Pin کامل ۱۰۰٪ پکیج‌ها و زیر-وابستگی‌های زمان اجرا در `backend/requirements.txt` (`full_pinned_lock`)**. تصمیم‌های معماری در `ADR-0036` ثبت شده‌اند.
+
+### Conventional Commits — فاز ۹
+
+- `build(deps)`: قفل کامل تمام ۴۰ پکیج پروداکشن (۲۰ پکیج سطح اول + ۲۰ زیر-وابستگی زمان اجرا) با نسخهٔ دقیق `==` در `backend/requirements.txt` (`ADR-0036`).
+- `security(settings)`: نهایی‌سازی `backend/config/settings/production.py` و `base.py` شامل قفل `DEBUG = False`، فعال‌سازی `CONN_HEALTH_CHECKS = True` و `sql_mode='STRICT_TRANS_TABLES'` در MySQL، تعریف `STORAGES` استاندارد Django 5.2، مسیرهای قابل‌تنظیم `DJANGO_STATIC_ROOT` و `DJANGO_MEDIA_ROOT`، تنظیمات کامل کوکی‌ها (`SameSite=Lax`, `Secure`, `HttpOnly`)، هدرهای `SECURE_HSTS_*` و `SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin"`، و متغیرهای SMTP ایمیل.
+- `feat(deploy)`: ایجاد اسکریپت‌های عملیاتی `scripts/deploy_backend.sh` (مهاجرت، `collectstatic`، بررسی ترجمه، `check --deploy` و ری‌استارت Passenger)، `scripts/deploy_frontend.sh` (بیلد پروداکشن Next.js و ری‌استارت Passenger) و `scripts/restore_backup.sh` (بازیابی ایمن دیتابیس و آرشیو Media همراه با بکاپ ایمنی پیش از بازنویسی).
+- `feat(deploy)`: افزودن قالب ورودی Passenger نود در `frontend/deploy/server.js.example`، تکمیل `backend/deploy/public_html.htaccess.example` برای الگوی دامنهٔ واحد هم‌مبدأ، به‌روزرسانی کامل `backend/.env.example` و ایجاد `frontend/.env.example`.
+- `docs(deploy)`: نگارش راهنمای جامع فارسی `DEPLOYMENT.md` در ریشهٔ مخزن (شامل گام‌های استقرار روی cPanel، راهنمای متغیرهای محیطی، راهنمای بکاپ و بازیابی، و چک‌لیست Go-Live) و ثبت `docs/adr/0036-deployment-readiness-and-runbooks.md`.
+- `test(deploy)`: افزودن `backend/apps/core/tests/test_deployment_readiness.py` برای بررسی خودکار Pin بودن ۱۰۰٪ `requirements.txt`، ممیزی تنظیمات `config.settings.production`، صحت نحوی اسکریپت‌های Bash و تست چرخهٔ بکاپ/بازیابی.
+
+---
+
+## [فاز ۸ — کیفیت کد، پایپ‌لاین CI/CD و مستندات جامع] — 2026-10-06
+
+دامنهٔ فاز ۸ شامل یکپارچه‌سازی فرمت‌کننده‌ها و لینترهای کد (`Ruff` + `Black` + `mypy --strict` + `ESLint` + `Prettier`)، ارتقای پوشش تست‌های واحد و یکپارچهٔ بک‌اند و فرانت‌اند به بالای ۸۵٪، تکمیل تست‌های E2E (`Playwright`)، راه‌اندازی هوک‌های `Pre-commit`، ساخت پایپ‌لاین کامل `GitHub Actions` (شامل اسکن امنیتی و `Lighthouse CI` با هدف ≥ ۹۵)، و نگارش مستندات فنی دوزبانهٔ تک‌فایلی و راهنمای استقرار روی cPanel است. تصمیم‌های معماری در `ADR-0034` و `ADR-0035` ثبت شده‌اند.
+
+### Conventional Commits — فاز ۸
+
+#### `feat` / `ci` (زیرساخت کیفیت، Pre-commit، GitHub Actions و استقرار cPanel)
+- `ci(pipeline)`: ایجاد پایپ‌لاین ۶جابهٔ GitHub Actions در `.github/workflows/ci.yml` شامل `backend-quality`, `backend-test`, `frontend-quality`, `frontend-test-build`, `security-scan` و `e2e-and-lighthouse` (`ADR-0034`).
+- `ci(lighthouse)`: افزودن پیکربندی `.lighthouserc.json` با گیت خطای `minScore: 0.95` در هر چهار محور Performance، Accessibility، Best Practices و SEO (قانون ۱۹).
+- `ci(pre-commit)`: ایجاد `.pre-commit-config.yaml` با ۱۰ هوک خودکار (`check-secrets`, `ruff check`, `ruff format --check`, `black --check`, `mypy --strict`, `scripts/i18n.py check`, `prettier --check`, `eslint`, `tsc --noEmit`, `conventional-commits`).
+- `security(ci)`: پیاده‌سازی اسکریپت `scripts/check_secrets.py` برای جلوگیری از کامیت فایل‌های `.env`، کلیدهای خصوصی PEM/SSH و توکن‌های API (قانون ۵) و یکپارچه‌سازی اسکن استاتیک `bandit` روی کل کدهای بک‌اند.
+- `chore(git)`: پیاده‌سازی اعتبارسنج `scripts/check_commit_msg.py` برای بررسی ساختار پیام‌های کامیت بر اساس استاندارد Conventional Commits.
+- `feat(deploy)`: افزودن قالب‌های استقرار هاست اشتراکی cPanel شامل `backend/deploy/passenger_wsgi.py.example` و `backend/deploy/public_html.htaccess.example` (`ADR-0035`).
+- `chore(lint)`: هم‌راستاسازی پیکربندی `Ruff`، `Black` (`black==26.10.0`)، `Bandit` (`bandit==1.9.4`) و `Coverage` (`fail_under = 85`) در `backend/pyproject.toml` و افزودن `Prettier` (`prettier@^3.5.3`) و `@vitest/coverage-v8` در `frontend/package.json`.
+
+#### `test` (پوشش تست واحد، یکپارچه و E2E — هدف ≥ ۸۵٪)
+- `test(backend)`: افزودن `backend/apps/core/tests/test_seed_demo_data.py` و گسترش تست‌های `test_blog_summary.py`, `test_utils.py` و `test_admin_search_filters.py`؛ دستیابی به **۵۰۱ تست سبز** و پوشش کل **۹۲٪** (بسیار بالاتر از حداقل ۸۵٪).
+- `test(frontend)`: افزودن ۵ فایل تست واحد و کامپوننت جدید (`src/lib/api/api.test.ts`, `src/lib/seo/feed.test.ts`, `src/components/ui/ui-atoms.test.tsx`, `src/components/molecules/molecules.test.tsx`, `src/components/organisms/organisms.test.tsx`) و تکمیل `metadata.test.ts`؛ دستیابی به **۷۲ تست سبز در ۱۳ فایل** با پوشش **۹۷.۷۷٪ Statements / ۹۸.۲۸٪ Lines / ۹۷.۳۸٪ Functions**.
+- `test(e2e)`: افزودن `frontend/e2e/ai-and-seo.spec.ts` برای پوشش سناریوهای فاز ۵ (`/advisor`, `/estimate`) و فاز ۷ (`sitemap.xml`, `robots.txt`, `/blog/rss`, `/academy/rss`, و اسکیمای JSON-LD)؛ مجموع **۲۵ سناریوی E2E در ۶ فایل**.
+
+#### `fix` / `security` (باگ‌های کشف‌شده و رفع‌شده با تست‌های فاز ۸)
+- `fix(admin)`: اصلاح باگ `AttributeError` در `RelatedPresenceFilter.queryset` (`backend/apps/core/admin_filters.py`) با تغییر `self.model._meta.get_field(...)` به `queryset.model._meta.get_field(...)`.
+- `fix(frontend)`: اصلاح باگ از دست رفتن مرجع رویداد React پس از `await` در `NewsletterForm` (`frontend/src/components/organisms/newsletter-form.tsx`) با ذخیرهٔ `const formElement = event.currentTarget;` پیش از فراخوانی ناهمگام.
+- `fix(frontend)`: اصلاح باگ خواندن `event.currentTarget.checked` درون callback تاخیری `setSelectedGoals` در `AIProjectContextFields` (`frontend/src/components/organisms/ai-project-context-fields.tsx`).
+- `security(settings)`: تغییر مسیر پیش‌فرض `CACHE_LOCATION` از `/tmp/emmett-django-cache` به `BASE_DIR / ".cache" / "django-cache"` در `backend/config/settings/base.py` برای رفع هشدار امنیتی `B108` در Bandit و جداسازی کش در هاست اشتراکی.
+- `chore(test)`: افزودن `__test__ = False` روی مدل `Testimonial` و مهاجرت `resource_class` به `resource_classes = [...]` در کلاس‌های ادمین برای حذف کامل هشدارهای `pytest` و `django-import-export`.
+
+#### `docs` (مستندات جامع دوزبانه — تک‌فایلی فارسی و انگلیسی)
+- `docs(tech)`: نگارش مرجع فنی یکپارچه و تک‌فایلی فارسی در `docs/TECHNICAL_DOCUMENTATION.fa.md` (شامل معماری، فهرست ۳۵ ADR، مستندات کامل API، راهنمای ادمین، راهنمای گام‌به‌گام استقرار روی cPanel و پایپ‌لاین CI/CD).
+- `docs(tech)`: نگارش مرجع فنی یکپارچه و تک‌فایلی انگلیسی در `docs/TECHNICAL_DOCUMENTATION.en.md`.
+- `docs(readme)`: به‌روزرسانی `README.md` (فارسی) و ایجاد `README.en.md` (انگلیسی) و `CONTRIBUTING.md` (دوزبانه).
+- `docs(adr)`: ثبت `docs/adr/0034-ci-cd-quality-gates-and-precommit.md` و `docs/adr/0035-cpanel-deployment-topology.md`.
+
+### خلاصهٔ Conventional Commits فازهای پیشین (فاز ۱ تا ۷)
+- `feat(architecture)`: طراحی معماری کلان مونو-ریپو، مدل دادهٔ ۲۰ موجودیت و ثبت `ADR-0001` تا `ADR-0010` (فاز ۱).
+- `feat(backend)`: پیاده‌سازی اسکلت Django 5.2، ۱۱ اپ دامنه‌ای، احراز هویت ایمیل‌محور، نرم‌حذف، `AuditLog`، استراتژی i18n و اسکیمای OpenAPI (`ADR-0011` تا `ADR-0015` — فاز ۲).
+- `feat(design-system)`: پیاده‌سازی سیستم طراحی Emerald/Obsidian در Next.js 16، فونت‌های خودمیزبان، تاریخ شمسی/میلادی، اعداد فارسی/لاتین و صفحهٔ `/design-system` (`ADR-0016` تا `ADR-0020` — فاز ۳).
+- `feat(pages)`: پیاده‌سازی صفحات عمومی، جست‌وجوی تمام‌متن (FTS)، Markdown امن با `nh3`، آداپتور کاوه‌نگار و پروفایل کاربری (`ADR-0021` تا `ADR-0025` — فاز ۴).
+- `feat(ai-engine)`: پیاده‌سازی موتور مرکزی هوش مصنوعی (`ai_engine`)، مشاور ایده‌پرداز با کاتالوگ بستهٔ Enum، تخمین‌گر قطعی روز کاری، خلاصه‌ساز بلاگ و Guardrail فرهنگی ایرانی (`ADR-0026` — فاز ۵).
+- `feat(admin)`: سفارشی‌سازی پنل ادمین با Jazzmin + RTL، داشبورد KPI، گردش‌کار انتشار گروهی، صادرات/واردات CSV/TSV/JSON و ابزار `scripts/i18n.py` (`ADR-0027` تا `ADR-0030` — فاز ۶).
+- `feat(seo)` / `perf(web)` / `security(hardening)`: پیاده‌سازی سئوی کامل، بودجهٔ کارایی، هدر CSP، احراز هویت دو مرحله‌ای ادمین (2FA)، قفل ورود ضد brute-force و دستور `backup_db` (`ADR-0031` تا `ADR-0033` — فاز ۷).
+
+---
 
 ## [فاز ۷ — SEO، کارایی و امنیت] — 2026-10-05
 

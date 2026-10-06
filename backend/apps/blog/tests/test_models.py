@@ -28,9 +28,7 @@ class TestBlogPostModel:
 
     def test_reading_time_increases_with_longer_content(self) -> None:
         short_post = cast(BlogPost, BlogPostFactory(slug="short-post", content="متن کوتاه"))
-        long_post = cast(
-            BlogPost, BlogPostFactory(slug="long-post", content="کلمه طولانی " * 500)
-        )
+        long_post = cast(BlogPost, BlogPostFactory(slug="long-post", content="کلمه طولانی " * 500))
         assert long_post.reading_time_minutes > short_post.reading_time_minutes
 
     def test_view_count_defaults_to_zero(self) -> None:

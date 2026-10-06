@@ -28,11 +28,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function SharedAdvisorResultPage({
-  params,
-}: {
-  params: Promise<PageParams>;
-}) {
+export default async function SharedAdvisorResultPage({ params }: { params: Promise<PageParams> }) {
   const { locale, token } = await params;
   setRequestLocale(locale as AppLocale);
   const t = await getTranslations("ai");
@@ -49,32 +45,54 @@ export default async function SharedAdvisorResultPage({
         <h1 className="mt-3 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
           {t("sharedResultTitle")}
         </h1>
-        <p className="mt-3 text-base leading-7 text-muted-foreground">{t("preliminaryDisclaimer")}</p>
+        <p className="mt-3 text-base leading-7 text-muted-foreground">
+          {t("preliminaryDisclaimer")}
+        </p>
       </header>
 
       <ShareResultButton />
 
       <ol className="mt-10 flex flex-col gap-6">
         {suggestion.concepts.map((concept) => (
-          <li key={concept.public_id} className="rounded-xl border border-border bg-background p-5 sm:p-8">
+          <li
+            key={concept.public_id}
+            className="rounded-xl border border-border bg-background p-5 sm:p-8"
+          >
             <div className="flex flex-wrap items-center gap-2">
-              <Badge variant="outline">{t("conceptNumber", { number: formatNumber(concept.position, locale as AppLocale) })}</Badge>
+              <Badge variant="outline">
+                {t("conceptNumber", {
+                  number: formatNumber(concept.position, locale as AppLocale),
+                })}
+              </Badge>
               <Badge variant="neutral">{concept.solution_area.label}</Badge>
               <Badge variant="neutral">{concept.complexity.label}</Badge>
             </div>
-            <h2 className="mt-5 text-2xl font-semibold tracking-tight text-foreground">{concept.title}</h2>
+            <h2 className="mt-5 text-2xl font-semibold tracking-tight text-foreground">
+              {concept.title}
+            </h2>
             <p className="mt-3 leading-7 text-muted-foreground">{concept.description}</p>
             <p className="mt-4 rounded-lg bg-secondary/30 p-4 text-sm leading-6 text-foreground">
-              <span className="font-semibold">{t("benefitLabel")}: </span>{concept.benefit}
+              <span className="font-semibold">{t("benefitLabel")}: </span>
+              {concept.benefit}
             </p>
             <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted-foreground">
-              <span>{t("deliveryScopeLabel")}: {concept.delivery_scope.label}</span>
+              <span>
+                {t("deliveryScopeLabel")}: {concept.delivery_scope.label}
+              </span>
               {concept.minimum_working_days !== null ? (
-                <span>{t("minimumDays", { days: formatNumber(concept.minimum_working_days, locale as AppLocale) })}</span>
+                <span>
+                  {t("minimumDays", {
+                    days: formatNumber(concept.minimum_working_days, locale as AppLocale),
+                  })}
+                </span>
               ) : null}
               {concept.related_item ? (
                 <Link
-                  href={concept.related_item.type === "service" ? `/services/${concept.related_item.slug}` : `/projects/${concept.related_item.slug}`}
+                  href={
+                    concept.related_item.type === "service"
+                      ? `/services/${concept.related_item.slug}`
+                      : `/projects/${concept.related_item.slug}`
+                  }
                   className="font-medium text-primary underline underline-offset-4"
                 >
                   {t("relatedExisting", { title: concept.related_item.title })}
@@ -87,7 +105,9 @@ export default async function SharedAdvisorResultPage({
       </ol>
 
       <p className="mt-8 text-sm text-muted-foreground">
-        <Link href="/advisor" className="font-medium text-primary underline underline-offset-4">{t("startAgain")}</Link>
+        <Link href="/advisor" className="font-medium text-primary underline underline-offset-4">
+          {t("startAgain")}
+        </Link>
       </p>
     </div>
   );

@@ -6,5 +6,4 @@ import { routing } from "./routing";
  * `next/link` و `next/navigation` خام در کامپوننت‌های اپ استفاده کنید تا
  * پیشوند locale به‌طور خودکار مدیریت شود.
  */
-export const { Link, redirect, usePathname, useRouter, getPathname } =
-  createNavigation(routing);
+export const { Link, redirect, usePathname, useRouter, getPathname } = createNavigation(routing);

@@ -61,7 +61,10 @@ export function ContactForm({ catalogs }: ContactFormProps) {
 
   if (status === "success") {
     return (
-      <p role="status" className="rounded-lg border border-border bg-secondary/30 p-4 text-sm text-foreground">
+      <p
+        role="status"
+        className="rounded-lg border border-border bg-secondary/30 p-4 text-sm text-foreground"
+      >
         {t("success")}
       </p>
     );
@@ -69,7 +72,10 @@ export function ContactForm({ catalogs }: ContactFormProps) {
 
   if (!catalogsReady) {
     return (
-      <p role="status" className="rounded-lg border border-border bg-secondary/30 p-4 text-sm text-muted-foreground">
+      <p
+        role="status"
+        className="rounded-lg border border-border bg-secondary/30 p-4 text-sm text-muted-foreground"
+      >
         {t("catalogUnavailable")}
       </p>
     );
@@ -108,7 +114,11 @@ export function ContactForm({ catalogs }: ContactFormProps) {
         <select
           name="budget_range"
           required
-          defaultValue={budgetRanges.find((option) => option.key === "not_sure")?.key ?? budgetRanges[0]?.key ?? ""}
+          defaultValue={
+            budgetRanges.find((option) => option.key === "not_sure")?.key ??
+            budgetRanges[0]?.key ??
+            ""
+          }
           className="flex h-11 w-full rounded-sm border border-input bg-transparent px-3 py-2 text-sm text-foreground transition-colors duration-fast ease-emmett-standard focus-visible:border-primary focus-visible:bg-secondary/30 focus-visible:outline-none"
         >
           {budgetRanges.map((option) => (
@@ -123,7 +133,9 @@ export function ContactForm({ catalogs }: ContactFormProps) {
         <select
           name="timeline"
           required
-          defaultValue={timelines.find((option) => option.key === "flexible")?.key ?? timelines[0]?.key ?? ""}
+          defaultValue={
+            timelines.find((option) => option.key === "flexible")?.key ?? timelines[0]?.key ?? ""
+          }
           className="flex h-11 w-full rounded-sm border border-input bg-transparent px-3 py-2 text-sm text-foreground transition-colors duration-fast ease-emmett-standard focus-visible:border-primary focus-visible:bg-secondary/30 focus-visible:outline-none"
         >
           {timelines.map((option) => (

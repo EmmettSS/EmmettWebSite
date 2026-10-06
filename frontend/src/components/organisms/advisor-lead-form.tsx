@@ -27,10 +27,17 @@ export function AdvisorLeadForm({ token, concept, catalogs }: AdvisorLeadFormPro
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
-  if (!catalogs || !["project_type", "budget_range", "timeline"].every((key) =>
-    catalogs.some((catalog) => catalog.key === key && catalog.options.length > 0),
-  )) {
-    return <p role="status" className="mt-5 text-sm text-muted-foreground">{t("catalogUnavailable")}</p>;
+  if (
+    !catalogs ||
+    !["project_type", "budget_range", "timeline"].every((key) =>
+      catalogs.some((catalog) => catalog.key === key && catalog.options.length > 0),
+    )
+  ) {
+    return (
+      <p role="status" className="mt-5 text-sm text-muted-foreground">
+        {t("catalogUnavailable")}
+      </p>
+    );
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -65,7 +72,14 @@ export function AdvisorLeadForm({ token, concept, catalogs }: AdvisorLeadFormPro
   }
 
   if (submitted) {
-    return <p role="status" className="mt-5 rounded-lg border border-border bg-secondary/30 p-4 text-sm text-foreground">{t("leadSuccess")}</p>;
+    return (
+      <p
+        role="status"
+        className="mt-5 rounded-lg border border-border bg-secondary/30 p-4 text-sm text-foreground"
+      >
+        {t("leadSuccess")}
+      </p>
+    );
   }
 
   const projectTypes = optionsFor(catalogs, "project_type");
@@ -87,38 +101,70 @@ export function AdvisorLeadForm({ token, concept, catalogs }: AdvisorLeadFormPro
         <Input name="phone" type="tel" autoComplete="tel" />
       </FormGroup>
       <FormGroup label={contactT("projectTypeLabel")} required>
-        <select name="project_type" required defaultValue={projectTypes[0]?.key ?? ""} className={selectClassName}>
-          {projectTypes.map((option) => <option key={option.key} value={option.key}>{option.label}</option>)}
+        <select
+          name="project_type"
+          required
+          defaultValue={projectTypes[0]?.key ?? ""}
+          className={selectClassName}
+        >
+          {projectTypes.map((option) => (
+            <option key={option.key} value={option.key}>
+              {option.label}
+            </option>
+          ))}
         </select>
       </FormGroup>
       <FormGroup label={contactT("budgetLabel")} required>
         <select
           name="budget_range"
           required
-          defaultValue={budgetRanges.find((option) => option.key === "not_sure")?.key ?? budgetRanges[0]?.key ?? ""}
+          defaultValue={
+            budgetRanges.find((option) => option.key === "not_sure")?.key ??
+            budgetRanges[0]?.key ??
+            ""
+          }
           className={selectClassName}
         >
-          {budgetRanges.map((option) => <option key={option.key} value={option.key}>{option.label}</option>)}
+          {budgetRanges.map((option) => (
+            <option key={option.key} value={option.key}>
+              {option.label}
+            </option>
+          ))}
         </select>
       </FormGroup>
       <FormGroup label={contactT("timelineLabel")} required>
         <select
           name="timeline"
           required
-          defaultValue={timelines.find((option) => option.key === "flexible")?.key ?? timelines[0]?.key ?? ""}
+          defaultValue={
+            timelines.find((option) => option.key === "flexible")?.key ?? timelines[0]?.key ?? ""
+          }
           className={selectClassName}
         >
-          {timelines.map((option) => <option key={option.key} value={option.key}>{option.label}</option>)}
+          {timelines.map((option) => (
+            <option key={option.key} value={option.key}>
+              {option.label}
+            </option>
+          ))}
         </select>
       </FormGroup>
       <FormGroup label={contactT("messageLabel")}>
-        <textarea name="message" rows={3} maxLength={5000} className="flex w-full rounded-sm border border-input bg-transparent px-3 py-2 text-sm text-foreground focus-visible:border-primary focus-visible:outline-none" />
+        <textarea
+          name="message"
+          rows={3}
+          maxLength={5000}
+          className="flex w-full rounded-sm border border-input bg-transparent px-3 py-2 text-sm text-foreground focus-visible:border-primary focus-visible:outline-none"
+        />
       </FormGroup>
       <label className="flex items-start gap-2 text-sm text-muted-foreground">
         <input name="consent_given" type="checkbox" required className="mt-1 size-4" />
         {contactT("consentLabel")}
       </label>
-      {error ? <p role="alert" className="text-sm text-destructive">{error}</p> : null}
+      {error ? (
+        <p role="alert" className="text-sm text-destructive">
+          {error}
+        </p>
+      ) : null}
       <Button type="submit" variant="secondary" isLoading={isSubmitting}>
         {isSubmitting ? t("sendingLead") : t("requestReview")}
       </Button>

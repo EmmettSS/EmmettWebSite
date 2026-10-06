@@ -16,7 +16,15 @@ interface FormGroupProps {
  * ترکیب label + فیلد + پیام خطا/راهنما با سیم‌کشی صحیح `aria-describedby`
  * (قانون ۱۸). هیچ رشتهٔ ثابتی اینجا نیست — همهٔ متن‌ها از next-intl می‌آیند.
  */
-export function FormGroup({ label, htmlFor, error, hint, required, className, children }: FormGroupProps) {
+export function FormGroup({
+  label,
+  htmlFor,
+  error,
+  hint,
+  required,
+  className,
+  children,
+}: FormGroupProps) {
   const generatedId = useId();
   const fieldId = htmlFor ?? generatedId;
   const errorId = error ? `${fieldId}-error` : undefined;

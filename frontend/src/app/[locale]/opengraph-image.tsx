@@ -47,7 +47,9 @@ async function readFontFile(fileName: string): Promise<ArrayBuffer | null> {
  * دیدیم. هر دو زیرمجموعه با نام‌های جدا به ``satori`` داده می‌شوند و هر متن
  * فونت مناسب خودش را می‌گیرد.
  */
-async function loadFonts(): Promise<{ name: string; data: ArrayBuffer; style: "normal"; weight: 700 }[]> {
+async function loadFonts(): Promise<
+  { name: string; data: ArrayBuffer; style: "normal"; weight: 700 }[]
+> {
   const [arabic, latin] = await Promise.all([
     readFontFile("vazirmatn-arabic-700.woff"),
     readFontFile("vazirmatn-latin-700.woff"),
@@ -63,11 +65,7 @@ async function loadFonts(): Promise<{ name: string; data: ArrayBuffer; style: "n
   return fonts;
 }
 
-export default async function OpengraphImage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
+export default async function OpengraphImage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const isPersian = toAppLocale(locale) === "fa";
   const fonts = isPersian ? await loadFonts() : [];
@@ -87,82 +85,80 @@ export default async function OpengraphImage({
   const subtitle = withoutZwnj(t("ogSubtitle"));
 
   return new ImageResponse(
-    (
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        padding: "72px",
+        background: "linear-gradient(135deg, #0b1220 0%, #16233c 60%, #1f3556 100%)",
+        color: "#f8fafc",
+        fontFamily: fonts.length > 0 ? "VazirmatnArabic, VazirmatnLatin" : "sans-serif",
+        // satori جهت متن را از استایل می‌گیرد؛ بدون این مقدار، کلمات فارسی
+        // در ترتیب LTR چیده می‌شوند و متن به‌هم‌ریخته دیده می‌شود.
+        direction: isPersian ? "rtl" : "ltr",
+        textAlign: isPersian ? "right" : "left",
+      }}
+    >
       <div
         style={{
-          width: "100%",
-          height: "100%",
           display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          padding: "72px",
-          background: "linear-gradient(135deg, #0b1220 0%, #16233c 60%, #1f3556 100%)",
-          color: "#f8fafc",
-          fontFamily: fonts.length > 0 ? "VazirmatnArabic, VazirmatnLatin" : "sans-serif",
-          // satori جهت متن را از استایل می‌گیرد؛ بدون این مقدار، کلمات فارسی
-          // در ترتیب LTR چیده می‌شوند و متن به‌هم‌ریخته دیده می‌شود.
-          direction: isPersian ? "rtl" : "ltr",
-          textAlign: isPersian ? "right" : "left",
+          alignItems: "center",
+          gap: "20px",
+          flexDirection: isPersian ? "row-reverse" : "row",
+          alignSelf: isPersian ? "flex-end" : "flex-start",
         }}
       >
         <div
           style={{
+            width: "64px",
+            height: "64px",
+            borderRadius: "18px",
+            background: "#3b82f6",
             display: "flex",
             alignItems: "center",
-            gap: "20px",
-            flexDirection: isPersian ? "row-reverse" : "row",
-            alignSelf: isPersian ? "flex-end" : "flex-start",
+            justifyContent: "center",
+            fontSize: "38px",
+            fontWeight: 700,
           }}
         >
-          <div
-            style={{
-              width: "64px",
-              height: "64px",
-              borderRadius: "18px",
-              background: "#3b82f6",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "38px",
-              fontWeight: 700,
-            }}
-          >
-            E
-          </div>
-          <div
-            style={{
-              fontSize: "30px",
-              letterSpacing: "0.08em",
-              opacity: 0.85,
-              fontFamily: "VazirmatnLatin, sans-serif",
-              // متن لاتین داخل قالب RTL باید جهت مستقل بگیرد، وگرنه satori
-              // آن را تکه‌تکه/بریده رندر می‌کند (مشاهده‌شده در build فاز ۷).
-              direction: "ltr",
-              textAlign: "left",
-            }}
-          >
-            {brandLabel}
-          </div>
+          E
         </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
-          <div style={{ fontSize: "86px", fontWeight: 700, lineHeight: 1.1 }}>{title}</div>
-          <div style={{ fontSize: "34px", opacity: 0.85, lineHeight: 1.5, maxWidth: "900px" }}>
-            {subtitle}
-          </div>
-        </div>
-
         <div
           style={{
-            display: "flex",
-            height: "6px",
-            width: "220px",
-            background: "#3b82f6",
-            alignSelf: isPersian ? "flex-end" : "flex-start",
+            fontSize: "30px",
+            letterSpacing: "0.08em",
+            opacity: 0.85,
+            fontFamily: "VazirmatnLatin, sans-serif",
+            // متن لاتین داخل قالب RTL باید جهت مستقل بگیرد، وگرنه satori
+            // آن را تکه‌تکه/بریده رندر می‌کند (مشاهده‌شده در build فاز ۷).
+            direction: "ltr",
+            textAlign: "left",
           }}
-        />
+        >
+          {brandLabel}
+        </div>
       </div>
-    ),
+
+      <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
+        <div style={{ fontSize: "86px", fontWeight: 700, lineHeight: 1.1 }}>{title}</div>
+        <div style={{ fontSize: "34px", opacity: 0.85, lineHeight: 1.5, maxWidth: "900px" }}>
+          {subtitle}
+        </div>
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          height: "6px",
+          width: "220px",
+          background: "#3b82f6",
+          alignSelf: isPersian ? "flex-end" : "flex-start",
+        }}
+      />
+    </div>,
     {
       ...size,
       fonts: fonts.length > 0 ? fonts : undefined,

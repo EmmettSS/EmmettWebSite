@@ -33,7 +33,9 @@ export function LocaleSwitcher() {
             aria-current={isActive ? "true" : undefined}
             className={cn(
               "rounded-sm px-2 py-1 font-medium transition-colors duration-fast",
-              isActive ? "bg-secondary text-secondary-foreground" : "text-muted-foreground hover:text-foreground",
+              isActive
+                ? "bg-secondary text-secondary-foreground"
+                : "text-muted-foreground hover:text-foreground",
             )}
           >
             {t(locale)}

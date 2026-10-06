@@ -15,7 +15,10 @@ export function Avatar({ className, ...props }: React.ComponentProps<typeof Avat
   );
 }
 
-export function AvatarImage({ className, ...props }: React.ComponentProps<typeof AvatarPrimitive.Image>) {
+export function AvatarImage({
+  className,
+  ...props
+}: React.ComponentProps<typeof AvatarPrimitive.Image>) {
   return (
     <AvatarPrimitive.Image
       data-slot="avatar-image"

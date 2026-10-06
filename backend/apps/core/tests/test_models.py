@@ -137,9 +137,7 @@ class TestMediaValidation:
 
     def test_valid_png_passes_full_clean(self) -> None:
         media = Media(
-            file=SimpleUploadedFile(
-                "photo.png", b"\x89PNG\r\n\x1a\n" + b"rest", content_type="image/png"
-            ),
+            file=SimpleUploadedFile("photo.png", b"\x89PNG\r\n\x1a\n" + b"rest", content_type="image/png"),
             media_type=Media.MediaType.IMAGE,
         )
         media.full_clean()  # no raise

@@ -82,7 +82,8 @@ class TestBlogPostViewSet:
         client.force_authenticate(user=user)
 
         response = client.post(
-            "/api/v1/blog/add-comment-post/comments/", {"body": "نظر من دربارهٔ این مقاله"}
+            "/api/v1/blog/add-comment-post/comments/",
+            {"body": "نظر من دربارهٔ این مقاله"},
         )
 
         assert response.status_code == 201

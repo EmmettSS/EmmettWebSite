@@ -21,5 +21,8 @@ pytest-django==4.14.0
 factory-boy==3.3.3
 coverage==7.16.2
 
-# --- Lint/format ---
+# --- Lint/format/security/hooks (فاز ۸ — ADR-0034) ---
 ruff==0.16.10
+black==26.10.0
+bandit==1.9.4
+pre-commit==4.6.2

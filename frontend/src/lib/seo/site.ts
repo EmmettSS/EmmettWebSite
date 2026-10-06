@@ -26,9 +26,7 @@ export function toAppLocale(value: string | undefined | null): AppLocale {
 /** ``PUBLIC_SITE_URL`` را می‌خواند و بدون اسلش پایانی نرمال می‌کند. */
 export function getPublicSiteUrl(): string {
   const raw =
-    process.env.PUBLIC_SITE_URL ??
-    process.env.NEXT_PUBLIC_SITE_URL ??
-    "http://localhost:3000";
+    process.env.PUBLIC_SITE_URL ?? process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
   return raw.replace(/\/+$/, "");
 }
 

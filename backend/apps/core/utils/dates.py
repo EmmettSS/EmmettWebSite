@@ -57,9 +57,11 @@ def format_date(
         local_value = value
 
     if locale == "fa":
-        jalali = jdatetime.date.fromgregorian(date=local_value) if not isinstance(
-            local_value, datetime
-        ) else jdatetime.datetime.fromgregorian(datetime=local_value)
+        jalali = (
+            jdatetime.date.fromgregorian(date=local_value)
+            if not isinstance(local_value, datetime)
+            else jdatetime.datetime.fromgregorian(datetime=local_value)
+        )
         month_name = _FA_MONTH_NAMES[jalali.month - 1]
         base = f"{jalali.day} {month_name} {jalali.year}"
         if with_time and isinstance(jalali, jdatetime.datetime):

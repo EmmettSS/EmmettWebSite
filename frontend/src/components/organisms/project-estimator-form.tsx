@@ -37,11 +37,20 @@ export function ProjectEstimatorForm({ catalogs }: ProjectEstimatorFormProps) {
     "goal",
     "delivery_scope",
   ];
-  const ready = catalogs !== null && requiredCatalogs.every((key) =>
-    catalogs.some((catalog) => catalog.key === key && catalog.options.length > 0),
-  );
+  const ready =
+    catalogs !== null &&
+    requiredCatalogs.every((key) =>
+      catalogs.some((catalog) => catalog.key === key && catalog.options.length > 0),
+    );
   if (!ready || !catalogs) {
-    return <p role="status" className="rounded-lg border border-border p-4 text-sm text-muted-foreground">{t("catalogUnavailable")}</p>;
+    return (
+      <p
+        role="status"
+        className="rounded-lg border border-border p-4 text-sm text-muted-foreground"
+      >
+        {t("catalogUnavailable")}
+      </p>
+    );
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -84,23 +93,36 @@ export function ProjectEstimatorForm({ catalogs }: ProjectEstimatorFormProps) {
           <select
             name="delivery_scope"
             required
-            defaultValue={scopeOptions.find((option) => option.key === "mvp")?.key ?? scopeOptions[0]?.key ?? ""}
+            defaultValue={
+              scopeOptions.find((option) => option.key === "mvp")?.key ?? scopeOptions[0]?.key ?? ""
+            }
             className="flex h-11 w-full rounded-sm border border-input bg-transparent px-3 py-2 text-sm text-foreground transition-colors duration-fast ease-emmett-standard focus-visible:border-primary focus-visible:bg-secondary/30 focus-visible:outline-none"
           >
-            {scopeOptions.map((option) => <option key={option.key} value={option.key}>{option.label}</option>)}
+            {scopeOptions.map((option) => (
+              <option key={option.key} value={option.key}>
+                {option.label}
+              </option>
+            ))}
           </select>
         </FormGroup>
         <p className="rounded-lg border border-border bg-secondary/20 p-4 text-sm leading-6 text-muted-foreground">
           {t("estimateDisclaimer")}
         </p>
-        {error ? <p role="alert" className="text-sm text-destructive">{error}</p> : null}
+        {error ? (
+          <p role="alert" className="text-sm text-destructive">
+            {error}
+          </p>
+        ) : null}
         <Button type="submit" size="lg" isLoading={isSubmitting}>
           {isSubmitting ? t("estimating") : t("estimateProject")}
         </Button>
       </form>
 
       {estimate ? (
-        <section aria-live="polite" className="mt-8 rounded-xl border border-border bg-secondary/20 p-6">
+        <section
+          aria-live="polite"
+          className="mt-8 rounded-xl border border-border bg-secondary/20 p-6"
+        >
           <div className="flex items-start gap-4">
             <span className="inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
               <Clock3 aria-hidden="true" className="size-5" />
@@ -110,12 +132,16 @@ export function ProjectEstimatorForm({ catalogs }: ProjectEstimatorFormProps) {
               <p className="mt-1 text-sm text-muted-foreground">{estimate.delivery_scope_label}</p>
               {estimate.minimum_working_days !== null ? (
                 <p className="mt-4 text-2xl font-semibold text-foreground">
-                  {t("minimumDays", { days: formatNumber(estimate.minimum_working_days, locale as AppLocale) })}
+                  {t("minimumDays", {
+                    days: formatNumber(estimate.minimum_working_days, locale as AppLocale),
+                  })}
                 </p>
               ) : (
                 <p className="mt-4 text-sm text-muted-foreground">{t("estimateUnavailable")}</p>
               )}
-              <p className="mt-2 text-xs leading-5 text-muted-foreground">{t("estimateDisclaimer")}</p>
+              <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                {t("estimateDisclaimer")}
+              </p>
               <Button asChild variant="secondary" className="mt-5">
                 <Link href="/contact">{t("requestQuote")}</Link>
               </Button>

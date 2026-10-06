@@ -1,0 +1,36 @@
+# نمونه فایل .htaccess ریشهٔ دامنه (public_html/.htaccess) روی هاست cPanel (ADR-0035، ADR-0036)
+#
+# توپولوژی مصوب: دامنهٔ واحد هم‌مبدأ (Single-Domain Same-Origin)
+# - مسیرهای /static/ و /media/ مستقیماً از دیسک (یا سیم‌لینک در public_html) با هدرهای امنیتی سرو می‌شوند.
+# - مسیرهای /admin/ و /i18n/ توسط اپلیکیشن پایتونی Django روی Passenger سرو می‌شوند.
+# - سایر مسیرها (شامل /، /en/ و پراکسی /api/v1/*) توسط اپلیکیشن Node.js (Next.js) روی Passenger مدیریت می‌شوند.
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # ۱) اجبار HTTPS در تمام درخواست‌ها (قانون ۱۶)
+    RewriteCond %{HTTPS} !=on
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+    # ۲) سرو مستقیم فایل‌های استاتیک و مدیا در صورت وجود فیزیکی روی دیسک
+    RewriteCond %{REQUEST_URI} ^/(static|media)/ [NC]
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule ^ - [L]
+</IfModule>
+
+# ۳) هدرهای امنیتی پایه و کش برای دارایی‌های استاتیک سرو شده توسط Apache
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set X-Frame-Options "DENY"
+
+    <FilesMatch "\.(woff2|woff|css|js|png|jpg|jpeg|webp|avif|svg|ico)$">
+        Header set Cache-Control "public, max-age=2592000, immutable"
+    </FilesMatch>
+</IfModule>
+
+# ۴) غیرفعال‌سازی کامل فهرست دایرکتوری‌ها و مسدودسازی دسترسی به فایل‌های نقطه (.env, .git)
+Options -Indexes
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>

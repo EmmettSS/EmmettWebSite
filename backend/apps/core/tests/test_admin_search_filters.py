@@ -99,6 +99,28 @@ class TestFilters:
         # فیلتر «ثبت‌شده در هر دو زبان» هر دو ردیف همان کلید را برمی‌گرداند.
         assert set(apply("both")) == {"both"}
 
+    def test_related_presence_filter_for_courses(self) -> None:
+        from apps.academy.admin import CourseHasEnrollmentsFilter
+        from apps.academy.models import Course, Enrollment
+        from apps.academy.tests.factories import CourseFactory
+
+        course_with = cast(Course, CourseFactory(slug="with-enroll"))
+        CourseFactory(slug="without-enroll")
+        Enrollment.objects.create(user=UserFactory(), course=course_with)
+
+        def apply(val: str) -> list[str]:
+            flt = CourseHasEnrollmentsFilter(
+                cast(Any, type("R", (), {"GET": {"has_enrollments": val}}))(),
+                {"has_enrollments": [val]},
+                Course,
+                cast(Any, None),
+            )
+            qs = flt.queryset(cast(Any, None), Course.objects.all())
+            return sorted(qs.values_list("slug", flat=True))
+
+        assert apply("yes") == ["with-enroll"]
+        assert apply("no") == ["without-enroll"]
+
     def test_search_inside_translation_values(self, client: Client) -> None:
         Translation.objects.create(namespace="site", key="tagline", locale="fa", value="شعار برند")
         Translation.objects.create(namespace="legal", key="terms", locale="fa", value="شرایط")

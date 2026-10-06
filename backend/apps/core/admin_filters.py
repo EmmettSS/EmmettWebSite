@@ -40,7 +40,7 @@ class RelatedPresenceFilter(admin.SimpleListFilter):
             return queryset
 
         try:
-            relation_field = self.model._meta.get_field(self.relation)  # type: ignore[attr-defined]
+            relation_field = queryset.model._meta.get_field(self.relation)
         except Exception:  # pragma: no cover - پیکربندی اشتباه در کد، نه ورودی کاربر
             return queryset
 

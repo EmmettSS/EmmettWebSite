@@ -45,4 +45,8 @@ if env.bool("DJANGO_DEV_ALLOW_ANY_HOST", default=False):
     # قاب‌بندی (iframe) پنل ادمین در پیش‌نمایش باید ممکن باشد؛ X-Frame-Options
     # تنها هدری است که مانع نمایش preview داخل iframe می‌شود. در production
     # مقدار DENY از ``base.py`` حفظ می‌شود.
-    MIDDLEWARE = [mw for mw in MIDDLEWARE if mw != "django.middleware.clickjacking.XFrameOptionsMiddleware"]  # noqa: F405
+    MIDDLEWARE = [
+        mw
+        for mw in MIDDLEWARE  # noqa: F405
+        if mw != "django.middleware.clickjacking.XFrameOptionsMiddleware"
+    ]
