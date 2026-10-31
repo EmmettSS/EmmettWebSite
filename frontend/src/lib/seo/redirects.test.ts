@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { BRAND_GRADIENT_BASE, BRAND_INK, BRAND_LINK } from "@/lib/brand-colors";
 import {
   buildRedirectMap,
   goneResponseHtml,
@@ -67,5 +68,17 @@ describe("managed redirects", () => {
     expect(en).toContain('lang="en"');
     expect(en).toContain("/en/search");
     expect(en).not.toContain('<!doctype html><html lang="fa-IR"');
+  });
+
+  it("uses the shared emerald brand palette in 410 HTML with zero legacy navy/blue literals", () => {
+    for (const locale of ["fa", "en"] as const) {
+      const html = goneResponseHtml(locale);
+      expect(html).toContain(`background:${BRAND_GRADIENT_BASE}`);
+      expect(html).toContain(`color:${BRAND_INK}`);
+      expect(html).toContain(`style="color:${BRAND_LINK}"`);
+      for (const retired of ["#0b1220", "#93c5fd", "#f8fafc"]) {
+        expect(html.toLowerCase()).not.toContain(retired);
+      }
+    }
   });
 });

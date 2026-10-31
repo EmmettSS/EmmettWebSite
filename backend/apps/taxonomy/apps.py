@@ -7,3 +7,6 @@ class TaxonomyConfig(AppConfig):
     name = "apps.taxonomy"
     label = "taxonomy"
     verbose_name = _("Taxonomy")
+
+    def ready(self) -> None:
+        from apps.taxonomy import signals  # noqa: F401

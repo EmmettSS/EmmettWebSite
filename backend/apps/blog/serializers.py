@@ -17,6 +17,7 @@ from apps.taxonomy.serializers import CategorySerializer, TagSerializer
 class BlogPostListSerializer(serializers.ModelSerializer[BlogPost]):
     cover_image_url = serializers.SerializerMethodField()
     author_name = serializers.CharField(source="author.get_full_name", read_only=True, default=None)
+    categories = CategorySerializer(many=True, read_only=True)
 
     class Meta:
         model = BlogPost
@@ -27,6 +28,7 @@ class BlogPostListSerializer(serializers.ModelSerializer[BlogPost]):
             "excerpt",
             "cover_image_url",
             "author_name",
+            "categories",
             "reading_time_minutes",
             "published_at",
         )
@@ -102,7 +104,8 @@ class BlogPostDetailSerializer(serializers.ModelSerializer[BlogPost]):
         related = (
             BlogPost.objects.filter(status=BlogPost.Status.PUBLISHED, categories__in=obj.categories.all())
             .exclude(pk=obj.pk)
-            .distinct()[:3]
+            .distinct()
+            .prefetch_related("categories")[:3]
         )
         return list(BlogPostListSerializer(related, many=True).data)
 

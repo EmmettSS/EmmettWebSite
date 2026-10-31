@@ -24,6 +24,16 @@ class TestCourseViewSet:
         assert "published-course" in slugs
         assert "draft-course" not in slugs
 
+    def test_list_reports_the_actual_lesson_count(self) -> None:
+        course = cast(Course, CourseFactory(slug="course-with-count"))
+        LessonFactory(course=course, order=0)
+        LessonFactory(course=course, order=1)
+
+        response = APIClient().get("/api/v1/academy/")
+        item = next(row for row in response.data["results"] if row["slug"] == "course-with-count")
+
+        assert item["lesson_count"] == 2
+
     def test_filter_by_level(self) -> None:
         CourseFactory(slug="beginner-course", level=Course.Level.BEGINNER)
         CourseFactory(slug="advanced-course", level=Course.Level.ADVANCED)

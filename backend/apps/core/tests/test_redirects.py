@@ -71,6 +71,24 @@ class TestModelValidation:
         Redirect(from_path="/a", target="https://example.com/x").clean()
         Redirect(from_path="/b", target="/internal").clean()
 
+    @pytest.mark.parametrize(
+        "target",
+        [
+            "//evil.example",
+            "///evil.example",
+            r"/\\evil.example",
+            "http://example.com",
+            "javascript:alert(1)",
+            "https:///missing-host",
+            "https://user:secret@example.com",
+            "https://example.com:invalid",
+            "/path\r\nLocation: https://evil.example",
+        ],
+    )
+    def test_unsafe_targets_are_rejected(self, target: str) -> None:
+        with pytest.raises(ValidationError):
+            Redirect(from_path="/unsafe", target=target).clean()
+
     def test_str_is_human_readable(self) -> None:
         redirect = Redirect.objects.create(from_path="/old", target="/new")
         assert "/old" in str(redirect) and "/new" in str(redirect)
@@ -88,6 +106,16 @@ class TestRedirectMiddleware:
     def test_temporary_redirect_returns_302(self, client: Client) -> None:
         Redirect.objects.create(from_path="/temp", target="/blog", status_code=302)
         assert client.get("/temp").status_code == 302
+
+    def test_legacy_protocol_relative_target_is_not_redirected(self, client: Client) -> None:
+        # .objects.create() does not call full_clean(), matching legacy/imported rows.
+        Redirect.objects.create(from_path="/legacy-open-redirect", target="//evil.example")
+        cache.clear()
+
+        response = client.get("/legacy-open-redirect")
+
+        assert response.status_code == 404
+        assert "Location" not in response
 
     def test_gone_redirect_returns_410(self, client: Client) -> None:
         Redirect.objects.create(from_path="/gone", target="", status_code=410)

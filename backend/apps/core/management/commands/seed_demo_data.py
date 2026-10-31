@@ -41,6 +41,8 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args: Any, **options: Any) -> None:
+        if settings.SETTINGS_MODULE == "config.settings.production":
+            raise CommandError("اجرای seed_demo_data با تنظیمات production ممنوع است، حتی با --force.")
         if not settings.DEBUG and not options["force"]:
             raise CommandError(
                 "این دستور فقط برای محیط توسعه/دمو است. در DEBUG=False باید صراحتاً --force بدهید."
@@ -63,16 +65,16 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS("seed دادهٔ نمایشی با موفقیت کامل شد."))
         self.stdout.write(
             self.style.WARNING(
-                f"کاربر ادمین دمو: {admin_user.email} / رمز عبور پیش‌فرض dev (در .env قابل‌تغییر با "
-                "DEMO_ADMIN_PASSWORD)."
+                f"کاربر ادمین دمو: {admin_user.email}. برای ورود، پیش از seed مقدار "
+                "DEMO_ADMIN_PASSWORD را در محیط توسعه تنظیم کنید؛ رمز در خروجی چاپ نمی‌شود."
             )
         )
 
     # -- کاربران -----------------------------------------------------------------
 
     def _create_admin_user(self) -> User:
-        password = getattr(settings, "DEMO_ADMIN_PASSWORD", None) or "DemoAdmin!2024"
-        admin_user, created = User.objects.get_or_create(
+        password = getattr(settings, "DEMO_ADMIN_PASSWORD", "")
+        admin_user, _ = User.objects.get_or_create(
             email="admin@emmett.dev",
             defaults={
                 "first_name": "Admin",
@@ -82,27 +84,27 @@ class Command(BaseCommand):
                 "is_superuser": True,
             },
         )
-        if created:
+        if password:
             admin_user.set_password(password)
-            admin_user.save(update_fields=["password"])
+        else:
+            admin_user.set_unusable_password()
+        admin_user.save(update_fields=["password"])
         return admin_user
 
     def _create_demo_users(self) -> tuple[User, User]:
-        author_user, created = User.objects.get_or_create(
+        author_user, _ = User.objects.get_or_create(
             email="author@emmett.dev",
             defaults={"first_name": "سارا", "last_name": "نویسنده", "role": User.Role.EDITOR},
         )
-        if created:
-            author_user.set_password("DemoAuthor!2024")
-            author_user.save(update_fields=["password"])
+        author_user.set_unusable_password()
+        author_user.save(update_fields=["password"])
 
-        client_user, created = User.objects.get_or_create(
+        client_user, _ = User.objects.get_or_create(
             email="client@emmett.dev",
             defaults={"first_name": "علی", "last_name": "مشتری", "role": User.Role.CLIENT},
         )
-        if created:
-            client_user.set_password("DemoClient!2024")
-            client_user.save(update_fields=["password"])
+        client_user.set_unusable_password()
+        client_user.save(update_fields=["password"])
 
         return author_user, client_user
 

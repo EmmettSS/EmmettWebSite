@@ -5,6 +5,7 @@ import { ImageResponse } from "next/og";
 import { getTranslations } from "next-intl/server";
 
 import { routing } from "@/i18n/routing";
+import { BRAND_ACCENT, BRAND_GRADIENT_CSS, BRAND_INK } from "@/lib/brand-colors";
 import { toAppLocale } from "@/lib/seo/site";
 
 /**
@@ -93,8 +94,8 @@ export default async function OpengraphImage({ params }: { params: Promise<{ loc
         flexDirection: "column",
         justifyContent: "space-between",
         padding: "72px",
-        background: "linear-gradient(135deg, #0b1220 0%, #16233c 60%, #1f3556 100%)",
-        color: "#f8fafc",
+        background: BRAND_GRADIENT_CSS,
+        color: BRAND_INK,
         fontFamily: fonts.length > 0 ? "VazirmatnArabic, VazirmatnLatin" : "sans-serif",
         // satori جهت متن را از استایل می‌گیرد؛ بدون این مقدار، کلمات فارسی
         // در ترتیب LTR چیده می‌شوند و متن به‌هم‌ریخته دیده می‌شود.
@@ -116,7 +117,7 @@ export default async function OpengraphImage({ params }: { params: Promise<{ loc
             width: "64px",
             height: "64px",
             borderRadius: "18px",
-            background: "#3b82f6",
+            background: BRAND_ACCENT,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -154,7 +155,7 @@ export default async function OpengraphImage({ params }: { params: Promise<{ loc
           display: "flex",
           height: "6px",
           width: "220px",
-          background: "#3b82f6",
+          background: BRAND_ACCENT,
           alignSelf: isPersian ? "flex-end" : "flex-start",
         }}
       />

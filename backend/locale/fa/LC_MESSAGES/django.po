@@ -1887,9 +1887,9 @@ msgstr "مسیر نسبی (مثلاً /services/web/) یا نشانی کامل h
 msgid "A redirect with this status code needs a target."
 msgstr "ریدایرکتی با این کد وضعیت باید مقصد داشته باشد."
 
-#: apps/core/models.py:538
-msgid "The target must start with / or https://."
-msgstr "مقصد باید با / یا https:// آغاز شود."
+#: apps/core/models.py:572
+msgid "Use a root-relative path or a valid HTTPS URL without credentials."
+msgstr "از مسیر نسبیِ ریشه یا نشانی معتبر HTTPS بدون اطلاعات ورود استفاده کنید."
 
 #: apps/core/seo.py:169
 msgid ""

@@ -31,6 +31,7 @@ from apps.core.admin_mixins import (
     RecordStateFilter,
     SoftDeleteAdminMixin,
 )
+from apps.core.frontend_cache import invalidate_model_cache, invalidate_translation_cache
 from apps.core.models import (
     AuditLog,
     FAQItem,
@@ -182,12 +183,26 @@ class TranslationEntryAdmin(EmmettImportExportAdmin):
     def save_model(self, request: HttpRequest, obj: Translation, form: Any, change: bool) -> None:
         obj.updated_by = request.user if isinstance(request.user, User) else None
         super().save_model(request, obj, form, change)
+        if obj.namespace == "site.copy":
+            invalidate_translation_cache(obj.locale)
         log_action(
             action=f"core.translation_{'updated' if change else 'created'}",
             actor=request.user,
             target=obj,
             metadata={"namespace": obj.namespace, "key": obj.key, "locale": obj.locale},
         )
+
+    def delete_model(self, request: HttpRequest, obj: Translation) -> None:
+        namespace, locale = obj.namespace, obj.locale
+        super().delete_model(request, obj)
+        if namespace == "site.copy":
+            invalidate_translation_cache(locale)
+
+    def delete_queryset(self, request: HttpRequest, queryset: Any) -> None:
+        locales = set(queryset.filter(namespace="site.copy").values_list("locale", flat=True))
+        super().delete_queryset(request, queryset)
+        for locale in locales:
+            invalidate_translation_cache(str(locale))
 
     @admin.action(description=_("Create the missing language row for selected entries"))
     def create_missing_locale(self, request: HttpRequest, queryset: Any) -> None:
@@ -328,6 +343,8 @@ class RedirectAdmin(SoftDeleteAdminMixin, EmmettImportExportAdmin):
             metadata={"updated": updated},
         )
         self.message_user(request, _("Updated %(count)s redirect(s).") % {"count": updated}, messages.SUCCESS)
+        if updated and action in {"redirects_activated", "redirects_deactivated"}:
+            invalidate_model_cache(Redirect)
 
     def save_model(self, request: HttpRequest, obj: Redirect, form: Any, change: bool) -> None:
         super().save_model(request, obj, form, change)

@@ -11,6 +11,7 @@
  *   برمی‌گرداند (اختلاف مهم با ۴۰۴: خزنده سریع‌تر حذف می‌کند).
  */
 
+import { BRAND_GRADIENT_BASE, BRAND_INK, BRAND_LINK } from "@/lib/brand-colors";
 import type { SeoRedirect } from "@/lib/seo/types";
 
 export interface RedirectMatch {
@@ -69,5 +70,5 @@ export function goneResponseHtml(locale: "fa" | "en" = "fa"): string {
   const searchHref = isPersian ? "/search" : "/en/search";
   const direction = isPersian ? "rtl" : "ltr";
 
-  return `<!doctype html><html lang="${isPersian ? "fa-IR" : "en"}" dir="${direction}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>${title}</title></head><body style="margin:0;font-family:system-ui,sans-serif;background:#0b1220;color:#f8fafc;display:flex;min-height:100vh;align-items:center;justify-content:center"><main style="max-width:34rem;padding:2rem;text-align:center"><h1 style="font-size:1.75rem;margin:0 0 1rem">${title}</h1><p style="line-height:1.9;opacity:.85;margin:0 0 1.5rem">${body}</p><p style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin:0"><a href="${homeHref}" style="color:#93c5fd">${homeLabel}</a><a href="${searchHref}" style="color:#93c5fd">${searchLabel}</a></p></main></body></html>`;
+  return `<!doctype html><html lang="${isPersian ? "fa-IR" : "en"}" dir="${direction}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>${title}</title></head><body style="margin:0;font-family:system-ui,sans-serif;background:${BRAND_GRADIENT_BASE};color:${BRAND_INK};display:flex;min-height:100vh;align-items:center;justify-content:center"><main style="max-width:34rem;padding:2rem;text-align:center"><h1 style="font-size:1.75rem;margin:0 0 1rem">${title}</h1><p style="line-height:1.9;opacity:.85;margin:0 0 1.5rem">${body}</p><p style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin:0"><a href="${homeHref}" style="color:${BRAND_LINK}">${homeLabel}</a><a href="${searchHref}" style="color:${BRAND_LINK}">${searchLabel}</a></p></main></body></html>`;
 }

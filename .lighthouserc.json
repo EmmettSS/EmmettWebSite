@@ -5,7 +5,9 @@
         "http://127.0.0.1:3000/",
         "http://127.0.0.1:3000/en",
         "http://127.0.0.1:3000/services",
-        "http://127.0.0.1:3000/blog"
+        "http://127.0.0.1:3000/blog",
+        "http://127.0.0.1:3000/projects/pentestor",
+        "http://127.0.0.1:3000/products/crm"
       ],
       "numberOfRuns": 2,
       "settings": {
@@ -22,7 +24,8 @@
       }
     },
     "upload": {
-      "target": "temporary-public-storage"
+      "target": "filesystem",
+      "outputDir": ".lighthouseci"
     }
   }
 }

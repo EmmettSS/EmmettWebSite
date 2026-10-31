@@ -28,8 +28,9 @@ class BlogPostViewSet(PublicReadOnlyViewSet[BlogPost]):
         qs: QuerySet[BlogPost] = BlogPost.objects.filter(status=BlogPost.Status.PUBLISHED).select_related(
             "author", "cover_image"
         )
+        qs = qs.prefetch_related("categories")
         if self.action == "retrieve":
-            qs = qs.prefetch_related("categories", "tags", "comments__author")
+            qs = qs.prefetch_related("tags")
         return qs.order_by("-published_at")
 
     def get_serializer_class(self) -> type[BlogPostListSerializer | BlogPostDetailSerializer]:

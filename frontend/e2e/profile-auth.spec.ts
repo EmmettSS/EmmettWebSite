@@ -52,7 +52,9 @@ test.describe("ثبت‌نام، ورود و پروفایل", () => {
       timeout: 10_000,
     });
 
-    // خروج.
+    // خروج از صفحهٔ پروفایل انجام می‌شود (در شل پورت‌شده دکمهٔ خروج فقط
+    // همان‌جاست؛ صفحهٔ مقاله چنین دکمه‌ای ندارد).
+    await page.goto("/profile");
     await page.getByRole("button", { name: "خروج" }).click();
     await expect(page.getByText(/خوش آمدید/)).toHaveCount(0, { timeout: 10_000 });
     await expect(page.getByLabel("رمز عبور")).toBeVisible();

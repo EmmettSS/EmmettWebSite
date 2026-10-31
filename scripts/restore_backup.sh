@@ -6,9 +6,9 @@
 #   ۱) مشاهدهٔ فهرست بکاپ‌های موجود:
 #      bash scripts/restore_backup.sh --list
 #   ۲) بازیابی دیتابیس (SQLite / MySQL SQL / JSON dumpdata):
-#      bash scripts/restore_backup.sh --db backend/backups/db-20261006T033000Z.sql.gz --yes
+#      bash scripts/restore_backup.sh --db backend/backups/db-20261022-033000.sql.gz --yes
 #   ۳) بازیابی آرشیو فایل‌های آپلودشده (Media):
-#      bash scripts/restore_backup.sh --media backend/backups/media-20261006T033000Z.tar.gz --yes
+#      bash scripts/restore_backup.sh --media backend/backups/media-20261022-033000.tar.gz --yes
 # =============================================================================
 
 set -Eeuo pipefail
@@ -90,7 +90,7 @@ fi
 
 if [[ "${SKIP_PRE_BACKUP}" != "true" ]]; then
   echo "==> تهیهٔ نسخهٔ پشتیبان ایمنی پیش از بازیابی..."
-  (cd "${BACKEND_DIR}" && "${PYTHON_BIN}" manage.py backup_db --no-media || true)
+  (cd "${BACKEND_DIR}" && "${PYTHON_BIN}" manage.py backup_db --skip-media || true)
 fi
 
 if [[ -n "${DB_ARCHIVE}" ]]; then
@@ -146,7 +146,12 @@ if [[ -n "${MEDIA_ARCHIVE}" ]]; then
   MEDIA_TARGET="${DJANGO_MEDIA_ROOT:-${BACKEND_DIR}/media}"
   mkdir -p "${MEDIA_TARGET}"
   echo "==> در حال استخراج فایل‌های Media در ${MEDIA_TARGET}..."
-  tar -xzf "${MEDIA_ARCHIVE}" -C "${MEDIA_TARGET}"
+  FIRST_ENTRY="$(tar -tzf "${MEDIA_ARCHIVE}" 2>/dev/null | head -n 1 || true)"
+  if [[ "${FIRST_ENTRY}" == "media/" || "${FIRST_ENTRY}" == media/* ]]; then
+    tar -xzf "${MEDIA_ARCHIVE}" --strip-components=1 -C "${MEDIA_TARGET}"
+  else
+    tar -xzf "${MEDIA_ARCHIVE}" -C "${MEDIA_TARGET}"
+  fi
   cp "${BACKEND_DIR}/deploy/media.htaccess.example" "${MEDIA_TARGET}/.htaccess"
   echo "✔ فایل‌های Media و محافظ .htaccess با موفقیت بازیابی شدند."
 fi

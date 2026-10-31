@@ -151,3 +151,24 @@ class TestSearch:
 
     def test_no_match_returns_empty_list(self) -> None:
         assert search(query="نامرتبط‌ترین‌عبارت‌ممکن", locale="fa") == []
+
+    def test_mysql_empty_fulltext_falls_back_to_icontains_on_short_queries(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        from django.db import connection
+
+        sync_search_index(
+            content_type="service",
+            object_id=30,
+            public_id=uuid.uuid4(),
+            locale="fa",
+            title="مشاورهٔ هوش مصنوعی AI",
+            body="طراحی راهکارهای هوشمند وب",
+            url_path="/services/ai-consulting",
+        )
+        monkeypatch.setattr(connection, "vendor", "mysql")
+        monkeypatch.setattr("apps.core.search._search_mysql", lambda query, locale, limit: [])
+
+        results = search(query="AI", locale="fa")
+        assert len(results) == 1
+        assert results[0].url_path == "/services/ai-consulting"

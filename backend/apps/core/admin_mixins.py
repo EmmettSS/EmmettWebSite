@@ -38,6 +38,7 @@ from django.utils.translation import gettext_lazy as _
 # ``# type: ignore[misc]`` فقط روی همان کلاس پایه نشسته است (نه روی همهٔ ادمین‌ها).
 from import_export.admin import ImportExportModelAdmin
 
+from apps.core.frontend_cache import invalidate_model_cache
 from apps.core.models import PublishableModel, log_action
 
 
@@ -207,6 +208,7 @@ class PublishWorkflowMixin(admin.ModelAdmin[Any]):
             actor=request.user if request.user.is_authenticated else None,
             metadata={"ids": ids, **metadata},
         )
+        invalidate_model_cache(self.model)
 
 
 # ---------------------------------------------------------------------------
@@ -250,6 +252,12 @@ class SoftDeleteAdminMixin(admin.ModelAdmin[Any]):
             return cast(QuerySet[Any], model.all_objects.all())
         return super().get_queryset(request)
 
+    def delete_queryset(self, request: HttpRequest, queryset: QuerySet[Any]) -> None:
+        affected = queryset.count()
+        super().delete_queryset(request, queryset)
+        if affected:
+            invalidate_model_cache(self.model)
+
     @admin.action(description=_("Restore selected records"), permissions=["change"])
     def restore_selected(self, request: HttpRequest, queryset: QuerySet[Any]) -> None:
         deleted_ids = list(queryset.filter(deleted_at__isnull=False).values_list("pk", flat=True))
@@ -262,6 +270,7 @@ class SoftDeleteAdminMixin(admin.ModelAdmin[Any]):
         restored = model.all_objects.filter(pk__in=deleted_ids).update(
             is_active=True, deleted_at=None, updated_at=now
         )
+        invalidate_model_cache(self.model)
         log_action(
             action=f"{self.model._meta.label}.restored",
             actor=request.user if request.user.is_authenticated else None,

@@ -7,8 +7,17 @@ from apps.portfolio.models import CaseStudy, Project
 from apps.taxonomy.serializers import CategorySerializer, TagSerializer
 
 
+class CaseStudyHighlightsSerializer(serializers.ModelSerializer[CaseStudy]):
+    class Meta:
+        model = CaseStudy
+        fields = ("technology_stack", "metrics")
+
+
 class ProjectListSerializer(serializers.ModelSerializer[Project]):
     cover_image_url = serializers.SerializerMethodField()
+    categories = CategorySerializer(many=True, read_only=True)
+    tags = TagSerializer(many=True, read_only=True)
+    case_study = serializers.SerializerMethodField()
 
     class Meta:
         model = Project
@@ -22,10 +31,21 @@ class ProjectListSerializer(serializers.ModelSerializer[Project]):
             "year",
             "is_product",
             "is_featured",
+            "categories",
+            "tags",
+            "case_study",
         )
 
     def get_cover_image_url(self, obj: Project) -> str | None:
         return obj.cover_image.file.url if obj.cover_image else None
+
+    @extend_schema_field(CaseStudyHighlightsSerializer)
+    def get_case_study(self, obj: Project) -> dict[str, object] | None:
+        try:
+            case_study = obj.case_study
+        except CaseStudy.DoesNotExist:
+            return None
+        return CaseStudyHighlightsSerializer(case_study).data
 
 
 class CaseStudySerializer(serializers.ModelSerializer[CaseStudy]):

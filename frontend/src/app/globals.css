@@ -1,64 +1,151 @@
 @import "tailwindcss";
 
 /*
- * فونت‌های خوداستقرار (self-hosted) — از طریق @fontsource (فایل‌های واقعی
- * در node_modules، نصب‌شده از npm registry، بدون فراخوانی شبکهٔ خارجی در
- * زمان build). ر.ک. src/lib/fonts.ts و ADR-0018 برای دلیل کامل.
+ * فونت‌های خوداستقرار (self-hosted) — از طریق @fontsource (فایل‌های واقعی woff2
+ * در node_modules، نصب‌شده از npm registry، بدون فراخوانی شبکهٔ خارجی در زمان
+ * build). دلیل انتخاب خانواده‌ها (Vazirmatn / Inter / JetBrains Mono) و چراییِ
+ * جایگزینی `next/font/google` در ADR-0018 مستند است.
+ *
+ * بودجهٔ بارگذاری (ADR-0032). این دانسته‌ها پیش‌تر در docstringِ
+ * `src/lib/fonts.ts` بود؛ آن فایل در بستهٔ ۴ به‌عنوان کد مرده حذف شد (سه ثابت
+ * رشته‌ای که هیچ مصرف‌کننده‌ای نداشتند و تستشان خودتکرار بود). برای اینکه
+ * مستندسازی از بین نرود، به اینجا منتقل شد — چون مکانیزم واقعی همین‌جاست:
+ * - همهٔ فایل‌های `@fontsource` با `font-display: swap` اعلام می‌شوند (خروجیِ
+ *   خودِ پکیج، قابل بازبینی در `node_modules/@fontsource/<family>/<weight>.css`)
+ *   تا متن هرگز با FOIT پنهان نشود.
+ * - وزن ۷۰۰ فونت فارسی در `[locale]/layout.tsx` با `<link rel="preload">` از
+ *   `public/fonts/` پیش‌بارگذاری می‌شود تا LCP متن فارسی به انتظار شبکه گره
+ *   نخورد.
+ * - هیچ فونتی از CDN خارجی بارگذاری نمی‌شود؛ CSP با `font-src 'self'` در
+ *   `src/proxy.ts` این را اجبار می‌کند.
+ *
+ * نام خانواده‌ها در `:root` همین فایل به‌صورت `--font-fa` / `--font-en` /
+ * `--font-technical-raw` تعریف می‌شود و لایهٔ layout بر پایهٔ زبان
+ * `--font-active-sans` را ست می‌کند (که `--font-sans` در `@theme inline` به آن
+ * با fallback ارجاع می‌دهد). تستِ
+ * `backend/apps/core/tests/test_performance_budget.py::
+ * test_frontend_uses_inline_font_loading_with_swap` همین سه مکانیزم را از روی
+ * فایل‌های ریپو می‌سنجد.
  */
 @import "@fontsource/vazirmatn/400.css";
 @import "@fontsource/vazirmatn/500.css";
 @import "@fontsource/vazirmatn/600.css";
 @import "@fontsource/vazirmatn/700.css";
+@import "@fontsource/inter/300.css";
 @import "@fontsource/inter/400.css";
 @import "@fontsource/inter/500.css";
 @import "@fontsource/inter/600.css";
 @import "@fontsource/inter/700.css";
 @import "@fontsource/jetbrains-mono/400.css";
 @import "@fontsource/jetbrains-mono/500.css";
+@import "@fontsource/jetbrains-mono/600.css";
+@import "@fontsource/newsreader/400.css";
+@import "@fontsource/newsreader/500.css";
+@import "@fontsource/newsreader/600.css";
+@import "@fontsource/newsreader/400-italic.css";
+@import "@fontsource/newsreader/500-italic.css";
 
 /*
- * توکن‌های طراحی برند امیت — استخراج‌شده از سند مشخصات طراحی
- * (legacy-frontend-reference/src/imports/pasted_text/emmett-design-spec.md،
- * بخش‌های B1–B3) طبق تصمیم صریح مالک محصول (فاز ۳، سؤال ۴).
- * جزئیات و دلایل هر گروه توکن در ADR-0017 مستند شده است.
+ * قواعد پوستهٔ UI که توکن نیستند (فونت سرمقاله‌ای، فید ورود، لودر).
+ * خودِ توکن‌ها از فاز ۷ روی `:root` همین فایل هستند.
  */
+@import "./ui-theme.css";
 
-/* ===== حالت روشن (پیش‌فرض) — از «Light surfaces» + «Text light» ===== */
+/*
+ * توکن‌های تم — فاز ۷. مقادیر معنایی همان `:root` بستهٔ UI هستند
+ * (`EmmettWebSite/frontend/src/styles/theme.css`): یک پالت تیرهٔ زمردی، بدون حالت روشن.
+ * نام توکن‌ها عوض نشده تا افزودن پالت روشن در آینده، اگر لازم شد، بازنویسی
+ * نخواهد. لهجه‌ها و سطوح ادیتوریال ADR-0017 جدا مانده‌اند؛ صفحهٔ دیزاین‌سیستم
+ * هنوز همان سواچ‌ها را نشان می‌دهد.
+ */
 :root {
-  --background: #f6f4f0; /* color/bg/warm-white */
-  --foreground: #16171a; /* color/text/light-primary */
+  color-scheme: dark;
+  --font-size: 16px;
 
-  --card: #ffffff;
-  --card-foreground: #16171a;
-  --popover: #ffffff;
-  --popover-foreground: #16171a;
+  /* Emmett Group — Emerald Engineering Color System */
+  --background: #0b1f18;
+  --foreground: #f3faf6;
+  --card: #102a20;
+  --card-foreground: #f3faf6;
 
-  --primary: #5b62e0; /* color/accent/indigo */
-  --primary-foreground: #ffffff;
+  --primary: #1fae6e;
+  --primary-foreground: #07130f;
 
-  --secondary: #e7e5e1; /* color/surface/soft-gray */
-  --secondary-foreground: #16171a;
+  --secondary: #16382b;
+  --secondary-foreground: #f3faf6;
 
-  --muted: #efebe4; /* color/bg/ivory */
-  --muted-foreground: #4a4b4f; /* color/text/light-secondary */
+  --muted: #102a20;
+  --muted-foreground: rgba(243, 250, 246, 0.5);
 
-  --accent: #1fae6e; /* color/accent/emerald */
-  --accent-foreground: #0b0c0e;
+  --accent: #35c98a;
+  --accent-foreground: #07130f;
 
-  --destructive: #b3433d; /* قرمز مات — اسپک فقط لحن را توصیف کرده، نه hex دقیق (ر.ک. ADR-0017) */
-  --destructive-foreground: #ffffff;
+  --destructive: #ef4444;
 
-  --border: #dad7d1; /* color/border/hairline-light */
-  --input: #dad7d1;
-  --ring: rgb(91 98 224 / 40%); /* color/border/accent */
+  --border: rgba(31, 174, 110, 0.18);
+  --input: rgba(31, 174, 110, 0.12);
+  --ring: #1fae6e;
 
-  /* لهجه‌های برند، مستقل از حالت روشن/تاریک */
+  /*
+   * بستهٔ ۴ (کد مرده): هشت نام مستعار پالت که مقدارشان با توکن‌های معناییِ
+   * بالا تکراری بود و هیچ مصرف‌کننده‌ای نداشتند حذف شدند —
+   * `--dark-emerald` (= `--background`)، `--forest-graphite` (= `--card`)،
+   * `--emerald-slate` (= `--secondary`)، `--emerald-primary` (= `--primary`)،
+   * `--emerald-secondary` (= `--accent`) و `--soft-green`/`--warm-green-white`/
+   * `--warm-ivory` که هیچ‌گاه مصرف نشدند. دو عضو باقی‌مانده
+   * (`--deep-green-black` و `--emerald-deep`) مقدارِ یکتا دارند و در ADR-0039
+   * به `@theme inline` نگاشت شدند.
+   */
+  --deep-green-black: #07130f;
+  --emerald-deep: #0b6b48;
+
+  /*
+   * پالت دسته‌بندی (ADR-0039). پنج رنگ هم‌خانواده برای تفکیک دستهٔ مقالات در
+   * بخش کتابخانه؛ `--emerald-deep` عضو اول همین پالت است. چهار مقدار دیگر
+   * پیش‌تر فقط به‌شکل هگز خام در `library-section.tsx` وجود داشتند. همه
+   * عمداً تیره‌اند تا روی پس‌زمینهٔ روشنِ آن بخش کنتراست WCAG AA (≥۴٫۵)
+   * داشته باشند — همان دلیلی که در آن فایل مستند شده و گیت color-contrast
+   * لایت‌هاوس می‌سنجد. پس جایگزینی‌شان با توکن روشن‌تر = شکست دسترس‌پذیری.
+   */
+  --blue-deep: #1d6fb8;
+  --teal-deep: #0e7a6d;
+  --amber-deep: #8a5a00;
+  --violet-deep: #6c4bd8;
+
+  /*
+   * متن ملایم روی سطح (ADR-0039). این دو **عمداً** از `--muted-foreground`
+   * جدا نگه داشته شده‌اند: مقدار آن `rgba(243, 250, 246, 0.5)` است، پس
+   * جایگزین‌کردنش با این دو آلفای رندرشده را تغییر می‌دهد (۰٫۵۸ و ۰٫۶۸) و
+   * کنتراست متن را جابه‌جا می‌کند. این دو پرتکرارترین لیترال خام بستهٔ UI
+   * بودند (۲۷ و ۲۸ مورد، در هر دو حالت فقط `text-[...]`)؛ نام‌شان سطحِ زیرِ
+   * متن را بیان می‌کند چون یک مقدار روی هر دو سطح روشن و تیره معنا ندارد.
+   */
+  --muted-on-dark: rgba(243, 250, 246, 0.58);
+  --muted-on-light: rgba(16, 42, 32, 0.68);
+
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+
+  /*
+   * بستهٔ ۴ (کد مرده): دو خانوادهٔ کامل حذف شدند چون هیچ utility مشتق‌شده
+   * از آن‌ها در CSS بیلدشده صادر نمی‌شد و هیچ `var()` هم به آن‌ها ارجاع
+   * نمی‌داد: پنج توکن `--chart-*` (این پروژه نمودار ندارد) و هشت توکن
+   * `--sidebar*` (این پروژه نوار کناری ندارد؛ ناوبری `navbar` پورت UI است).
+   * سنجهٔ مرده‌بودن «CSS بیلدشده» بود، نه grep روی سورس — چون Tailwind v4
+   * فقط utility مصرف‌شده را صادر می‌کند، نبودِ قاعده در خروجی یعنی نبودِ
+   * مصرف. این روش یک مثبت کاذبِ grep را هم لو داد: `--shadow-glow-cta` با
+   * کلاس `hover:shadow-glow-cta` در `ui/button.tsx` مصرف می‌شود و grepِ
+   * سادهٔ «shadow-glow-cta» به‌خاطر پیشوندِ variant آن را مرده می‌خواند.
+   */
+  --radius: 0.5rem;
+
+  /* لهجه‌های برند، مستقل از تم معنایی */
   --brand-indigo: #5b62e0;
   --brand-emerald: #1fae6e;
   --brand-muted-blue: #4c6e91;
   --brand-cyan: #4fd1d9;
 
-  /* سطوح ادیتوریال ثابت (برای ریتم تناوبی بخش‌های صفحه، مستقل از تم) */
+  /* سطوح ادیتوریال ثابت (ADR-0017؛ بستهٔ UI از آن‌ها استفاده نمی‌کند) */
   --surface-obsidian: #0b0c0e;
   --surface-graphite: #131417;
   --surface-slate: #1a1c20;
@@ -70,46 +157,17 @@
   --font-en: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-technical-raw: "JetBrains Mono";
 
-  --radius-value-sm: 0.25rem; /* radius/sm — 4px */
-  --radius-value-md: 0.5rem; /* radius/md — 8px */
-  --radius-value-lg: 1rem; /* radius/lg — 16px */
-  --radius-value-none: 0px;
+  /*
+   * گردی‌های UI: sm = 4px، md = 6px، lg = 8px.
+   * تا فاز ۷ این سه مقدار فقط داخل `.ui-theme` بودند.
+   */
+  --radius-value-sm: calc(var(--radius) - 4px);
+  --radius-value-md: calc(var(--radius) - 2px);
+  --radius-value-lg: var(--radius);
 
   --shadow-value-sm: 0 1px 2px rgb(0 0 0 / 24%);
   --shadow-value-md: 0 4px 16px rgb(0 0 0 / 28%);
-  --shadow-value-lg: 0 12px 32px rgb(0 0 0 / 32%);
   --shadow-value-glow-cta: 0 0 24px rgb(91 98 224 / 30%);
-  --shadow-value-glow-pentestor: 0 0 20px rgb(79 209 217 / 35%);
-}
-
-/* ===== حالت تاریک — از «Dark surfaces» + «Text dark» ===== */
-.dark {
-  --background: #0b0c0e; /* color/bg/obsidian */
-  --foreground: #f2f1ee; /* color/text/dark-primary */
-
-  --card: #202226; /* color/surface/charcoal */
-  --card-foreground: #f2f1ee;
-  --popover: #2a2c31; /* color/surface/charcoal-elevated */
-  --popover-foreground: #f2f1ee;
-
-  --primary: #5b62e0;
-  --primary-foreground: #ffffff;
-
-  --secondary: #202226;
-  --secondary-foreground: #f2f1ee;
-
-  --muted: #1a1c20; /* color/bg/slate */
-  --muted-foreground: #a7a9ae; /* color/text/dark-secondary */
-
-  --accent: #1fae6e;
-  --accent-foreground: #0b0c0e;
-
-  --destructive: #e5726b;
-  --destructive-foreground: #0b0c0e;
-
-  --border: #2e3034; /* color/border/hairline-dark */
-  --input: #2e3034;
-  --ring: rgb(91 98 224 / 50%);
 }
 
 /* ===== نگاشت به سیستم تم Tailwind v4 (CSS-first) ===== */
@@ -118,8 +176,6 @@
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
@@ -129,7 +185,6 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -146,56 +201,154 @@
   --color-surface-ivory: var(--surface-ivory);
   --color-surface-soft-gray: var(--surface-soft-gray);
 
+  /*
+   * نگاشت پالت زمردی و دسته‌بندی به Tailwind v4 (ADR-0039).
+   * `--emerald-deep` و `--deep-green-black` پیش از این در `:root` تعریف شده
+   * بودند ولی اینجا نگاشت نشده بودند، پس هیچ utility معادلی نداشتند و کد
+   * مجبور بود هگز خام بنویسد (`#0B6B48` ۱۷ بار و `#07130f` ۱۲ بار در بستهٔ
+   * UI). `@theme inline` مقدار را درون‌خطی می‌کند، پس افزودن این نگاشت‌ها تا
+   * وقتی utility‌شان استفاده نشود **هیچ** قاعدهٔ CSS تازه‌ای تولید نمی‌کند.
+   */
+  --color-emerald-deep: var(--emerald-deep);
+  --color-deep-green-black: var(--deep-green-black);
+  --color-blue-deep: var(--blue-deep);
+  --color-teal-deep: var(--teal-deep);
+  --color-amber-deep: var(--amber-deep);
+  --color-violet-deep: var(--violet-deep);
+
+  --color-muted-on-dark: var(--muted-on-dark);
+  --color-muted-on-light: var(--muted-on-light);
+
   --radius-sm: var(--radius-value-sm);
   --radius-md: var(--radius-value-md);
   --radius-lg: var(--radius-value-lg);
-  --radius-none: var(--radius-value-none);
 
   --shadow-sm: var(--shadow-value-sm);
   --shadow-md: var(--shadow-value-md);
-  --shadow-lg: var(--shadow-value-lg);
   --shadow-glow-cta: var(--shadow-value-glow-cta);
-  --shadow-glow-pentestor: var(--shadow-value-glow-pentestor);
 
-  /* موشن (motion/fast, motion/base, motion/slow — بخش B3 اسپک طراحی) */
+  /*
+   * موشن (motion/fast, motion/base, motion/slow — بخش B3 اسپک طراحی).
+   *
+   * ⚠ این سه `--duration-*` در Tailwind v4 **بی‌اثر** هستند: فضای‌نام درستِ
+   * این نسخه `--transition-duration-*` است (از `node_modules/tailwindcss/theme.css`
+   * تأیید شد، در برابر `--ease-*` که درست کار می‌کند). اندازه‌گیری: کلاس‌های
+   * `duration-fast` و `duration-base` در سورس استفاده می‌شوند ولی هیچ قاعدهٔ
+   * `.duration-fast`/`.duration-base` در CSS بیلدشده صادر نمی‌شود، در حالی که
+   * `.duration-150/200/300` عددی صادر می‌شوند.
+   *
+   * اثر واقعی: `duration-fast` (۱۵۰ms) تصادفاً با
+   * `--default-transition-duration: 150ms` خودِ Tailwind یکی است پس تفاوتی
+   * ندارد؛ اما `duration-base` در `molecules/card.tsx` به‌جای ۲۵۰msِ
+   * طراحی‌شده، ۱۵۰ms اجرا می‌شود.
+   *
+   * عمداً در بستهٔ ۴ حذف **نشدند**: حذفشان هیچ اثری ندارد (چون از قبل
+   * بی‌اثرند) و دو تایشان با نام کلاس در کامپوننت‌های زنده ارجاع شده‌اند.
+   * اصلاح درست — تغییر نام به `--transition-duration-*` تا مقیاس موشن واقعاً
+   * کار کند — یک **تغییر رفتار بصری** است و نیازمند تصمیم مالک محصول؛
+   * پس به‌عنوان یافته گزارش شد، نه به‌عنوان کد مرده.
+   */
   --duration-fast: 150ms;
   --duration-base: 250ms;
   --duration-slow: 400ms;
   --ease-emmett-standard: cubic-bezier(0.16, 1, 0.3, 1);
 
-  /* بریک‌پوینت‌های برند (بخش B3 — جایگزین کامل مقیاس پیش‌فرض Tailwind) */
-  --breakpoint-xxs: 23.4375rem; /* 375px */
-  --breakpoint-xs: 24.375rem; /* 390px */
-  --breakpoint-sm: 48rem; /* 768px */
-  --breakpoint-md: 64rem; /* 1024px */
-  --breakpoint-lg: 80rem; /* 1280px */
-  --breakpoint-xl: 90rem; /* 1440px */
+  /*
+   * بریک‌پوینت‌ها — فاز ۲ (پورت UI): `sm/md/lg` به **پیش‌فرض Tailwind**
+   * برگشتند، چون بستهٔ UI با همان مقیاس نوشته شده است (sm=640، md=768،
+   * lg=1024). این تنها راه وفاداری کامل پورت است، چون media queryها در زمان
+   * build ثابت می‌شوند و قابل scope کردن نیستند (تصمیم ثبت‌شدهٔ مالک محصول در
+   * `docs/ui-port-ledger.md`، بخش «تصمیم‌های ثبت‌شده»).
+   *
+   * بستهٔ ۴ (کد مرده): سه عضو این مقیاس حذف شدند چون شمارش دقیقِ variantها
+   * در کل `src/` صفر مصرف نشان داد — `xxs:` ‏۰ بار، `xs:` ‏۰ بار و `xl:` ‏۰ بار،
+   * در برابر `sm:` ‏۳۰ بار، `md:` ‏۱۵ بار و `lg:` ‏۶۲ بار. کامنت پیشین ادعا
+   * می‌کرد `xxs`/`xs` «فقط در مسیرهای فعلی استفاده می‌شوند» که با اندازه‌گیری
+   * رد شد. حذف `xl` هم بی‌اثر است چون مقدارش (`80rem`) دقیقاً برابر پیش‌فرض
+   * خودِ Tailwind است (`node_modules/tailwindcss/theme.css`)، پس اگر روزی
+   * `xl:` لازم شود همان مقدار در دسترس می‌ماند.
+   */
+  --breakpoint-sm: 40rem; /* 640px — پیش‌فرض Tailwind (مقیاس UI) */
+  --breakpoint-md: 48rem; /* 768px — پیش‌فرض Tailwind (مقیاس UI) */
+  --breakpoint-lg: 64rem; /* 1024px — پیش‌فرض Tailwind (مقیاس UI) */
+
+  /*
+   * بستهٔ ۴ (کد مرده): `--container-site: 90rem` حذف شد. تنها
+   * مصرف‌کننده‌هایش همان سه کامپوننت `organisms/{site-header,site-footer,hero}`
+   * بودند (`max-w-(--container-site)`) که در این بسته حذف شدند. پوستهٔ زندهٔ
+   * پورت UI عرض‌هایش را از `ui-port/page-frame.tsx` می‌گیرد
+   * (`max-w-[1440px]`، `max-w-3xl`، `max-w-2xl`، `max-w-4xl`).
+   */
 
   /* فونت‌ها — مقدار واقعی متغیر CSS در لایهٔ layout بسته به زبان ست می‌شود */
   --font-sans: var(--font-active-sans, ui-sans-serif, system-ui, sans-serif);
   --font-technical: var(--font-technical-raw), ui-monospace, monospace;
 }
 
-/* فعال‌سازی variant سفارشی `dark:` با استراتژی کلاس (next-themes) */
+/*
+ * `dark:` روی کلاس می‌ماند، نه روی `prefers-color-scheme`. سایت یک تم دارد و
+ * کلاس `.dark` دیگر ست نمی‌شود؛ پس این variant ظاهر را عوض نمی‌کند و پالت
+ * روشن آینده، اگر لازم شد، بدون بازنویسی اضافه می‌شود.
+ */
 @custom-variant dark (&:where(.dark, .dark *));
 
 @layer base {
   * {
     border-color: var(--color-border);
-    outline-color: var(--color-ring);
+    outline-color: color-mix(in oklab, var(--ring) 50%, transparent);
   }
 
   html {
     scroll-behavior: smooth;
+    font-size: var(--font-size);
   }
 
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
-    transition:
-      background-color var(--duration-base) var(--ease-emmett-standard),
-      color var(--duration-base) var(--ease-emmett-standard);
+  }
+
+  h1 {
+    font-size: var(--text-2xl);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  h2 {
+    font-size: var(--text-xl);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  h3 {
+    font-size: var(--text-lg);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  h4 {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  label {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  button {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  input {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-normal);
+    line-height: 1.5;
   }
 
   /* کرسر/فوکوس در دسترس: هرگز outline را به‌طور کامل حذف نکنید (WCAG AA) */

@@ -25,13 +25,15 @@ export default function GlobalError({
           fontFamily: "system-ui, sans-serif",
           textAlign: "center",
           padding: "2rem",
+          backgroundColor: "#0B1F18",
+          color: "#F3FAF6",
         }}
       >
-        <p style={{ fontSize: "0.875rem", letterSpacing: "0.1em", color: "#6b7280" }}>500</p>
+        <p style={{ fontSize: "0.875rem", letterSpacing: "0.1em", color: "#1FAE6E" }}>500</p>
         <h1 style={{ fontSize: "1.75rem", fontWeight: 600 }}>
           Something went wrong / مشکلی پیش آمد
         </h1>
-        <p style={{ color: "#6b7280", maxWidth: "32rem" }}>
+        <p style={{ color: "rgba(243,250,246,0.55)", maxWidth: "32rem" }}>
           An unexpected error occurred. Please try again. / خطای غیرمنتظره‌ای رخ داد. لطفاً دوباره
           تلاش کنید.
         </p>
@@ -40,8 +42,8 @@ export default function GlobalError({
           onClick={() => reset()}
           style={{
             borderRadius: "0.375rem",
-            backgroundColor: "#5b62e0",
-            color: "#fff",
+            backgroundColor: "#1FAE6E",
+            color: "#07130F",
             padding: "0.625rem 1.25rem",
             fontWeight: 500,
           }}

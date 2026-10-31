@@ -46,7 +46,7 @@ fi
 
 export NODE_ENV="production"
 export PUBLIC_SITE_URL="${PUBLIC_SITE_URL:-https://emmett.ir}"
-export INTERNAL_API_URL="${INTERNAL_API_URL:-http://127.0.0.1:8000}"
+export INTERNAL_API_URL="${INTERNAL_API_URL:-https://emmett.ir/backend}"
 
 echo "==> [3/4] بیلد پروداکشن Next.js (PUBLIC_SITE_URL=${PUBLIC_SITE_URL})..."
 npm run build

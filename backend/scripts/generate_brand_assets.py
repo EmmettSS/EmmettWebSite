@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""تولید دارایی‌های ثابت برند ادمین از دارایی مرجع موجود در ریپو.
+r"""تولید دارایی‌های ثابت برند ادمین از دارایی مرجع موجود در ریپو.
 
 طبق ADR-0027 (پشتهٔ ادمین و تم‌بندی)، هیچ فایل طراحی جداگانه‌ای (``.fig``) در
-ریپو وجود ندارد؛ تنها دارایی هویتی، لوژوتایپ مرجع در
-``legacy-frontend-reference/src/imports/____.jpg`` است. این اسکریپت:
+ریپو وجود ندارد. لوژوتایپ مرجع قبلاً در
+``legacy-frontend-reference/src/imports/____.jpg`` بود؛ همان فایل اکنون در
+``EmmettWebSite\backend\assets\brand-source\____.jpg`` است. این اسکریپت:
 
 1. نشان‌نوشت (wordmark) افقی «Emmett │ Group / SOFTWARE DEVELOPMENT» را از
    تصویر مرجع جدا می‌کند و آن را روی یک کارتِ گردگوشهٔ تیره با پس‌زمینهٔ خودِ
@@ -30,8 +31,9 @@ from PIL import Image, ImageDraw
 
 SCRIPT_PATH = Path(__file__).resolve()
 BACKEND_DIR = SCRIPT_PATH.parent.parent
-REPO_ROOT = BACKEND_DIR.parent
-SOURCE_IMAGE = REPO_ROOT / "legacy-frontend-reference" / "src" / "imports" / "____.jpg"
+# ``backend/`` داخل ``EmmettWebSite/`` است؛ بایگانی UI یک سطح بالاتر، کنار آن است.
+WORKSPACE_ROOT = BACKEND_DIR.parent.parent
+SOURCE_IMAGE = BACKEND_DIR / "assets" / "brand-source" / "____.jpg"
 OUTPUT_DIR = BACKEND_DIR / "static" / "brand"
 
 # ناحیهٔ کامل نشان‌نوشت در تصویر مرجع ۱۲۵۴×۱۲۵۴:
@@ -86,6 +88,9 @@ def build_mark(size: int) -> Image.Image:
 
 
 def main() -> None:
+    if not SOURCE_IMAGE.is_file():
+        raise SystemExit(f"source image not found: {SOURCE_IMAGE}")
+
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     wordmark = build_wordmark()

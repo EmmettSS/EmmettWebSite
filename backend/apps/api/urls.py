@@ -14,10 +14,11 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
 )
 
-from apps.core.views import GlobalSearchView, HealthCheckView
+from apps.core.views import GlobalSearchView, HealthCheckView, ProxyDiagnosticView
 
 urlpatterns = [
     path("health/", HealthCheckView.as_view(), name="health-check"),
+    path("health/proxy/", ProxyDiagnosticView.as_view(), name="health-proxy-diagnostic"),
     path("search/", GlobalSearchView.as_view(), name="global-search"),
     path("seo/", include("apps.core.urls")),
     path("schema/", SpectacularAPIView.as_view(), name="schema"),

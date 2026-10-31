@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from urllib.parse import urlencode
 
 from django.conf import settings
 from django.db.models import F
@@ -18,7 +19,7 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from apps.core.logging import get_logger
-from apps.core.models import Redirect, RedirectStatus, normalize_redirect_path
+from apps.core.models import Redirect, RedirectStatus, is_safe_redirect_target, normalize_redirect_path
 from apps.core.security import LoginLockout, build_csp_policy
 from apps.core.utils.request import get_client_ip
 
@@ -125,10 +126,10 @@ class AdminTwoFactorMiddleware:
             return self.get_response(request)
 
         has_device = self._has_confirmed_device(request)
-        next_url = request.get_full_path()
+        next_query = urlencode({"next": request.get_full_path()})
         if has_device:
-            return HttpResponseRedirect(f"{reverse('admin-2fa-verify')}?next={next_url}")
-        return HttpResponseRedirect(f"{reverse('admin-2fa-setup')}?next={next_url}")
+            return HttpResponseRedirect(f"{reverse('admin-2fa-verify')}?{next_query}")
+        return HttpResponseRedirect(f"{reverse('admin-2fa-setup')}?{next_query}")
 
     @staticmethod
     def _should_enforce(request: HttpRequest) -> bool:
@@ -177,6 +178,10 @@ class RedirectFallbackMiddleware:
             return response
 
         target, status_code, redirect_id = entry
+        if status_code != int(RedirectStatus.GONE) and not is_safe_redirect_target(target):
+            logger.error("seo_redirect_unsafe_target", path=request.path, redirect_id=redirect_id)
+            return response
+
         self._count_hit(redirect_id)
         logger.info("seo_redirect_hit", path=request.path, status_code=status_code)
 

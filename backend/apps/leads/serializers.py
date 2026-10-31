@@ -58,11 +58,14 @@ class NewsletterCreateSerializer(serializers.ModelSerializer[Newsletter]):
 
     def create(self, validated_data: dict[str, Any]) -> Newsletter:
         newsletter: Newsletter
-        newsletter, _created = Newsletter.objects.update_or_create(
+        newsletter, _created = Newsletter.all_objects.update_or_create(
             email=validated_data["email"],
             defaults={
                 "phone": validated_data.get("phone", ""),
                 "locale_preference": validated_data.get("locale_preference", "fa"),
+                "is_active": True,
+                "deleted_at": None,
+                "unsubscribed_at": None,
             },
         )
         return newsletter

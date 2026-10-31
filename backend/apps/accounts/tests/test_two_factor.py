@@ -226,17 +226,35 @@ class TestSessionLifecycle:
         response = fresh_browser.get(reverse("admin:index"))
         assert response.status_code == 302
 
-    def test_open_redirect_is_blocked(self, client: Client) -> None:
+    @pytest.mark.parametrize(
+        "candidate",
+        [
+            "https://evil.example/x",
+            "//evil.example/x",
+            r"/\\evil.example/x",
+        ],
+    )
+    def test_unsafe_next_destinations_are_blocked(self, client: Client, candidate: str) -> None:
         user = superuser()
         device = TOTPDevice.objects.create(user=user, name="default", confirmed=True)
         client.force_login(user)
 
-        response = client.post(
-            reverse("admin-2fa-verify"), {"token": _code_for(device), "next": "https://evil.example/x"}
-        )
+        response = client.post(reverse("admin-2fa-verify"), {"token": _code_for(device), "next": candidate})
 
         assert response.status_code == 302
-        assert "evil.example" not in response["Location"]
+        assert response["Location"] == "/admin/"
+
+    def test_percent_encoded_backslashes_remain_same_origin(self, client: Client) -> None:
+        user = superuser()
+        device = TOTPDevice.objects.create(user=user, name="default", confirmed=True)
+        client.force_login(user)
+        candidate = "/%5c%5cevil.example/x"
+
+        response = client.post(reverse("admin-2fa-verify"), {"token": _code_for(device), "next": candidate})
+
+        assert response.status_code == 302
+        assert response["Location"] == candidate
+        assert not response["Location"].startswith("//")
 
     def test_disable_requires_verification_when_policy_is_on(self, client: Client, settings: Any) -> None:
         settings.ADMIN_2FA_REQUIRED = True

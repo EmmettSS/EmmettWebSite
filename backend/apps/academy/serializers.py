@@ -35,6 +35,7 @@ class LessonSerializer(serializers.ModelSerializer[Lesson]):
 class CourseListSerializer(serializers.ModelSerializer[Course]):
     cover_image_url = serializers.SerializerMethodField()
     instructor_name = serializers.CharField(source="instructor.name", read_only=True, default=None)
+    lesson_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Course
@@ -48,6 +49,7 @@ class CourseListSerializer(serializers.ModelSerializer[Course]):
             "instructor_name",
             "cover_image_url",
             "is_featured",
+            "lesson_count",
         )
 
     def get_cover_image_url(self, obj: Course) -> str | None:

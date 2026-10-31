@@ -200,7 +200,15 @@ class TestDumpdataFallback:
         from apps.accounts.tests.factories import UserFactory
 
         monkeypatch.setattr("shutil.which", lambda name: None)
-        settings.DATABASES["default"]["ENGINE"] = "django.db.backends.mysql"
+        # ``monkeypatch.setitem`` عمداً به‌جای انتساب مستقیم استفاده می‌شود.
+        # ``settings.DATABASES["default"]["ENGINE"] = ...`` جهش در سطح تودرتو است
+        # و fixture ``settings`` آن را برنمی‌گرداند (همان هشدار fixture
+        # ``file_database`` دربارهٔ ``NAME``). نشتِ ``ENGINE=mysql`` به تست‌های
+        # بعدی باعث می‌شد ``test_restore_backup_script_list_and_json_roundtrip``
+        # روی هر ماشینی که ``mysqldump`` نصب دارد — از جمله رانر GitHub Actions —
+        # با «Can't connect to MySQL server» بشکند، در حالی که روی ماشین بدون
+        # ``mysqldump`` سبز می‌ماند چون ``backup_db`` به ``dumpdata`` برمی‌گشت.
+        monkeypatch.setitem(settings.DATABASES["default"], "ENGINE", "django.db.backends.mysql")
         UserFactory(email="fallback@example.com")
 
         call_command("backup_db", output_dir=str(tmp_path), skip_media=True, stdout=StringIO())

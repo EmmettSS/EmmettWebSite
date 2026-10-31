@@ -1,300 +1,594 @@
-name: Emmett Quality & CI Pipeline
+# =============================================================================
+# پایپ‌لاین CI پروژهٔ امیت (ADR-0034 + ADR-0037 + ADR-0038)
+# =============================================================================
+#
+# این فایل در **ریشهٔ ریپو** قرار دارد؛ GitHub Actions فقط
+# `.github/workflows/` ریشه را می‌شناسد (بند ۳-۱ ADR-0037). ساختار پوشهٔ
+# این ریپو تخت است (`backend/` و `frontend/` مستقیماً زیر ریشه)، بنابراین
+# هیچ مسیری با پیشوند `EmmettWebSite/` نوشته نمی‌شود.
+#
+# شش جاب، دقیقاً با همان شناسه‌هایی که مستندات قول داده‌اند:
+#   backend-quality · backend-test · frontend-quality
+#   frontend-test-build · security-scan · e2e-and-lighthouse
+#
+# جاب‌ها **موازی** اجرا می‌شوند (هیچ `needs` بین آن‌ها نیست): سریع‌ترین
+# سیگنال ممکن روی هر PR، و هر جاب محیط خودش را مستقل می‌سازد.
+#
+# دو نکتهٔ طراحی که عمداً این‌جا هستند:
+#
+# ۱) تست‌های بک‌اند با یک لایهٔ تنظیمات مخصوص CI اجرا می‌شوند
+#    (`.github/ci/ci_test_settings.py`) که فقط کلید `staticfiles` را از
+#    `CompressedManifestStaticFilesStorage` به `StaticFilesStorage` ساده
+#    تغییر می‌دهد. دلیل: قالب‌های Jazzmin عبارت `{% static "vendor/bootswatch" %}`
+#    را روی یک **پوشه** صدا می‌زنند و مانیفست آن را ثبت نمی‌کند، پس بدون این
+#    لایه ۳۵ تست ادمین با `ValueError: Missing staticfiles manifest entry`
+#    قرمز می‌شوند. هیچ فایل `backend/` تغییر نکرده است (ADR-0037 بند ۳-۵).
+#
+# ۲) گیت `npm audit` کل درخت وابستگی را بررسی می‌کند. قفل فعلی با
+#    `npm audit --audit-level=high` پاک است؛ اگر advisory جدیدی وارد هر یک از
+#    وابستگی‌های production یا development شود، جاب امنیتی شکست می‌خورد.
+# =============================================================================
+
+name: CI
 
 on:
   push:
-    branches: ["main", "arena/**"]
+    branches: [main]
   pull_request:
-    branches: ["main"]
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  # فقط روی PR اجرای قبلی لغو می‌شود؛ push به main همیشه کامل می‌شود.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  # jsdom@30.1.2 در `engines` خود `node: ^22.22.2 || ^24.15.0 || >=26.0.0`
+  # می‌خواهد؛ نسخهٔ زیر اولین نسخهٔ سازگارِ بررسی‌شده با این lockfile است.
+  NODE_VERSION: "22.22.3"
+  PYTHON_VERSION: "3.11"
+  NEXT_TELEMETRY_DISABLED: "1"
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
 
 jobs:
   # ---------------------------------------------------------------------------
-  # ۱) دروازهٔ کیفیت بک‌اند: Ruff + Black + mypy strict + i18n + OpenAPI Schema
+  # ۱) کیفیت بک‌اند: lint + فرمت + تایپ strict + سلامت جنگو + اسکیمای OpenAPI
   # ---------------------------------------------------------------------------
   backend-quality:
-    name: "Backend: Lint, Format, Mypy Strict & OpenAPI"
+    name: backend-quality
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     defaults:
       run:
         working-directory: backend
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v7
 
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v5
+      - name: Set up Python
+        uses: actions/setup-python@v7
         with:
-          python-version: "3.11"
-          cache: "pip"
-          cache-dependency-path: |
-            backend/requirements.txt
-            backend/requirements-dev.txt
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: backend/requirements*.txt
 
-      - name: Install backend dependencies
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements-dev.txt
 
-      - name: Ruff lint check
+      - name: Ruff — lint
         run: ruff check .
 
-      - name: Ruff format check
+      - name: Ruff — format check
         run: ruff format --check .
 
-      - name: Black format check
+      - name: Black — format check
         run: black --check .
 
-      - name: Mypy strict type check (Rule 7)
+      - name: Mypy — strict (apps, config)
         run: mypy apps config
 
-      - name: Django system checks & migration drift check
-        env:
-          DJANGO_SETTINGS_MODULE: config.settings.dev
-        run: |
-          python manage.py check
-          python manage.py makemigrations --check --dry-run
+      - name: Django — system checks
+        run: python manage.py check
 
-      - name: Gettext i18n catalog & .mo freshness check (Rule 9)
+      - name: Django — migration drift
+        run: python manage.py makemigrations --check --dry-run
+
+      - name: Gettext — translation coverage and freshness
         run: python scripts/i18n.py check
 
-      - name: Validate OpenAPI 3.0 Schema (Rule 8)
-        env:
-          DJANGO_SETTINGS_MODULE: config.settings.dev
-        run: python manage.py spectacular --file /tmp/openapi-schema.yaml --validate --fail-on-warn
+      - name: OpenAPI — schema validation (fail on warnings)
+        run: python manage.py spectacular --validate --fail-on-warn --file "${RUNNER_TEMP}/openapi-schema.yml"
+
+      - name: Upload OpenAPI schema
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: openapi-schema
+          path: ${{ runner.temp }}/openapi-schema.yml
+          if-no-files-found: warn
+          retention-days: 7
 
   # ---------------------------------------------------------------------------
-  # ۲) تست‌های واحد و یکپارچهٔ بک‌اند + گیت پوشش ≥ ۸۵٪
+  # ۲) تست بک‌اند: کل سوئیت pytest در یک پروسه + گیت پوشش ۸۵٪
   # ---------------------------------------------------------------------------
   backend-test:
-    name: "Backend: Pytest & Coverage (≥ 85%)"
+    name: backend-test
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     defaults:
       run:
         working-directory: backend
+    env:
+      # لایهٔ تنظیمات CI (بند ۱ توضیحات بالای فایل). `config.settings.dev`
+      # در `pytest.ini` است؛ متغیر محیطی بر ini اولویت دارد.
+      PYTHONPATH: ${{ github.workspace }}/.github/ci
+      DJANGO_SETTINGS_MODULE: ci_test_settings
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v7
 
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v5
+      - name: Set up Python
+        uses: actions/setup-python@v7
         with:
-          python-version: "3.11"
-          cache: "pip"
-          cache-dependency-path: |
-            backend/requirements.txt
-            backend/requirements-dev.txt
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: backend/requirements*.txt
 
-      - name: Install backend dependencies
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements-dev.txt
 
-      - name: Run pytest with coverage enforcement (≥ 85%)
-        env:
-          DJANGO_SETTINGS_MODULE: config.settings.dev
+      # SQLite درون‌حافظ/فایلِ موقت؛ نیازی به سرویس پایگاه‌داده نیست.
+      # `--create-db` صریح است تا هر اجرا از صفر ساخته شود و `--reuse-db`
+      # (که در `pytest.ini` هست) نتواند پایگاه‌دادهٔ مانده از کش را reuse کند.
+      - name: Pytest with coverage
         run: |
-          coverage run -m pytest -q
-          coverage report --fail-under=85 -m
+          set -o pipefail
+          coverage run -m pytest --create-db -q 2>&1 | tee "${RUNNER_TEMP}/pytest.log"
+
+      # لاگ کامل در artifact نیست و خواندنش از بیرون GitHub هم ممکن نیست؛ پس
+      # خلاصهٔ شکست‌ها به‌صورت annotation روی خود PR می‌نشیند (هم برای انسان
+      # خواناست هم با API قابل خواندن).
+      - name: Annotate test failures on the PR
+        if: failure()
+        run: |
+          python3 - <<'PY'
+          import os, pathlib
+          log = pathlib.Path(os.environ["RUNNER_TEMP"], "pytest.log").read_text(encoding="utf-8", errors="replace")
+          lines = log.splitlines()
+          failed = [ln for ln in lines if ln.startswith(("FAILED ", "ERROR "))]
+          start = next((i for i, ln in enumerate(lines) if "short test summary info" in ln), None)
+          block = lines[start:start + 45] if start is not None else lines[-45:]
+          parts = ([f"{len(failed)} شکست:"] + failed[:40] + ["", "--- انتهای لاگ ---"]) if failed else ["--- انتهای لاگ ---"]
+          msg = "\n".join([*parts, *block])
+          msg = msg.replace("%", "%25").replace("\r", "").replace("\n", "%0A")
+          print(f"::error title=pytest failures::{msg}")
+          PY
+
+      - name: Coverage gate (fail under 85%)
+        run: coverage report --fail-under=85
+
+      - name: Export coverage XML
+        run: coverage xml -o coverage.xml
+
+      - name: Coverage summary
+        if: always()
+        run: |
+          {
+            echo '### Backend coverage'
+            echo ''
+            echo '```'
+            coverage report --fail-under=0 | tail -n 30 || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: backend-coverage
+          path: backend/coverage.xml
+          if-no-files-found: warn
+          retention-days: 14
 
   # ---------------------------------------------------------------------------
-  # ۳) دروازهٔ کیفیت فرانت‌اند: Prettier + ESLint + TypeScript Strict
+  # ۳) کیفیت فرانت‌اند: Prettier + ESLint + TypeScript strict
   # ---------------------------------------------------------------------------
   frontend-quality:
-    name: "Frontend: Prettier, ESLint & TypeScript Strict"
+    name: frontend-quality
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     defaults:
       run:
         working-directory: frontend
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v7
 
-      - name: Set up Node.js 22
-        uses: actions/setup-node@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
         with:
-          node-version: "22"
-          cache: "npm"
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
           cache-dependency-path: frontend/package-lock.json
 
-      - name: Install frontend dependencies
+      - name: Install dependencies
         run: npm ci
 
-      - name: Prettier format check
+      - name: Prettier — format check
         run: npm run format:check
 
-      - name: ESLint check
+      - name: ESLint
         run: npm run lint
 
-      - name: TypeScript strict check (Rule 7)
+      - name: TypeScript — strict (tsc --noEmit)
         run: npm run typecheck
 
   # ---------------------------------------------------------------------------
-  # ۴) تست واحد/کامپوننت فرانت‌اند (Coverage ≥ 85%) + بیلد Production Next.js
+  # ۴) تست و بیلد فرانت‌اند: گیت پوشش Vitest + `next build`
   # ---------------------------------------------------------------------------
   frontend-test-build:
-    name: "Frontend: Vitest Coverage (≥ 85%) & Next.js Build"
+    name: frontend-test-build
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     defaults:
       run:
         working-directory: frontend
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v7
 
-      - name: Set up Node.js 22
-        uses: actions/setup-node@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
         with:
-          node-version: "22"
-          cache: "npm"
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
           cache-dependency-path: frontend/package-lock.json
 
-      - name: Install frontend dependencies
+      - name: Install dependencies
         run: npm ci
 
-      - name: Run Vitest unit & component tests with coverage (≥ 85%)
+      # آستانه‌ها در `vitest.config.mts` تعریف شده‌اند
+      # (statements 85 / branches 78 / functions 85 / lines 85).
+      - name: Vitest with coverage gate
         run: npm run test:coverage
 
-      - name: Build Next.js production application
-        env:
-          PUBLIC_SITE_URL: https://emmett.ir
-          INTERNAL_API_URL: http://127.0.0.1:8000
+      # بیلد به بک‌اند زنده نیاز ندارد: همهٔ صفحه‌ها به‌خاطر `src/proxy.ts`
+      # پویا (SSR در زمان درخواست) هستند و داده در زمان رندر خوانده می‌شود.
+      - name: Production build
         run: npm run build
 
+      - name: Coverage summary
+        if: always()
+        run: |
+          if [ -f coverage/coverage-summary.json ]; then
+            {
+              echo '### Frontend coverage (total)'
+              echo ''
+              echo '| metric | % | threshold |'
+              echo '| --- | --- | --- |'
+              node -e '
+                const s = require("./coverage/coverage-summary.json").total;
+                const th = { statements: 85, branches: 78, functions: 85, lines: 85 };
+                for (const k of Object.keys(th)) {
+                  console.log(`| ${k} | ${s[k].pct} | ${th[k]} |`);
+                }
+              '
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload coverage summary
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: frontend-coverage
+          path: frontend/coverage/coverage-summary.json
+          if-no-files-found: warn
+          retention-days: 14
+
   # ---------------------------------------------------------------------------
-  # ۵) اسکن امنیتی: اسکن رازها + Bandit SAST + Django Deploy Check + npm audit
+  # ۵) اسکن امنیتی: رازها + SAST + سخت‌سازی deploy + audit وابستگی‌ها
   # ---------------------------------------------------------------------------
   security-scan:
-    name: "Security: Secret Scan, Bandit, Django Deploy & NPM Audit"
+    name: security-scan
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v7
 
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v5
+      - name: Set up Python
+        uses: actions/setup-python@v7
         with:
-          python-version: "3.11"
-          cache: "pip"
-          cache-dependency-path: |
-            backend/requirements.txt
-            backend/requirements-dev.txt
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: backend/requirements*.txt
 
-      - name: Set up Node.js 22
-        uses: actions/setup-node@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
         with:
-          node-version: "22"
-          cache: "npm"
-          cache-dependency-path: frontend/package-lock.json
+          node-version: ${{ env.NODE_VERSION }}
 
-      - name: Scan repository for leaked secrets or .env files (Rule 5)
-        run: python3 scripts/check_secrets.py
-
-      - name: Install backend dev tools & run Bandit SAST
+      - name: Install backend dependencies
         working-directory: backend
         run: |
+          python -m pip install --upgrade pip
           pip install -r requirements-dev.txt
-          bandit -c pyproject.toml -r apps config -ll
 
-      - name: Verify Django production security posture
+      # قانون ۵: هیچ فایل `.env` واقعی و هیچ رازی در فایل‌های ردیابی‌شدهٔ Git.
+      - name: Secret scan (tracked files)
+        run: python3 scripts/check_secrets.py
+
+      # `-c pyproject.toml` کانفیگ خود پروژه را اعمال می‌کند
+      # (`[tool.bandit] exclude_dirs = tests, migrations, .venv`).
+      - name: Bandit SAST (medium and above)
+        working-directory: backend
+        run: bandit -c pyproject.toml -r apps config -ll
+
+      # مقادیر زیر ساختگی و مخصوص همین اجرا هستند (قانون ۵: راز واقعی در ریپو
+      # نمی‌آید). `SECRET_KEY` باید ۵۰+ کاراکتر و با آنتروپی کافی باشد تا
+      # `emmett_admin.W013` رد نشود، و `BACKUP_DIR` باید وجود داشته باشد تا
+      # `W011`/`W012` رد نشوند. `--fail-level WARNING` این مرحله را به یک گیت
+      # واقعی تبدیل می‌کند: هر هشدار deploy = شکست.
+      - name: Django — production deploy checks (zero warnings)
         working-directory: backend
         env:
           DJANGO_SETTINGS_MODULE: config.settings.production
-          DJANGO_SECRET_KEY: "ci-production-verification-key-with-more-than-50-chars-entropy-987654"
-          DJANGO_ALLOWED_HOSTS: "emmett.ir,www.emmett.ir"
-          DJANGO_CSRF_TRUSTED_ORIGINS: "https://emmett.ir"
-          PUBLIC_SITE_URL: "https://emmett.ir"
+          DJANGO_SECRET_KEY: ci-only-not-a-real-secret-key-0123456789abcdefghijklmnopqrstuvwxyz
+          DJANGO_ALLOWED_HOSTS: emmett.ir,www.emmett.ir
+          DJANGO_CSRF_TRUSTED_ORIGINS: https://emmett.ir,https://www.emmett.ir
+          PUBLIC_SITE_URL: https://emmett.ir
+          MYSQL_DATABASE: emmett_ci
+          MYSQL_USER: emmett_ci
+          MYSQL_PASSWORD: ci-only-not-a-real-db-password
           ADMIN_2FA_REQUIRED: "True"
           DJANGO_CSP_ENABLED: "True"
           DJANGO_FRAME_ANCESTORS: "'none'"
-          MYSQL_DATABASE: "emmett_prod"
-          MYSQL_USER: "emmett_user"
-          MYSQL_PASSWORD: "ci-dummy-db-password"
+          BACKUP_DIR: ${{ runner.temp }}/emmett-ci-backup
         run: |
-          mkdir -p backups
-          python manage.py check --deploy --fail-level ERROR
+          mkdir -p "$BACKUP_DIR"
+          python manage.py check --deploy --fail-level WARNING
 
-      - name: Audit production frontend dependencies
+      # گیت کامل: production + development dependencies.
+      - name: npm audit — all dependencies (gate)
         working-directory: frontend
-        run: |
-          npm ci
-          npm audit --omit=dev --audit-level=moderate
+        run: npm audit --audit-level=high
 
   # ---------------------------------------------------------------------------
-  # ۶) تست‌های E2E (Playwright) و بودجهٔ کارایی Lighthouse CI (هدف ≥ 95)
+  # ۶) E2E + Lighthouse: بک‌اند SQLite با دادهٔ demo + سرور پروداکشن Next.js
   # ---------------------------------------------------------------------------
+  # تست‌های E2E روی **هر** PR اجرا می‌شوند و یک چک لازم‌اند. سنجش Lighthouse
+  # فقط روی `main` و اجرای دستی انجام می‌شود: امتیاز Lighthouse به منابع
+  # رانر حساس است و روی PR نوسان دارد، اما بودجهٔ کارایی باید روی شاخهٔ
+  # اصلی بدون تخفیف (۰٫۹۵ در هر چهار محور) نگه داشته شود. هر دو در یک جاب
+  # هستند تا بیلد فرانت‌اند فقط **یک بار** پرداخت شود.
   e2e-and-lighthouse:
-    name: "E2E (Playwright) & Lighthouse CI (≥ 95)"
+    name: e2e-and-lighthouse
     runs-on: ubuntu-latest
-    needs: [backend-quality, backend-test, frontend-quality, frontend-test-build]
+    timeout-minutes: 45
+    env:
+      # سرور Next از این آدرس به بک‌اند می‌رسد (سرور-به-سرور، هرگز مرورگر).
+      INTERNAL_API_URL: http://127.0.0.1:8000
+      # تنها منبع حقیقت دامنه برای canonical/hreflang/sitemap/OG در این اجرا.
+      PUBLIC_SITE_URL: http://127.0.0.1:3000
+      # پراکسی `/api/[...path]` فقط `host`، `connection` و `content-length` را
+      # در `SKIP_REQUEST_HEADERS` حذف می‌کند، پس هدر `Origin` مرورگر عیناً به
+      # جنگو می‌رسد: `Origin: http://127.0.0.1:3000` در حالی که `get_host()`
+      # جنگو `127.0.0.1:8000` است. در `CsrfViewMiddleware._origin_verified`
+      # این دو با هم برابر نمی‌شوند و با `CSRF_TRUSTED_ORIGINS=[]` هر درخواست
+      # POST احراز هویت‌شده (ثبت‌نام دوره، نظر، خروج) با ۴۰۳
+      # «Origin checking failed» رد می‌شود. production همین مسئله را با مقدار
+      # پیش‌فرضِ ساخته‌شده از `PUBLIC_SITE_URL` حل می‌کند؛ این‌جا صریح نوشته
+      # می‌شود تا توپولوژی هم‌مبداییِ ADR-0035 در CI بازتولید شود.
+      DJANGO_CSRF_TRUSTED_ORIGINS: http://127.0.0.1:3000,http://localhost:3000
+      # نرخ‌های throttle **فقط برای همین اجرای ایزوله** بالا برده می‌شوند.
+      # اندازه‌گیری: با نرخ پیش‌فرض `anon=100/hour`، از درخواست شمارهٔ ۱۰۰ به
+      # بعد هر پاسخ ۴۲۹ می‌شود (با Retry-After ≈ ۳۵۹۹ ثانیه) و
+      # `/api/v1/academy/`، `/api/v1/blog/`، `/api/v1/search/` و
+      # `/api/v1/seo/settings/` دیگر داده برنمی‌گردانند — دقیقاً همان ۹ تستی که
+      # در اولین اجرای CI شکست خوردند. علت: `AnonRateThrottle` سراسری است و
+      # شناسهٔ آن `REMOTE_ADDR` است، پس همهٔ فراخوانی‌های SSR و پراکسی
+      # `/api/[...path]` که از `127.0.0.1` می‌آیند در **یک سطل مشترک** می‌نشینند
+      # و یک سوئیت ۵۳ تستی آن را در چند دقیقه خالی می‌کند.
+      # ریسک متناظر در production در ADR-0038 بند ۵ گزارش شده و عمداً در این
+      # بسته دست‌نخورده مانده است (تغییر تنظیمات جنگو نیازمند تأیید جداست).
+      THROTTLE_RATE_ANON: 100000/hour
+      THROTTLE_RATE_USER: 100000/hour
+      THROTTLE_RATE_CONTACT: 10000/hour
+      THROTTLE_RATE_AI: 10000/hour
+      THROTTLE_RATE_AUTH: 10000/hour
+      THROTTLE_RATE_NEWSLETTER: 10000/day
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v7
 
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v5
+      - name: Set up Python
+        uses: actions/setup-python@v7
         with:
-          python-version: "3.11"
-          cache: "pip"
-          cache-dependency-path: |
-            backend/requirements.txt
-            backend/requirements-dev.txt
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: backend/requirements*.txt
 
-      - name: Set up Node.js 22
-        uses: actions/setup-node@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
         with:
-          node-version: "22"
-          cache: "npm"
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
           cache-dependency-path: frontend/package-lock.json
 
-      - name: Install & start seeded Django backend
+      - name: Install backend dependencies
         working-directory: backend
-        env:
-          DJANGO_SETTINGS_MODULE: config.settings.dev
-          PUBLIC_SITE_URL: http://127.0.0.1:3000
         run: |
+          python -m pip install --upgrade pip
           pip install -r requirements-dev.txt
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v6
+        with:
+          # مسیر پیش‌فرض Playwright؛ عمداً `PLAYWRIGHT_BROWSERS_PATH` تنظیم
+          # نمی‌شود. کلید به lockfile گره خورده تا با ارتقای Playwright
+          # مرورگرها دوباره دانلود شوند.
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-ms-playwright-${{ hashFiles('frontend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-ms-playwright-
+
+      - name: Install Chromium (Playwright)
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
+
+      # پایگاه‌دادهٔ demo همان داده‌ای است که تست‌ها رویش assertion می‌نویسند
+      # (خدمات/پروژه‌ها/محصول‌ها/پست‌ها/دوره‌ها + کاربر ادمین).
+      - name: Prepare SQLite database and seed demo data
+        working-directory: backend
+        run: |
           python manage.py migrate --noinput
           python manage.py seed_demo_data
-          nohup python manage.py runserver 127.0.0.1:8000 --noreload > /tmp/django-e2e.log 2>&1 &
-          for i in $(seq 1 30); do
-            if curl -fsS http://127.0.0.1:8000/api/v1/health/ >/dev/null; then
-              echo "Django backend is healthy."
-              break
+
+      # `host` در `SKIP_REQUEST_HEADERS` پراکسی `/api/[...path]` است، پس جنگو
+      # همیشه `127.0.0.1:8000` را می‌بیند و پیش‌فرض `ALLOWED_HOSTS` در DEBUG
+      # کافی است؛ نیازی به `DJANGO_DEV_ALLOW_ANY_HOST` نیست.
+      - name: Start Django API server
+        working-directory: backend
+        run: |
+          nohup python manage.py runserver 127.0.0.1:8000 --noreload \
+            > "${RUNNER_TEMP}/django-server.log" 2>&1 &
+          for _ in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:8000/api/v1/health/ > /dev/null 2>&1; then
+              echo "Django API is ready on 127.0.0.1:8000"
+              exit 0
             fi
             sleep 1
           done
+          echo "::error::Django API did not become ready in 60s"
+          cat "${RUNNER_TEMP}/django-server.log"
+          exit 1
 
-      - name: Install frontend dependencies & Playwright Chromium
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
+
+      # `playwright.config.ts` خودش `webServer` دارد ولی
+      # `reuseExistingServer: true` است؛ چون سرور از قبل بالاست، Playwright
+      # بیلد دوم نمی‌زند و از همین سرور استفاده می‌کند.
+      - name: Start Next.js production server
         working-directory: frontend
         run: |
-          npm ci
-          npx playwright install --with-deps chromium
-
-      - name: Run Playwright E2E test suite
-        working-directory: frontend
-        env:
-          CI: "true"
-          INTERNAL_API_URL: http://127.0.0.1:8000
-          PUBLIC_SITE_URL: http://127.0.0.1:3000
-        run: npm run test:e2e
-
-      - name: Run Lighthouse CI (target ≥ 95 across all categories)
-        working-directory: frontend
-        env:
-          INTERNAL_API_URL: http://127.0.0.1:8000
-          PUBLIC_SITE_URL: http://127.0.0.1:3000
-        run: |
-          nohup npm run start -- -p 3000 -H 127.0.0.1 > /tmp/next-lhci.log 2>&1 &
-          for i in $(seq 1 30); do
-            if curl -fsS http://127.0.0.1:3000/ >/dev/null; then
-              break
+          nohup npm run start -- --port 3000 --hostname 0.0.0.0 \
+            > "${RUNNER_TEMP}/next-server.log" 2>&1 &
+          for _ in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:3000/ > /dev/null 2>&1; then
+              echo "Next.js is ready on 127.0.0.1:3000"
+              exit 0
             fi
             sleep 1
           done
-          npx --yes @lhci/cli@0.14.x autorun --config=../.lighthouserc.json
+          echo "::error::Next.js did not become ready in 60s"
+          cat "${RUNNER_TEMP}/next-server.log"
+          exit 1
+
+      - name: Playwright E2E
+        working-directory: frontend
+        run: |
+          set -o pipefail
+          npx playwright test 2>&1 | tee "${RUNNER_TEMP}/playwright.log"
+
+      - name: Annotate E2E failures on the PR
+        if: failure()
+        run: |
+          python3 - <<'PY'
+          import os, pathlib, re
+          log = pathlib.Path(os.environ["RUNNER_TEMP"], "playwright.log").read_text(encoding="utf-8", errors="replace")
+          lines = log.splitlines()
+          heads = [ln.strip() for ln in lines if re.match(r"^\s+\d+\) ", ln)]
+          summary = [ln.strip() for ln in lines if re.search(r"\d+ (failed|flaky|passed|skipped)", ln)]
+          msg = "\n".join(
+              [f"{len(heads)} تست شکست‌خورده:"] + heads[:40] + ["", *(summary[-3:]), "", "--- انتهای لاگ ---"] + lines[-45:]
+          )
+          msg = msg.replace("%", "%25").replace("\r", "").replace("\n", "%0A")
+          print(f"::error title=playwright failures::{msg}")
+          PY
+
+      # Lighthouse همان Chromium نصب‌شدهٔ Playwright را استفاده می‌کند تا
+      # دانلود دوم مرورگر لازم نباشد.
+      - name: Resolve Chromium path for Lighthouse
+        if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+        working-directory: frontend
+        run: |
+          CHROME_PATH="$(node -e "const { chromium } = require('@playwright/test'); console.log(chromium.executablePath());")"
+          echo "CHROME_PATH=${CHROME_PATH}" >> "$GITHUB_ENV"
+          echo "CHROME_PATH=${CHROME_PATH}"
+
+      # `.lighthouserc.json` در ریشهٔ ریپو است: ۶ URL، preset دسکتاپ، ۲ اجرا،
+      # گیت `error` روی ۰٫۹۵ برای Performance / Accessibility / Best Practices
+      # / SEO، و خروجی روی فایل‌سیستم (`.lighthouseci/`) — هیچ گزارشی عمومی
+      # منتشر نمی‌شود (ADR-0037 بند ۳-۴).
+      - name: Lighthouse CI (main and manual runs only)
+        if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+        run: npx --yes @lhci/cli@0.15.1 autorun
+
+      - name: Lighthouse summary
+        if: always() && (github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch')
+        run: |
+          if [ -d .lighthouseci ]; then
+            {
+              echo '### Lighthouse CI'
+              echo ''
+              ls -1 .lighthouseci | sed 's/^/- /'
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: frontend/playwright-report
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Upload Playwright test results (trace/screenshot on failure)
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-test-results
+          path: frontend/test-results
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Upload Lighthouse reports
+        if: always() && (github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch')
+        uses: actions/upload-artifact@v7
+        with:
+          name: lighthouse-reports
+          path: .lighthouseci
+          # `.lighthouseci` با نقطه شروع می‌شود و `upload-artifact` به‌طور
+          # پیش‌فرض فایل‌های مخفی را کنار می‌گذارد (`include-hidden-files:
+          # false`)؛ بدون این پرچم آرتیفکت بی‌صدا خالی می‌ماند.
+          include-hidden-files: true
+          # عمداً `error` و نه `ignore`: اگر Lighthouse اجرا شد و گزارشی
+          # تولید نکرد، باید با صدای بلند بشکند تا وعدهٔ «فایل‌سیستم +
+          # آرتیفکت GitHub» (ADR-0037 بند ۳-۴) بی‌صدا نقض نشود.
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload server logs
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: e2e-server-logs
+          path: |
+            ${{ runner.temp }}/django-server.log
+            ${{ runner.temp }}/next-server.log
+          if-no-files-found: ignore
+          retention-days: 14

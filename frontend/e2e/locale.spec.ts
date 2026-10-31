@@ -24,7 +24,11 @@ test("صفحهٔ اصلی با dir/عنوان/برچسب ناوبری صحیح �
 
   await expect(page).toHaveTitle(expected.titlePattern);
   await expect(page.locator("html")).toHaveAttribute("dir", expected.dir);
-  await expect(page.getByRole("link", { name: expected.navLabel })).toBeVisible();
+  // برچسب ناوبری از پیام‌های پروژه می‌آید (`nav.*`)؛ دامنه را به نوار ناوبری
+  // محدود می‌کنیم چون فوتر هم می‌تواند برچسب مشابهی داشته باشد.
+  await expect(
+    page.getByRole("navigation").getByRole("link", { name: expected.navLabel }),
+  ).toBeVisible();
 });
 
 test("ناوبری به صفحهٔ خدمات در هر دو locale کار می‌کند", async ({ page }, testInfo) => {

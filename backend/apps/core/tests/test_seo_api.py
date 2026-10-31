@@ -68,6 +68,26 @@ class TestSitemapPayload:
         assert "/blog/published-post" in paths
         assert "/academy/published-course" in paths
 
+    def test_product_projects_stay_under_the_projects_prefix(self) -> None:
+        """محصولات (``is_product=True``) هم با پیشوند ``/projects/`` فهرست می‌شوند.
+
+        قرارداد canonical (ADR-0040): صفحهٔ جزئیات یک پروژه — محصول باشد یا
+        نه — در فرانت‌اند زیر ``/projects/{slug}`` سرو می‌شود و canonicalِ
+        خودش را دارد. مسیرهای ``/products/{slug}`` در فرانت صفحهٔ «به‌زودی»ِ
+        پورت UI هستند (ADR-0037) و هیچ محتوای دیتابیسی ندارند، پس sitemap
+        نباید آن‌ها را بسازد؛ وگرنه دوباره با canonicalِ صفحهٔ واقعی در تناقض
+        می‌افتد — همان باگی که این تست جلویش را می‌گیرد.
+        """
+
+        from apps.portfolio.tests.factories import ProjectFactory
+
+        ProjectFactory(slug="sitemap-product", is_product=True, **_published())
+
+        paths = {entry["path"] for entry in build_sitemap_entries(use_cache=False)}
+
+        assert "/projects/sitemap-product" in paths
+        assert "/products/sitemap-product" not in paths
+
     def test_entries_carry_seo_fields(self) -> None:
         ServiceFactory(slug="sized", **_published())
         entry = next(

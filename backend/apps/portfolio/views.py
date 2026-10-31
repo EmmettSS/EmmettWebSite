@@ -20,7 +20,7 @@ class ProjectViewSet(PublicReadOnlyViewSet[Project]):
         # دربارهٔ محدودیت شناخته‌شدهٔ django-stubs با منیجر سفارشی BaseModel.
         queryset: QuerySet[Project] = Project.objects.filter(status=Project.Status.PUBLISHED)
         return (
-            queryset.select_related("service", "cover_image")
+            queryset.select_related("service", "cover_image", "case_study")
             .prefetch_related("categories", "tags", "gallery")
             .order_by("order", "-year")
         )

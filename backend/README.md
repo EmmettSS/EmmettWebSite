@@ -2,7 +2,7 @@
 
 پروژهٔ Django 5.2 + DRF که API نسخه‌دار (`/api/v1/`) سایت امیت را سرو
 می‌کند. معماری کلان (Modular Monolith، مرزبندی اپ‌ها، i18n، احراز هویت و...)
-در `../ARCHITECTURE.md` و ADRهای ریپو (تا `ADR-0026`) مستند شده؛ این فایل
+در `../ARCHITECTURE.md` و ADRهای ریپو (فهرست کامل و معتبر: [`../docs/adr/README.md`](../docs/adr/README.md)) مستند شده؛ این فایل
 راهنمای عملی توسعه و عملیات محلی است.
 
 ## راه‌اندازی محلی
@@ -17,8 +17,8 @@ cp .env.example .env   # و مقادیر را در صورت نیاز ویرای�
 
 export DJANGO_SETTINGS_MODULE=config.settings.dev
 python manage.py migrate
+# در صورت نیاز به ورود با مدیر seed، پیش از این دستور DEMO_ADMIN_PASSWORD را در .env محلی تنظیم کنید.
 python manage.py seed_demo_data      # دادهٔ نمایشی دوزبانهٔ ایدمپوتنت (پایین را ببینید)
-python manage.py createsuperuser     # اختیاری؛ seed_demo_data از قبل admin@emmett.dev می‌سازد
 python manage.py runserver 0.0.0.0:8000
 ```
 
@@ -37,9 +37,12 @@ API روی <http://localhost:8000/api/v1/> بالا می‌آید؛ پنل اد�
   CaseStudy)، ۳ دوره با درس و یک ثبت‌نام نمونه، ۳ پست بلاگ با یک کامنت
   نمونه، یک مشترک خبرنامه.
 
-رمز عبور پیش‌فرض کاربران dev با متغیر محیطی `DEMO_ADMIN_PASSWORD` (و
-مشابه) قابل override است — **هرگز از این دستور روی دیتابیس production
-استفاده نشود.**
+هیچ رمز پیش‌فرض یا ثابت در seed وجود ندارد: اگر `DEMO_ADMIN_PASSWORD` را در
+محیط توسعه تنظیم کنید، فقط برای حساب `admin@emmett.dev` به کار می‌رود؛ در غیر
+این صورت حساب مدیر و کاربران نمونه رمز قابل‌استفاده ندارند؛ اجرای دوباره
+بدون این مقدار، رمزهای قبلی حساب‌های seed شده را نیز غیرفعال می‌کند. رمز در خروجی
+چاپ نمی‌شود. اجرای این دستور با `config.settings.production` ممنوع است، حتی با
+`--force`؛ از seed روی دیتابیس واقعی production استفاده نکنید.
 
 ## تنظیمات (`config/settings/`)
 
@@ -110,8 +113,15 @@ python manage.py spectacular --file /tmp/schema.yaml --fail-on-warn
 ## تست و کیفیت کد
 
 ```bash
+# لایهٔ تنظیماتِ CI برای اجرای تست‌ها **الزامی** است (ر.ک. ADR-0038). بدونِ آن هر تستی که
+# قالبِ ادمین را رندر می‌کند با `Missing staticfiles manifest entry` می‌شکند — ۲۹ تا ۳۴
+# شکستِ کاذب. این لایه فقط کلید `staticfiles` را به `StaticFilesStorage` ساده عوض می‌کند.
+export PYTHONPATH=../.github/ci DJANGO_SETTINGS_MODULE=ci_test_settings
+
 pytest                                  # کل تست‌ها (pytest-django + factory-boy)
-pytest --cov=apps --cov-report=term     # نیاز به نصب جداگانهٔ pytest-cov
+coverage run -m pytest -q && coverage report --fail-under=85   # پوشش؛ همان کاری که CI می‌کند
+# pytest --cov=apps نیاز به نصب جداگانهٔ pytest-cov دارد که در requirements-dev.txt نیست؛
+# مسیرِ پشتیبانی‌شده همان `coverage run` بالاست.
 ruff check apps config                  # لینت
 mypy apps config                        # type-check سخت‌گیرانه (strict)
 python manage.py check                  # System Checkها (E001–W013)

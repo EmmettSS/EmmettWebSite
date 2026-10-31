@@ -16,23 +16,22 @@
 
 | گزینه | توضیح | مزایا | معایب | وضعیت |
 |---|---|---|---|---|
-| **A. دامنهٔ واحد هم‌مبدأ (Same-Origin Single Domain)** | دامنهٔ اصلی (`https://emmett.ir`) روی اپلیکیشن Node.js (Next.js) قرار می‌گیرد؛ درخواست‌های `/api/*` از طریق Route Handler داخلی Next به پورت/سوکت داخلی Django پراکسی می‌شوند و مسیرهای `/admin/*`, `/i18n/*`, `/static/*`, `/media/*` در `.htaccess` مستقیماً به اپ WSGI جنگو و دیسک هدایت می‌شوند | بدون پیچیدگی CORS، کوکی‌های `SameSite=Lax` و CSRF کاملاً هم‌مبدأ، یک گواهی SSL واحد، همسان با معماری تست/توسعه | نیازمند تنظیم دقیق `.htaccess` برای تفکیک مسیرهای ادمین/استاتیک از فرانت | **انتخاب‌شده (الگوی مرجع اصلی)** |
-| **B. ساب‌دامنهٔ مجزا برای بک‌اند (`api.emmett.ir`)** | فرانت‌اند روی `emmett.ir` (Node.js App) و بک‌اند/ادمین روی `api.emmett.ir` (Python WSGI App) | جداسازی کامل در cPanel بدون `.htaccess` ترکیبی | نیازمند تنظیم `CORS_ALLOWED_ORIGINS` و `CSRF_TRUSTED_ORIGINS` بین دو ساب‌دامنه (مگر اینکه کلاینت همچنان از پراکسی `/api/` خود Next استفاده کند) | **پشتیبانی‌شده به‌عنوان الگوی جایگزین** |
+| **A. دامنهٔ واحد هم‌مبدأ (Same-Origin Single Domain)** | Node.js/Next.js در ریشهٔ دامنه (`/`) و Python/Django در mount اختصاصی cPanel برابر `/backend`؛ `/api/v1/*` از Route Handler در Next به `https://<canonical-host>/backend/api/v1/*` می‌رود؛ ادمین در `/backend/admin/` و `i18n` در `/backend/i18n/` است | بدون CORS بین مرورگر و API، کوکی‌های `SameSite=Lax` و CSRF هم‌مبدأ، یک گواهی TLS | نیازمند پشتیبانی Passenger/cPanel از Node در `/` و Python در `/backend`؛ قوانین Passenger را cPanel می‌سازد و نباید با `.htaccess` دستی جایگزین کرد | **انتخاب‌شده (الگوی مرجع اصلی)** |
+| **B. ساب‌دامنهٔ مجزا برای بک‌اند (`api.emmett.ir`)** | فرانت‌اند روی `emmett.ir` (Node.js App) و بک‌اند/ادمین روی `api.emmett.ir` (Python WSGI App) | جداسازی کامل در cPanel | تغییر env و بازبینی CSRF/CORS لازم است | **انتخاب نشده؛ فقط با تصویب جداگانهٔ مالک محصول** |
 | **C. خروجی استاتیک Next (`output: export`)** | بیلد استاتیک بدون سرور Node.js | عدم نیاز به Node.js App | نقض نیازمندی‌های پروژه: از دست رفتن SSR پویا، CSP با nonce یکتا در هر درخواست، `sitemap.xml` پویا و OG Image پویا | رد شده |
 
 ## ۳. تصمیم
 
 ### الف) توپولوژی مرجع (دامنهٔ واحد + دو اپلیکیشن Passenger)
-1. **اپلیکیشن اول — بک‌اند Django (`Setup Python App` در cPanel):**
-   - نسخهٔ پایتون: `Python 3.11`؛
-   - ریشهٔ اپلیکیشن: `/home/<cpanel_user>/EmmettWebSite/backend`؛
-   - فایل ورودی WSGI: `passenger_wsgi.py` (که `config.wsgi:application` را با `DJANGO_SETTINGS_MODULE=config.settings.production` بارگذاری می‌کند)؛
-   - سرو فایل‌های استاتیک جنگو/ادمین با `WhiteNoise` (`STATIC_ROOT = backend/staticfiles`) و سرو فایل‌های `media/` مستقیم توسط Apache با فایل امنیتی `media/.htaccess` (`php_flag engine off`, `Options -ExecCGI -Indexes`).
-2. **اپلیکیشن دوم — فرانت‌اند Next.js (`Setup Node.js App` در cPanel):**
-   - نسخهٔ نود: `Node.js 22 LTS`؛
-   - ریشهٔ اپلیکیشن: `/home/<cpanel_user>/EmmettWebSite/frontend`؛
-   - فایل ورودی استارت‌آپ Passenger: `server.js` (راه‌انداز استاندارد Next.js در حالت production)؛
-   - متغیر `INTERNAL_API_URL` به آدرس داخلی سرویس Django تنظیم می‌شود تا هم Server Components و هم Route Handler پراکسی (`/api/[...path]`) بدون خروج از شبکهٔ محلی سرور با Django ارتباط برقرار کنند.
+1. **اپلیکیشن Python — بک‌اند Django (`Setup Python App` در cPanel):**
+   - نسخهٔ پایتون: `3.11`؛ ریشه: `/home/<cpanel_user>/EmmettWebSite/backend`؛ فایل ورودی: `passenger_wsgi.py`؛ entry point: `application`.
+   - **Application URL: `/backend`** (نه `/admin` و نه پورت فرضی `127.0.0.1:8000`). این mount با `DJANGO_FORCE_SCRIPT_NAME=/backend` در Environment Variables همان Python App هم‌تراز می‌شود؛ در صورت نیاز مقدار جداگانه‌ای برای CLI/Cron در env خصوصی سرور قرار می‌گیرد. مسیرهای عمومی Django در نتیجه `/backend/admin/`, `/backend/i18n/` و `/backend/api/v1/` هستند.
+   - استاتیک Django با WhiteNoise/`STATIC_ROOT=backend/staticfiles` و مدیا با مسیر `/media/` و `.htaccess` مخصوص media سرو می‌شوند.
+2. **اپلیکیشن Node.js — فرانت‌اند Next.js (`Setup Node.js App` در cPanel):**
+   - نسخهٔ Node: دقیقاً `22.22.3` (مطابق `frontend/package.json` و CI)؛ ریشه: `/home/<cpanel_user>/EmmettWebSite/frontend`؛ فایل ورودی Passenger: `server.js`؛ **Application URL: ریشهٔ دامنه (`/`)** و `PORT` از Passenger گرفته می‌شود.
+   - مرورگر فقط `/api/v1/*` را روی همان مبدأ فراخوانی می‌کند؛ Next آن را به mount جنگو پراکسی می‌کند. مقدار مرجع `INTERNAL_API_URL=https://emmett.ir/backend` است و برای دامنهٔ دیگر باید با host canonical جایگزین شود. همین مقدار برای Server Components و Route Handler استفاده می‌شود.
+   - `FRONTEND_REVALIDATE_URL=https://emmett.ir/api/revalidate` برای تماس Django با Next است؛ secret مشترک فقط در env سرورهای Django و Node نگه‌داری می‌شود.
+3. **مالکیت مسیریابی:** cPanel/Passenger قواعد route لازم را هنگام ساخت اپ‌ها مدیریت می‌کند. نمونهٔ `public_html.htaccess.example` فقط قواعد تکمیلی امنیتی است و نباید فایل `.htaccess` مدیریت‌شدهٔ cPanel را کامل overwrite کند.
 
 ### ب) دیتابیس و کش روی cPanel
 - **دیتابیس:** MySQL 8.0+ در بخش `MySQL Databases` سی‌پنل با مجموعه کاراکتر `utf8mb4` و collation `utf8mb4_unicode_ci`؛ اتصال از طریق درایور خالص پایتون `PyMySQL` (بدون نیاز به `mysqlclient` و کامپایلر C روی هاست اشتراکی — `ADR-0011`).
@@ -49,5 +48,6 @@
 
 ## ۴. پیامدها
 
-- **مثبت:** استقرار کاملاً منطبق با امکانات استاندارد هاست‌های اشتراکی ایرانی cPanel است و هیچ وابستگی به Docker، کامپایلر C، Redis یا دسترسی root ندارد.
-- **مثبت:** در صورت محدودیت هاست در تعریف دو اپ Passenger روی یک دامنه، الگوی جایگزین ساب‌دامنه (`api.domain.ir` برای WSGI و `domain.ir` برای Node.js با `INTERNAL_API_URL=https://api.domain.ir`) بدون تغییر حتی یک خط کد و صرفاً با تغییر `.env` کار می‌کند.
+- **مثبت:** به Docker، کامپایلر C، Redis یا دسترسی root وابسته نیست؛ بااین‌حال پشتیبانی حساب cPanel مشخص از دو Application URL هم‌زمان `/` و `/backend` باید پیش از Go-Live تأیید شود.
+- **جایگزینِ نیازمند تصمیم مجدد:** اگر ارائه‌دهنده نتواند دو Passenger App را روی یک دامنه در URLهای `/` و `/backend` route کند، استقرار متوقف می‌ماند تا مالک محصول توپولوژی ساب‌دامنه را جداگانه تأیید کند؛ در آن حالت `DJANGO_FORCE_SCRIPT_NAME` و `INTERNAL_API_URL` باید مطابق آن پیکربندی بازتنظیم شوند.
+- **دروازهٔ استقرار:** این ADR قرارداد هدف مخزن را تثبیت می‌کند، نه سازگاری اثبات‌شده با حساب هاست خاص. پیش از Go-Live باید از ترمینال همان هاست، هر دو health URL مستقیم و proxied و مسیر login ادمین بررسی شوند. پورت `127.0.0.1:8000` هیچ‌وقت در production فرض نمی‌شود.

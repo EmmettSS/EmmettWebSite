@@ -7,6 +7,8 @@ from django.contrib import admin
 from django.urls import URLPattern, URLResolver, include, path
 
 urlpatterns: list[URLPattern | URLResolver] = [
+    # محتوای ترجمه‌شدهٔ عمومیِ فرانت‌اند از CMS، مستقل از SEO و محتوای دامنه‌ای.
+    path("api/v1/site-content/", include("apps.core.frontend_content_urls")),
     # ۲FA ادمین باید پیش از الگوهای عمومی ادمین ثبت شود (ADR-0033).
     path("admin/2fa/", include("apps.accounts.twofa_urls")),
     path("admin/", admin.site.urls),

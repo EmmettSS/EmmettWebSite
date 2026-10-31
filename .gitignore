@@ -34,6 +34,16 @@ backend/passenger_wsgi.py
 frontend/tmp/
 frontend/server.js
 
+# === آرتیفکت‌های CI (تولیدشده توسط .github/workflows/ci.yml) ===
+# این دو در ریپو نگه داشته نمی‌شوند؛ در GitHub Actions به‌صورت artifact
+# بارگذاری می‌شوند. خروجی‌های Playwright/Vitest از قبل در frontend/.gitignore
+# هستند؛ `.lighthouseci/` این‌جا لازم است چون LHCI از ریشهٔ ریپو اجرا می‌شود.
+backend/coverage.xml
+.lighthouseci/
+# اجرای محلی دستور جاب `backend-test` این پوشه را می‌سازد (`.gitignore` ریشه
+# تاکنون فقط `backend/**/__pycache__/` را پوشش می‌داد).
+.github/ci/__pycache__/
+
 # === آرتیفکت‌های موقت بررسی (تصاویر OG تولیدشده در build و مانند آن) ===
 .arena-tmp/
 
