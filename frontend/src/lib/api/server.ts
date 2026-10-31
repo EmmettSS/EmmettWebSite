@@ -1,6 +1,6 @@
 import { CACHE_TAGS } from "@/lib/cache-tags";
 import { getSafeErrorType, logUpstreamFailure } from "./upstream-logging";
-import { getApiBaseUrl } from "./config";
+import { UPSTREAM_TIMEOUT_MS, getApiBaseUrl, internalServiceHeaders } from "./config";
 import type {
   AISuggestion,
   BlogPostDetail,
@@ -30,6 +30,11 @@ export function extractForwardedClientIp(requestHeaders: Pick<Headers, "get">): 
   return realIp ? realIp : undefined;
 }
 
+/** فاز ساخت (``next build``) — برای هشدار «بک‌اند در زمان build در دسترس نبود». */
+function isBuildPhase(): boolean {
+  return process.env.NEXT_PHASE === "phase-production-build";
+}
+
 /**
  * fetch سمت سرور (Server Component) — مستقیماً بک‌اند Django را صدا می‌زند
  * (هرگز از مرورگر عبور نمی‌کند). هدر ``Accept-Language`` معادل locale درخواستی
@@ -45,7 +50,9 @@ async function serverFetch<T>(
   try {
     const response = await fetch(url, {
       ...init,
+      signal: init?.signal ?? AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
       headers: {
+        ...internalServiceHeaders(),
         "Accept-Language": locale,
         "X-Forwarded-Proto": "https",
         ...init?.headers,
@@ -60,6 +67,15 @@ async function serverFetch<T>(
     return (await response.json()) as T;
   } catch (error) {
     logUpstreamFailure("django-ssr", path, { errorType: getSafeErrorType(error) });
+    if (isBuildPhase()) {
+      // صفحات عمومی حالا pre-render می‌شوند (ADR-0041). اگر بک‌اند هنگام
+      // `next build` بالا نباشد، HTML ساخته‌شده خالی است تا نخستین
+      // revalidate؛ این هشدار آن حالت را قابل‌تشخیص می‌کند.
+      console.warn(
+        `[build] backend unreachable during prerender (${path}); ` +
+          "the page was generated with fallback data and will be refreshed by ISR.",
+      );
+    }
     return null;
   }
 }
@@ -140,6 +156,7 @@ export async function getSharedAISuggestion(
 ): Promise<AISuggestion | null> {
   const url = `${getApiBaseUrl()}/ai/results/${encodeURIComponent(token)}/`;
   const reqHeaders: Record<string, string> = {
+    ...internalServiceHeaders(),
     "Accept-Language": locale,
     "X-Forwarded-Proto": "https",
   };

@@ -129,12 +129,25 @@ class TestRealProjectCoverage:
         assert i18n.command_check(BACKEND_ROOT, ["fa", "en"]) == 0
         assert "موفق" in capsys.readouterr().out
 
-    def test_compiled_mo_files_exist_and_are_fresh(self) -> None:
+    def test_compiled_mo_files_match_po_catalog(self, tmp_path: Path) -> None:
+        """``.mo`` باید دقیقاً خروجی کامپایل ``.po`` فعلی باشد.
+
+        پیش‌تر این تست بر ``mtime`` تکیه داشت؛ با هر checkout/renormalize (مثلاً
+        یکسان‌سازی CRLF→LF در ADR-0041) فایل‌های ``.po`` تازه‌تر می‌شدند و تست
+        قرمز می‌شد، بدون آنکه واقعاً کاتالوگ کهنه باشد. مقایسهٔ بایتی، همان
+        قرارداد را قفل می‌کند و به زمان وابسته نیست.
+        """
         for locale in ("fa", "en"):
             po = i18n.po_path(BACKEND_ROOT, locale)
             mo = i18n.mo_path(BACKEND_ROOT, locale)
             assert mo.exists(), f"{locale}/django.mo در مخزن نیست (ادمین انگلیسی می‌ماند)"
-            assert mo.stat().st_mtime >= po.stat().st_mtime - 1, "mo قدیمی‌تر از po است: دوباره compile کنید"
+            candidate = tmp_path / f"{locale}.mo"
+            i18n.compile_po(polib.pofile(str(po)), candidate)
+            message = (
+                f"{locale}/django.mo با {locale}/django.po هم‌خوان نیست: "
+                "`python scripts/i18n.py compile` را اجرا کنید"
+            )
+            assert candidate.read_bytes() == mo.read_bytes(), message
 
 
 class TestRuntimeTranslation:

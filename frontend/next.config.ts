@@ -34,6 +34,13 @@ const nextConfig: NextConfig = {
     // هرگز نباید در CI/production فعال شود؛ خطاهای TS باید build را بشکنند.
     ignoreBuildErrors: false,
   },
+  poweredByHeader: false,
+  // فشرده‌سازی gzip برای پاسخ‌های داینامیک (پیش‌فرض Next) صریح نوشته می‌شود.
+  // توجه (اندازه‌گیری‌شده در ADR-0041): فایل‌های `/_next/static/*.js` با
+  // `next start` **فشرده‌نشده** سرو می‌شوند؛ فشرده‌سازی آن‌ها وظیفهٔ Apache/
+  // Passenger است — بلوک mod_deflate/mod_brotli در
+  // `backend/deploy/public_html.htaccess.example` بند ۳.
+  compress: true,
   // کد سمت مرورگر همیشه به مسیر نسبی `/api/v1/...` درخواست می‌زند؛
   // ``src/app/api/[...path]/route.ts`` آن را سمت سرور به بک‌اند Django
   // پراکسی می‌کند (هم‌مبدا از دید مرورگر، پس کوکی سشن/CSRF بدون پیچیدگی CORS

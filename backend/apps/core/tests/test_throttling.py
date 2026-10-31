@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 import pytest
 from django.core.cache import cache
 from django.test import RequestFactory
@@ -134,3 +136,54 @@ class TestNewsletterThrottleEnforced:
             HTTP_X_FORWARDED_FOR="198.51.100.99, 203.0.113.77",
         )
         assert blocked.status_code == 429
+
+
+class TestInternalServiceBypass:
+    """ADR-0041: فراخوانی‌های سرور-به-سرور Next.js نباید در سطل throttle ناشناس بیفتند."""
+
+    def _request(self, token: str | None) -> Request:
+        factory = RequestFactory()
+        raw = factory.get("/api/v1/services/")
+        if token is not None:
+            raw.META["HTTP_X_INTERNAL_TOKEN"] = token
+        return Request(raw)
+
+    @staticmethod
+    def _tight(throttle_class: type[Any]) -> Any:
+        """نمونهٔ throttle با سقف ۱ درخواست در ساعت (مستقل از تنظیمات سراسری)."""
+        throttle = throttle_class()
+        throttle.rate = "1/hour"
+        throttle.num_requests, throttle.num_seconds = 1, 3600
+        return throttle
+
+    @pytest.mark.parametrize("throttle_class", [ProxyAwareAnonRateThrottle, ProxyAwareUserRateThrottle])
+    def test_matching_token_bypasses_default_throttles(
+        self, throttle_class: type[Any], settings: Any
+    ) -> None:
+        settings.INTERNAL_API_TOKEN = "unit-test-internal-token-value"
+        cache.clear()
+        throttle = self._tight(throttle_class)
+        request = self._request("unit-test-internal-token-value")
+        assert throttle.allow_request(request, view=object()) is True
+
+    def test_wrong_token_is_still_throttled(self, settings: Any) -> None:
+        settings.INTERNAL_API_TOKEN = "unit-test-internal-token-value"
+        cache.clear()
+        throttle = self._tight(ProxyAwareAnonRateThrottle)
+        # مصرف سهمیهٔ throttle معمولی برای همان شناسه
+        assert throttle.allow_request(self._request(None), view=object()) is True
+        assert throttle.allow_request(self._request("wrong-token"), view=object()) is False
+
+    def test_empty_setting_disables_bypass(self, settings: Any) -> None:
+        settings.INTERNAL_API_TOKEN = ""
+        throttle = ProxyAwareAnonRateThrottle()
+        cache.clear()
+        assert throttle.allow_request(self._request(""), view=object()) is True
+        assert throttle.allow_request(self._request("anything"), view=object()) is True
+
+    def test_scoped_user_action_throttles_are_not_bypassed(self, settings: Any) -> None:
+        """فرم تماس/هوش مصنوعی/ورود نباید با توکن داخلی از سقف عبور کنند."""
+        from apps.core.throttling import InternalServiceBypassMixin
+
+        for cls in (ContactFormRateThrottle, AIEngineRateThrottle, AuthRateThrottle):
+            assert not issubclass(cls, InternalServiceBypassMixin)

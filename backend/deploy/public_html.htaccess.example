@@ -23,7 +23,21 @@
     RewriteRule ^ - [L]
 </IfModule>
 
-# ۳) تزریق امن IP واقعی کلاینت، هدرهای امنیتی پایه و کش دارایی‌های استاتیک Apache
+# ۳) فشرده‌سازی پاسخ‌های متنی
+# چرا لازم است؟ `next start` فقط پاسخ‌های داینامیک را gzip می‌کند و فایل‌های
+# `/_next/static/*.js` را **فشرده‌نشده** می‌فرستد (اندازه‌گیری‌شده: ۲۷۵KB به‌جای
+# ~۹۰KB در صفحهٔ اصلی). Apache جلوی Node می‌تواند این شکاف را پر کند؛ بدون این
+# بلوک، هر بازدیدکننده چند صد کیلوبایت اضافه دانلود می‌کند.
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml \
+        application/javascript application/json application/xml image/svg+xml
+</IfModule>
+<IfModule mod_brotli.c>
+    AddOutputFilterByType BROTLI_COMPRESS text/html text/plain text/css text/xml \
+        application/javascript application/json application/xml image/svg+xml
+</IfModule>
+
+# ۴) تزریق امن IP واقعی کلاینت، هدرهای امنیتی پایه و کش دارایی‌های استاتیک Apache
 <IfModule mod_headers.c>
     # بازنویسی X-Forwarded-For با همتای TCP واقعی در لبهٔ Apache 2.4 تا هر هدر جعلی
     # ارسالی توسط کلاینت پاک شود و زنجیرهٔ Passenger Node (Next.js) -> Django دقیقاً IP
@@ -46,7 +60,7 @@
     </FilesMatch>
 </IfModule>
 
-# ۴) غیرفعال‌سازی کامل فهرست دایرکتوری‌ها و مسدودسازی دسترسی به فایل‌های نقطه (.env, .git)
+# ۵) غیرفعال‌سازی کامل فهرست دایرکتوری‌ها و مسدودسازی دسترسی به فایل‌های نقطه (.env, .git)
 Options -Indexes
 <FilesMatch "^\.">
     Require all denied

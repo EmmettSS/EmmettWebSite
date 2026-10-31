@@ -8,6 +8,7 @@ import { Link } from "@/i18n/navigation";
 import { CommentForm } from "@/components/organisms/comment-form";
 import type { AppLocale } from "@/i18n/routing";
 import { getBlogPost } from "@/lib/api/server";
+import { blogDetailParams } from "@/lib/api/static-params";
 import { sanitizeRichHtml } from "@/lib/security/sanitize-rich-html";
 import { JsonLd } from "@/components/seo/json-ld";
 import { getSeoSettingsOrDefaults } from "@/lib/api/seo";
@@ -16,6 +17,22 @@ import { buildPageMetadata } from "@/lib/seo/metadata";
 import { getPublicSiteUrl, toAppLocale } from "@/lib/seo/site";
 import Image from "next/image";
 import { frameWidth, pageTitleClass } from "@/components/ui-port/page-frame";
+
+/**
+ * ISR برای صفحه‌های جزئیات (ADR-0041).
+ *
+ * چرا: این مسیر بدون `generateStaticParams` در هر درخواست رندر می‌شد (ƒ) و
+ * بازدید اول هر مقاله ۳۷–۱۰۷ میلی‌ثانیه طول می‌کشید. با `revalidate` نتیجهٔ
+ * رندر در حافظهٔ ISR کش می‌شود و بازدیدهای بعدی همان HTML آماده را می‌گیرند.
+ * محتوای تازه‌منتشرشده هم بلافاصله در دسترس است (`dynamicParams` پیش‌فرض),
+ * و وب‌هوک `/api/revalidate` با تگ `blog` آن را فوری تازه می‌کند.
+ */
+export const revalidate = 60;
+export const dynamicParams = true;
+
+export function generateStaticParams() {
+  return blogDetailParams();
+}
 
 interface PageParams {
   locale: string;
