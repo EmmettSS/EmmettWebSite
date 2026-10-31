@@ -1877,8 +1877,8 @@ msgstr ""
 msgid "A redirect with this status code needs a target."
 msgstr ""
 
-#: apps/core/models.py:538
-msgid "The target must start with / or https://."
+#: apps/core/models.py:572
+msgid "Use a root-relative path or a valid HTTPS URL without credentials."
 msgstr ""
 
 #: apps/core/seo.py:169

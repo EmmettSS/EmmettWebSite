@@ -1,9 +1,14 @@
-# نمونه فایل .htaccess ریشهٔ دامنه (public_html/.htaccess) روی هاست cPanel (ADR-0035، ADR-0036)
+# قواعد تکمیلی امنیتی برای public_html روی cPanel (ADR-0035، ADR-0036).
 #
-# توپولوژی مصوب: دامنهٔ واحد هم‌مبدأ (Single-Domain Same-Origin)
-# - مسیرهای /static/ و /media/ مستقیماً از دیسک (یا سیم‌لینک در public_html) با هدرهای امنیتی سرو می‌شوند.
-# - مسیرهای /admin/ و /i18n/ توسط اپلیکیشن پایتونی Django روی Passenger سرو می‌شوند.
-# - سایر مسیرها (شامل /، /en/ و پراکسی /api/v1/*) توسط اپلیکیشن Node.js (Next.js) روی Passenger مدیریت می‌شوند.
+# Passenger routing is owned by the cPanel Setup Python/Node.js Apps and its generated
+# .htaccess rules: Node.js serves /; Django is mounted at /backend. This file does not
+# configure Passenger routing. Merge these rules with the cPanel-managed file; NEVER
+# replace that file wholesale with this example.
+#
+# Public path map:
+# - /api/v1/* -> Next.js Route Handler -> Django at /backend/api/v1/*
+# - /backend/admin/* and /backend/i18n/* -> Django Passenger app
+# - /static/* and /media/* -> public_html symlinks (when configured)
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
@@ -18,8 +23,20 @@
     RewriteRule ^ - [L]
 </IfModule>
 
-# ۳) هدرهای امنیتی پایه و کش برای دارایی‌های استاتیک سرو شده توسط Apache
+# ۳) تزریق امن IP واقعی کلاینت، هدرهای امنیتی پایه و کش دارایی‌های استاتیک Apache
 <IfModule mod_headers.c>
+    # بازنویسی X-Forwarded-For با همتای TCP واقعی در لبهٔ Apache 2.4 تا هر هدر جعلی
+    # ارسالی توسط کلاینت پاک شود و زنجیرهٔ Passenger Node (Next.js) -> Django دقیقاً IP
+    # واقعی کاربر را ببیند (هم‌راستا با DJANGO_NUM_PROXIES=1 در .env).
+    # توجه ۱: از نحو Apache 2.4 («expr=%{REMOTE_ADDR}») استفاده کنید، نه «%{REMOTE_ADDR}e»
+    # که متغیر محیطی است و بدون SetEnv مقدار «(null)» تولید می‌کند.
+    # توجه ۲: اگر سایت پشت CDN (کلادفلر/آروان) قرار گرفت و mod_remoteip روی هاست فعال نبود،
+    # دستور «set» زیر را به «append» تغییر دهید و در .env مقدار DJANGO_NUM_PROXIES=2 بگذارید.
+    # راستی‌آزمایی روی هاست واقعی: پس از ورود به /backend/admin/، مسیر GET /api/v1/health/proxy/ را باز کنید.
+    RequestHeader set X-Forwarded-For "expr=%{REMOTE_ADDR}"
+    RequestHeader set X-Real-IP "expr=%{REMOTE_ADDR}"
+    RequestHeader set X-Forwarded-Proto "https"
+
     Header always set X-Content-Type-Options "nosniff"
     Header always set Referrer-Policy "strict-origin-when-cross-origin"
     Header always set X-Frame-Options "DENY"

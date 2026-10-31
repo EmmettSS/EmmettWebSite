@@ -107,6 +107,10 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "config.urls"
+# cPanel's Python Passenger app is mounted under /backend while Next.js owns /
+# (ADR-0035). Normalize the value and keep local development at the domain root.
+_script_prefix = env("DJANGO_FORCE_SCRIPT_NAME", default="").strip().strip("/")
+FORCE_SCRIPT_NAME = f"/{_script_prefix}" if _script_prefix else None
 
 TEMPLATES = [
     {
@@ -167,13 +171,13 @@ STATIC_ROOT = Path(env("DJANGO_STATIC_ROOT", default=str(BASE_DIR / "staticfiles
 # (فاز ۶، ADR-0027). در production با ``collectstatic`` در ``STATIC_ROOT``
 # جمع می‌شوند و با WhiteNoise یا مستقیم توسط Apache سرو می‌شوند.
 STATICFILES_DIRS = [BASE_DIR / "static"]
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STATICFILES_STORAGE = "apps.core.storage.NonStrictCompressedManifestStaticFilesStorage"
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        "BACKEND": STATICFILES_STORAGE,
     },
 }
 
@@ -208,6 +212,12 @@ else:
             "LOCATION": "emmett-locmem",
         }
     }
+
+# Next.js on-demand cache invalidation. When the webhook is not configured,
+# frontend data fetches still recover through their explicit short TTL.
+FRONTEND_REVALIDATE_URL = env("FRONTEND_REVALIDATE_URL", default="")
+FRONTEND_REVALIDATE_SECRET = env("FRONTEND_REVALIDATE_SECRET", default="")
+FRONTEND_REVALIDATE_TIMEOUT_SECONDS = env.int("FRONTEND_REVALIDATE_TIMEOUT_SECONDS", default=2)
 
 # ---------------------------------------------------------------------------
 # CORS (فقط برای توسعهٔ محلی frontend جدا؛ در prod تنظیمات سخت‌گیرانه‌تر است)
@@ -277,9 +287,17 @@ REST_FRAMEWORK = {
         "rest_framework.filters.OrderingFilter",
     ],
     "DEFAULT_THROTTLE_CLASSES": [
-        "rest_framework.throttling.AnonRateThrottle",
-        "rest_framework.throttling.UserRateThrottle",
+        "apps.core.throttling.ProxyAwareAnonRateThrottle",
+        "apps.core.throttling.ProxyAwareUserRateThrottle",
     ],
+    # تعداد reverse proxyهای مطمئن جلوتر از اپلیکیشن:
+    # - 1 (پیش‌فرض): Apache/Passenger روی هاست cPanel هدر X-Forwarded-For را ست/اضافه
+    #   می‌کند و پراکسی داخلی Next.js آن را بدون افزودن 127.0.0.1 عبور می‌دهد.
+    # - 2: زمانی که CDN خارجی (Cloudflare/ArvanCloud) بدون mod_remoteip جلوتر از Apache است
+    #   و Apache از RequestHeader append استفاده می‌کند.
+    # - 0: اتصال مستقیم بدون پراکسی (نادیده‌گرفتن کامل هدرهای X-Forwarded-For).
+    # پیش از ترافیک واقعی، خروجی تشخیصی /api/v1/health/proxy/ را روی هاست بررسی کنید.
+    "NUM_PROXIES": env.int("DJANGO_NUM_PROXIES", default=1),
     "DEFAULT_THROTTLE_RATES": {
         "anon": env("THROTTLE_RATE_ANON", default="100/hour"),
         "user": env("THROTTLE_RATE_USER", default="1000/hour"),
@@ -480,6 +498,17 @@ IMPORT_EXPORT_IMPORT_IGNORE_BLANK_LINES = True
 # ---------------------------------------------------------------------------
 # صفحه‌های ثابت ویترین که در sitemap می‌آیند و «مسیر بومی‌سازی‌نشده» دارند
 # (پیشوند ``/en`` را فرانت‌اند اضافه می‌کند). ترتیب، اولویت/تناوب را تعیین می‌کند.
+#
+# صفحه‌های جزئیات اینجا نمی‌آیند: آن‌ها را ``apps/core/seo.py::_published_entries``
+# از رکوردهای منتشرشده می‌سازد و برای همهٔ پروژه‌ها — از جمله محصولات با
+# ``is_product=True`` — پیشوند ``/projects/`` را به کار می‌برد. این قرارداد
+# canonical است (ADR-0040): در فرانت‌اند هم صفحهٔ جزئیات محصول زیر
+# ``/projects/{slug}`` سرو می‌شود و فهرست محصولات هم به همان‌جا لینک می‌دهد.
+#
+# ``/products/{slug}`` **عمداً** در این فهرست نیست. در فرانت‌اند آن مسیرها
+# صفحهٔ «به‌زودی»ِ پورت UI هستند (ADR-0037)، محتوای دیتابیسی ندارند و
+# canonicalِ خودشان را نگه می‌دارند؛ فرستادنشان در sitemap یعنی معرفی یک
+# صفحهٔ خالی به موتور جست‌وجو و تناقض دوباره با canonical صفحهٔ واقعی.
 SEO_STATIC_PAGES: tuple[tuple[str, str, str], ...] = (
     ("/", "1.0", "weekly"),
     ("/services", "0.9", "weekly"),
@@ -587,18 +616,25 @@ LOGGING = {
             "formatter": "plain_console",
         },
     },
+    "root": {
+        "handlers": ["console"],
+        "level": "DEBUG" if DEBUG else "INFO",
+    },
     "loggers": {
         "django": {
-            "handlers": ["console"],
+            "handlers": [],
             "level": env("DJANGO_LOG_LEVEL", default="INFO"),
+            "propagate": True,
         },
         "django_structlog": {
-            "handlers": ["console"],
+            "handlers": [],
             "level": "INFO",
+            "propagate": True,
         },
         "apps": {
-            "handlers": ["console"],
+            "handlers": [],
             "level": "DEBUG" if DEBUG else "INFO",
+            "propagate": True,
         },
     },
 }

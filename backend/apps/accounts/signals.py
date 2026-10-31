@@ -7,10 +7,11 @@ from __future__ import annotations
 from typing import Any
 
 from django.contrib.auth.signals import user_logged_in, user_login_failed
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
 
 from apps.accounts.models import Profile, User
+from apps.core.frontend_cache import invalidate_model_cache
 from apps.core.models import log_action
 from apps.core.security import LoginLockout
 from apps.core.utils.request import get_client_ip
@@ -20,6 +21,27 @@ from apps.core.utils.request import get_client_ip
 def create_profile_for_new_user(sender: type[User], instance: User, created: bool, **kwargs: Any) -> None:
     if created:
         Profile.objects.get_or_create(user=instance)
+
+
+@receiver(post_save, sender=User)
+def invalidate_public_blog_author_cache(
+    sender: type[User],
+    instance: User,
+    created: bool,
+    update_fields: frozenset[str] | None = None,
+    **kwargs: Any,
+) -> None:
+    """Refresh cached post/comment author names when a referenced user's name changes."""
+
+    if created or (update_fields is not None and not {"first_name", "last_name"}.intersection(update_fields)):
+        return
+    if instance.blog_posts.exists() or instance.comments.exists():
+        invalidate_model_cache("blog.BlogPost")
+
+
+@receiver(post_delete, sender=User)
+def invalidate_deleted_blog_author_cache(sender: type[User], instance: User, **kwargs: Any) -> None:
+    invalidate_model_cache("blog.BlogPost")
 
 
 @receiver(pre_save, sender=User)

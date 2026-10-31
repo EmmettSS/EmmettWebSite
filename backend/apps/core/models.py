@@ -15,6 +15,7 @@ from __future__ import annotations
 import os
 import uuid
 from typing import Any, cast
+from urllib.parse import urlsplit
 
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -271,8 +272,9 @@ def media_upload_path(instance: Media, filename: str) -> str:
 
     ext = os.path.splitext(filename)[1].lower()
     base_name = slugify(os.path.splitext(filename)[0])[:60] or "file"
+    folder = (instance.media_type or "misc").strip("/") or "misc"
     today = timezone.now()
-    return f"{instance.media_type}/{today:%Y}/{today:%m}/{uuid.uuid4().hex}_{base_name}{ext}"
+    return f"{folder}/{today:%Y}/{today:%m}/{uuid.uuid4().hex}_{base_name}{ext}"
 
 
 class Media(BaseModel):
@@ -482,6 +484,34 @@ class RedirectStatus(models.IntegerChoices):
     GONE = 410, _("410 — Removed permanently")
 
 
+def is_safe_redirect_target(target: str) -> bool:
+    """فقط مسیر داخلی ریشه‌ای یا URL مطلق HTTPS معتبر را مجاز می‌کند.
+
+    این بررسی هم در اعتبارسنجی مدل و هم درست پیش از پاسخ HTTP اجرا می‌شود تا
+    رکوردهای قدیمی/واردشده که از ``full_clean()`` عبور نکرده‌اند ایمن بمانند.
+    """
+
+    value = (target or "").strip()
+    if not value or "\\" in value or any(ord(char) < 0x20 or ord(char) == 0x7F for char in value):
+        return False
+    if value.startswith("/"):
+        return not value.startswith("//")
+
+    try:
+        parsed = urlsplit(value)
+        port = parsed.port  # دسترسی به port، قالب نامعتبر را با ValueError رد می‌کند.
+    except ValueError:
+        return False
+
+    return (
+        parsed.scheme == "https"
+        and bool(parsed.hostname)
+        and parsed.username is None
+        and parsed.password is None
+        and (port is None or 1 <= port <= 65535)
+    )
+
+
 class Redirect(BaseModel):
     """ریدایرکت مدیریت‌شده از ادمین (۳۰۱/۳۰۲/۴۱۰) — بدون تغییر کد برای مدیر محتوا.
 
@@ -537,8 +567,10 @@ class Redirect(BaseModel):
         }
         if needs_target and not self.target:
             raise ValidationError({"target": _("A redirect with this status code needs a target.")})
-        if self.target and not (self.target.startswith("/") or self.target.startswith("https://")):
-            raise ValidationError({"target": _("The target must start with / or https://.")})
+        if self.target and not is_safe_redirect_target(self.target):
+            raise ValidationError(
+                {"target": _("Use a root-relative path or a valid HTTPS URL without credentials.")}
+            )
 
 
 def normalize_redirect_path(value: str) -> str:
@@ -596,6 +628,7 @@ __all__ = [
     "SearchIndexEntry",
     "RedirectStatus",
     "Redirect",
+    "is_safe_redirect_target",
     "normalize_redirect_path",
     "FAQItem",
 ]

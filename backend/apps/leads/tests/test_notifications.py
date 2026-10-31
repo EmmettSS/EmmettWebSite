@@ -38,20 +38,32 @@ class TestKavenegarSMSBackend:
         import requests
 
         backend = KavenegarSMSBackend(api_key="test-key")
-        with patch("apps.leads.notifications.requests.post", side_effect=requests.RequestException("boom")):
+        with (
+            patch(
+                "apps.leads.notifications.requests.post",
+                side_effect=requests.RequestException("request failed for /v1/test-key/sms/send.json"),
+            ),
+            patch("apps.leads.notifications.logger.warning") as mock_warning,
+        ):
             result = backend.send(to="09120000000", message="سلام")
 
         assert result.success is False
         assert result.provider == "kavenegar"
-        assert "boom" in result.detail
+        assert result.detail == "RequestException"
+        assert mock_warning.call_args.kwargs["error_type"] == "RequestException"
+        assert "test-key" not in str(mock_warning.call_args)
 
 
 class TestConsoleSMSBackend:
     def test_send_always_succeeds_without_network_call(self) -> None:
         backend = ConsoleSMSBackend()
-        result = backend.send(to="09120000000", message="تست")
+        with patch("apps.leads.notifications.logger.info") as mock_info:
+            result = backend.send(to="09120000000", message="اطلاعات تماس محرمانه")
+
         assert result.success is True
         assert result.provider == "console"
+        assert mock_info.call_args.args == ("sms_would_send",)
+        assert mock_info.call_args.kwargs == {"provider": "console"}
 
 
 class TestFakeSMSBackend:
@@ -140,3 +152,20 @@ class TestNotifyNewContact:
 
         with patch("apps.leads.notifications.get_sms_backend", side_effect=Exception("boom")):
             notify_new_contact(contact)  # should not raise
+
+    def test_email_transport_failure_is_logged_without_failing_notification(self, settings: object) -> None:
+        import django.conf
+
+        s = cast(django.conf.LazySettings, settings)
+        s.LEADS_NOTIFICATION_PHONE = ""
+        s.LEADS_NOTIFICATION_EMAIL = "team@example.com"
+        contact = cast(Contact, ContactFactory())
+
+        with (
+            patch("apps.leads.notifications.send_mail", side_effect=OSError("SMTP unavailable")) as send_mail,
+            patch("apps.leads.notifications.logger.exception") as mock_exception,
+        ):
+            notify_new_contact(contact)
+
+        assert send_mail.call_args.kwargs["fail_silently"] is False
+        mock_exception.assert_called_once_with("contact_email_notification_failed", contact_id=contact.pk)

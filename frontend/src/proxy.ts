@@ -99,5 +99,5 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
 
 export const config = {
   // Apply CSP to pages and localized routes, not API responses or static assets.
-  matcher: ["/((?!api|_next|_vercel|.*\\..*).*)"],
+  matcher: ["/((?!api|media|_next|_vercel|.*\\..*).*)"],
 };

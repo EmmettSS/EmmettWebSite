@@ -2,18 +2,41 @@
 
 > **نوع سند:** مرجع فنی یکپارچه و جامع (Single-File Technical Documentation — فارسی)  
 > **نسخهٔ انگلیسی:** [`docs/TECHNICAL_DOCUMENTATION.en.md`](./TECHNICAL_DOCUMENTATION.en.md)  
-> **پوشش:** معماری سیستم، مدل داده، خلاصهٔ ۳۵ ADR، مستندات کامل API، راهنمای کامل پنل ادمین، راهنمای گام‌به‌گام استقرار روی cPanel، و دروازه‌های کیفیت/CI-CD.
+> **پوشش:** معماری سیستم، مدل داده، خلاصهٔ هر ۴۰ ADR، مستندات کامل API، راهنمای کامل پنل ادمین، راهنمای گام‌به‌گام استقرار روی cPanel، و دروازه‌های کیفیت/CI-CD.
 
 ---
 
 ## فهرست مطالب
 
 1. [بخش اول: معماری کلان سیستم و مدل داده](#بخش-اول-معماری-کلان-سیستم-و-مدل-داده)
-2. [بخش دوم: فهرست و خلاصهٔ تصمیمات معماری (ADR-0001 تا ADR-0035)](#بخش-دوم-فهرست-و-خلاصهٔ-تصمیمات-معماری-adr-0001-تا-adr-0035)
+2. [بخش دوم: فهرست و خلاصهٔ تصمیمات معماری (ADR-0001 تا ADR-0040)](#بخش-دوم-فهرست-و-خلاصهٔ-تصمیمات-معماری-adr-0001-تا-adr-0040)
 3. [بخش سوم: مستندات کامل API (OpenAPI / REST v1)](#بخش-سوم-مستندات-کامل-api-openapi--rest-v1)
 4. [بخش چهارم: راهنمای جامع پنل مدیریت (Admin Guide)](#بخش-چهارم-راهنمای-جامع-پنل-مدیریت-admin-guide)
 5. [بخش پنجم: راهنمای گام‌به‌گام استقرار روی هاست اشتراکی cPanel](#بخش-پنجم-راهنمای-گام‌به‌گام-استقرار-روی-هاست-اشتراکی-cpanel)
 6. [بخش ششم: دروازه‌های کیفیت، تست، Pre-commit و پایپ‌لاین CI/CD](#بخش-ششم-دروازه‌های-کیفیت-تست-pre-commit-و-پایپ‌لاین-cicd)
+
+### تقارنِ فارسی/انگلیسی — نگاشتِ بخش‌ها
+
+این دو فایل **آینهٔ کاربردی** یکدیگرند، نه آینهٔ سطر‌به‌سطر. قاعدهٔ بستهٔ ۷ این بود:
+هر محتوایی که خواننده برای **عمل کردن** لازم دارد باید در هر دو زبان باشد؛ ولی
+شماره‌گذاریِ زیربخش‌ها الزاماً یکی نیست، چون نسخهٔ انگلیسی چند بخشِ فارسی را در یک
+زیربخش ادغام کرده است. این جدول تنها تفاوت‌های باقی‌مانده را ثبت می‌کند — هرچه اینجا
+نیامده، در دو زبان هم‌شماره و هم‌محتواست.
+
+| فارسی | انگلیسی | تفاوت |
+|---|---|---|
+| ۴.۵. مدیریت موتور AI در ادمین | 4.5. AI Catalogs, Prompts, Summaries & Data Import/Export | انگلیسی بخش‌های ۴.۵ و ۴.۶ فارسی را ادغام کرده |
+| ۴.۶. صادرات و واردات داده | (داخل 4.5) | محتوایش هست، شمارهٔ جدا ندارد |
+| ۴.۷. 2FA و مدیریت سئو در ادمین | 4.6 (2FA) + 4.7 (SEO) | فارسی دو موضوع را در یک بخش دارد؛ انگلیسی جدا کرده |
+| ۴.۸. مرجع کدهای `System Checks` | (داخل 4.6) | محتوایش هست، شمارهٔ جدا ندارد |
+| ۵.۱ تا ۵.۷ | 5.1 to 5.7 | ✅ **یکسان** — از بستهٔ ۷ به بعد |
+| ۶.۲. هوک‌های Pre-commit | 6.2. Pre-commit Hooks & GitHub Actions Pipeline | انگلیسی بخش‌های ۶.۲ و ۶.۳ فارسی را ادغام کرده |
+| ۶.۳. پایپ‌لاین GitHub Actions | (داخل 6.2) | محتوایش هست، شمارهٔ جدا ندارد |
+| ۶.۴. پوشش تست: دامنهٔ واقعی اندازه‌گیری | 6.3. Test Coverage: Actual Measured Scope | همان محتوا با **شمارهٔ متفاوت** — این تنها جابه‌جاییِ شماره‌ای است که در ارجاع‌های متقابل دیده می‌شود |
+
+محتوایی که **فقط در یک زبان** باشد دیگر وجود ندارد: پیش‌نیازهای هاست (۵.۱)، چک‌لیست
+پس از استقرار (۵.۷) و مدیریت سئوی ادمین (۴.۷) در بستهٔ ۷ به نسخهٔ انگلیسی اضافه
+شدند.
 
 ---
 
@@ -40,7 +63,7 @@
 
 - **چرا مونو-ریپو؟** همگام‌سازی تایپ‌های API، اشتراک پایپ‌لاین CI/CD، Pre-commit واحد و ردیابی اتمیک تغییرات فرانت و بک‌اند در یک Pull Request.
 - **الگوی اتصال فرانت به بک‌اند:**
-  - **Server Components:** مستقیماً از سرور Next.js به `INTERNAL_API_URL` (پیش‌فرض `http://127.0.0.1:8000`) با هدر `Accept-Language` و کش `revalidate` درخواست می‌زنند.
+  - **Server Components:** مستقیم از سمت سرور Next به `INTERNAL_API_URL` درخواست می‌زنند؛ در توسعه `http://127.0.0.1:8000` و در cPanel `https://<canonical-host>/backend` (mount اپ Python Passenger) است. ر.ک. ADR-0035.
   - **Client Components:** همیشه به مسیر نسبی هم‌مبدأ `/api/v1/...` درخواست می‌فرستند که توسط Route Handler سمت سرور (`frontend/src/app/api/[...path]/route.ts`) با حفظ دقیق اسلش پایانی و کوکی‌های `csrftoken`/`sessionid` به بک‌اند Django پراکسی می‌شود.
 
 ### ۱.۲. مرزبندی اپ‌های بک‌اند (`backend/apps/`)
@@ -54,7 +77,7 @@
 | `taxonomy` | دسته‌بندی سلسله‌مراتبی و برچسب‌های مشترک بین اپ‌های محتوایی | `Category`, `Tag` |
 | `company` | اعضای تیم و نظرات مشتریان (صفحهٔ دربارهٔ ما) | `TeamMember`, `Testimonial` |
 | `services` | معرفی خدمات مهندسی نرم‌افزار | `Service` |
-| `portfolio` | نمونه‌کارها، محصولات (`is_product=True` مانند Pentestor و CRM) و مطالعات موردی ۷بخشی | `Project`, `CaseStudy` |
+| `portfolio` | نمونه‌کارها، محصولات (`is_product=True`) و مطالعات موردی ۷بخشی. در دادهٔ نمونه فقط **`pentestor`** محصول است؛ CRM هیچ رکوردی در دیتابیس ندارد و صفحهٔ `/products/crm` یک «به‌زودی» زنده است (`ADR-0040`) | `Project`, `CaseStudy` |
 | `academy` | مدرسان، دوره‌های آموزشی، سرفصل درس‌ها و ثبت‌نام دانشجویان | `Instructor`, `Course`, `Lesson`, `Enrollment` |
 | `blog` | مقالات کتابخانه، نظرات چندسطحی با تأیید ادمین و فید RSS | `BlogPost`, `Comment` |
 | `leads` | فرم تماس، پایپ‌لاین فروش (CRM) متصل به پیشنهاد AI، عضویت خبرنامه و آداپتور پیامک کاوه‌نگار | `Contact`, `Lead`, `Newsletter` |
@@ -83,14 +106,14 @@
 
 ---
 
-## بخش دوم: فهرست و خلاصهٔ تصمیمات معماری (ADR-0001 تا ADR-0035)
+## بخش دوم: فهرست و خلاصهٔ تصمیمات معماری (ADR-0001 تا ADR-0040)
 
-تمام تصمیمات معماری در مسیر `docs/adr/` مستند شده‌اند:
+تمام تصمیمات معماری در مسیر `docs/adr/` مستند شده‌اند. **فهرست کامل و معتبر هر ۴۰ ADR — به‌همراه ارجاع‌های مردهٔ شناخته‌شده و یادداشت‌های اصلاحی — در [`adr/README.md`](./adr/README.md) است.** جدول زیر خلاصهٔ *تصمیمِ* هر ADR است، نه فهرستِ وجودیِ آن‌ها:
 
 | کد ADR | عنوان تصمیم | خلاصهٔ تصمیم مصوب |
 |---|---|---|
 | **ADR-0001** | معماری کلان سیستم | مونو-ریپو شامل Next.js (SSR) در `frontend/` و Django/DRF در `backend/` قابل استقرار روی cPanel |
-| **ADR-0002** | مرزبندی اپ‌های Django | معماری Modular Monolith با ۱۱ اپ دامنه‌ای مستقل و لایهٔ تجمیع `api` |
+| **ADR-0002** | مرزبندی اپ‌های Django | معماری Modular Monolith با ۱۰ اپ دامنه‌ای مستقل به‌علاوهٔ لایهٔ تجمیع `api` (مجموعاً ۱۱ اپ؛ `api` مدل ندارد) |
 | **ADR-0003** | استراتژی سه‌لایهٔ i18n | ترکیب `gettext` + `django-modeltranslation` + جدول `core.Translation` |
 | **ADR-0004** | بومی‌سازی تاریخ و اعداد بک‌اند | ذخیرهٔ UTC در دیتابیس؛ تبدیل به شمسی با `jdatetime` و ارقام فارسی در لایهٔ نمایش |
 | **ADR-0005** | استراتژی ذخیره‌سازی Media | ذخیرهٔ محلی با نام‌گذاری UUID، بررسی پسوند، سقف حجم، Magic Bytes و `.htaccess` ضد اجرای اسکریپت |
@@ -125,6 +148,10 @@
 | **ADR-0034** | دروازه‌های کیفیت، Pre-commit و CI/CD | یکپارچه‌سازی Ruff + Black + mypy + ESLint + Prettier، گیت پوشش تست ≥ ۸۵٪، هوک‌های Pre-commit و GitHub Actions |
 | **ADR-0035** | توپولوژی استقرار روی هاست cPanel | معماری استقرار دو اپ Passenger (WSGI + Node.js) پشت دامنهٔ واحد هم‌مبدأ با دیتابیس MySQL 8 و Cron Jobها |
 | **ADR-0036** | بستهٔ نهایی آمادگی استقرار (فاز ۹) | قفل ۱۰۰٪ `requirements.txt`، نهایی‌سازی `production.py`، اسکریپت‌های `deploy_backend.sh`/`deploy_frontend.sh`/`restore_backup.sh` و `DEPLOYMENT.md` |
+| **ADR-0037** | فاز ۸ پورت UI — E2E، ماتریس عرض‌ها و Lighthouse | انتقال CI به ریشهٔ ریپو، دو سوئیت E2E اختصاصی پورت (`ui-port.spec.ts` و `responsive.spec.ts` با ۸ عرض مرزی) و Lighthouse CI واقعی روی شش نشانی با گیت `0.95` در هر چهار محور |
+| **ADR-0038** | پایپ‌لاین CI در ریشهٔ ریپو و لایهٔ تنظیمات تست CI | یک workflow با شش جاب و مسیرهای تخت در `.github/workflows/ci.yml` + فایل `.github/ci/ci_test_settings.py` که **فقط** کلید `staticfiles` را برای تست‌ها به `StaticFilesStorage` ساده تغییر می‌دهد |
+| **ADR-0039** | استاندارد توکن‌های طراحی و جفت‌بند رنگ خام | اجباری‌شدن توکن به‌جای لیترال خام، سیم‌کشی دو توکن موجود، چهار توکن پالت دسته‌بندی و دو توکن متن ملایم + گارد رگرسیون `hardcoded-colors.test.ts` با فهرست پایهٔ دوطرفه (یادداشتِ اصلاحی: `adr/README.md`) |
+| **ADR-0040** | مرجعیت canonical صفحهٔ جزئیات محصول | مسیر رسمیِ جزئیات محصول `/projects/{slug}` است نه `/products/{slug}`؛ تابع سطح ماژول `projectDetailPath` هر سه مصرف (canonical، نانبرد، JSON-LD) را از یک منبع تغذیه می‌کند و `/products/pentestor` با ریدایرکت دائمی `308` به آن وصل شد |
 
 ---
 
@@ -186,7 +213,8 @@
 
 | متد | مسیر کامل | دسترسی | توضیح و پارامترها |
 |---|---|---|---|
-| `GET` | `/api/v1/health/` | عمومی | بررسی سلامت دیتابیس و کش (`{"status": "ok", "database": "ok", "cache": "ok"}`) |
+| `GET` | `/api/v1/health/` | عمومی | بررسی سلامت دیتابیس و کش (`{"status": "ok", "checks": {"database": true, "cache": true}}`) |
+| `GET` | `/api/v1/health/proxy/` | ادمین (`IsAdminUser`) | تشخیص زندهٔ زنجیرهٔ هدرهای پراکسی (`X-Forwarded-For` / `X-Real-IP` / CDN) و هم‌راستایی IP واقعی کلاینت بین `get_client_ip` و `Throttle` (`verdict.ready_for_traffic`) |
 | `GET` | `/api/v1/search/` | عمومی | جست‌وجوی سراسری تمام‌متن؛ پارامترها: `q` (عبارت)، `locale` (`fa`/`en`)، `limit` (حداکثر ۵۰) |
 | `GET` | `/api/v1/seo/settings/` | عمومی | تنظیمات سراسری سئو، اطلاعات سازمان، شبکه‌های اجتماعی، کد تأیید Search Console و مسیرهای `noindex` |
 | `GET` | `/api/v1/seo/sitemap/` | عمومی | فهرست کامل URLهای عمومی منتشرشده برای ساخت `sitemap.xml` |
@@ -250,6 +278,8 @@
 
 ## بخش چهارم: راهنمای جامع پنل مدیریت (Admin Guide)
 
+> در پروداکشن cPanel، Django با `DJANGO_FORCE_SCRIPT_NAME=/backend` mount می‌شود؛ بنابراین پیشوند `/backend` را به تمام مسیرهای ادمین و i18n این بخش اضافه کنید (مثلاً `/backend/admin/`). مسیرهای بدون پیشوند، مسیر Django در توسعهٔ محلی هستند.
+
 ### ۴.۱. ورود، نقش‌ها و تجربهٔ کاربری دوزبانه (RTL/LTR)
 
 - **آدرس پنل:** `/admin/`
@@ -303,7 +333,7 @@
 
 ### ۴.۶. صادرات و واردات داده (CSV / TSV / JSON)
 
-- تمام ۲۰ مدل دارای کلاس صریح `Resource` در `apps/<app>/resources.py` هستند (`ADR-0029`).
+- هر ۳۵ مدلِ ثبت‌شده در ۱۰ اپِ دامنه‌ای، کلاس صریح `Resource` در `apps/<app>/resources.py` دارند (`ADR-0029`). مجموعاً ۳۶ کلاس `*Resource` وجود دارد: ۳۵ کلاس مخصوصِ هر مدل + کلاس پایهٔ مشترکِ `EmmettResource` در `apps/core/resources.py:60`.
 - **امنیت صادرات:** سلول‌هایی که با کاراکترهای خطرناک اکسل (`=`, `+`, `-`, `@`) شروع شوند به‌طور خودکار خنثی‌سازی (Formula Injection Escape) می‌شوند و هر عملیات صادرات در `AuditLog` با نام فایل، فرمت و تعداد ردیف ثبت می‌گردد.
 - **واردات دو مرحله‌ای و ایدمپوتنت:** واردات ابتدا پیش‌نمایش تغییرات (`new / update / skip`) را نشان می‌دهد و پس از تأیید، درون یک تراکنش دیتابیس (`IMPORT_EXPORT_USE_TRANSACTIONS=True`) بر اساس کلید طبیعی پایدار (`slug`, `(course, order)`, `(namespace, key, locale)`) اعمال می‌شود. مدل‌های کاربرمحور و لاگ‌ها (`User`, `Contact`, `Lead`, `Comment`, `Enrollment`, `AuditLog`, `AIRequest`) صرفاً قابلیت صادرات دارند و واردات آن‌ها غیرفعال است.
 
@@ -385,7 +415,7 @@ cp ~/EmmettWebSite/backend/deploy/passenger_wsgi.py.example ~/EmmettWebSite/back
 1. در cPanel وارد **Setup Python App** شوید و روی **Create Application** کلیک کنید:
    - **Python version:** `3.11`
    - **Application root:** `EmmettWebSite/backend`
-   - **Application URL:** در الگوی دامنهٔ واحد می‌توانید مسیر پایهٔ وب‌سرور یا در الگوی ساب‌دامنه، `api.emmett.ir` را انتخاب کنید.
+   - **Application URL:** دقیقاً `/backend` روی دامنهٔ اصلی؛ Node.js در `/` می‌ماند. این الگو باید توسط ارائه‌دهندهٔ cPanel پشتیبانی شود.
    - **Application startup file:** `passenger_wsgi.py`
    - **Application Entry point:** `application`
 2. دستور فعال‌سازی محیط مجازی نمایش‌داده‌شده در بالای صفحهٔ Setup Python App را کپی و در ترمینال اجرا کنید:
@@ -395,42 +425,9 @@ cp ~/EmmettWebSite/backend/deploy/passenger_wsgi.py.example ~/EmmettWebSite/back
    pip install --upgrade pip
    pip install -r requirements.txt
    ```
-3. فایل `.env` پروداکشن را در `~/EmmettWebSite/backend/.env` بسازید (`chmod 600 .env`):
-   ```ini
-   DJANGO_SETTINGS_MODULE=config.settings.production
-   DJANGO_SECRET_KEY=<یک-رشته-تصادفی-۶۴-کاراکتری-امن>
-   DJANGO_DEBUG=False
-   DJANGO_ALLOWED_HOSTS=emmett.ir,www.emmett.ir,127.0.0.1,localhost
-
-   MYSQL_DATABASE=cpaneluser_emmett
-   MYSQL_USER=cpaneluser_app
-   MYSQL_PASSWORD=<رمز-دیتابیس>
-   MYSQL_HOST=127.0.0.1
-   MYSQL_PORT=3306
-
-   CACHE_BACKEND=filebased
-   CACHE_LOCATION=/home/<cpanel_user>/EmmettWebSite/backend/.cache/django-cache
-
-   PUBLIC_SITE_URL=https://emmett.ir
-   DJANGO_CSRF_TRUSTED_ORIGINS=https://emmett.ir,https://www.emmett.ir
-   DJANGO_SECURE_SSL_REDIRECT=True
-   DJANGO_SESSION_COOKIE_SECURE=True
-   DJANGO_CSRF_COOKIE_SECURE=True
-
-   DJANGO_CSP_ENABLED=True
-   DJANGO_FRAME_ANCESTORS='none'
-   ADMIN_2FA_REQUIRED=True
-   LOGIN_LOCKOUT_ENABLED=True
-
-   BACKUP_DIR=/home/<cpanel_user>/EmmettWebSite/backend/backups
-   BACKUP_RETENTION=7
-   BACKUP_INCLUDE_MEDIA=True
-
-   KAVENEGAR_API_KEY=<کلید-کاوه‌نگار-در-صورت-استفاده>
-   KAVENEGAR_SENDER=<خط-ارسال‌کننده>
-   AI_ENABLED=false
-   ```
-4. دستورات مهاجرت دیتابیس، جمع‌آوری استاتیک، بررسی ترجمه و بررسی امنیتی پروداکشن را اجرا کنید:
+3. متغیرهای runtime جنگو را در **Setup Python App → Environment Variables** تنظیم کنید: `DJANGO_SETTINGS_MODULE=config.settings.production`, `DJANGO_FORCE_SCRIPT_NAME=/backend`, دامنهٔ canonical و CSRF، تنظیمات MySQL، `FRONTEND_REVALIDATE_URL` و یک `FRONTEND_REVALIDATE_SECRET` پرقدرت. همان secret را در Environment Variables اپ Node نیز ثبت کنید. نام دیتابیس، کاربر، میزبان، دامنه و مسیرها را فقط از cPanel/provider واقعی بگیرید؛ مقادیر نمونه را حدس نزنید.
+4. متغیرهای Passenger را در Terminal/Cron خودکار فرض نکنید. اگر فرمان‌های CLI یا Cron به env نیاز دارند و cPanel آن را به آن‌ها منتقل نمی‌کند، یک `backend/.env` خصوصی روی سرور با مجوز `600` و خارج از Git بسازید؛ از نمونه فقط به‌عنوان فهرست متغیرها استفاده کنید و همهٔ مقدارهای توسعه را جایگزین کنید. جزئیات در [راهنمای عملیات Production](deployment/production-operations.md) آمده است.
+5. دستورهای مهاجرت پایگاه داده، جمع‌آوری فایل‌های استاتیک، بررسی ترجمه‌ها و چک امنیتی استقرار را اجرا کنید:
    ```bash
    python manage.py migrate --noinput
    python manage.py collectstatic --noinput
@@ -438,20 +435,21 @@ cp ~/EmmettWebSite/backend/deploy/passenger_wsgi.py.example ~/EmmettWebSite/back
    python manage.py check --deploy
    python manage.py createsuperuser
    ```
-5. در صفحهٔ **Setup Python App** دکمهٔ **Restart** را بزنید.
+6. در صفحهٔ **Setup Python App** دکمهٔ **Restart** را بزنید.
 
 ### ۵.۵. گام ۴: بیلد و راه‌اندازی فرانت‌اند Next.js (`Setup Node.js App`)
 
 1. در cPanel وارد **Setup Node.js App** شوید و روی **Create Application** کلیک کنید:
-   - **Node.js version:** `22.x`
+   - **Node.js version:** دقیقاً `22.22.3` (مطابق `frontend/package.json` و CI)
    - **Application mode:** `Production`
    - **Application root:** `EmmettWebSite/frontend`
    - **Application URL:** `emmett.ir`
-   - **Application startup file:** `node_modules/next/dist/bin/next` (با آرگومان `start` یا از طریق اسکریپت `npm start`)
+   - **Application startup file:** `server.js` (نمونهٔ مخزن: `frontend/deploy/server.js.example`)
 2. متغیرهای محیطی زیر را در بخش **Environment variables** اپلیکیشن Node.js اضافه کنید:
    - `NODE_ENV` = `production`
    - `PUBLIC_SITE_URL` = `https://emmett.ir`
-   - `INTERNAL_API_URL` = آدرس داخلی یا ساب‌دامنهٔ سرویس Django (مثلاً `http://127.0.0.1:8000` یا `https://api.emmett.ir`)
+   - `INTERNAL_API_URL` = `https://emmett.ir/backend` (mount اپ Python؛ host را برای دامنهٔ canonical خود جایگزین کنید)
+   - `FRONTEND_REVALIDATE_SECRET` = همان secret سمت Django، بدون پیشوند `NEXT_PUBLIC_`
 3. در ترمینال، محیط مجازی Node.js را فعال کرده و پروژه را بیلد کنید:
    ```bash
    source /home/<cpanel_user>/nodevenv/EmmettWebSite/frontend/22/bin/activate
@@ -480,9 +478,10 @@ cp ~/EmmettWebSite/backend/deploy/passenger_wsgi.py.example ~/EmmettWebSite/back
 
 ### ۵.۷. گام ۶: چک‌لیست تأیید پس از استقرار (Post-Deployment Checklist)
 
-- [ ] فراخوانی `https://emmett.ir/api/v1/health/` کد `200 OK` و `{"status": "ok"}` برمی‌گرداند.
+- [ ] فراخوانی `https://emmett.ir/api/v1/health/` کد `200 OK` و `{"status": "ok", "checks": {"database": true, "cache": true}}` برمی‌گرداند.
+- [ ] پس از ورود به `/backend/admin/`، فراخوانی تشخیصی `https://emmett.ir/api/v1/health/proxy/` کد `200 OK` و `verdict.ready_for_traffic: true` برمی‌گرداند (تأیید اینکه `X-Forwarded-For` از Apache و Next.js عبور کرده و `resolved_client_ip` آدرس واقعی کاربر است، نه `127.0.0.1`).
 - [ ] خروجی `python manage.py check --deploy` هیچ خطا یا هشدار امنیتی (`W007`–`W013`) ندارد.
-- [ ] ورود به `https://emmett.ir/admin/` کاربر staff را به راه‌اندازی 2FA (`/admin/2fa/setup`) هدایت می‌کند و کدهای بازیابی در جای امن ذخیره شده‌اند.
+- [ ] ورود به `https://emmett.ir/backend/admin/` کاربر staff را به راه‌اندازی 2FA (`/backend/admin/2fa/setup`) هدایت می‌کند و کدهای بازیابی در جای امن ذخیره شده‌اند.
 - [ ] در `Site settings` پنل ادمین، کد تأیید Google Search Console وارد شده و `https://emmett.ir/sitemap.xml` در Search Console ثبت شده است.
 - [ ] صفحات `/` (فارسی، `dir="rtl"`) و `/en` (انگلیسی، `dir="ltr"`)، فیدهای `/blog/rss` و `/academy/rss` و تصویر `/opengraph-image` بدون خطا بارگذاری می‌شوند.
 - [ ] دستور `python manage.py backup_db` یک‌بار دستی اجرا شده و فایل‌های `db-*.gz` و `manifest-*.json` در پوشهٔ `backups/` ساخته شده‌اند.
@@ -507,7 +506,8 @@ python scripts/i18n.py check                                        # بررسی
 python manage.py check                                              # بررسی سلامت سیستم جنگو
 python manage.py makemigrations --check --dry-run                   # بررسی عدم وجود تغییر مدل بدون migration
 python manage.py spectacular --file /tmp/schema.yaml --validate --fail-on-warn
-coverage run -m pytest -q && coverage report --fail-under=85 -m     # اجرای تست‌ها با شرط پوشش ≥ ۸۵٪
+PYTHONPATH=../.github/ci DJANGO_SETTINGS_MODULE=ci_test_settings coverage run -m pytest -q && coverage report --fail-under=85 -m
+    # اجرای تست‌ها با شرط پوشش ≥ ۸۵٪ (لایهٔ `ci_test_settings` استوریج تست را ساده می‌کند؛ در تنظیمات پایه نیز `NonStrictCompressedManifestStaticFilesStorage` فعال است تا اجرای مستقیم `pytest` و رندر پروداکشن پنل ادمین بدون خطای manifest کار کند)
 ```
 
 #### در فرانت‌اند (`frontend/`):
@@ -548,3 +548,158 @@ backend/.venv/bin/pre-commit run --all-files
 4. **`frontend-test-build`**: اجرای تست‌های Vitest با گیت پوشش `≥ 85%` و اجرای `next build`.
 5. **`security-scan`**: اجرای `check_secrets.py`، اسکن `bandit`، بررسی `manage.py check --deploy` با تنظیمات پروداکشن و اجرای `npm audit --omit=dev`.
 6. **`e2e-and-lighthouse`**: بالا آوردن سرور Django با دادهٔ `seed_demo_data`، اجرای سرور پروداکشن Next.js، اجرای کامل تست‌های E2E با Playwright و سنجش بودجهٔ کارایی با **Lighthouse CI** (`.lighthouserc.json` با حداقل امتیاز `0.95` در هر چهار محور Performance، Accessibility، Best Practices و SEO).
+
+### ۶.۴. پوشش تست: دامنهٔ واقعی اندازه‌گیری
+
+> **این بند عمداً صریح نوشته شده است.** نقلِ درصدِ پوشش بدونِ ذکرِ دامنه گمراه‌کننده است، زیرا گیت‌های CI روی **بخشی** از کد اعمال می‌شوند نه کل آن. هر عددِ پوشش در این مخزن باید همراه با دامنه‌اش خوانده شود.
+>
+> همهٔ اعدادِ این بند در یک نشستِ اندازه‌گیریِ واحد روی کامیت `9c6d685` گرفته شده‌اند (Vitest `5.0.3` با provider `v8`؛ `coverage` پایتون با تنظیمات `backend/pyproject.toml`) و با **۹۹ تست واحد فرانت‌اند** و **۴۹۷ تست بک‌اند** هم‌خوان‌اند.
+
+#### ۶.۴.۱. فرانت‌اند — گیت چه چیزی را می‌سنجد
+
+کلید `coverage.include` در `frontend/vitest.config.mts` روی **پنج گلوب** تنظیم شده است: `src/lib/**/*.ts` و `src/components/{ui,molecules,organisms,seo}/**/*.tsx`. آستانه‌های اجباری `85 / 78 / 85 / 85` (statements / branches / functions / lines) هستند.
+
+این دامنه **۳۲ فایل از ۹۳ فایلِ منبعِ `src`** را می‌پیماید (۳۴٪):
+
+| دامنهٔ اندازه‌گیری | فایل | statements | branches | functions | lines |
+|---|---|---|---|---|---|
+| گیتِ CI همان‌طور که پیکربندی شده | ۳۲ از ۹۳ | **۹۸٫۰۸** | **۷۸٫۳۱** | **۹۸٫۲۲** | **۹۸٫۶۸** |
+| همان دامنه **بدون** استثنای `profile-view.tsx` | ۳۳ از ۹۳ | ۸۸٫۱۰ | **۷۱٫۳۷** ⚠️ | ۹۱٫۲۰ | ۸۸٫۳۸ |
+| **کلِ `src`** (عددِ صادقانهٔ فرانت‌اند) | ۹۳ | **۴۱٫۶۷** | **۳۶٫۱۴** | **۴۵٫۳۱** | **۴۱٫۹۹** |
+
+⚠️ سطر دوم از این جهت مهم است که **بارِ گیت را به دوش می‌کشد**: با احتساب `profile-view.tsx`، معیار `branches` به ۷۱٫۳۷ می‌رسد و آستانهٔ ۷۸ را **می‌شکند**. یعنی پاس‌شدنِ گیتِ branches به استثنا بودنِ همین یک فایل وابسته است (جزئیات در ۶.۴.۳).
+
+#### ۶.۴.۲. فرانت‌اند — چه چیزی سنجیده نمی‌شود
+
+**۶۱ فایل منبع** در هیچ‌کدام از پنج گلوب بالا نمی‌گنجند و بنابراین در عددِ پوشش **لحاظ نمی‌شوند**:
+
+| مسیر | فایل | statements | branches | functions | lines | چه چیزی است |
+|---|---|---|---|---|---|---|
+| `src/app/**` | ۳۵ | **۰٫۴۸** | ۰ | ۰ | **۰٫۵۱** | هر ۳۵ فایلِ زیر `src/app`: ‏۳۱ فایلِ بخشِ مسیر (۲۰ ‏`page.tsx`، ۴ ‏`layout.tsx`، ۳ ‏`route.ts`، ۲ ‏`error.tsx` شامل `global-error.tsx`، ۲ ‏`not-found.tsx`) به‌علاوهٔ ۴ فایلِ تولیدِ متادیتا/داده (`sitemap.ts`، `robots.ts`، `opengraph-image.tsx`، `hardcoded-colors.baseline.ts`) |
+| `src/components/ui-port/**` | ۲۲ | **۲۱٫۰۷** | ۲۰٫۴۹ | ۲۴٫۴۱ | ۲۱٫۳۲ | پوستهٔ دیده‌شدهٔ سایت: صفحهٔ خانه، navbar، هیرو، پالت ⌘K، فوتر و بخش‌های محصولات/خدمات/پروژه‌ها/آکادمی/کتابخانه/تماس |
+| `src/i18n/**` | ۳ | **۲۸٫۵۷** | ۰ | ۰ | ۲۸٫۵۷ | `navigation.ts`، `request.ts`، `routing.ts` |
+| `src/proxy.ts` | ۱ | **۰** | ۰ | ۰ | ۰ | پروکسی middleware (بازنویسی مسیرها و هدایت‌ها) |
+
+اگر همهٔ `src` سنجیده شود، پوشش فرانت‌اند **۴۱٫۶۷٪** است — نه ۹۸٪.
+
+> **هشدارِ روش‌سنجی دربارهٔ جدول بالا:** گزارشِ متنیِ Vitest برای هر پوشه فقط فایل‌های **مستقیمِ** همان پوشه را جمع می‌زند، نه کل زیردرخت را. به همین دلیل سطرِ `src/app` در خروجیِ `text` عددِ **۶٫۲۵٪** را نشان می‌دهد، در حالی که عددِ واقعیِ هر ۳۵ فایلِ زیردرخت **۰٫۴۸٪** (statements) و **۰٫۵۱٪** (lines) است. اعدادِ `src/app/**` در این جدول از `coverage/coverage-summary.json` محاسبه شده‌اند که مرجعِ معتبر است. برای بقیهٔ پوشه‌ها (`ui-port`، `i18n`، `organisms`، `seo`، `ui`، `molecules`) چون زیرپوشه ندارند، سطرِ گزارشِ متنی با مقدارِ زیردرخت یکی است.
+>
+> وزنِ هر دامنه از کلِ ۱۶۹۹ ‏statement فرانت‌اند: ‏`ui-port` **۳۹٫۴٪**، `src/app/**` **۲۴٫۵٪**، `src/lib/**` **۱۷٫۴٪**، چهار پوشهٔ کامپوننتِ سنجیده‌شده **۱۶٫۴٪**، `src/proxy.ts` **۱٫۹٪** و `src/i18n/**` **۰٫۴٪**. این وزن‌ها در ۶.۴.۸ برای فرافکنی استفاده می‌شوند.
+>
+> نکتهٔ دقت: `ui-port` پنج فایل `.ts` هم دارد که دو تای آن‌ها تست‌پذیر و خوب پوشش داده شده‌اند (`dialog-a11y.ts` = ۹۱٫۴۸٪، `home-data.ts` = ۱۰۰٪). اگر دامنه فقط `**/*.tsx` گرفته شود، این دو جا می‌افتند و عددِ `ui-port` به‌اشتباه **۱۳٫۲۴٪** به‌جای **۲۱٫۰۷٪** گزارش می‌شود. عددِ درست همان ۲۱٫۰۷٪ است که همهٔ فایل‌های پوشه را شامل می‌شود.
+
+#### ۶.۴.۳. فرانت‌اند — استثنائاتِ `coverage.exclude`
+
+سه فایل صریحاً استثنا شده‌اند. دو تای اول کاملاً موجه‌اند، سومی نه:
+
+| فایل | خط | export اجرایی | پوشش | قضاوت |
+|---|---|---|---|---|
+| `src/lib/api/types.ts` | ۲۸۳ | **۰** (۳۱ `type`/`interface`) | — | ✅ **موجه** — فقط اعلامِ نوع است و هیچ JS تولید نمی‌کند |
+| `src/lib/seo/types.ts` | ۷۴ | **۰** (۹ `type`) | — | ✅ **موجه** — همان دلیل |
+| `src/components/organisms/profile-view.tsx` | ۲۵۰ | **۱۶** | **۰٪** (خطوط ۱–۲۳۸) | ❌ **ناموجه** — یک کامپوننت اجراییِ واقعی است که هیچ تستی آن را اجرا نمی‌کند |
+
+#### ۶.۴.۴. فرانت‌اند — دو ویژگیِ خودِ گیت که باید شناخته شوند
+
+**۱) آستانهٔ `branches` (۷۸) با سه معیار دیگر (۸۵) ناهمگون است** و یک آستانهٔ تک‌عددِ سراسری، ضعفِ تفکیکی را پنهان می‌کند. در همان دامنهٔ سنجیده‌شده، دو پوشه **به‌تنهایی زیر ۷۸** هستند و فقط چون `lib`/`ui`/`molecules` روی ۱۰۰٪‌اند، میانگینِ سراسری از ۷۸ رد می‌شود:
+
+| پوشه | statements | branches | functions | lines |
+|---|---|---|---|---|
+| `src/lib` | ۱۰۰ | ۱۰۰ | ۱۰۰ | ۱۰۰ |
+| `src/lib/api` | ۹۸٫۳۸ | ۸۵٫۷۱ | ۱۰۰ | ۱۰۰ |
+| `src/lib/format` | ۱۰۰ | ۷۵ | ۱۰۰ | ۱۰۰ |
+| `src/lib/seo` | ۹۷٫۳۵ | ۷۹٫۵۴ | ۹۴٫۴۴ | ۹۷٫۷۶ |
+| `src/components/ui` | ۱۰۰ | ۱۰۰ | ۱۰۰ | ۱۰۰ |
+| `src/components/molecules` | ۱۰۰ | ۹۳٫۳۳ | ۱۰۰ | ۱۰۰ |
+| `src/components/organisms` | ۹۷٫۸۹ | **۷۱٫۲۸** ← زیر ۷۸ | ۹۸٫۴۱ | ۹۸٫۲۲ |
+| `src/components/seo` | ۱۰۰ | **۷۵** ← زیر ۷۸ | ۱۰۰ | ۱۰۰ |
+
+**۲) حاشیهٔ گیت باریک است.** پس از بستهٔ ۴، حاشیهٔ `branches` فقط **+۰٫۳۱** است (۷۸٫۳۱ در برابر آستانهٔ ۷۸). یعنی افزودنِ تقریباً هر کدِ شعبه‌داری بدون تست، گیت را قرمز می‌کند.
+
+#### ۶.۴.۵. بک‌اند — دامنه و اعداد
+
+`backend/pyproject.toml` مقدار `source = ["apps"]` و `omit = ["*/migrations/*", "*/tests/*"]` و `fail_under = 85` را تنظیم کرده است.
+
+| دامنهٔ اندازه‌گیری | فایل | statements | missed | پوشش |
+|---|---|---|---|---|
+| گیتِ CI همان‌طور که پیکربندی شده (`apps/`) | ۱۵۷ | ۵۶۰۷ | ۳۲۵ | **۹۴٪** |
+| دامنهٔ گسترده (`apps` + `config` + `scripts`) | — | ۶۰۸۳ | ۵۱۳ | **۹۲٪** |
+
+خارج از دامنهٔ گیت: `config/` (۷۷۳ خط) و `scripts/` (۵۲۴ خط). با سنجشِ آن‌ها، تفکیک چنین است:
+
+| فایل | پوشش | چرا |
+|---|---|---|
+| `config/settings/base.py` | ۹۸٪ | بخش عمدهٔ آن با بارگذاری تنظیمات اجرا می‌شود |
+| `config/settings/dev.py` | ۷۹٪ | مسیرهای شرطیِ محیط توسعه |
+| `config/urls.py` | ۷۵٪ | |
+| `config/settings/production.py` | **۰٪** | CI از تنظیماتِ dev استفاده می‌کند، پس هرگز بارگذاری نمی‌شود |
+| `config/asgi.py` / `config/wsgi.py` | **۰٪** | نقطهٔ ورود سرور؛ در تست اجرا نمی‌شود |
+| `scripts/i18n.py` | **۵۸٪** | با وجودِ `test_i18n_tooling.py`، شاخه‌های CLI پوشش داده نشده‌اند |
+| `scripts/generate_brand_assets.py` | **۰٪** | هیچ تستی ندارد |
+
+`migrations` (۱۸ فایل / ۱۸۳۷ خط) حذف شده‌اند که **رویهٔ استاندارد** است: کدِ تولیدشدهٔ ماشین، نه منطق دست‌نویس.
+
+**نتیجه برای بک‌اند:** هر دو عدد (۹۴٪ و ۹۲٪) بالای آستانهٔ ۸۵٪‌اند، پس شکافِ بک‌اند در برابر فرانت‌اند **کوچک و قابل‌دفاع** است.
+
+#### ۶.۴.۶. لینت و تایپ‌چک چه دامنه‌ای دارند (برخلاف پوشش تست)
+
+جملهٔ «تمام کدهای مخزن تحت لینت و تایپ‌چک هستند» **درست** است؛ فقط «تست» است که دامنهٔ محدود دارد. تفکیکِ راستی‌آزمایی‌شده:
+
+| گیت | دامنهٔ واقعی | وضعیت |
+|---|---|---|
+| `tsc --noEmit` (فرانت) | `**/*.ts` و `**/*.tsx` → **کل `src`** شامل `ui-port` و `app` | ✅ کامل |
+| `eslint` (فرانت) | کل پروژه | ✅ کامل |
+| `prettier --check` (فرانت) | `src/**`، `e2e/**`، `messages/**` | ✅ کامل |
+| `ruff check .` / `ruff format --check .` / `black --check .` (بک‌اند) | **همه‌چیز** شامل `scripts/` | ✅ کامل |
+| `mypy apps config` (بک‌اند) | ۲۴۲ فایل — **`scripts/` را شامل نمی‌شود** | ⚠️ شکاف |
+
+تنها شکافِ غیرپوششی: `backend/scripts/` (۵۲۴ خط) تایپ‌چک نمی‌شود، چون CI دستور `mypy apps config` را اجرا می‌کند نه `mypy .`.
+
+#### ۶.۴.۷. کنترل‌های جبرانی — کدِ سنجیده‌نشده بی‌محافظ نیست
+
+پوششِ تستِ واحد، تنها لایهٔ محافظ نیست. برای همان ۶۱ فایلِ سنجیده‌نشده، این گیت‌ها در CI اجرا می‌شوند:
+
+- **۶۰ تست E2E در ۹ فایل** روی **Chromium واقعی** در سه پروژهٔ `fa` / `fa-locale` / `en`. بخش عمدهٔ این تست‌ها دقیقاً صفحات `src/app/**` و پوستهٔ `ui-port` را در مرورگر می‌آزمایند — همان‌جایی که پوشش واحد ۶٪ و ۲۱٪ است.
+- **Lighthouse CI با حداقل امتیاز `۰٫۹۵`** در هر چهار محور روی **۶ نشانی** (`.lighthouserc.json`: `/`، `/en`، `/services`، `/blog`، `/projects/pentestor` و `/products/crm`)، فعال روی `main` و `workflow_dispatch`.
+- **گارد دو‌طرفهٔ رنگ خام** (بستهٔ ۲، `hardcoded-colors.test.ts`): سقفِ کنونی **۱۷۷ لیترال در ۱۶ فایل** — بستهٔ ۶ آن را از ۳۶۰ در ۲۰ فایل پایین آورد — به‌همراه چهار استثنای صریح و دلیل‌دار (سه تای آن‌ها آبشارِ CSS ندارند: `global-error.tsx`، `not-found.tsx` و ماژولِ مشترکِ `brand-colors.ts` برای تصویر OG و صفحهٔ ۴۱۰؛ چهارمی `neural-network-3d.tsx` رنگ را به‌شکل عدد به Three.js/WebGL می‌دهد؛ `scannedTotal = ۲۰۰ = ۱۷۷ + ۲۳`). تفکیکِ ۱۷۷ لیترالِ باقی‌مانده (۱۵۱ بدونِ توکنِ هم‌مقدار + ۲۶ دارای توکن ولی مهاجرت‌ناپذیر) در CHANGELOG بستهٔ ۶ آمده است.
+- `mypy` سخت‌گیرانه و `ruff` روی کل کد (بند ۶.۴.۶).
+
+پس ریسک، «کدِ آزموده‌نشده» نیست؛ ریسک، **«کدی که تستِ واحدش در سطحِ تابع/شاخه اجرا نمی‌شود»** است. این تفاوت مهم است و باید در ارزیابی ریسک دقیق بماند.
+
+#### ۶.۴.۸. وضعیت تصمیم
+
+بستهٔ ۵ از برنامهٔ بازسازی هفت‌بسته‌ای («صداقتِ پوشش») قرار بود `src/components/ui-port/**/*.tsx` را به `coverage.include` اضافه کند. سه گزینه بررسی و اندازه‌گیری شد:
+
+| گزینه | نتیجهٔ اندازه‌گیری‌شده |
+|---|---|
+| نوشتن تست تا رسیدن به آستانهٔ موجود | **با وزنِ اندازه‌گیری‌شده، ریاضی‌وار ناممکن است.** ‏`ui-port` سهمِ ۳۹٫۴٪ از statements را دارد، پس حتی رساندنش به **۱۰۰٪** میانگینِ کل را فقط به **۷۲٫۷۵٪** می‌رساند (برای ۸۵٪ به ۱۳۱٪ پوشش نیاز بود). رسیدن به ۸۵٪ مستلزمِ پوشاندنِ `src/app/**` هم هست: یا `ui-port` → ۱۰۰٪ **و** `src/app` → ۵۰٫۵٪، یا هر دو → ۸۵٪ که ۸۷٫۵۴٪ می‌دهد. گذشته از این، بخش عمدهٔ `ui-port` کامپوننت‌های نمایشی/انیمیشنی است ⇒ تستِ صرفاً درصدی، **تئاتر پوشش** می‌شد. رد شد |
+| آستانهٔ تفکیک‌شده به‌تفکیک پوشه | با Vitest `5.0.3` سنجیده شد: آستانهٔ سراسری **همچنان بر همهٔ فایل‌ها اعمال می‌شود** و glob-های تفکیکی آن‌ها را از محاسبهٔ سراسری خارج **نمی‌کنند**. پیاده‌سازی‌پذیر است فقط اگر آستانهٔ سراسری هم روی عددِ صادقانه تنظیم شود |
+| ورود به گزارش بدون گیت | عدد صادقانه می‌شود ولی هیچ قفلی روی آن نیست |
+
+**تصمیم مالک (۲۰۲۶-۱۰-۲۰):** بستهٔ ۵ **پیش از استقرار به تعویق افتاد** (محدودیت زمانی). در نتیجه:
+
+- `coverage.include` و `thresholds` **دست‌نخورده باقی ماندند**. هیچ آستانه‌ای پایین آورده نشد (قانون ۱۹ رعایت شد).
+- **هیچ تغییری در CI لازم نبود**: گیت با دامنهٔ موجود سبز و سازگار است.
+- تعهدِ جایگزین، **همین بند** است: به‌جای تغییرِ گیت، دامنهٔ واقعیِ آن به‌طور کامل افشا می‌شود تا هیچ عددی بدونِ زمینه نقل نشود.
+- این یک **بدهی فنیِ پذیرفته‌شدهٔ آگاهانه** است، نه یک وضعیتِ ناخواسته. هر بازنگریِ آینده باید از اعدادِ همین بند شروع کند، نه از ۹۸٪.
+
+#### ۶.۴.۹. بازتولید اعداد
+
+```bash
+# فرانت‌اند — عددِ گیت (دقیقاً همان چیزی که CI اجرا می‌کند)
+cd frontend && npm run test:coverage          # → ۹۸٫۰۸ / ۷۸٫۳۱ / ۹۸٫۲۲ / ۹۸٫۶۸
+
+# بک‌اند — عددِ گیت
+cd backend && PYTHONPATH=../.github/ci DJANGO_SETTINGS_MODULE=ci_test_settings coverage run -m pytest --create-db -q && coverage report --fail-under=85
+#                                                          → ۵۶۰۷ stmt / ۳۲۵ missed / ۹۴٪
+
+# بک‌اند — دامنهٔ گسترده
+coverage run --source=apps,config,scripts -m pytest --create-db -q && coverage report --fail-under=0
+#                                                          → ۶۰۸۳ stmt / ۵۱۳ missed / ۹۲٪
+
+# تعداد تست‌های E2E (منبع معتبر، نه شمارش با grep)
+cd frontend && npx playwright test --list      # → Total: 60 tests in 9 files
+```
+
+عددِ **کلِ `src`** (۴۱٫۶۷٪) بخشی از CI نیست و با یک پیکربندیِ موقتِ دوراندیش گرفته شد که کامیت **نشده** است: `coverage.include` به `["src/**/*.ts", "src/**/*.tsx"]` و همهٔ `thresholds` به صفر تغییر یافت، سپس `npx vitest run --coverage` اجرا شد. برای تکرار، همین دو تغییر را موقتاً در `vitest.config.mts` اعمال کنید و بعد برگردانید.
+
+> **هشدارِ روش‌سنجی:** شمارشِ تست‌ها با `grep -c 'test('` عددِ **۶۳** می‌دهد که **غلط** است؛ تنها منبع معتبر `npx playwright test --list` است. به‌طور مشابه، پوششِ یک پوشه را باید از یک گزارشِ واحد گرفت: گلوبِ `**/*.tsx` به‌تنهایی برای `ui-port` عددِ ۱۳٫۲۴٪ می‌دهد که فایل‌های `.ts` همان پوشه را جا می‌اندازد.

@@ -7,3 +7,6 @@ class CompanyConfig(AppConfig):
     name = "apps.company"
     label = "company"
     verbose_name = _("Company")
+
+    def ready(self) -> None:
+        from apps.company import signals  # noqa: F401

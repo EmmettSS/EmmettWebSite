@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from typing import cast
 from unittest.mock import patch
 
 import pytest
@@ -33,6 +34,25 @@ class TestContactCreateView:
         assert Contact.objects.filter(email="narges@example.com").exists()
         assert Lead.objects.filter(contact__email="narges@example.com").exists()
         mock_notify.assert_called_once()
+
+    def test_smtp_failure_does_not_undo_saved_contact_or_fail_submission(self, settings: object) -> None:
+        import django.conf
+
+        cast(django.conf.LazySettings, settings).LEADS_NOTIFICATION_EMAIL = "team@example.com"
+        cast(django.conf.LazySettings, settings).LEADS_NOTIFICATION_PHONE = ""
+        payload = {**_VALID_PAYLOAD, "email": "smtp-failure@example.com"}
+        client = APIClient()
+
+        with (
+            patch("apps.leads.notifications.send_mail", side_effect=OSError("SMTP unavailable")),
+            patch("apps.leads.notifications.logger.exception") as mock_exception,
+        ):
+            response = client.post("/api/v1/leads/contact/", payload, format="json")
+
+        assert response.status_code == 201
+        assert Contact.objects.filter(email=payload["email"]).exists()
+        assert Lead.objects.filter(contact__email=payload["email"]).exists()
+        mock_exception.assert_called_once()
 
     def test_without_consent_is_rejected(self) -> None:
         payload = {**_VALID_PAYLOAD, "consent_given": False}
@@ -103,6 +123,22 @@ class TestNewsletterSubscribeView:
         client = APIClient()
         response = client.post("/api/v1/leads/newsletter/", {"email": "not-an-email"}, format="json")
         assert response.status_code == 400
+
+    def test_resubscribing_soft_deleted_newsletter_reactivates_without_500(self) -> None:
+        client = APIClient()
+        assert (
+            client.post(
+                "/api/v1/leads/newsletter/", {"email": "revive@example.com"}, format="json"
+            ).status_code
+            == 201
+        )
+        sub = Newsletter.objects.get(email="revive@example.com")
+        sub.delete()
+        assert not Newsletter.objects.filter(email="revive@example.com").exists()
+
+        revived = client.post("/api/v1/leads/newsletter/", {"email": "revive@example.com"}, format="json")
+        assert revived.status_code == 201
+        assert Newsletter.objects.filter(email="revive@example.com").exists()
 
 
 def test_anonymous_contact_and_newsletter_posts_require_csrf() -> None:

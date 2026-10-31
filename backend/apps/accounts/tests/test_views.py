@@ -242,3 +242,28 @@ class TestFavorites:
         response = client.delete(f"/api/v1/auth/favorites/{favorite.pk}/")
         assert response.status_code == 404
         assert Favorite.objects.filter(pk=favorite.pk).exists()
+
+    def test_re_adding_deleted_favorite_reactivates_without_500(self) -> None:
+        user = cast(User, UserFactory())
+        service = cast(Service, ServiceFactory())
+        client = APIClient()
+        client.force_authenticate(user=user)
+
+        first = client.post(
+            "/api/v1/auth/favorites/add/",
+            {"content_type": "service", "public_id": str(service.public_id)},
+            format="json",
+        )
+        assert first.status_code == 201
+        favorite_id = first.data["id"]
+
+        assert client.delete(f"/api/v1/auth/favorites/{favorite_id}/").status_code == 204
+        assert not Favorite.objects.filter(pk=favorite_id).exists()
+
+        re_added = client.post(
+            "/api/v1/auth/favorites/add/",
+            {"content_type": "service", "public_id": str(service.public_id)},
+            format="json",
+        )
+        assert re_added.status_code == 201
+        assert Favorite.objects.filter(user=user).count() == 1

@@ -200,8 +200,11 @@ class FavoriteCreateView(APIView):
             return Response({"detail": "محتوای موردنظر پیدا نشد."}, status=status.HTTP_404_NOT_FOUND)
 
         content_type = ContentType.objects.get_for_model(model)
-        favorite, _created = Favorite.objects.get_or_create(
-            user=request.user, content_type=content_type, object_id=target.pk
+        favorite, _created = Favorite.all_objects.update_or_create(
+            user=request.user,
+            content_type=content_type,
+            object_id=target.pk,
+            defaults={"is_active": True, "deleted_at": None},
         )
         return Response(FavoriteSerializer(favorite).data, status=status.HTTP_201_CREATED)
 

@@ -6,7 +6,8 @@ test.describe("فرم تماس", () => {
 
     const uniqueEmail = `e2e-contact-${Date.now()}@example.com`;
     await page.getByLabel("نام").fill("کاربر تست");
-    await page.getByLabel("ایمیل", { exact: true }).fill(uniqueEmail);
+    // برچسب فیلد ستارهٔ الزامی هم دارد («ایمیل *»)؛ exact اینجا پیدا نمی‌کند.
+    await page.getByLabel(/ایمیل/).fill(uniqueEmail);
     await page.getByLabel("پیام").fill("این یک پیام تستی از Playwright است.");
     await page.getByLabel("موافقم که برای پیگیری درخواستم تماس گرفته شود.").check();
 

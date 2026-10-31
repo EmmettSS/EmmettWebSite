@@ -8,9 +8,11 @@
  */
 
 import { getApiBaseUrl } from "@/lib/api/config";
+import { getSafeErrorType, logUpstreamFailure } from "@/lib/api/upstream-logging";
+import { CACHE_TAGS } from "@/lib/cache-tags";
 import { isAppLocale } from "@/lib/seo/site";
 
-export const FEED_REVALIDATE_SECONDS = 900;
+export const FEED_REVALIDATE_SECONDS = 60;
 
 export type FeedKind = "blog" | "academy";
 
@@ -21,10 +23,17 @@ export async function fetchFeed(kind: FeedKind, locale: string): Promise<Respons
 
   try {
     const upstream = await fetch(url, {
-      headers: { "Accept-Language": language },
-      next: { revalidate: FEED_REVALIDATE_SECONDS },
+      headers: {
+        "Accept-Language": language,
+        "X-Forwarded-Proto": "https",
+      },
+      next: {
+        revalidate: FEED_REVALIDATE_SECONDS,
+        tags: [kind === "blog" ? CACHE_TAGS.blogFeed : CACHE_TAGS.academyFeed],
+      },
     });
     if (!upstream.ok) {
+      logUpstreamFailure("django-feed", `/${kind}/rss/`, { status: upstream.status });
       return new Response("feed unavailable\n", {
         status: 502,
         headers: { "content-type": "text/plain; charset=utf-8" },
@@ -34,10 +43,11 @@ export async function fetchFeed(kind: FeedKind, locale: string): Promise<Respons
       status: 200,
       headers: {
         "content-type": "application/rss+xml; charset=utf-8",
-        "cache-control": `public, s-maxage=${FEED_REVALIDATE_SECONDS}, stale-while-revalidate=3600`,
+        "cache-control": `public, max-age=0, s-maxage=${FEED_REVALIDATE_SECONDS}, must-revalidate`,
       },
     });
-  } catch {
+  } catch (error) {
+    logUpstreamFailure("django-feed", `/${kind}/rss/`, { errorType: getSafeErrorType(error) });
     return new Response("feed unavailable\n", {
       status: 502,
       headers: { "content-type": "text/plain; charset=utf-8" },

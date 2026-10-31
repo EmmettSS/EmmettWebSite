@@ -5,21 +5,22 @@
  *   cp frontend/deploy/server.js.example frontend/server.js
  *
  * در صفحهٔ Setup Node.js App در cPanel:
- * - Node.js version: 22.x
+ * - Node.js version: exactly 22.22.3 (matches frontend/package.json and CI)
  * - Application mode: Production
  * - Application root: EmmettWebSite/frontend
  * - Application startup file: server.js
  */
 
 const { createServer } = require("node:http");
-const { parse } = require("node:url");
 const next = require("next");
 
 const dev = process.env.NODE_ENV !== "production";
-const hostname = process.env.HOSTNAME || "127.0.0.1";
+// Passenger supplies PORT. Bind its listener on all interfaces unless the host
+// explicitly provides HOST; HOSTNAME is the machine name, not a bind address.
+const hostname = process.env.HOST || "0.0.0.0";
 const port = Number.parseInt(process.env.PORT || "3000", 10);
 
-const app = next({ dev, hostname, port });
+const app = next({ dev });
 const handle = app.getRequestHandler();
 
 app
@@ -27,15 +28,19 @@ app
   .then(() => {
     createServer(async (req, res) => {
       try {
-        const parsedUrl = parse(req.url || "/", true);
-        await handle(req, res, parsedUrl);
+        await handle(req, res);
       } catch (err) {
-        console.error("Error occurred handling request:", req.url, err);
+        // Never log query strings (which may contain tokens) or exception messages.
+        const requestPath = new URL(req.url || "/", "http://localhost").pathname;
+        console.error("request_handler_failed", {
+          method: req.method,
+          path: requestPath,
+          error_type: err instanceof Error ? err.name : "UnknownError",
+        });
         res.statusCode = 500;
         res.end("Internal Server Error");
       }
-    }).listen(port, (err) => {
-      if (err) throw err;
+    }).listen(port, hostname, () => {
       console.log(`> Emmett Next.js SSR server ready on http://${hostname}:${port}`);
     });
   })

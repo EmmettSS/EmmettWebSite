@@ -16,6 +16,7 @@ from django.contrib.auth.views import redirect_to_login
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext as _
 from django.views import View
 from django_otp import login as otp_login
@@ -30,10 +31,18 @@ logger = get_logger(__name__)
 
 
 def _safe_next(request: HttpRequest, fallback: str | None = None) -> str:
-    """``next`` را فقط اگر مسیر داخلی باشد می‌پذیرد (جلوگیری از open redirect)."""
+    """``next`` را با بررسی استاندارد Django و فقط برای میزبان همین درخواست می‌پذیرد."""
 
     candidate = str(request.GET.get("next") or request.POST.get("next") or "")
-    if candidate.startswith("/") and not candidate.startswith("//"):
+    if (
+        candidate.startswith("/")
+        and not candidate.startswith("//")
+        and url_has_allowed_host_and_scheme(
+            candidate,
+            allowed_hosts={request.get_host()},
+            require_https=request.is_secure(),
+        )
+    ):
         return candidate
     return fallback or reverse("admin:index")
 

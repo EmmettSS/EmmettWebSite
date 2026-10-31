@@ -26,11 +26,13 @@ export interface ServiceListItem {
   slug: string;
   summary: string;
   icon: string;
+  categories: Category[];
+  tags: Tag[];
   is_featured: boolean;
   order: number;
 }
 
-export interface ServiceDetail extends Omit<ServiceListItem, "summary"> {
+export interface ServiceDetail extends Omit<ServiceListItem, "summary" | "is_featured" | "order"> {
   summary: string;
   description_html: string;
   categories: Category[];
@@ -51,6 +53,9 @@ export interface ProjectListItem {
   year: number | null;
   is_product: boolean;
   is_featured: boolean;
+  categories: Category[];
+  tags: Tag[];
+  case_study: Pick<CaseStudy, "technology_stack" | "metrics"> | null;
 }
 
 export interface CaseStudy {
@@ -63,7 +68,7 @@ export interface CaseStudy {
   metrics: Record<string, string>;
 }
 
-export interface ProjectDetail extends ProjectListItem {
+export interface ProjectDetail extends Omit<ProjectListItem, "is_featured"> {
   service_slug: string | null;
   categories: Category[];
   tags: Tag[];
@@ -103,9 +108,10 @@ export interface CourseListItem {
   instructor_name: string | null;
   cover_image_url: string | null;
   is_featured: boolean;
+  lesson_count: number;
 }
 
-export interface CourseDetail extends CourseListItem {
+export interface CourseDetail extends Omit<CourseListItem, "is_featured" | "lesson_count"> {
   description_html: string;
   instructor: Instructor | null;
   categories: Category[];
@@ -123,6 +129,7 @@ export interface BlogPostListItem {
   excerpt: string;
   cover_image_url: string | null;
   author_name: string | null;
+  categories: Category[];
   reading_time_minutes: number;
   published_at: string | null;
 }

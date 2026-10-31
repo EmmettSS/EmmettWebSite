@@ -26,6 +26,28 @@ class TestProjectViewSet:
         assert "published-project" in slugs
         assert "draft-project" not in slugs
 
+    def test_list_exposes_published_project_highlights_from_database(self) -> None:
+        project = cast(Project, ProjectFactory(slug="with-list-highlights", is_product=True))
+        category = cast(Category, CategoryFactory(name="امنیت", slug="security"))
+        tag = cast(Tag, TagFactory(name="Django", slug="django"))
+        project.categories.add(category)
+        project.tags.add(tag)
+        CaseStudyFactory(
+            project=project,
+            technology_stack=["Python", "PostgreSQL"],
+            metrics={"latency": "18ms"},
+        )
+
+        response = APIClient().get("/api/v1/projects/")
+        item = next(row for row in response.data["results"] if row["slug"] == "with-list-highlights")
+
+        assert item["categories"][0]["name"] == "امنیت"
+        assert item["tags"] == [{"name": "Django", "slug": "django"}]
+        assert item["case_study"] == {
+            "technology_stack": ["Python", "PostgreSQL"],
+            "metrics": {"latency": "18ms"},
+        }
+
     def test_retrieve_includes_case_study_when_present(self) -> None:
         project = cast(Project, ProjectFactory(slug="with-case-study"))
         CaseStudyFactory(project=project, result="نتیجهٔ خوب")

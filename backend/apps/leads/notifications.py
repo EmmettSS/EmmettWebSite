@@ -53,15 +53,23 @@ class KavenegarSMSBackend:
             response.raise_for_status()
             return SMSResult(success=True, provider="kavenegar")
         except requests.RequestException as exc:
-            logger.warning("kavenegar_sms_failed", to=to, error=str(exc))
-            return SMSResult(success=False, provider="kavenegar", detail=str(exc))
+            # The provider API key is embedded in the request URL. Request exceptions
+            # can therefore contain credentials; log only safe diagnostic metadata.
+            logger.warning(
+                "kavenegar_sms_failed",
+                error_type=type(exc).__name__,
+                status_code=getattr(getattr(exc, "response", None), "status_code", None),
+            )
+            return SMSResult(success=False, provider="kavenegar", detail=type(exc).__name__)
 
 
 class ConsoleSMSBackend:
     """پیش‌فرض dev/test — هیچ تماس شبکه‌ای واقعی برقرار نمی‌کند، فقط لاگ ساختاریافته."""
 
     def send(self, *, to: str, message: str) -> SMSResult:
-        logger.info("sms_would_send", to=to, message=message)
+        # Do not put contact data in server logs when the non-delivery console
+        # backend is active (e.g. during an incomplete production configuration).
+        logger.info("sms_would_send", provider="console")
         return SMSResult(success=True, provider="console")
 
 
@@ -102,7 +110,9 @@ def notify_new_contact(contact: Contact) -> None:
                 message=f"{message}\n\nپیام:\n{contact.message}",
                 from_email=getattr(settings, "DEFAULT_FROM_EMAIL", None),
                 recipient_list=[team_email],
-                fail_silently=True,
+                # Let the exception reach the handler below so the delivery failure
+                # is recorded without failing the already-persisted contact request.
+                fail_silently=False,
             )
         except Exception:  # noqa: BLE001
             logger.exception("contact_email_notification_failed", contact_id=contact.pk)

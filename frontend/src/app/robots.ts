@@ -30,7 +30,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
   disallow.add("/advisor/results/");
   disallow.add("/en/advisor/results/");
   // پیشوندها با اسلش پایانی هم بسته شوند (Sitemap/API doc و مسیرهای فرزند).
-  for (const path of ["/api", "/admin", "/media"]) {
+  for (const path of ["/api", "/admin", "/backend", "/media"]) {
     disallow.add(`${path}/`);
     disallow.add(`/en${path}/`);
   }

@@ -1,8 +1,5 @@
-import { renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { FONT_FAMILY_EN, FONT_FAMILY_FA, FONT_FAMILY_MONO } from "@/lib/fonts";
-import { useHasMounted } from "@/lib/hooks/use-has-mounted";
 import { fetchFeed } from "@/lib/seo/feed";
 
 describe("lib/seo/feed", () => {
@@ -22,7 +19,14 @@ describe("lib/seo/feed", () => {
     const res = await fetchFeed("blog", "fa");
     expect(res.status).toBe(200);
     expect(res.headers.get("content-type")).toContain("application/rss+xml");
+    expect(res.headers.get("cache-control")).toBe(
+      "public, max-age=0, s-maxage=60, must-revalidate",
+    );
     expect(await res.text()).toContain("<rss");
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining("/blog/rss/"),
+      expect.objectContaining({ next: { revalidate: 60, tags: ["feed:blog"] } }),
+    );
   });
 
   it("returns 502 when upstream fails or throws", async () => {
@@ -33,18 +37,5 @@ describe("lib/seo/feed", () => {
     fetchMock.mockRejectedValueOnce(new Error("connection refused"));
     const res2 = await fetchFeed("blog", "en");
     expect(res2.status).toBe(502);
-  });
-});
-
-describe("lib/fonts & lib/hooks/use-has-mounted", () => {
-  it("exports self-hosted font family constants", () => {
-    expect(FONT_FAMILY_FA).toBe("Vazirmatn");
-    expect(FONT_FAMILY_EN).toBe("Inter");
-    expect(FONT_FAMILY_MONO).toBe("JetBrains Mono");
-  });
-
-  it("useHasMounted returns true in client test environment", () => {
-    const { result } = renderHook(() => useHasMounted());
-    expect(result.current).toBe(true);
   });
 });

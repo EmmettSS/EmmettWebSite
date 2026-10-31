@@ -6,7 +6,9 @@ test.describe("جستجوی سراسری", () => {
     await expect(page.getByText("برای جستجو در کل سایت تایپ کنید.")).toBeVisible();
 
     await page.getByPlaceholder("جستجو در خدمات، پروژه‌ها، دوره‌ها، مقالات…").fill("Django");
-    await page.getByRole("button", { name: "جستجو" }).click();
+    // دکمهٔ جستجوی فرم اصلی؛ دکمهٔ «جستجو»ی ناوبر (پالت ⌘K) هم همین نام
+    // دسترسی را دارد، پس کلیک باید به محتوای اصلی محدود شود.
+    await page.locator("#main-content").getByRole("button", { name: "جستجو" }).click();
 
     await expect(page).toHaveURL(/\/search\?q=Django/);
     await expect(page.getByText(/نتیجه برای.*Django/)).toBeVisible();

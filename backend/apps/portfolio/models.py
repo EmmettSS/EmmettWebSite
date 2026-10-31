@@ -1,4 +1,12 @@
-"""Project و CaseStudy — نمونه‌کار/پورتفولیو (شامل Pentestor/CRM به‌عنوان Project با ``is_product=True``)."""
+"""Project و CaseStudy — نمونه‌کار/پورتفولیو.
+
+«محصولِ داخلی» یک ردیفِ ``Project`` با ``is_product=True`` است، نه یک مدلِ جدا؛
+صفحهٔ جزئیاتِ مرجعِ آن ``/projects/{slug}`` است (ر.ک. ADR-0040).
+
+توجه: ``CRM`` عمداً محصولِ دیتابیسی **نیست**. ``/products/crm`` یک صفحهٔ
+«به‌زودی»ِ زنده است و ``/projects/crm`` ۴۰۴ می‌دهد، پس در میانِ محصولاتِ داخلی
+تنها ``Pentestor`` قرار دارد. (پیش‌تر این docstring هر دو را محصول می‌نامید.)
+"""
 
 from __future__ import annotations
 

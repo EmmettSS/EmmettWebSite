@@ -13,7 +13,12 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
  */
 function mediaHostnames(): string[] {
   const hosts = new Set<string>(["127.0.0.1", "localhost"]);
-  for (const candidate of [process.env.INTERNAL_API_URL, process.env.NEXT_PUBLIC_MEDIA_URL]) {
+  for (const candidate of [
+    process.env.INTERNAL_API_URL,
+    process.env.NEXT_PUBLIC_MEDIA_URL,
+    process.env.PUBLIC_SITE_URL,
+    process.env.NEXT_PUBLIC_SITE_URL,
+  ]) {
     if (!candidate) continue;
     try {
       hosts.add(new URL(candidate).hostname);
@@ -46,6 +51,7 @@ const nextConfig: NextConfig = {
     formats: ["image/avif", "image/webp"],
     deviceSizes: [360, 640, 768, 1024, 1280, 1536, 1920],
     minimumCacheTTL: 60 * 60 * 24 * 30,
+    localPatterns: [{ pathname: "/media/**" }, { pathname: "/**" }],
     remotePatterns: mediaHostnames().flatMap((hostname) => [
       { protocol: "http" as const, hostname },
       { protocol: "https" as const, hostname },
@@ -62,6 +68,36 @@ const nextConfig: NextConfig = {
       { source: "/en/blog/rss.xml", destination: "/en/blog/rss", permanent: true },
       { source: "/en/academy/rss.xml", destination: "/en/academy/rss", permanent: true },
       { source: "/feed", destination: "/blog/rss", permanent: true },
+
+      // صفحهٔ «به‌زودی»ِ Pentestor برای همیشه به صفحهٔ واقعیِ دیتابیسی‌اش
+      // واگذار می‌کند (ADR-0040 بند ۵، گزینهٔ ۱ با تصمیم صریح مالک محصول).
+      //
+      // چرا: `/projects/pentestor` محتوای واقعی دارد (مطالعهٔ موردی، در
+      // sitemap، canonical خودش) در حالی که `/products/pentestor` یک
+      // ComingSoonِ ایستا بود. پس از اصلاح canonical در بستهٔ ۳ دیگر هیچ‌کدام
+      // به دیگری دروغ نمی‌گفت، ولی دو صفحهٔ هم‌موضوع و هر دو index‌پذیر
+      // باقی مانده بودند. این ریدایرکت تمام سیگنال‌ها را در مقصد واحد جمع
+      // می‌کند و کاربر را هم از پالت ⌘K به صفحهٔ واقعی می‌رساند.
+      //
+      // هر دو زبان **صریح** نوشته می‌شوند چون این لایه پیش از روتینگ زبانِ
+      // میان‌افزار اعمال می‌شود — همان الگویی که ریدایرکت‌های RSS بالا دارند.
+      //
+      // `/products/crm` عمداً ریدایرکت **نمی‌شود**: CRM در دیتابیس نیست
+      // (`/api/v1/projects/?is_product=true` ⇒ `count=1`، فقط pentestor) و
+      // `/projects/crm` ‏404 می‌دهد، پس واگذاری به آن یعنی شکستن لینک. آن
+      // صفحه باید «به‌زودی» بماند.
+      //
+      // `permanent: true` در Next.js کد **308** می‌دهد نه 301؛ این API گزینهٔ
+      // 301 ندارد و هر چهار ریدایرکت دائمیِ بالای این فایل هم 308 هستند
+      // (اندازه‌گیری‌شده). ۳۰۸ ریدایرکت دائمیِ استاندارد است و موتورهای
+      // جست‌وجو برای تجمیع سیگنال همانند ۳۰۱ رفتار می‌کنند؛ یک‌دستی با
+      // بقیهٔ ریپو بر عددِ کد وضعیت اولویت دارد.
+      { source: "/products/pentestor", destination: "/projects/pentestor", permanent: true },
+      {
+        source: "/en/products/pentestor",
+        destination: "/en/projects/pentestor",
+        permanent: true,
+      },
     ];
   },
 

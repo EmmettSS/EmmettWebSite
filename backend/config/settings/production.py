@@ -8,7 +8,10 @@ from .base import PUBLIC_SITE_URL, SECURITY_REFERRER_POLICY, env
 # در محیط پروداکشن، DEBUG همیشه و بدون استثنا خاموش است.
 DEBUG = False
 
-ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=[])
+_configured_hosts = env.list("DJANGO_ALLOWED_HOSTS", default=[])
+ALLOWED_HOSTS = (
+    list(dict.fromkeys([*_configured_hosts, "127.0.0.1", "localhost"])) if _configured_hosts else []
+)
 _default_csrf_origins = [PUBLIC_SITE_URL] if PUBLIC_SITE_URL.startswith("https://") else []
 CSRF_TRUSTED_ORIGINS = env.list("DJANGO_CSRF_TRUSTED_ORIGINS", default=_default_csrf_origins)
 

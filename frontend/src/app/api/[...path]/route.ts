@@ -1,5 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
 
+import { extractForwardedClientIp } from "@/lib/api/server";
+import { getSafeErrorType, logUpstreamFailure } from "@/lib/api/upstream-logging";
+
 /**
  * پراکسی سمت سرور برای ``/api/*`` — جایگزین ``rewrites()`` در next.config.ts
  * (ADR مرتبط: تصمیم معماری frontend↔backend در فاز ۴).
@@ -12,8 +15,6 @@ import { NextResponse, type NextRequest } from "next/server";
  * ``request.nextUrl.pathname`` در Route Handler، مسیر اصلی را بدون تغییر
  * (با همان اسلش پایانی) حفظ می‌کند.
  */
-const INTERNAL_API_URL = process.env.INTERNAL_API_URL ?? "http://127.0.0.1:8000";
-
 // هدرهایی که نباید مستقیماً عبور داده شوند (hop-by-hop یا مخصوص host فعلی).
 const SKIP_REQUEST_HEADERS = new Set(["host", "connection", "content-length"]);
 const SKIP_RESPONSE_HEADERS = new Set([
@@ -24,7 +25,11 @@ const SKIP_RESPONSE_HEADERS = new Set([
 ]);
 
 async function proxy(request: NextRequest): Promise<Response> {
-  const targetUrl = `${INTERNAL_API_URL}${request.nextUrl.pathname}${request.nextUrl.search}`;
+  const internalBase = (process.env.INTERNAL_API_URL ?? "http://127.0.0.1:8000").replace(
+    /\/+$/,
+    "",
+  );
+  const targetUrl = `${internalBase}${request.nextUrl.pathname}${request.nextUrl.search}`;
 
   const headers = new Headers();
   request.headers.forEach((value, key) => {
@@ -32,16 +37,29 @@ async function proxy(request: NextRequest): Promise<Response> {
       headers.set(key, value);
     }
   });
+  const forwardedIp = extractForwardedClientIp(request.headers);
+  if (forwardedIp) {
+    headers.set("x-forwarded-for", forwardedIp);
+  }
+  headers.set("x-forwarded-proto", "https");
 
   const hasBody = !["GET", "HEAD"].includes(request.method);
 
-  const backendResponse = await fetch(targetUrl, {
-    method: request.method,
-    headers,
-    body: hasBody ? await request.arrayBuffer() : undefined,
-    redirect: "manual",
-    cache: "no-store",
-  });
+  let backendResponse: Response;
+  try {
+    backendResponse = await fetch(targetUrl, {
+      method: request.method,
+      headers,
+      body: hasBody ? await request.arrayBuffer() : undefined,
+      redirect: "manual",
+      cache: "no-store",
+    });
+  } catch (error) {
+    logUpstreamFailure("django-proxy", request.nextUrl.pathname, {
+      errorType: getSafeErrorType(error),
+    });
+    return NextResponse.json({ detail: "Upstream backend unavailable." }, { status: 502 });
+  }
 
   const responseHeaders = new Headers();
   backendResponse.headers.forEach((value, key) => {

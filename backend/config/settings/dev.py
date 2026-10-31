@@ -13,6 +13,9 @@ from .base import BASE_DIR, env
 
 DEBUG = True
 
+# Only used by the development/demo seed command; never a production credential.
+DEMO_ADMIN_PASSWORD = env("DEMO_ADMIN_PASSWORD", default="")
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",

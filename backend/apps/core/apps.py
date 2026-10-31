@@ -28,3 +28,4 @@ class CoreConfig(AppConfig):
         # ``<app>.admin``)؛ بدون این import، همهٔ بررسی‌های ``emmett_admin.E00x``
         # بی‌صدا بی‌اثر می‌ماندند. این import فقط ثبتِ checkها را انجام می‌دهد.
         import apps.core.checks  # noqa: F401
+        import apps.core.signals  # noqa: F401

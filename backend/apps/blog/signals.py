@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-from django.db.models.signals import post_delete, post_save
+from django.db.models.signals import m2m_changed, post_delete, post_save
 from django.dispatch import receiver
 
-from apps.blog.models import BlogPost
+from apps.blog.models import BlogPost, Comment
+from apps.core.frontend_cache import invalidate_model_cache
 from apps.core.search import remove_from_index, sync_search_index
 from apps.core.utils.urls import localized_path
 
@@ -19,6 +20,7 @@ def _category_label(instance: BlogPost) -> str:
 
 @receiver(post_save, sender=BlogPost)
 def sync_blog_post_index(sender: type[BlogPost], instance: BlogPost, **kwargs: object) -> None:
+    invalidate_model_cache(instance)
     category_label = _category_label(instance)
     for locale in ("fa", "en"):
         sync_search_index(
@@ -36,4 +38,17 @@ def sync_blog_post_index(sender: type[BlogPost], instance: BlogPost, **kwargs: o
 
 @receiver(post_delete, sender=BlogPost)
 def remove_blog_post_from_index(sender: type[BlogPost], instance: BlogPost, **kwargs: object) -> None:
+    invalidate_model_cache(instance)
     remove_from_index(content_type=_CONTENT_TYPE, object_id=instance.pk)
+
+
+@receiver((post_save, post_delete), sender=Comment)
+def invalidate_comment_cache(sender: type[Comment], instance: Comment, **kwargs: object) -> None:
+    invalidate_model_cache(BlogPost)
+
+
+@receiver(m2m_changed, sender=BlogPost.categories.through)
+@receiver(m2m_changed, sender=BlogPost.tags.through)
+def invalidate_blog_taxonomy_cache(sender: type, instance: object, action: str, **kwargs: object) -> None:
+    if action in {"post_add", "post_remove", "post_clear"}:
+        invalidate_model_cache(instance)

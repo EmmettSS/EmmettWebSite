@@ -1,0 +1,73 @@
+/*
+ * =============================================================================
+ * قواعد پوستهٔ UI که توکن نیستند
+ * =============================================================================
+ *
+ * توکن‌های `EmmettWebSite/frontend/src/styles/theme.css` از فاز ۷ روی `:root` در
+ * `globals.css` هستند. این فایل فقط چیزهایی را نگه می‌دارد که توکن نیستند:
+ * فونت سرمقاله‌ای، فونت مونو، فید ورود، و پنهان شدن لودر.
+ */
+
+/* ===== فونت سرمقاله‌ای (نقل ۱:۱ از UI/src/styles/fonts.css) ===== */
+/*
+ * در UI این کلاس سراسری و بدون cascade layer تعریف شده است (پس بر کلاس‌های
+ * utility اولویت دارد)؛ همان رفتار عیناً تکرار می‌شود. این کلاس در مسیرهای
+ * فعلی فرانت استفاده نمی‌شود، بنابراین هیچ اثر بصری ندارد.
+ */
+.font-editorial {
+  font-family: "Newsreader", Georgia, "Times New Roman", serif;
+}
+
+/* ===== فید ورود پوستهٔ UI ===== */
+/*
+ * معادل دقیق `motion.div` در `UI/src/app/App.tsx`
+ * (`initial={{opacity:0}} animate={{opacity:1}} transition={{duration:0.4}}`).
+ * به‌صورت انیمیشن CSS پیاده شده تا صفحه بدون JavaScript هم دیده شود؛ قاعدهٔ
+ * سراسری `prefers-reduced-motion` در globals.css مدت آن را به ۰.۰۱ms می‌رساند.
+ */
+@keyframes ui-shell-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.ui-shell {
+  animation: ui-shell-in 0.4s ease-out;
+}
+
+/* ===== احترام به prefers-reduced-motion در لودر آغازین ===== */
+/*
+ * لودر یک پوشش تمام‌صفحه با انیمیشن پیشرفت است؛ برای کاربرانی که کاهش حرکت
+ * خواسته‌اند، بی‌درنگ پنهان می‌شود (معادل «رد کردن» لودر). این کار فقط در
+ * لایهٔ رندر انجام می‌شود تا هیچ setState در effect لازم نباشد
+ * (قاعدهٔ react-hooks/set-state-in-effect در ESLint پروژه).
+ */
+@media (prefers-reduced-motion: reduce) {
+  .ui-loader {
+    display: none;
+  }
+}
+
+/* ===== فونت فنی (نقل ۱:۱ از UI/src/styles/fonts.css) ===== */
+/*
+ * بدون cascade layer تا مثل UI بر utilityهای `font-mono` اولویت داشته باشد.
+ * از فاز ۷ سراسری است، چون پوشش توکن برداشته شده.
+ */
+.font-mono {
+  font-family: "JetBrains Mono", "Courier New", monospace;
+}
+
+/* کارت‌های صفحات داخلی: هاور زمردی، بدون تغییر کارت‌های اختصاصی خانه. */
+a:hover [data-slot="card"] {
+  border-color: rgba(31, 174, 110, 0.45);
+}
+
+/* فهرست باز <select> در بعضی مرورگرها پس‌زمینهٔ روشن می‌گیرد. */
+select option,
+select optgroup {
+  background-color: #102a20;
+  color: #f3faf6;
+}

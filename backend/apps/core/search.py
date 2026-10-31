@@ -18,6 +18,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 
 from django.db import connection
+from django.db.models import Q
 
 from apps.core.logging import get_logger
 from apps.core.models import SearchIndexEntry
@@ -133,11 +134,11 @@ def _search_sqlite(query: str, locale: str, limit: int) -> list[SearchResult]:
 
 
 def _search_fallback(query: str, locale: str, limit: int) -> list[SearchResult]:
-    """پشتیبان ساده برای backendهای ناشناخته (مثلاً در تست‌های غیرمعمول)."""
+    """پشتیبان زیررشته‌ای برای عبارات کوتاه MySQL یا backendهای فاقد ایندکس متن کامل."""
 
     qs = (
         SearchIndexEntry.objects.filter(locale=locale)
-        .filter(**{"title__icontains": query})
+        .filter(Q(title__icontains=query) | Q(body__icontains=query))
         .order_by("-updated_at")[:limit]
     )
     return [
@@ -167,10 +168,13 @@ def search(query: str, locale: str, limit: int = 20) -> list[SearchResult]:
     }
     handler = handlers.get(vendor, _search_fallback)
     try:
-        return handler(query, locale, limit)
+        results = handler(query, locale, limit)
     except Exception:  # noqa: BLE001 - اگر ایندکس FTS هنوز ساخته نشده (مثلاً قبل از migrate)
         logger.warning("search_index_fallback", vendor=vendor, query=query, exc_info=True)
         return _search_fallback(query, locale, limit)
+    if results or handler is _search_fallback:
+        return results
+    return _search_fallback(query, locale, limit)
 
 
 __all__ = ["SearchResult", "sync_search_index", "remove_from_index", "search"]

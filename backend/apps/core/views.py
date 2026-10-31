@@ -5,13 +5,14 @@ from __future__ import annotations
 from dataclasses import asdict
 from typing import Any
 
+from django.conf import settings
 from django.core.cache import cache
 from django.db import connection
 from django.utils import timezone
 from django.utils.translation import get_language
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -30,6 +31,8 @@ from apps.core.seo_serializers import (
     SEOSettingsSerializer,
     SitemapEntrySerializer,
 )
+from apps.core.throttling import ProxyAwareAnonRateThrottle
+from apps.core.utils.request import get_client_ip
 
 logger = get_logger(__name__)
 
@@ -85,6 +88,76 @@ class HealthCheckView(APIView):
         except Exception:  # noqa: BLE001
             logger.exception("health_check_cache_failed")
             return False
+
+
+class ProxyDiagnosticView(APIView):
+    """تشخیص زندهٔ زنجیرهٔ هدرهای پراکسی و هویت IP کلاینت روی هاست واقعی (فقط Staff/Admin).
+
+    چرا این endpoint وجود دارد:
+    در توپولوژی cPanel (``Apache -> Passenger Node/Next.js -> Passenger Python/Django``)
+    رفتار واقعی ``X-Forwarded-For`` (اینکه اصلاً ست می‌شود یا نه، و اینکه تک‌مقدار است یا
+    زنجیرهٔ چندپله‌ای پشت CDN) فقط روی هاست مقصد قابل مشاهده است. این view از همان مسیر
+    کامل ``/api/v1/health/proxy/`` عبور می‌کند، فقط به ادمین احرازهویت‌شده پاسخ می‌دهد
+    (``IsAdminUser`` -> صفر افشای اطلاعات عمومی) و هم‌راستایی کامل ``get_client_ip`` و
+    شناسهٔ ``Throttle`` را گزارش می‌کند.
+    """
+
+    permission_classes = [IsAdminUser]
+
+    @extend_schema(
+        responses={200: OpenApiTypes.OBJECT, 403: OpenApiTypes.OBJECT},
+        description=(
+            "تشخیص زندهٔ هدرهای پراکسی (X-Forwarded-For / X-Real-IP / CDN) و بررسی هم‌راستایی "
+            "IP استخراج‌شده بین LoginLockout/AuditLog و DRF Throttle؛ مخصوص کاربران Staff."
+        ),
+    )
+    def get(self, request: Request) -> Response:
+        django_req = request._request
+        resolved_ip = get_client_ip(django_req)
+        drf_ident = ProxyAwareAnonRateThrottle().get_ident(request)
+        rf_settings: dict[str, Any] = getattr(settings, "REST_FRAMEWORK", {})
+        num_proxies = rf_settings.get("NUM_PROXIES")
+        remote_addr = (django_req.META.get("REMOTE_ADDR") or "").strip() or None
+
+        raw_xff = django_req.META.get("HTTP_X_FORWARDED_FOR")
+        xff_chain = [entry.strip() for entry in (raw_xff or "").split(",") if entry.strip()]
+        chain_len = len(xff_chain)
+        if chain_len == 0:
+            proxy_behavior = "missing"
+        elif chain_len == 1:
+            proxy_behavior = "overwrite_or_single_hop"
+        else:
+            proxy_behavior = "multi_hop_chain"
+
+        loopback_addrs = {None, "", "127.0.0.1", "::1", "localhost"}
+        ident_is_loopback = resolved_ip in loopback_addrs
+        subsystems_in_sync = resolved_ip == drf_ident
+
+        return Response(
+            {
+                "resolved_client_ip": resolved_ip,
+                "drf_throttle_ident": drf_ident,
+                "num_proxies": num_proxies,
+                "remote_addr": remote_addr,
+                "forwarded_headers": {
+                    "x_forwarded_for": raw_xff,
+                    "x_forwarded_for_chain": xff_chain,
+                    "x_real_ip": (django_req.META.get("HTTP_X_REAL_IP") or "").strip() or None,
+                    "x_forwarded_proto": (django_req.META.get("HTTP_X_FORWARDED_PROTO") or "").strip()
+                    or None,
+                    "cf_connecting_ip": (django_req.META.get("HTTP_CF_CONNECTING_IP") or "").strip() or None,
+                    "ar_real_ip": (django_req.META.get("HTTP_AR_REAL_IP") or "").strip() or None,
+                },
+                "verdict": {
+                    "xff_present": chain_len > 0,
+                    "chain_length": chain_len,
+                    "proxy_behavior": proxy_behavior,
+                    "ident_is_loopback_or_empty": ident_is_loopback,
+                    "subsystems_in_sync": subsystems_in_sync,
+                    "ready_for_traffic": (not ident_is_loopback) and subsystems_in_sync,
+                },
+            }
+        )
 
 
 class GlobalSearchView(APIView):

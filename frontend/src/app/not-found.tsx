@@ -17,17 +17,19 @@ export default function RootNotFound() {
           fontFamily: "system-ui, sans-serif",
           textAlign: "center",
           padding: "2rem",
+          backgroundColor: "#0B1F18",
+          color: "#F3FAF6",
         }}
       >
-        <p style={{ fontSize: "0.875rem", letterSpacing: "0.1em", color: "#6b7280" }}>404</p>
+        <p style={{ fontSize: "0.875rem", letterSpacing: "0.1em", color: "#1FAE6E" }}>404</p>
         <h1 style={{ fontSize: "1.75rem", fontWeight: 600 }}>Page not found / صفحه پیدا نشد</h1>
         {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- خارج از next-intl، next/link قابل استفاده نیست */}
         <a
           href="/"
           style={{
             borderRadius: "0.375rem",
-            backgroundColor: "#5b62e0",
-            color: "#fff",
+            backgroundColor: "#1FAE6E",
+            color: "#07130F",
             padding: "0.625rem 1.25rem",
             fontWeight: 500,
             textDecoration: "none",

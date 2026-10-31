@@ -172,15 +172,45 @@ class TestPublicAssetHints:
         assert "avif" in text and "webp" in text
 
     def test_frontend_uses_inline_font_loading_with_swap(self) -> None:
+        """فونت‌ها باید خوداستقرار و بدون CDN خارجی بارگذاری شوند (ADR-0018/ADR-0032).
+
+        مکانیزم واقعی، ``@import`` بسته‌های ``@fontsource/*`` در ``globals.css``
+        است؛ خودِ آن بسته‌ها ``font-display: swap`` اعلام می‌کنند پس متن هرگز با
+        FOIT پنهان نمی‌شود. این تست عمداً **فقط فایل‌های ردیابی‌شدهٔ ریپو** را
+        می‌خواند، چون جاب ``backend-test`` در CI پوشهٔ ``node_modules`` فرانت‌اند را
+        نصب نمی‌کند و خواندن CSS خودِ بسته‌ها آن‌جا ممکن نیست.
+
+        نسخهٔ پیشین فایل‌هایی را جمع می‌کرد که «font» در مسیرشان بود و در
+        متنشان دنبال ``next/font`` یا ``font-display`` می‌گشت. تنها مصداقش
+        ``src/lib/fonts.ts`` بود و عبارت ``next/font`` را از **docstring** همان
+        فایل پیدا می‌کرد — docstring‌ای که می‌گفت ``next/font/google`` امتحان و
+        به‌دلیل بسته‌بودن شبکه *رد* شد. یعنی تست به دلیلِ اشتباه سبز می‌شد و
+        هیچ‌کدام از سه مکانیزم واقعی (خوداستکاری، نبودِ CDN، preload) را
+        نمی‌سنجید. با حذف آن فایل مرده در بستهٔ ۴، تست به مکانیزم واقعی وصل شد.
+        """
+
+        import json
         from pathlib import Path
 
-        root = Path(__file__).resolve().parents[4] / "frontend" / "src"
-        candidates = [
-            path for path in root.rglob("*.ts*") if "font" in path.name.lower() or "font" in str(path).lower()
-        ]
-        assert candidates, "پیکربندی فونت پیدا نشد"
-        haystack = "\n".join(path.read_text(encoding="utf-8") for path in candidates)
-        assert "next/font" in haystack or "font-display" in haystack
+        frontend = Path(__file__).resolve().parents[4] / "frontend"
+
+        globals_css = (frontend / "src" / "app" / "globals.css").read_text(encoding="utf-8")
+        assert "@fontsource/" in globals_css, "فونت‌ها باید خوداستقرار (@fontsource) باشند"
+
+        src_text = "\n".join(
+            path.read_text(encoding="utf-8", errors="replace") for path in (frontend / "src").rglob("*.ts*")
+        )
+        assert "next/font" not in src_text, "فونت نباید از next/font (CDN خارجی) بیاید"
+
+        package = json.loads((frontend / "package.json").read_text(encoding="utf-8"))
+        fontsource = sorted(
+            name for name in package.get("dependencies", {}) if name.startswith("@fontsource/")
+        )
+        assert fontsource, "وابستگی‌های @fontsource باید در package.json ثبت شده باشند"
+
+        layout = (frontend / "src" / "app" / "[locale]" / "layout.tsx").read_text(encoding="utf-8")
+        assert 'rel="preload"' in layout, "فونت بحرانی باید preload شود تا LCP گره نخورد"
+        assert ".woff2" in layout, "پیش‌بارگذاری باید برای فایل woff2 باشد"
 
     def test_no_raw_img_tags_in_public_pages(self) -> None:
         """تصاویر باید از ``next/image`` بیایند تا WebP/AVIF و lazy-loading فعال شود."""

@@ -27,6 +27,17 @@ class TestBlogPostViewSet:
         assert "published-post" in slugs
         assert "draft-post" not in slugs
 
+    def test_list_exposes_database_categories(self) -> None:
+        category = cast(Category, CategoryFactory(name="مهندسی", slug="engineering"))
+        post = cast(BlogPost, BlogPostFactory(slug="categorized-list-post"))
+        post.categories.add(category)
+
+        response = APIClient().get("/api/v1/blog/")
+        item = next(row for row in response.data["results"] if row["slug"] == "categorized-list-post")
+
+        assert item["categories"][0]["name"] == "مهندسی"
+        assert item["categories"][0]["slug"] == "engineering"
+
     def test_retrieve_increments_view_count(self) -> None:
         post = cast(BlogPost, BlogPostFactory(slug="view-count-post"))
         assert post.view_count == 0

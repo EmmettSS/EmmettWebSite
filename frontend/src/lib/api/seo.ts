@@ -8,6 +8,8 @@
  * صفحه هرگز با نبود تنظیمات SEO نشکند (قاعدهٔ «تخریب مهربان» فاز ۷).
  */
 
+import { CACHE_TAGS } from "@/lib/cache-tags";
+import { getSafeErrorType, logUpstreamFailure } from "@/lib/api/upstream-logging";
 import { getApiBaseUrl } from "@/lib/api/config";
 import type {
   FaqPayload,
@@ -23,33 +25,58 @@ import type {
 export const SEO_REVALIDATE_SECONDS = 900;
 export const REDIRECT_REVALIDATE_SECONDS = 300;
 
-async function seoFetch<T>(path: string, revalidate: number, locale?: string): Promise<T | null> {
+async function seoFetch<T>(
+  path: string,
+  revalidate: number,
+  locale: string | undefined,
+  tags: readonly string[],
+): Promise<T | null> {
+  const headers: Record<string, string> = { "X-Forwarded-Proto": "https" };
+  if (locale) {
+    headers["Accept-Language"] = locale;
+  }
   try {
     const response = await fetch(`${getApiBaseUrl()}${path}`, {
-      headers: locale ? { "Accept-Language": locale } : undefined,
-      next: { revalidate },
+      headers,
+      next: { revalidate, tags: [...tags] },
     });
-    if (!response.ok) return null;
+    if (!response.ok) {
+      logUpstreamFailure("django-seo", path, { status: response.status });
+      return null;
+    }
     return (await response.json()) as T;
-  } catch {
+  } catch (error) {
+    logUpstreamFailure("django-seo", path, { errorType: getSafeErrorType(error) });
     return null;
   }
 }
 
 /** تنظیمات SEO سایت (پیش‌فرض‌ها، سازمان، تأیید Search Console). */
 export async function getSeoSettings(): Promise<SeoSettings | null> {
-  return seoFetch<SeoSettings>("/seo/settings/", SEO_REVALIDATE_SECONDS);
+  return seoFetch<SeoSettings>("/seo/settings/", SEO_REVALIDATE_SECONDS, undefined, [
+    CACHE_TAGS.seoSettings,
+  ]);
 }
 
 /** همهٔ URLهای عمومی برای ``sitemap.xml``. */
 export async function getSitemapEntries(): Promise<SitemapEntry[]> {
-  const payload = await seoFetch<SitemapPayload>("/seo/sitemap/", SEO_REVALIDATE_SECONDS);
+  const payload = await seoFetch<SitemapPayload>(
+    "/seo/sitemap/",
+    SEO_REVALIDATE_SECONDS,
+    undefined,
+    [CACHE_TAGS.sitemap],
+  );
   return payload?.results ?? [];
 }
 
 /** نگاشت ریدایرکت‌های مدیریت‌شده (۳۰۱/۳۰۲/۴۱۰). */
 export async function getSeoRedirects(): Promise<SeoRedirect[]> {
-  const payload = await seoFetch<RedirectPayload>("/seo/redirects/", REDIRECT_REVALIDATE_SECONDS);
+  const payload = await seoFetch<RedirectPayload>(
+    "/seo/redirects/",
+    REDIRECT_REVALIDATE_SECONDS,
+    undefined,
+    [CACHE_TAGS.redirects],
+  );
   return payload?.results ?? [];
 }
 
@@ -59,6 +86,7 @@ export async function getFaqForPath(path: string, locale: string): Promise<SeoFa
     `/seo/faq/?path=${encodeURIComponent(path)}`,
     SEO_REVALIDATE_SECONDS,
     locale,
+    [locale === "en" ? CACHE_TAGS.faqEn : CACHE_TAGS.faqFa],
   );
   return payload?.results ?? [];
 }

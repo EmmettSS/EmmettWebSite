@@ -7,9 +7,22 @@ from apps.taxonomy.serializers import CategorySerializer, TagSerializer
 
 
 class ServiceListSerializer(serializers.ModelSerializer[Service]):
+    categories = CategorySerializer(many=True, read_only=True)
+    tags = TagSerializer(many=True, read_only=True)
+
     class Meta:
         model = Service
-        fields = ("public_id", "title", "slug", "summary", "icon", "is_featured", "order")
+        fields = (
+            "public_id",
+            "title",
+            "slug",
+            "summary",
+            "icon",
+            "categories",
+            "tags",
+            "is_featured",
+            "order",
+        )
 
 
 class ServiceDetailSerializer(serializers.ModelSerializer[Service]):

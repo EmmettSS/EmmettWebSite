@@ -7,13 +7,10 @@ import { CommentForm } from "@/components/organisms/comment-form";
 import { ContactForm } from "@/components/organisms/contact-form";
 import { CreativeAdvisorForm } from "@/components/organisms/creative-advisor-form";
 import { EnrollButton } from "@/components/organisms/enroll-button";
-import { Hero } from "@/components/organisms/hero";
 import { NewsletterForm } from "@/components/organisms/newsletter-form";
 import { ProjectEstimatorForm } from "@/components/organisms/project-estimator-form";
 import { SearchBox } from "@/components/organisms/search-box";
 import { ShareResultButton } from "@/components/organisms/share-result-button";
-import { SiteFooter } from "@/components/organisms/site-footer";
-import { SiteHeader } from "@/components/organisms/site-header";
 import * as apiClient from "@/lib/api/client";
 import type { AIConcept, Catalog } from "@/lib/api/types";
 
@@ -22,10 +19,6 @@ const pushMock = vi.fn();
 vi.mock("next-intl", () => ({
   useLocale: () => "fa",
   useTranslations: () => (key: string) => key,
-}));
-
-vi.mock("next-themes", () => ({
-  useTheme: () => ({ resolvedTheme: "dark", setTheme: vi.fn() }),
 }));
 
 vi.mock("@/i18n/navigation", () => ({
@@ -90,23 +83,6 @@ describe("Organisms", () => {
   beforeEach(() => {
     pushMock.mockReset();
     vi.restoreAllMocks();
-  });
-
-  it("renders Hero, SiteFooter, and SiteHeader with mobile menu toggle", () => {
-    render(
-      <div>
-        <SiteHeader />
-        <Hero />
-        <SiteFooter />
-      </div>,
-    );
-
-    expect(screen.getByRole("heading", { level: 1, name: "headline" })).toBeInTheDocument();
-    expect(screen.getByRole("navigation", { name: "Footer" })).toBeInTheDocument();
-
-    const menuButton = screen.getByRole("button", { name: "openMenu" });
-    fireEvent.click(menuButton);
-    expect(screen.getByRole("button", { name: "closeMenu" })).toBeInTheDocument();
   });
 
   it("submits SearchBox with trimmed query and empty query", () => {

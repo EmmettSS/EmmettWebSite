@@ -100,3 +100,21 @@ class TestEnrollmentViews:
         results = response.data.get("results", response.data)
         assert len(results) == 1
         assert results[0]["course"]["slug"] == "shared-course"
+
+    def test_re_enrolling_after_soft_delete_reactivates_without_500(self) -> None:
+        user = cast(User, UserFactory())
+        course = cast(Course, CourseFactory(slug="revive-course"))
+        client = APIClient()
+        client.force_authenticate(user=user)
+
+        assert (
+            client.post("/api/v1/academy/enrollments/add/", {"course_slug": "revive-course"}).status_code
+            == 201
+        )
+        enrollment = Enrollment.objects.get(user=user, course=course)
+        enrollment.delete()
+        assert not Enrollment.objects.filter(user=user, course=course).exists()
+
+        revived = client.post("/api/v1/academy/enrollments/add/", {"course_slug": "revive-course"})
+        assert revived.status_code == 201
+        assert Enrollment.objects.filter(user=user, course=course).exists()

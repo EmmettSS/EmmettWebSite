@@ -12,7 +12,8 @@
     "startProject": "Start a project",
     "loading": "Loading…",
     "readMore": "Read more",
-    "viewAll": "View all"
+    "viewAll": "View all",
+    "contentUnavailable": "Content is temporarily unavailable."
   },
   "nav": {
     "home": "Home",
@@ -26,20 +27,19 @@
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
     "search": "Search",
+    "landmark": "Primary",
+    "menu": "Menu",
     "account": "Account",
     "advisor": "Creative advisor",
-    "estimate": "Project estimate"
-  },
-  "theme": {
-    "toggleLabel": "Toggle light/dark theme",
-    "light": "Light",
-    "dark": "Dark",
-    "system": "System"
+    "estimate": "Project estimate",
+    "startProject": "Start a Project"
   },
   "locale": {
     "switchLabel": "Switch language",
     "fa": "فارسی",
-    "en": "English"
+    "en": "English",
+    "shortFa": "فا",
+    "shortEn": "EN"
   },
   "footer": {
     "tagline": "We engineer systems for difficult problems.",
@@ -57,6 +57,11 @@
     "title": "Design System",
     "description": "A living sample page for Phase 3 tokens and components — for design review, not final site content.",
     "colors": "Colors",
+    "tokenStandardLead": "The values below are read from the CSSOM at runtime (getComputedStyle on :root), not from a hand-written list; if a token is missing or its @theme inline mapping is removed, the swatch stays unpainted and its value shows as empty.",
+    "categoryPalette": "Emerald and category palette",
+    "mutedTextPalette": "Muted text on surfaces",
+    "tokenValuePending": "Read after hydration",
+    "mutedTextSample": "Sample text using this token",
     "typography": "Typography",
     "spacing": "Spacing",
     "buttons": "Buttons",
@@ -95,7 +100,8 @@
     "title": "Services",
     "description": "What we build, how we build it, and why it holds up under pressure.",
     "empty": "No services found.",
-    "backToList": "Back to services"
+    "backToList": "Back to services",
+    "listHeading": "All services"
   },
   "projects": {
     "title": "Projects",
@@ -263,5 +269,224 @@
     "shareLink": "Copy share link",
     "linkCopied": "Link copied",
     "linkCopyError": "Automatic copying is unavailable. Copy the page URL from your browser address bar."
+  },
+  "ui": {
+    "brand": "EMMETT",
+    "brandGroup": "GROUP",
+    "loader": {
+      "initializing": "INITIALIZING",
+      "collective": "EMMETT GROUP · ENGINEERING COLLECTIVE"
+    },
+    "nav": {
+      "openMenu": "Open menu",
+      "closeMenu": "Close menu",
+      "searchPlaceholder": "Search pages, products, commands…",
+      "noResults": "No results found.",
+      "pagesHeading": "Pages",
+      "resultsHeading": "Search results",
+      "searching": "Searching…",
+      "searchError": "Search failed; page results are still available.",
+      "viewAllResults": "View all results for “{query}”",
+      "palette": [
+        {
+          "label": "Home",
+          "category": "Page",
+          "href": "/"
+        },
+        {
+          "label": "Services — The Engineering System",
+          "category": "Page",
+          "href": "/services"
+        },
+        {
+          "label": "Products — The Product Lab",
+          "category": "Page",
+          "href": "/products"
+        },
+        {
+          "label": "PenTestor — Security Engineering",
+          "category": "Product",
+          "href": "/products/pentestor"
+        },
+        {
+          "label": "CRM — Business Systems",
+          "category": "Product",
+          "href": "/products/crm"
+        },
+        {
+          "label": "Projects — Proof of Work",
+          "category": "Page",
+          "href": "/projects"
+        },
+        {
+          "label": "Library — Engineering Knowledge",
+          "category": "Page",
+          "href": "/blog"
+        },
+        {
+          "label": "Academy — Learning Paths",
+          "category": "Page",
+          "href": "/academy"
+        },
+        {
+          "label": "About — Who We Are",
+          "category": "Page",
+          "href": "/about"
+        },
+        {
+          "label": "Contact — Start a Project",
+          "category": "Action",
+          "href": "/contact"
+        },
+        {
+          "label": "Creative advisor",
+          "category": "Page",
+          "href": "/advisor"
+        },
+        {
+          "label": "Project estimate",
+          "category": "Page",
+          "href": "/estimate"
+        },
+        {
+          "label": "Search",
+          "category": "Page",
+          "href": "/search"
+        },
+        {
+          "label": "Account",
+          "category": "Page",
+          "href": "/profile"
+        }
+      ]
+    },
+    "hero": {
+      "eyebrow": "Engineering Collective · University of Tehran",
+      "line1": "We engineer",
+      "accent": "intelligent",
+      "line3": "systems.",
+      "sub": "Software, AI, cybersecurity and products built for real-world complexity.",
+      "explore": "Explore our work",
+      "start": "Start a project",
+      "ai": "AI / ML",
+      "security": "Security",
+      "backend": "Backend",
+      "scroll": "scroll"
+    },
+    "services": {
+      "eyebrow": "Services · 01",
+      "title": "Engineering across the entire stack.",
+      "lead": "From infrastructure to intelligence, we design and build the systems that make ambitious products possible.",
+      "viewSystem": "View full engineering system",
+      "mapTitle": "System Map · Hover to explore",
+      "mapIdle": "Hover a service to activate"
+    },
+    "products": {
+      "eyebrow": "Products · 02",
+      "title": "Products born from engineering problems.",
+      "lead": "We build tools and systems because we have encountered problems worth solving ourselves.",
+      "view": "View product",
+      "seeAll": "See all products"
+    },
+    "projects": {
+      "eyebrow": "Projects · 03",
+      "title": "What we've built.",
+      "lead": "Real problems. Real constraints. Real systems.",
+      "outcome": "Outcome",
+      "caseStudy": "Read case study",
+      "viewAll": "View all projects",
+      "shown": "{shown} of {total} projects shown"
+    },
+    "library": {
+      "eyebrow": "Library · 04",
+      "title": "What we're learning, building and thinking about.",
+      "featured": "Featured",
+      "open": "Open Library",
+      "minute": "min",
+      "readSuffix": "{time} read"
+    },
+    "academy": {
+      "eyebrow": "Academy · 05",
+      "title": "Build your way into deeper knowledge.",
+      "lead": "Courses, paths and practical systems designed around real engineering problems — not artificial curricula.",
+      "graph": "Knowledge Graph · Learning Paths",
+      "available": "Available Paths",
+      "start": "Start building",
+      "lessonCount": "{count} lessons"
+    },
+    "contact": {
+      "eyebrow": "Contact · 06",
+      "line1": "Have a difficult",
+      "accent": "problem?",
+      "lead1": "Tell us what you're trying to build.",
+      "lead2": "We'll figure out the system together.",
+      "start": "Start a conversation",
+      "work": "See our work first"
+    },
+    "footer": {
+      "copyright": "© {year} Emmett Group",
+      "columns": [
+        {
+          "header": "Company",
+          "links": [
+            {
+              "label": "About",
+              "href": "/about"
+            },
+            {
+              "label": "Careers",
+              "href": "/about"
+            },
+            {
+              "label": "Contact",
+              "href": "/contact"
+            }
+          ]
+        },
+        {
+          "header": "Work",
+          "links": [
+            {
+              "label": "Services",
+              "href": "/services"
+            },
+            {
+              "label": "Products",
+              "href": "/products"
+            },
+            {
+              "label": "Projects",
+              "href": "/projects"
+            }
+          ]
+        },
+        {
+          "header": "Learn",
+          "links": [
+            {
+              "label": "Library",
+              "href": "/blog"
+            },
+            {
+              "label": "Academy",
+              "href": "/academy"
+            },
+            {
+              "label": "Research",
+              "href": "/blog"
+            }
+          ]
+        }
+      ]
+    },
+    "comingSoon": {
+      "pending": "Phase 2 · Pending",
+      "body": "This page is part of the Emmett digital ecosystem and will be implemented in a future phase, following review and approval of the Home experience.",
+      "back": "Return to Home",
+      "pentestorTitle": "Pentestor",
+      "pentestorSubtitle": "AI-powered security engineering",
+      "crmTitle": "CRM",
+      "crmSubtitle": "Business systems engineered around real workflows"
+    }
   }
 }

@@ -7,7 +7,11 @@ from apps.portfolio.models import CaseStudy, Project
 
 
 class ProjectResource(EmmettResource):
-    """پروژه‌ها (شامل محصولات داخلی مثل Pentestor/CRM — ``is_product``)."""
+    """پروژه‌ها، شامل محصولاتِ داخلی یعنی ردیف‌های ``is_product=True``.
+
+    تنها Pentestor در این دسته است؛ CRM عمداً محصولِ دیتابیسی نیست و
+    ``/projects/crm`` ۴۰۴ می‌دهد (ر.ک. ADR-0040).
+    """
 
     class Meta:
         model = Project

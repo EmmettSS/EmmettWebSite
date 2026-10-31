@@ -172,3 +172,10 @@ class TestMediaValidation:
         )
         with pytest.raises(ValidationError):
             media.full_clean()
+
+    def test_media_upload_path_without_media_type_uses_safe_relative_folder(self) -> None:
+        from apps.core.models import media_upload_path
+
+        path = media_upload_path(Media(media_type=""), "cover.png")
+        assert not path.startswith("/")
+        assert path.startswith("misc/")
