@@ -20,7 +20,7 @@ Cache has no effect in middleware; (3) every server-rendered upstream call share
 DRF throttle bucket, so after 100 renders/hour pages silently rendered **empty**; (4) the global
 loader waited for `window.load`; (5) CRLF line endings broke the deploy scripts and kept CI red.
 
-After the fix: home-page TTFB **62.7 ms → 2.6 ms** (10 concurrent clients: 162.8 ms → 4.8 ms),
+After the fix: home-page TTFB **62.7 ms → 2.6 ms** (10 concurrent clients: 162.8 ms → 14.8 ms),
 detail pages 105 ms → 2.5 ms, prerendered routes **0 → 61**, zero backend calls per page view
 until revalidation, and `make verify` (format/lint/types/tests/build/prerender gate) green.
 Two guardrails were added so the regression cannot return silently: `npm run verify:rendering`
@@ -49,7 +49,7 @@ on React**; the remaining weaknesses are payload size, not architecture.
 |---|---|---|---|
 | مسیرهای pre-render‌شده در بیلد | ۰ از ۲۵ | **۶۱** (۱۴ فهرست + ۲۶ جزئیات محتوایی + ۴ محصول + ۱۷ بقیه) | — |
 | TTFB صفحهٔ اصلی (۳۰ درخواست متوالی) | میانگین **۵۹٫۶ms** / p95 ۶۹٫۶ms | میانگین **۲٫۶ms** / p95 ۳٫۲ms | **≈۲۳×** |
-| TTFB صفحهٔ اصلی (۱۰ کلاینت هم‌زمان) | میانگین **۱۳۰٫۲ms** / p95 ۱۸۲٫۶ms | میانگین **۴٫۸ms** / p95 ۸٫۳ms | **≈۲۷×** |
+| TTFB صفحهٔ اصلی (۱۰ کلاینت هم‌زمان) | میانگین **۱۶۲٫۸ms** / p95 ۱۷۰٫۷ms | میانگین **۱۴٫۸ms** / p95 ۲۵٫۶ms | **≈۱۱×** |
 | TTFB صفحهٔ جزئیات (`/blog/{slug}`) | ۳۷–۱۰۷ms (بازدید اول) / ۱۱–۲۵ms | **۲٫۵ms** | **≈۵–۴۰×** |
 | فراخوانی بک‌اند به‌ازای هر بازدید صفحه | ۱ (+N در هر بازسازی) | **۰** (تا پایان TTL) | — |
 | CI (فرانت‌اند / بک‌اند) | قرمز / قرمز | سبز محلی (Prettier, ESLint, tsc, Vitest، pytest، build، verify:rendering) | — |
@@ -360,7 +360,7 @@ CSP ثابت بمانند و مسیرهای شخصی (`/profile`، `/search`، `
 | سنجه | قبل | بعد | نسبت |
 |---|---|---|---|
 | `/` متوالی (۳۰ نمونه) | ۶۲٫۷ms (p95 ۷۲٫۳) | **۲٫۶ms** (p95 ۳٫۲) | **≈۲۴×** |
-| `/` با ۱۰ کلاینت هم‌زمان | ۱۶۲٫۸ms (p95 ۱۷۰٫۷) | **۴٫۸ms** (p95 ۸٫۳) | **≈۳۴×** |
+| `/` با ۱۰ کلاینت هم‌زمان | ۱۶۲٫۸ms (p95 ۱۷۰٫۷) | **۱۴٫۸ms** (p95 ۲۵٫۶) | **≈۱۱×** |
 | `/en` متوالی | ۶۳٫۹ms | **۲٫۶ms** | ≈۲۵× |
 | `/services` متوالی | ۵۷٫۳ms | **۲٫۲ms** | ≈۲۶× |
 | `/blog` متوالی | ۶۰٫۱ms | **۲٫۱ms** | ≈۲۹× |
@@ -389,6 +389,12 @@ GET /api/v1/seo/redirects/               HTTP/1.1" 429 349
 ندارد». نمونهٔ اصلاح‌شده در همان لحظه و با همان بک‌اند، همان مسیر را **200** با ۶۳KB محتوای
 کامل برگرداند. این دقیقاً همان «خرابیِ بی‌صدایی» است که در R3 توضیح داده شد، و بهترین دلیل
 برای این‌که توکن سرویس داخلی (R3) هم‌وزن سرعت (R1) اهمیت دارد.
+
+> **دربارهٔ ابزار اندازه‌گیری:** همهٔ اعداد هم‌زمان با `make bench` (که `node:http` با
+> `maxSockets = 10` استفاده می‌کند) گرفته شده‌اند. اگر همان آزمون را با
+> `seq 40 | xargs -P 10 curl` بگیرید، عدد «بعد» حدود **۴٫۸ms** درمی‌آید — چون خط لولهٔ
+> شل واقعاً ۱۰ درخواست را هم‌زمان نمی‌فرستد. برای مقایسهٔ منصفانه، **هر دو طرف** با یک
+> ابزار سنجیده شده‌اند؛ عددِ محافظه‌کارانه‌تر (۱۴٫۸ms) در جدول آمده است.
 
 > **نکتهٔ مهم دربارهٔ `npm run dev`:** اگر پروژه را با `next dev` بالا می‌آورید، هر مسیر
 > **بار اول** کامپایل می‌شود (اینجا ۵٫۱ ثانیه برای `/`، ۱٫۱ ثانیه برای `/services`). این
