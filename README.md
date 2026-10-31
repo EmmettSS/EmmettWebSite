@@ -40,6 +40,10 @@
 اعداد با `make bench` تولید می‌شوند و در `docs/audit/2026-10-31-deep-audit.fa.md` روش کامل
 اندازه‌گیری آمده است.
 
+وضعیت CI این شاخه: **هر شش جاب سبز** (`backend-quality`، `backend-test`،
+`frontend-quality`، `frontend-test-build`، `security-scan`، `e2e-and-lighthouse`) — اجرای
+`41239783610`. پیش از این تغییر، هفت اجرای پیاپی (شامل `main`) قرمز بود.
+
 گزارش کامل با روش اندازه‌گیری و دستورهای بازتولید:
 [`docs/audit/2026-10-31-deep-audit.fa.md`](docs/audit/2026-10-31-deep-audit.fa.md) —
 تصمیم معماری: [`ADR-0041`](docs/adr/0041-content-pages-prerender-isr-and-internal-service-auth.md).

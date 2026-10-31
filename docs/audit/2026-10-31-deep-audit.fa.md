@@ -431,6 +431,19 @@ make bench        # اندازه‌گیری روی نمونهٔ در حال اج
 mypy (۲۵۲ فایل)، `tsc --noEmit`، pytest (**۵۵۹** تست)، Vitest (**۱۵۰** تست در ۳۲ فایل،
 پوشش ۹۷٫۷٪ statements)، `next build` و `verify:rendering`.
 
+**وضعیت CI روی شاخهٔ `arena/011d81e0-emmettwebsite` (۲۰۲۶-۱۰-۳۱):** همهٔ شش جاب سبز —
+`backend-quality`، `backend-test`، `frontend-quality`، `frontend-test-build`،
+`security-scan`، `e2e-and-lighthouse` (در اجرای `41239783610`). این اولین CI سبز مخزن پس از
+هفت اجرای قرمز پیاپی (شامل `main`) است.
+
+دو شکستِ **فقط-در-CI** که در همین مسیر پیدا و رفع شدند (و دقیقاً همان درس R8 را تکرار
+می‌کنند — «تستی که فقط روی ماشین من سبز است، گارد نیست»):
+
+| شکست | ریشه | اصلاح |
+|---|---|---|
+| `api.test.ts` هدرهای درخواست را دقیق مقایسه می‌کرد | در محیط محلی `INTERNAL_API_TOKEN` تعریف نشده بود، در CI بود؛ پس هدر `X-Internal-Token` فقط در CI اضافه می‌شد | مقایسه با `objectContaining` + یک تست تازه که **هر دو حالت** (توکن تنظیم‌شده / تنظیم‌نشده) را می‌سنجد |
+| تست E2E سه توکن متن ملایم | رنگ‌ها با یک `evaluate` بدون retry خوانده می‌شد؛ روی صفحهٔ prerender شده گاهی پیش از اعمال شیوه‌نامه یا در وسط hydration نمونه‌گیری می‌شد (خروجی `""` یا رنگ ارثی) | `toHaveCSS` و `expect.poll` که خودشان retry می‌کنند |
+
 > در همین اجرا دو ایراد واقعی در خودِ `Makefile` و کد جدید پیدا و رفع شد که تا قبل از آن
 > دیده نشده بود: `PY := backend/.venv/bin/python` باعث می‌شد در `cd backend && $(PY)`
 > مسیر دوباره تکرار شود، و `mypy` روی `throttling.py`/`test_throttling.py` ده خطای
