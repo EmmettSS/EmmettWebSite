@@ -46,6 +46,12 @@ class HealthCheckView(APIView):
 
     permission_classes = [AllowAny]
     authentication_classes: list[type] = []
+    # چرا throttle_classes خالی است؟ این endpoint برای uptime monitor و
+    # گیتِ پیش از استقرار ساخته شده و روزی صدها بار خوانده می‌شود؛ اگر در سطل
+    # «ناشناس» (۱۰۰/ساعت) بیفتد، مانیتور سایت سالم را «دان» اعلام می‌کند و
+    # اسکریپت استقرار هم پس از یک دوره ترافیک ساختگی، بیلد را متوقف می‌کند.
+    # خودِ پاسخ از دیتابیس و cache می‌خواند، پس گران نیست.
+    throttle_classes: list[type] = []
 
     @extend_schema(
         responses={

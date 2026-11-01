@@ -641,3 +641,91 @@ jobs:
             ${{ runner.temp }}/next-server.log
           if-no-files-found: ignore
           retention-days: 14
+
+  # ---------------------------------------------------------------------------
+  # ۷) اسکریپت‌های استقرار: نحو + گیت‌های اجباری ADR-0041
+  # ---------------------------------------------------------------------------
+  # چرا این جاب وجود دارد؟ دو اسکریپت استقرار تا امروز هیچ آزمونی نداشتند و
+  # «موفقیت» آن‌ها یعنی «بدون خطا تمام شد» — نه «سایت با محتوا بالا آمد».
+  # این جاب تضمین می‌کند گیت‌های تازه (توکن، سلامت بک‌اند، pre-render) واقعاً
+  # فعال‌اند و کسی در آینده بی‌صدا حذفشان نکند. هیچ‌جا build یا نصب پکیج لازم
+  # نیست، پس چند ثانیه بیشتر طول نمی‌کشد.
+  deploy-scripts:
+    name: deploy-scripts
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: bash -n روی همهٔ اسکریپت‌ها
+        run: |
+          for f in scripts/*.sh; do
+            echo "checking $f"
+            bash -n "$f"
+          done
+
+      - name: گیت توکن در deploy_frontend.sh باید فعال باشد
+        run: |
+          workdir="$(mktemp -d)"
+          mkdir -p "$workdir/scripts" "$workdir/frontend/deploy" "$workdir/backend"
+          cp scripts/deploy_frontend.sh "$workdir/scripts/"
+          cp frontend/deploy/server.js.example "$workdir/frontend/deploy/"
+
+          set +e
+          ( cd "$workdir" \
+            && env -u INTERNAL_API_TOKEN -u FRONTEND_REVALIDATE_SECRET \
+                 PUBLIC_SITE_URL=https://example.test \
+                 INTERNAL_API_URL=https://example.test/backend \
+                 bash scripts/deploy_frontend.sh ) > "$workdir/out.log" 2>&1
+          status=$?
+          set -e
+
+          cat "$workdir/out.log"
+          test "$status" -eq 1
+          grep -q "INTERNAL_API_TOKEN" "$workdir/out.log"
+
+      - name: گیت سلامت بک‌اند باید بیلد را متوقف کند
+        run: |
+          workdir="$(mktemp -d)"
+          mkdir -p "$workdir/scripts" "$workdir/frontend/deploy" "$workdir/backend"
+          cp scripts/deploy_frontend.sh "$workdir/scripts/"
+          cp frontend/deploy/server.js.example "$workdir/frontend/deploy/"
+
+          set +e
+          ( cd "$workdir" \
+            && PUBLIC_SITE_URL=https://example.test \
+               INTERNAL_API_URL=http://127.0.0.1:9 \
+               INTERNAL_API_TOKEN=dummy-token-for-the-gate \
+               HEALTH_TIMEOUT_SECONDS=2 \
+               bash scripts/deploy_frontend.sh ) > "$workdir/out.log" 2>&1
+          status=$?
+          set -e
+
+          cat "$workdir/out.log"
+          test "$status" -eq 1
+          grep -q "بیلد متوقف شد" "$workdir/out.log"
+
+      - name: گیت توکن در deploy_backend.sh باید فعال باشد
+        run: |
+          workdir="$(mktemp -d)"
+          mkdir -p "$workdir/scripts" "$workdir/backend/deploy"
+          cp scripts/deploy_backend.sh "$workdir/scripts/"
+          cp backend/deploy/media.htaccess.example "$workdir/backend/deploy/"
+          : > "$workdir/backend/.env"
+
+          set +e
+          ( cd "$workdir" \
+            && env -u INTERNAL_API_TOKEN -u FRONTEND_REVALIDATE_SECRET \
+                 DJANGO_SETTINGS_MODULE=config.settings.production \
+                 bash scripts/deploy_backend.sh ) > "$workdir/out.log" 2>&1
+          status=$?
+          set -e
+
+          cat "$workdir/out.log"
+          test "$status" -eq 1
+          grep -q "FRONTEND_REVALIDATE_SECRET" "$workdir/out.log"
+
+      - name: preflight_cpanel.sh باید قابل اجرا و خودتوضیح باشد
+        run: |
+          bash scripts/preflight_cpanel.sh --help | grep -q -- "--url"

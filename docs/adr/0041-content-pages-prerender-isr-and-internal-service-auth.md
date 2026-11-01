@@ -133,3 +133,33 @@ ADR-0032 (بودجهٔ کارایی)، ADR-0035 (توپولوژی استقرار
 - گارد رندر: `frontend/scripts/verify-rendering.mjs`
 - تست کش: `frontend/src/lib/api/redirect-cache.test.ts`
 - تست throttle: `backend/apps/core/tests/test_throttling.py::TestInternalServiceBypass`
+
+## ۷. پیوست: استقرار قطعی روی cPanel (بازبینی ۲ نوامبر ۲۰۲۶)
+
+پرسش مالک پروژه این بود: «آیا وضعیت فعلی، ساده و قطعی روی cPanel از مسیر اپ Python مستقر می‌شود؟» پاسخ پیش از این پیوست «بله» بود اما **قابل اثبات نبود**؛ سه شکست خاموش باقی مانده بود. هر سه بسته شد:
+
+### ۷.۱. `health` خودش throttle می‌شد (باگ واقعی، کشف‌شده در همین بازبینی)
+
+`HealthCheckView` هیچ `throttle_classes` نداشت، پس از `DEFAULT_THROTTLE_CLASSES` ارث می‌برد. پیامدها:
+
+1. یک مانیتور uptime که هر دقیقه health را می‌زند (۱۴۴۰ بار در روز) بعد از ۱۰۰ درخواست `429` می‌گیرد و سایت **سالم** را «دان» گزارش می‌کند.
+2. اسکریپت استقرار که قبل از بیلد منتظر `200` از health است، پس از هر دورهٔ ترافیک/تست، بیلد را بی‌دلیل متوقف می‌کند.
+3. اندازه‌گیری روی همین مخزن (پس از ۱۵۰ درخواست تستی): `130/130` درخواست health → `429`.
+
+رفع: `HealthCheckView.throttle_classes: list[type] = []` + تست
+`apps/core/tests/test_health_check.py::test_health_check_never_trips_the_anonymous_throttle`
+(۱۲۰ درخواست ناشناس پیاپی → همه `200`). پس از رفع، همان اندازه‌گیری: `130/130` → `200`.
+
+### ۷.۲. اسکریپت‌های استقرار، گیت دارند (نه فقط پیام)
+
+| فایل | گیت | رفتار |
+|---|---|---|
+| `scripts/deploy_backend.sh` | `INTERNAL_API_TOKEN` و `FRONTEND_REVALIDATE_SECRET` | در `config.settings.production` با کد خروج `1` متوقف می‌شود؛ در حالت dev/`--allow-missing-env` فقط هشدار |
+| `scripts/deploy_frontend.sh` | توکن خالی → توقف؛ بک‌اند ناسالم → توقف (تا `HEALTH_TIMEOUT_SECONDS`)؛ `.next` غیرقابل‌نوشتن → توقف؛ `verify:rendering` شکست → توقف | چهار شکست خاموش بسته شد |
+| `scripts/preflight_cpanel.sh` | runtime، فایل‌های Passenger، مجوز نوشتن، هم‌خوانی توکن، و پنج بررسی زنده روی دامنه (از جمله «آیا عنوان واقعی اولین خدمت از API داخل HTML هست؟») | کد خروج `0`/`1` |
+
+این گیت‌ها در CI جاب `deploy-scripts` اجرا می‌شوند، پس حذف یا بی‌اثر کردنشان بیلد را می‌شکند.
+
+### ۷.۳. چیزی که هنوز دستی است (صادقانه)
+
+این موارد در کد قابل اثبات نیستند و در `DEPLOYMENT.md` گام‌به‌گام آمده‌اند: ساخت دو اپ در cPanel، مسیردهی دامنه (Node روی `/`، Python روی `/backend`)، symlinkهای `static`/`media` در document root واقعی دامنه، و ثبت Cron. تا زمانی که `preflight_cpanel.sh` روی هاست سبز نشود، استقرار «قطعی» نیست — فقط «اجراشده» است.

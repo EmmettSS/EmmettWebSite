@@ -67,6 +67,55 @@ if [[ -f "${BACKEND_DIR}/.env" ]]; then
   chmod 600 "${BACKEND_DIR}/.env"
 fi
 
+# -----------------------------------------------------------------------------
+# ADR-0041: توکن سرویس داخلی و secret وب‌هوک revalidate
+# -----------------------------------------------------------------------------
+# چرا این بررسی وجود دارد؟ بدون INTERNAL_API_TOKEN، همهٔ فراخوانی‌های
+# Server Component / ISR / proxy از loopback در سطل throttle ناشناس
+# (۱۰۰ درخواست در ساعت) می‌افتند و صفحه‌ها پس از مدتی **بی‌صدا خالی** رندر
+# می‌شوند. بیلد فرانت هم بیش از ۱۰۰ فراخوانی دارد (۶۱ صفحه)، پس نبودِ توکن
+# دقیقاً همان باگ قدیمی را برمی‌گرداند. این تست روی هاست واقعی:
+#   ۱۵۰ درخواست بدون توکن → ۱۰۰×۲۰۰ + ۵۰×۴۲۹ | همان ۱۵۰ با توکن → ۱۵۰×۲۰۰
+read_env_value() {
+  local file="$1" key="$2"
+  [[ -f "${file}" ]] || return 0
+  tr -d '\r' < "${file}" | sed -n "s/^${key}=//p" | tail -n 1
+}
+
+INTERNAL_API_TOKEN="${INTERNAL_API_TOKEN:-$(read_env_value "${BACKEND_DIR}/.env" INTERNAL_API_TOKEN)}"
+FRONTEND_REVALIDATE_SECRET="${FRONTEND_REVALIDATE_SECRET:-$(read_env_value "${BACKEND_DIR}/.env" FRONTEND_REVALIDATE_SECRET)}"
+
+if [[ -z "${INTERNAL_API_TOKEN}" || -z "${FRONTEND_REVALIDATE_SECRET}" ]]; then
+  if [[ "${DJANGO_SETTINGS_MODULE:-config.settings.production}" == "config.settings.production" \
+        && "${ALLOW_MISSING_ENV}" != "true" ]]; then
+    cat >&2 <<'MSG'
+[ERROR] یکی از دو متغیر زیر خالی است و استقرار بک‌اند متوقف شد:
+
+  INTERNAL_API_TOKEN        توکن مشترک Next.js ↔ Django (ADR-0041)
+  FRONTEND_REVALIDATE_SECRET توکن وب‌هوک /api/revalidate (ADR-0031)
+
+بدون INTERNAL_API_TOKEN، فراخوانی‌های سرور-به-سرور در سقف throttle ناشناس
+(۱۰۰/ساعت) می‌افتند و صفحه‌ها پس از مدتی با 429 **خالی** رندر می‌شوند.
+بدون FRONTEND_REVALIDATE_SECRET، انتشار محتوای جدید تا ۶۰ ثانیه (ISR) به
+تأخیر می‌افتد و تازه‌سازی فوری کار نمی‌کند.
+
+ساخت هر دو مقدار:
+  python3 -c "import secrets; print(secrets.token_urlsafe(50))"
+
+ثبت در سه جا (همه یک‌سان):
+  1) Setup Python App → Environment Variables
+  2) Setup Node.js App → Environment Variables
+  3) backend/.env (برای CLI/Cron) و frontend/.env.local
+MSG
+    exit 1
+  fi
+  echo "[WARN] INTERNAL_API_TOKEN یا FRONTEND_REVALIDATE_SECRET خالی است (حالت غیرپروداکشن؛ ادامه می‌دهیم)."
+else
+  echo "    INTERNAL_API_TOKEN         = ${INTERNAL_API_TOKEN:0:6}… (${#INTERNAL_API_TOKEN} کاراکتر)"
+  echo "    FRONTEND_REVALIDATE_SECRET = ${FRONTEND_REVALIDATE_SECRET:0:6}… (${#FRONTEND_REVALIDATE_SECRET} کاراکتر)"
+  echo "    یادآوری: پس از هر تغییر توکن، هر دو اپ (Python و Node) را Restart کنید."
+fi
+
 mkdir -p "${BACKEND_DIR}/media" \
          "${BACKEND_DIR}/staticfiles" \
          "${BACKEND_DIR}/backups" \

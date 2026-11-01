@@ -16,6 +16,7 @@
    - [گام ۳.۳: راه‌اندازی بک‌اند در Setup Python App و Virtualenv](#گام-۳۳-راه‌اندازی-بک‌اند-در-setup-python-app-و-virtualenv)
    - [گام ۳.۴: تنظیم مسیرهای Static و Media و فایل‌های `.htaccess`](#گام-۳۴-تنظیم-مسیرهای-static-و-media-و-فایل‌های-htaccess)
    - [گام ۳.۵: راه‌اندازی فرانت‌اند در Setup Node.js App](#گام-۳۵-راه‌اندازی-فرانت‌اند-در-setup-nodejs-app)
+   - [گام ۳.۵.۱: پیش‌پرواز خودکار (`preflight_cpanel.sh`)](#گام-۳۵۱-پیش‌پرواز-خودکار-تنها-راه-تأیید-استقرار-قطعی)
    - [گام ۳.۶: ثبت Cron Jobها (بکاپ خودکار و نگهداری AI)](#گام-۳۶-ثبت-cron-jobها-بکاپ-خودکار-و-نگهداری-ai)
 4. [اسکریپت‌های خودکار استقرار، `collectstatic` و `migrate`](#۴-اسکریپت‌های-خودکار-استقرار-collectstatic-و-migrate)
 5. [راهنمای کامل متغیرهای محیطی (`.env.example`)](#۵-راهنمای-کامل-متغیرهای-محیطی-envexample)
@@ -194,17 +195,49 @@ ln -s "$PROJECT_ROOT/backend/media" "$ADDON_DOCROOT/media"
    - `NODE_ENV=production`
    - `PUBLIC_SITE_URL=https://emmett.ir` (دامنهٔ canonical واقعی، بدون اسلش پایانی)
    - `INTERNAL_API_URL=https://emmett.ir/backend` (همان mount اپ Python؛ برای دامنهٔ دیگر host را جایگزین کنید)
+   - `INTERNAL_API_TOKEN` = **توکن اجباری سرویس داخلی** (`ADR-0041`). مقدارش را یک‌بار بسازید و **دقیقاً یک‌سان** در سه جا ثبت کنید: `Environment variables` اپ Node، `Environment variables` اپ Python، و فایل `frontend/.env.local` (و برای CLI/Cron در `backend/.env`). اگر این توکن خالی یا ناهم‌خوان باشد، بیلد و اجرا هیچ خطایی نمی‌دهند اما صفحه‌های محتوایی پس از عبور از سقف throttle ناشناس (`100/hour`) **بی‌صدا خالی** می‌شوند.
+     ```bash
+     python3 -c "import secrets; print(secrets.token_urlsafe(50))"
+     ```
    - `FRONTEND_REVALIDATE_SECRET` = همان secret پرقدرتی که در Environment Variables اپ Python ثبت شده؛ فقط server-side و بدون پیشوند `NEXT_PUBLIC_`. یک مقدار بسازید و عیناً در هر دو اپ ثبت کنید (در env خصوصی CLI هم فقط اگر لازم است):
      ```bash
      python -c "import secrets; print(secrets.token_urlsafe(32))"
      ```
-4. روی **Create/Save** کلیک کنید، سپس محیط Node را فعال و build کنید:
+4. فایل `frontend/.env.local` را با همان مقادیر بسازید (اسکریپت بیلد و CLI این فایل را می‌خوانند؛ `Environment variables` بالا فقط در زمان **اجرا** به اپ تزریق می‌شود و در شل ترمینال وجود ندارد). این فایل در `frontend/.gitignore` است:
+   ```bash
+   cd ~/EmmettWebSite/frontend
+   cat > .env.local <<'EOF'
+   PUBLIC_SITE_URL=https://emmett.ir
+   INTERNAL_API_URL=https://emmett.ir/backend
+   INTERNAL_API_TOKEN=<همان-توکنی-که-در-دو-اپ-ثبت-شد>
+   FRONTEND_REVALIDATE_SECRET=<همان-secretی-که-در-دو-اپ-ثبت-شد>
+   EOF
+   chmod 600 .env.local
+   ```
+5. روی **Create/Save** کلیک کنید، سپس محیط Node را فعال و build کنید:
    ```bash
    source /home/<cpanel_user>/nodevenv/EmmettWebSite/frontend/22/bin/activate
    cd ~/EmmettWebSite
-   PUBLIC_SITE_URL=https://emmett.ir INTERNAL_API_URL=https://emmett.ir/backend bash scripts/deploy_frontend.sh --install-deps
+   bash scripts/deploy_frontend.sh --install-deps
    ```
-5. در صفحهٔ **Setup Node.js App** روی **Restart** کلیک کنید.
+6. در صفحهٔ **Setup Node.js App** روی **Restart** کلیک کنید.
+7. اسکریپت پیش‌پرواز را اجرا کنید (بخش بعد).
+
+### گام ۳.۵.۱: پیش‌پرواز خودکار (تنها راه تأیید «استقرار قطعی»)
+
+هیچ‌کدام از مراحل بالا به‌تنهایی ثابت نمی‌کند که سایتِ بالا آمده **داده دارد**. اسکریپت `scripts/preflight_cpanel.sh` همین را می‌سنجد: نسخهٔ runtime، وجود فایل‌های Passenger، مجوز نوشتن کش/آپلود/بکاپ، هم‌خوانی توکن دو اپ، و سپس پنج بررسی زنده روی دامنه — از جمله این‌که **عنوان واقعی اولین خدمت از API در HTML صفحهٔ اصلی هست یا نه** (معنی‌ترین نشانهٔ بیلدِ خالی).
+
+```bash
+cd ~/EmmettWebSite
+bash scripts/preflight_cpanel.sh --url https://emmett.ir
+```
+
+- خروجی `0` یعنی همهٔ بررسی‌ها سبز است؛ خروجی `1` یعنی استقرار قطعی نیست و باید همان موارد `✗` را رفع کنید.
+- اگر Django روی مسیری جز `/backend` mount شده است: `--backend-base /مسیر-واقعی`.
+- برای اجرای محلی بدون دامنه: `--url http://127.0.0.1:3000 --backend-base ""`.
+- برای بررسی‌های بصری و ادمین، اسکریپت فقط هشدار (`!`) می‌دهد و متوقف نمی‌شود.
+
+> این اسکریپت **جایگزین** بررسی انسانی نیست؛ جای «هیچ بررسی‌ای نکردن» است. اگر همهٔ موارد سبز بود ولی باز هم شک دارید، بخش «راستی‌آزمایی توپولوژی» پایین را دستی اجرا کنید.
 
 ### راستی‌آزمایی توپولوژی قبل از Go-Live
 
@@ -238,14 +271,15 @@ curl --silent --show-error --head https://emmett.ir/backend/admin/
 
 این اسکریپت کارهای زیر را به‌ترتیب و با مدیریت خطا (`set -Eeuo pipefail`) انجام می‌دهد:
 1. بررسی وجود `backend/.env` و تنظیم سطح دسترسی امن `chmod 600`؛
-2. ساخت پوشه‌های `media`, `staticfiles`, `backups`, `.cache/django-cache`, `tmp` و اعمال `chmod 700` روی پوشه‌های حساس؛
-3. کپی `media.htaccess.example` به `media/.htaccess` و `passenger_wsgi.py.example` به `passenger_wsgi.py`؛
-4. نصب پکیج‌های Pin شدهٔ `requirements.txt` (در صورت ارسال سوئیچ `--install-deps`)؛
-5. کامپایل و اعتبارسنجی فایل‌های ترجمهٔ دوزبانه (`python scripts/i18n.py compile && python scripts/i18n.py check`)؛
-6. اجرای مهاجرت‌های دیتابیس (`python manage.py migrate --noinput`)؛
-7. جمع‌آوری و فشرده‌سازی فایل‌های استاتیک (`python manage.py collectstatic --noinput --clear`)؛
-8. اجرای ممیزی امنیتی پروداکشن (`python manage.py check --deploy`)؛
-9. ری‌استارت بدون قطعی Passenger با `touch backend/tmp/restart.txt`.
+2. **گیت اجباری توکن‌ها (`ADR-0041`)**: اگر `INTERNAL_API_TOKEN` یا `FRONTEND_REVALIDATE_SECRET` خالی باشد و تنظیمات روی `config.settings.production` باشد، اجرا با پیام فارسی و کد خروج `1` **متوقف** می‌شود (با `--allow-missing-env` یا `DJANGO_SETTINGS_MODULE=config.settings.dev` فقط هشدار می‌دهد). مقدارها از `env` شل یا از خود `backend/.env` خوانده می‌شوند؛
+3. ساخت پوشه‌های `media`, `staticfiles`, `backups`, `.cache/django-cache`, `tmp` و اعمال `chmod 700` روی پوشه‌های حساس؛
+4. کپی `media.htaccess.example` به `media/.htaccess` و `passenger_wsgi.py.example` به `passenger_wsgi.py`؛
+5. نصب پکیج‌های Pin شدهٔ `requirements.txt` (در صورت ارسال سوئیچ `--install-deps`)؛
+6. کامپایل و اعتبارسنجی فایل‌های ترجمهٔ دوزبانه (`python scripts/i18n.py compile && python scripts/i18n.py check`)؛
+7. اجرای مهاجرت‌های دیتابیس (`python manage.py migrate --noinput`)؛
+8. جمع‌آوری و فشرده‌سازی فایل‌های استاتیک (`python manage.py collectstatic --noinput --clear`)؛
+9. اجرای ممیزی امنیتی پروداکشن (`python manage.py check --deploy`)؛
+10. ری‌استارت بدون قطعی Passenger با `touch backend/tmp/restart.txt`.
 
 **نحوهٔ اجرا پس از هر `git pull` در سرور:**
 ```bash
@@ -259,8 +293,23 @@ bash scripts/deploy_backend.sh --install-deps
 ```bash
 source /home/<cpanel_user>/nodevenv/EmmettWebSite/frontend/22/bin/activate
 cd ~/EmmettWebSite
-PUBLIC_SITE_URL=https://emmett.ir bash scripts/deploy_frontend.sh --install-deps
+bash scripts/deploy_frontend.sh --install-deps
 ```
+
+این اسکریپت شش گام دارد و **هیچ‌کدام تزئینی نیست**؛ هر گام دقیقاً یک شکست خاموش را می‌بندد:
+
+| گام | کار | شکستی که می‌بندد |
+|---|---|---|
+| ۱ | ساخت `frontend/server.js` از قالب Passenger و `tmp/` | اپ Node بالا نمی‌آید |
+| ۲ | حل `PUBLIC_SITE_URL` / `INTERNAL_API_URL` / `INTERNAL_API_TOKEN` از env یا `.env.local` و `backend/.env`؛ **توقف** اگر توکن خالی باشد | بیلد ۶۱ صفحه با ۴۲۹ می‌سازد و سایت خالی بالا می‌آید |
+| ۳ | انتظار تا `${INTERNAL_API_URL}/api/v1/health/` با کد `200` پاسخ دهد (تا `HEALTH_TIMEOUT_SECONDS`، پیش‌فرض ۹۰) | بیلد در حالی که Django خواب/خراب است |
+| ۴ | `npm ci` (در صورت نیاز) و تست نوشتن در `frontend/.next` | کش ISR در زمان اجرا نوشته نمی‌شود و هر بازدید یک رندر کامل است |
+| ۵ | `rm -rf .next && npm run build` و سپس `npm run verify:rendering` | رگرسیون ADR-0041: صفحه‌ای که در هر درخواست رندر می‌شود |
+| ۶ | `touch frontend/tmp/restart.txt` + پیام قدم بعدی | فراموش‌شدن Restart اپ Node |
+
+گام ۳ درخواست را با هدر `X-Internal-Token` هم می‌فرستد تا اگر نسخهٔ قدیمی بک‌اند هنوز در حال اجراست، این پروب در سطل throttle ناشناس نیفتد.
+
+**وردی‌های قابل‌تنظیم:** `PUBLIC_SITE_URL`، `INTERNAL_API_URL`، `INTERNAL_API_TOKEN`، `HEALTH_TIMEOUT_SECONDS` (برای عیب‌یابی: `HEALTH_TIMEOUT_SECONDS=0` گام سلامت را رد می‌کند — **هرگز برای استقرار واقعی**)، و سوئیچ `--install-deps`.
 
 ---
 
@@ -277,6 +326,7 @@ PUBLIC_SITE_URL=https://emmett.ir bash scripts/deploy_frontend.sh --install-deps
 | `PUBLIC_SITE_URL` | `https://emmett.ir` | بله | تنها منبع حقیقت برای ساخت canonical، hreflang، sitemap، OG و RSS (`W007`) |
 | `DJANGO_FORCE_SCRIPT_NAME` | `/backend` | بله در cPanel | باید دقیقاً با Python App URL در Passenger یکی باشد؛ مسیر root توسعه را خالی بگذارید |
 | `INTERNAL_API_URL` (frontend) | `https://emmett.ir/backend` | بله در cPanel | mount Python که توسط Server Components و Route Handler Next استفاده می‌شود؛ در محیط محلی `http://127.0.0.1:8000` |
+| `INTERNAL_API_TOKEN` | `secrets.token_urlsafe(50)` | **بله** (از `ADR-0041`) | توکن مشترک Next ↔ Django. با هدر `X-Internal-Token` مقایسه می‌شود (`secrets.compare_digest`) و فراخوانی‌های سرور-به-سرور را از سقف throttle ناشناس (`100/hour`) معاف می‌کند. **باید در Python App، Node App، `backend/.env` و `frontend/.env.local` کاملاً یک‌سان باشد.** اگر خالی باشد، هم `deploy_backend.sh` و هم `deploy_frontend.sh` متوقف می‌شوند. اسکوپ‌های کاربری (`contact_form`, `ai_engine`, `auth`, `newsletter`) معاف **نمی‌شوند**. |
 | `FRONTEND_REVALIDATE_URL` | `https://emmett.ir/api/revalidate` | بله برای on-demand invalidation | endpoint اپ Next؛ اگر آدرس داخلی مورد تأیید هاست دارید از همان استفاده کنید |
 | `FRONTEND_REVALIDATE_SECRET` | secret تصادفی مشترک، حداقل ۳۲ بایت entropy | بله برای on-demand invalidation | مقدار یکسان در Python App و Node Environment Variables (و env خصوصی CLI در صورت نیاز)؛ هرگز `NEXT_PUBLIC_` نکنید |
 | `DJANGO_CSRF_TRUSTED_ORIGINS` | `https://emmett.ir,https://www.emmett.ir` | بله | مبدأهای مورد اعتماد برای درخواست‌های تغییر وضعیت (`POST`/`PATCH`/`DELETE`) |
@@ -346,6 +396,7 @@ bash scripts/restore_backup.sh --media backend/backups/media-20261022-033000.tar
 - [ ] **گواهی SSL:** در cPanel بخش **SSL/TLS Status** گواهی AutoSSL برای `emmett.ir` و `www.emmett.ir` سبز و فعال است.
 - [ ] **Environment Variables اپ‌ها:** متغیرهای runtime در Python App و Node App ثبت شده‌اند؛ `DJANGO_FORCE_SCRIPT_NAME=/backend` با mount واقعی برابر است و `FRONTEND_REVALIDATE_SECRET` در هر دو اپ یکسان است. اگر برای CLI/Cron فایل `backend/.env` لازم است، فقط روی سرور، خارج از Git و با مجوز `600` نگهداری می‌شود.
 - [ ] **بررسی امنیتی خودکار جنگو:** اجرای `python manage.py check --deploy` هیچ خطا یا هشداری (`emmett_admin.E001` تا `W013`) برنمی‌گرداند.
+- [ ] **پیش‌پرواز سبز:** `bash scripts/preflight_cpanel.sh --url https://emmett.ir` با کد خروج `0` تمام می‌شود (بخش ۳.۵.۱). این تنها گامی است که ثابت می‌کند HTML سایتِ بالا آمده محتوای واقعی دارد.
 - [ ] **ترجمه‌های دوزبانه:** خروجی `python scripts/i18n.py check` سبز است.
 - [ ] **احراز هویت دو مرحله‌ای ادمین (2FA):** حساب Superuser وارد `/backend/admin/` شده، کد QR صفحهٔ `/backend/admin/2fa/setup` را در اپ Authenticator اسکن کرده و ۸ کد بازیابی یک‌بارمصرف (`/backend/admin/2fa/recovery`) را در مدیر رمز عبور امن ذخیره کرده است.
 - [ ] **تنظیمات سئو در پنل ادمین (`Core → Site settings`):**
@@ -358,6 +409,7 @@ bash scripts/restore_backup.sh --media backend/backups/media-20261022-033000.tar
 
 ### ۷.۲. چک‌لیست پس از انتشار (Post-Launch Verification)
 
+- [ ] **پیش‌پرواز دوباره پس از Restart:** `bash scripts/preflight_cpanel.sh --url https://emmett.ir` صفر شکست بدهد؛ اگر «HTML صفحهٔ اصلی دادهٔ واقعی دارد» شکست خورد، بیلد با بک‌اند خاموش یا توکن نامعتبر انجام شده است — `bash scripts/deploy_frontend.sh` را دوباره اجرا کنید.
 - [ ] **سلامت بک‌اند و کش:** باز کردن `https://emmett.ir/api/v1/health/` پاسخ `200 OK` با `{"status": "ok", "checks": {"database": true, "cache": true}}` برمی‌گرداند.
 - [ ] **تشخیص زندهٔ پراکسی و Throttle روی هاست واقعی (گام الزامی پیش از ترافیک):** پس از ورود به `/backend/admin/`، باز کردن `https://emmett.ir/api/v1/health/proxy/` پاسخ `200 OK` با `"ready_for_traffic": true` و `"subsystems_in_sync": true` برمی‌گرداند و `resolved_client_ip` برابر IP واقعی مرورگر شماست (نه `127.0.0.1` و نه IP لبهٔ CDN).
 - [ ] **رندر دوزبانه و RTL/LTR:**
@@ -380,4 +432,6 @@ bash scripts/restore_backup.sh --media backend/backups/media-20261022-033000.tar
 | خطای `403 CSRF verification failed` در فرم‌ها | عدم تطابق `DJANGO_CSRF_TRUSTED_ORIGINS` یا `PUBLIC_SITE_URL` با دامنهٔ HTTPS | قرار دادن `https://emmett.ir,https://www.emmett.ir` در `DJANGO_CSRF_TRUSTED_ORIGINS` و ری‌استارت Passenger |
 | خطای `MySQL server has gone away` پس از مدتی بیکاری | بسته شدن اتصال توسط MySQL هاست اشتراکی | در `config/settings/production.py` گزینهٔ `CONN_HEALTH_CHECKS = True` فعال شده است؛ مطمئن شوید `DJANGO_SETTINGS_MODULE=config.settings.production` است |
 | اعمال نشدن تغییرات کد پس از `git pull` | کش شدن پردازش پایتون/نود در Phusion Passenger | اجرای `touch ~/EmmettWebSite/backend/tmp/restart.txt` و `touch ~/EmmettWebSite/frontend/tmp/restart.txt` |
+| صفحه‌ها بالا می‌آیند ولی **خالی‌اند** (اسکلت هست، محتوا نه) | بیلد فرانت در حالی انجام شده که Django خاموش بود یا `INTERNAL_API_TOKEN` در دو اپ یک‌سان نبود؛ بیلد چنین وضعیتی را «موفق» اعلام می‌کند | `bash scripts/preflight_cpanel.sh --url https://emmett.ir` را ببینید؛ سپس توکن را در هر چهار جا یک‌سان کنید و `bash scripts/deploy_frontend.sh` را دوباره اجرا کنید |
+| `429` روی `/api/v1/health/` بعد از چند ساعت (مانیتور می‌گوید سایت دان است) | نسخهٔ قدیمی بک‌اند که `health` را از throttle معاف نمی‌کرد | `git pull` + `bash scripts/deploy_backend.sh`؛ در نسخهٔ فعلی `HealthCheckView.throttle_classes = []` است و این endpoint هرگز ۴۲۹ نمی‌دهد (تست: `apps/core/tests/test_health_check.py::test_health_check_never_trips_the_anonymous_throttle`) |
 | خطای `429 Too Many Requests` سراسری برای همهٔ کاربران یا `ready_for_traffic: false` در `/api/v1/health/proxy/` | ادغام نشدن `RequestHeader set X-Forwarded-For` در `.htaccess` مربوط به document root واقعی Addon Domain یا قرارگیری پشت CDN بدون تنظیم `DJANGO_NUM_PROXIES` | محل `.htaccess` و قواعد Passenger را از cPanel تأیید کنید؛ سپس قواعد تکمیلی `<IfModule mod_headers.c>` را بدون جایگزینی فایل کامل merge کنید (یا در حالت CDN بدون `mod_remoteip`، پس از تأیید chain، `set` را به `append` و `DJANGO_NUM_PROXIES=2` کنید) و endpoint تشخیصی را دوباره بررسی کنید |
