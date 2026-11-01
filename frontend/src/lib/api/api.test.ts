@@ -209,14 +209,18 @@ describe("lib/api/server & lib/api/seo", () => {
     expect(await getTestimonials("fa")).toEqual({ results: [] });
     expect(await searchSite("fa", "django")).toEqual({ results: [] });
     expect(await searchSite("fa", "django", "203.0.113.5")).toEqual({ results: [] });
+    // هدرها با objectContaining بررسی می‌شوند، نه برابری کامل: از ADR-0041
+    // هدر X-Internal-Token هم (وقتی توکن تنظیم شده باشد) در همین درخواست
+    // فرستاده می‌شود و برابری دقیق باعث می‌شد این تست فقط در محیطی که env
+    // تعریف نشده سبز باشد — همان چیزی که در CI شکست.
     expect(fetchMock).toHaveBeenLastCalledWith(
       expect.stringContaining("/search/?q=django"),
       expect.objectContaining({
-        headers: {
+        headers: expect.objectContaining({
           "Accept-Language": "fa",
           "X-Forwarded-Proto": "https",
           "X-Forwarded-For": "203.0.113.5",
-        },
+        }),
       }),
     );
     expect(await getCatalogs("fa", ["job_role"])).toEqual({ results: [] });
@@ -226,11 +230,11 @@ describe("lib/api/server & lib/api/seo", () => {
     expect(fetchMock).toHaveBeenLastCalledWith(
       expect.stringContaining("/ai/results/tok-123/"),
       expect.objectContaining({
-        headers: {
+        headers: expect.objectContaining({
           "Accept-Language": "fa",
           "X-Forwarded-Proto": "https",
           "X-Forwarded-For": "203.0.113.9",
-        },
+        }),
       }),
     );
 
@@ -255,6 +259,25 @@ describe("lib/api/server & lib/api/seo", () => {
 
     fetchMock.mockRejectedValueOnce(new Error("network down"));
     expect(await getSharedAISuggestion("fa", "err")).toBeNull();
+  });
+
+  it("sends the internal service token only when it is configured (ADR-0041)", async () => {
+    fetchMock.mockResolvedValue(new Response(JSON.stringify({ results: [] }), { status: 200 }));
+    const original = process.env.INTERNAL_API_TOKEN;
+    try {
+      process.env.INTERNAL_API_TOKEN = "unit-test-internal-token";
+      await getServices("fa");
+      const withToken = fetchMock.mock.calls.at(-1)?.[1] as RequestInit;
+      expect(withToken.headers).toMatchObject({ "X-Internal-Token": "unit-test-internal-token" });
+
+      delete process.env.INTERNAL_API_TOKEN;
+      await getServices("fa");
+      const withoutToken = fetchMock.mock.calls.at(-1)?.[1] as RequestInit;
+      expect(withoutToken.headers).not.toHaveProperty("X-Internal-Token");
+    } finally {
+      if (original === undefined) delete process.env.INTERNAL_API_TOKEN;
+      else process.env.INTERNAL_API_TOKEN = original;
+    }
   });
 
   it("associates public data fetches with stable cache-invalidation tags", async () => {

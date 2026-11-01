@@ -6,6 +6,7 @@ import { Breadcrumb } from "@/components/molecules/breadcrumb";
 import { Badge } from "@/components/ui/badge";
 import type { AppLocale } from "@/i18n/routing";
 import { getProject } from "@/lib/api/server";
+import { projectDetailParams } from "@/lib/api/static-params";
 import { sanitizeRichHtml } from "@/lib/security/sanitize-rich-html";
 import { JsonLd } from "@/components/seo/json-ld";
 import { getSeoSettingsOrDefaults } from "@/lib/api/seo";
@@ -19,6 +20,17 @@ import {
   pageTitleClass,
   sectionTitleClass,
 } from "@/components/ui-port/page-frame";
+
+/**
+ * pre-render زمان بیلد برای صفحه‌های جزئیات (ADR-0041).
+ * فهرست slugها از API گرفته می‌شود؛ در نبود بک‌اند، آرایهٔ خالی و
+ * رندر در نخستین درخواست (dynamicParams پیش‌فرض). ر.ک. `lib/api/static-params`.
+ */
+export const revalidate = 60;
+
+export function generateStaticParams() {
+  return projectDetailParams();
+}
 
 interface PageParams {
   locale: string;

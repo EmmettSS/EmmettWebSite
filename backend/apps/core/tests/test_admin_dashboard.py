@@ -240,7 +240,8 @@ class TestDashboardPage:
         assert "emmett-kpi" in content  # کارت KPI قالب سفارشی
         assert "emmett-chart" in content  # نمودار CSS (بدون CDN)
         assert "emmett-panel" in content
-        assert "admin/css/rtl.css" in content  # لایهٔ RTL رسمی جنگو در فارسی
+        # بدون پسوند: در production نام فایل با hash مانیفست کال‌شده است.
+        assert "admin/css/rtl" in content  # لایهٔ RTL رسمی جنگو در فارسی
         assert "کش می‌شود" in content  # ترجمهٔ فارسی از .mo
 
     def test_english_locale_renders_ltr_labels(self, client: Client, settings: Any) -> None:
@@ -259,7 +260,7 @@ class TestDashboardPage:
         assert response.status_code == 200
         content = response.content.decode()
         assert "Statistics are cached briefly" in content
-        assert "admin/css/rtl.css" not in content
+        assert "admin/css/rtl" not in content
         assert response.headers["Content-Language"].startswith("en")
 
     def test_dashboard_requires_staff(self, client: Client) -> None:

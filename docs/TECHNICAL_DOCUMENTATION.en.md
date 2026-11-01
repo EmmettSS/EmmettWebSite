@@ -2,14 +2,14 @@
 
 > **Document Type:** Unified Single-File Technical Reference (English)  
 > **Persian Counterpart:** [`docs/TECHNICAL_DOCUMENTATION.fa.md`](./TECHNICAL_DOCUMENTATION.fa.md)  
-> **Scope:** System Architecture, Data Model, Summary of All 40 ADRs, Complete REST API Reference (`/api/v1/`), SaaS Admin Panel Guide, Step-by-Step cPanel Shared Hosting Deployment Guide, and Quality Gates / CI-CD Pipeline.
+> **Scope:** System Architecture, Data Model, Rendering Model (ADR-0041), Summary of All 41 ADRs, Complete REST API Reference (`/api/v1/`), SaaS Admin Panel Guide, Step-by-Step cPanel Shared Hosting Deployment Guide, and Quality Gates / CI-CD Pipeline.
 
 ---
 
 ## Table of Contents
 
 1. [Section 1: System Architecture & Data Model](#section-1-system-architecture--data-model)
-2. [Section 2: Architecture Decision Records Index (ADR-0001 to ADR-0040)](#section-2-architecture-decision-records-index-adr-0001-to-adr-0040)
+2. [Section 2: Architecture Decision Records Index (ADR-0001 to ADR-0041)](#section-2-architecture-decision-records-index-adr-0001-to-adr-0041)
 3. [Section 3: Complete REST API Documentation (`/api/v1/`)](#section-3-complete-rest-api-documentation-apiv1)
 4. [Section 4: SaaS Admin Panel Guide](#section-4-saas-admin-panel-guide)
 5. [Section 5: Step-by-Step cPanel Shared Hosting Deployment Guide](#section-5-step-by-step-cpanel-shared-hosting-deployment-guide)
@@ -66,6 +66,28 @@ The Emmett corporate platform is engineered as a **Monorepo** combining a server
   - **Server Components:** Fetch server-side from `INTERNAL_API_URL`; local development uses `http://127.0.0.1:8000`, while the cPanel topology uses `https://<canonical-host>/backend` (the Django Passenger mount). See ADR-0035.
   - **Client Components:** Always call same-origin relative paths (`/api/v1/...`), which are proxied server-side by `frontend/src/app/api/[...path]/route.ts` while preserving trailing slashes (compatible with Django `APPEND_SLASH`) and forwarding `Set-Cookie` headers (`csrftoken`, `sessionid`).
 
+#### 1.1.1. Rendering model (updated by `ADR-0041` — 2026-10-31)
+
+| Route category | Mode | Freshness |
+|---|---|---|
+| `/fa/**`, `/en/**` content pages (home, about, services, blog, academy, projects, contact, …) | **SSG + ISR** (prerendered at build) | `revalidate = 60` (from `serverFetch`); instant refresh via the `/api/revalidate` webhook |
+| `sitemap.xml`, `robots.txt` | static | 900 s |
+| `/{locale}/{blog,academy,services,projects}/[slug]` | dynamic, then ISR-cached | 60 s |
+| `/{locale}/search`, RSS feeds, `advisor/results/[token]`, `/profile` (client-rendered) | dynamic | — |
+| `/api/[...path]` | Route Handler (proxy) | — |
+
+**Why this table matters:** before `ADR-0041` the first row was dynamic too. A single
+`await connection()` in `src/app/[locale]/layout.tsx` (required by the per-response CSP nonce)
+forced every route to `ƒ Dynamic`, so each visit cost a full Node render plus an extra
+`seo/redirects` request from `proxy.ts` and several Django calls. After the fix, home-page TTFB
+dropped from 59.6 ms to 4.0 ms (10 concurrent clients: 130.2 ms → 5.9 ms).
+
+**Guard:** `npm run verify:rendering` reads `.next/prerender-manifest.json` after every build
+and fails if any of the 14 required content routes is not prerendered. Re-introducing
+`headers()`/`cookies()`/`connection()`/`searchParams` into a public layout or page turns CI red.
+**Every performance number in this document has a reproducible command** in
+`docs/audit/2026-10-31-deep-audit.fa.md` §1.
+
 ### 1.2. Django Modular Monolith App Boundaries (`backend/apps/`)
 
 | App | Domain Responsibility | Primary Models |
@@ -104,9 +126,9 @@ The Emmett corporate platform is engineered as a **Monorepo** combining a server
 
 ---
 
-## Section 2: Architecture Decision Records Index (ADR-0001 to ADR-0040)
+## Section 2: Architecture Decision Records Index (ADR-0001 to ADR-0041)
 
-All 40 ADRs are stored in `docs/adr/`. **The complete, authoritative index — including known dead references and amendment notes — is [`adr/README.md`](./adr/README.md).** The table below summarises each *decision*; it is not the existence list:
+All 41 ADRs are stored in `docs/adr/`. **The complete, authoritative index — including known dead references and amendment notes — is [`adr/README.md`](./adr/README.md).** The table below summarises each *decision*; it is not the existence list:
 
 | ADR | Title | Summary of Decision |
 |---|---|---|
@@ -150,6 +172,7 @@ All 40 ADRs are stored in `docs/adr/`. **The complete, authoritative index — i
 | **ADR-0038** | CI Workflow at Repo Root & CI Test Settings | One workflow with six jobs and flat paths at `.github/workflows/ci.yml`, plus `.github/ci/ci_test_settings.py`, which overrides **only** the `staticfiles` key to plain `StaticFilesStorage` for tests |
 | **ADR-0039** | Design Token Standard & Raw-Colour Ratchet | Tokens become mandatory over raw literals: two existing tokens wired up, four category palette tokens and two muted-text tokens added, plus the two-way `hardcoded-colors.test.ts` regression guard (amendment note: `adr/README.md`) |
 | **ADR-0040** | Product Detail Canonical Is `/projects/{slug}` | The canonical product-detail path is `/projects/{slug}`, not `/products/{slug}`; a module-level `projectDetailPath()` feeds canonical, breadcrumb and JSON-LD from one source, and `/products/pentestor` now 308-redirects to it |
+| **ADR-0041** | Content-Page Rendering Model & Internal Service Auth | Public content pages are prerendered at build time and refreshed by ISR (`revalidate` from `serverFetch`); `connection()`/`headers()` were removed from the root layout and `JsonLd`, CSP moved from per-response nonces to a static policy, `proxy.ts` no longer fetches the backend per request (60 s in-memory cache), and server-to-server calls bypass the anonymous throttle via `X-Internal-Token`; regression guard: `npm run verify:rendering` |
 
 ---
 
@@ -439,6 +462,8 @@ Register three cron jobs in cPanel → **Cron Jobs**:
 ## Section 6: Quality Gates, Testing, Pre-commit & CI/CD Pipeline
 
 ### 6.1. Local Verification Commands
+
+> **Shortest path:** `make verify` (format-check + lint + typecheck + tests + build + `verify:rendering`). See `make help` for all targets.
 
 ```bash
 # Backend Quality & Tests (Coverage ≥ 85%)

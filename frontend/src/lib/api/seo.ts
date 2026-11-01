@@ -10,7 +10,7 @@
 
 import { CACHE_TAGS } from "@/lib/cache-tags";
 import { getSafeErrorType, logUpstreamFailure } from "@/lib/api/upstream-logging";
-import { getApiBaseUrl } from "@/lib/api/config";
+import { UPSTREAM_TIMEOUT_MS, getApiBaseUrl, internalServiceHeaders } from "@/lib/api/config";
 import type {
   FaqPayload,
   RedirectPayload,
@@ -31,7 +31,10 @@ async function seoFetch<T>(
   locale: string | undefined,
   tags: readonly string[],
 ): Promise<T | null> {
-  const headers: Record<string, string> = { "X-Forwarded-Proto": "https" };
+  const headers: Record<string, string> = {
+    ...internalServiceHeaders(),
+    "X-Forwarded-Proto": "https",
+  };
   if (locale) {
     headers["Accept-Language"] = locale;
   }
@@ -39,6 +42,9 @@ async function seoFetch<T>(
     const response = await fetch(`${getApiBaseUrl()}${path}`, {
       headers,
       next: { revalidate, tags: [...tags] },
+      // همان بودجهٔ زمانی لایهٔ SSR؛ نبودش یعنی معلق‌ماندن تا ۳۰۰ ثانیه در
+      // بدترین حالت روی هاست اشتراکی (ر.ک. UPSTREAM_TIMEOUT_MS در server.ts).
+      signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
     });
     if (!response.ok) {
       logUpstreamFailure("django-seo", path, { status: response.status });

@@ -156,11 +156,16 @@ class TestAdminTemplates:
         client.force_login(superuser())
 
         response_fa = client.get(reverse("admin:index"))
-        assert 'href="/static/admin/css/rtl.css"' in response_fa.content.decode()
+        # نام فایل را بدون پسوند می‌سنجیم: در production که
+        # ``ManifestStaticFilesStorage`` فعال است، URL به
+        # ``admin/css/rtl.<hash>.css`` تبدیل می‌شود. پیش‌تر همین تست فقط در
+        # محیطی پاس می‌شد که ``collectstatic`` اجرا نشده بود — یعنی یک
+        # تفاوت رفتار بین CI و هاست که هیچ‌کس نمی‌دید.
+        assert "admin/css/rtl" in response_fa.content.decode()
 
         client.cookies[settings.LANGUAGE_COOKIE_NAME] = "en"
         response_en = client.get(reverse("admin:index"))
-        assert "admin/css/rtl.css" not in response_en.content.decode()
+        assert "admin/css/rtl" not in response_en.content.decode()
 
     def test_dashboard_template_is_not_jazzmin_default(self) -> None:
         custom = (TEMPLATES_DIR / "admin" / "index.html").read_text(encoding="utf-8")
@@ -174,6 +179,8 @@ def test_dashboard_page_renders_brand_assets(client: Client) -> None:
 
     content = client.get(reverse("admin:index")).content.decode()
 
-    assert "admin_theme/css/emmett-admin.css" in content
-    assert "admin_theme/js/emmett-admin.js" in content
-    assert "brand/emmett-wordmark.png" in content or "emmett-logo-192.png" in content
+    # بدون پسوند، چون در production نام فایل با hash مانیفست جمع‌آوری می‌شود
+    # (``NonStrictCompressedManifestStaticFilesStorage``).
+    assert "admin_theme/css/emmett-admin" in content
+    assert "admin_theme/js/emmett-admin" in content
+    assert "brand/emmett-wordmark" in content or "emmett-logo-192" in content

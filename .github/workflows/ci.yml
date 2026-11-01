@@ -236,13 +236,28 @@ jobs:
   frontend-test-build:
     name: frontend-test-build
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     defaults:
       run:
         working-directory: frontend
+    env:
+      # ADR-0041: صفحات محتوایی حالا در زمان **بیلد** pre-render می‌شوند، پس
+      # بیلد به بک‌اند زنده نیاز دارد؛ وگرنه HTML خالی ساخته می‌شود (که با
+      # revalidate بعدی ترمیم می‌شود، ولی گیتِ «محتوای واقعی» را بی‌معنا می‌کند).
+      INTERNAL_API_URL: http://127.0.0.1:8000
+      PUBLIC_SITE_URL: http://127.0.0.1:3000
+      INTERNAL_API_TOKEN: ci-internal-service-token-not-a-secret
+      NEXT_TELEMETRY_DISABLED: "1"
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: backend/requirements*.txt
 
       - name: Set up Node.js
         uses: actions/setup-node@v7
@@ -251,18 +266,49 @@ jobs:
           cache: npm
           cache-dependency-path: frontend/package-lock.json
 
-      - name: Install dependencies
+      - name: Install frontend dependencies
         run: npm ci
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Prepare SQLite database and seed demo data
+        working-directory: backend
+        run: |
+          python manage.py migrate --noinput
+          python manage.py seed_demo_data
+
+      - name: Start Django API server
+        working-directory: backend
+        run: |
+          nohup python manage.py runserver 127.0.0.1:8000 --noreload \
+            > "${RUNNER_TEMP}/django-build.log" 2>&1 &
+          for _ in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:8000/api/v1/health/ > /dev/null 2>&1; then
+              echo "Django API is ready on 127.0.0.1:8000"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "::error::Django API did not become ready in 60s"
+          cat "${RUNNER_TEMP}/django-build.log"
+          exit 1
 
       # آستانه‌ها در `vitest.config.mts` تعریف شده‌اند
       # (statements 85 / branches 78 / functions 85 / lines 85).
       - name: Vitest with coverage gate
         run: npm run test:coverage
 
-      # بیلد به بک‌اند زنده نیاز ندارد: همهٔ صفحه‌ها به‌خاطر `src/proxy.ts`
-      # پویا (SSR در زمان درخواست) هستند و داده در زمان رندر خوانده می‌شود.
       - name: Production build
         run: npm run build
+
+      # گیت رگرسیون ADR-0041: اگر روزی دوباره صفحه‌های عمومی داینامیک شوند
+      # (headers()/cookies()/connection()/force-dynamic)، این‌جا قرمز می‌شود.
+      - name: Verify content routes are prerendered (ADR-0041)
+        run: npm run verify:rendering
 
       - name: Coverage summary
         if: always()
@@ -404,6 +450,9 @@ jobs:
       THROTTLE_RATE_AI: 10000/hour
       THROTTLE_RATE_AUTH: 10000/hour
       THROTTLE_RATE_NEWSLETTER: 10000/day
+      # ADR-0041: توکن خدمات داخلی — فراخوانی‌های SSR/ISR از سطل throttle ناشناس
+      # (که روی loopback با همهٔ بازدیدکننده‌ها مشترک است) معاف می‌شوند.
+      INTERNAL_API_TOKEN: ci-internal-service-token-not-a-secret
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -592,3 +641,91 @@ jobs:
             ${{ runner.temp }}/next-server.log
           if-no-files-found: ignore
           retention-days: 14
+
+  # ---------------------------------------------------------------------------
+  # ۷) اسکریپت‌های استقرار: نحو + گیت‌های اجباری ADR-0041
+  # ---------------------------------------------------------------------------
+  # چرا این جاب وجود دارد؟ دو اسکریپت استقرار تا امروز هیچ آزمونی نداشتند و
+  # «موفقیت» آن‌ها یعنی «بدون خطا تمام شد» — نه «سایت با محتوا بالا آمد».
+  # این جاب تضمین می‌کند گیت‌های تازه (توکن، سلامت بک‌اند، pre-render) واقعاً
+  # فعال‌اند و کسی در آینده بی‌صدا حذفشان نکند. هیچ‌جا build یا نصب پکیج لازم
+  # نیست، پس چند ثانیه بیشتر طول نمی‌کشد.
+  deploy-scripts:
+    name: deploy-scripts
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: bash -n روی همهٔ اسکریپت‌ها
+        run: |
+          for f in scripts/*.sh; do
+            echo "checking $f"
+            bash -n "$f"
+          done
+
+      - name: گیت توکن در deploy_frontend.sh باید فعال باشد
+        run: |
+          workdir="$(mktemp -d)"
+          mkdir -p "$workdir/scripts" "$workdir/frontend/deploy" "$workdir/backend"
+          cp scripts/deploy_frontend.sh "$workdir/scripts/"
+          cp frontend/deploy/server.js.example "$workdir/frontend/deploy/"
+
+          set +e
+          ( cd "$workdir" \
+            && env -u INTERNAL_API_TOKEN -u FRONTEND_REVALIDATE_SECRET \
+                 PUBLIC_SITE_URL=https://example.test \
+                 INTERNAL_API_URL=https://example.test/backend \
+                 bash scripts/deploy_frontend.sh ) > "$workdir/out.log" 2>&1
+          status=$?
+          set -e
+
+          cat "$workdir/out.log"
+          test "$status" -eq 1
+          grep -q "INTERNAL_API_TOKEN" "$workdir/out.log"
+
+      - name: گیت سلامت بک‌اند باید بیلد را متوقف کند
+        run: |
+          workdir="$(mktemp -d)"
+          mkdir -p "$workdir/scripts" "$workdir/frontend/deploy" "$workdir/backend"
+          cp scripts/deploy_frontend.sh "$workdir/scripts/"
+          cp frontend/deploy/server.js.example "$workdir/frontend/deploy/"
+
+          set +e
+          ( cd "$workdir" \
+            && PUBLIC_SITE_URL=https://example.test \
+               INTERNAL_API_URL=http://127.0.0.1:9 \
+               INTERNAL_API_TOKEN=dummy-token-for-the-gate \
+               HEALTH_TIMEOUT_SECONDS=2 \
+               bash scripts/deploy_frontend.sh ) > "$workdir/out.log" 2>&1
+          status=$?
+          set -e
+
+          cat "$workdir/out.log"
+          test "$status" -eq 1
+          grep -q "بیلد متوقف شد" "$workdir/out.log"
+
+      - name: گیت توکن در deploy_backend.sh باید فعال باشد
+        run: |
+          workdir="$(mktemp -d)"
+          mkdir -p "$workdir/scripts" "$workdir/backend/deploy"
+          cp scripts/deploy_backend.sh "$workdir/scripts/"
+          cp backend/deploy/media.htaccess.example "$workdir/backend/deploy/"
+          : > "$workdir/backend/.env"
+
+          set +e
+          ( cd "$workdir" \
+            && env -u INTERNAL_API_TOKEN -u FRONTEND_REVALIDATE_SECRET \
+                 DJANGO_SETTINGS_MODULE=config.settings.production \
+                 bash scripts/deploy_backend.sh ) > "$workdir/out.log" 2>&1
+          status=$?
+          set -e
+
+          cat "$workdir/out.log"
+          test "$status" -eq 1
+          grep -q "FRONTEND_REVALIDATE_SECRET" "$workdir/out.log"
+
+      - name: preflight_cpanel.sh باید قابل اجرا و خودتوضیح باشد
+        run: |
+          bash scripts/preflight_cpanel.sh --help | grep -q -- "--url"
