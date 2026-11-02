@@ -307,7 +307,10 @@ jobs:
 
       # گیت رگرسیون ADR-0041: اگر روزی دوباره صفحه‌های عمومی داینامیک شوند
       # (headers()/cookies()/connection()/force-dynamic)، این‌جا قرمز می‌شود.
-      - name: Verify content routes are prerendered (ADR-0041)
+      # ADR-0042: همین اسکریپت هر ۵۶ فایل HTML پخته‌شده را هم می‌خواند و اگر
+      # `<h1>` نامرئی (opacity:0) در آن باشد — یعنی محتوا بعد از hydration
+      # ظاهر می‌شود — بیلد را متوقف می‌کند. یک نام گام، دو گارد.
+      - name: Verify prerendered routes and visible headings (ADR-0041, ADR-0042)
         run: npm run verify:rendering
 
       - name: Coverage summary
