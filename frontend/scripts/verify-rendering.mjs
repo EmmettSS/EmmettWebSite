@@ -16,11 +16,12 @@
  *
  * اجرا: npm run verify:rendering   (نیازمند `npm run build` قبلی)
  */
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import { readFileSync, readdirSync } from "node:fs";
+import { join, relative } from "node:path";
 
 const ROOT = new URL("..", import.meta.url).pathname;
 const MANIFEST = join(ROOT, ".next", "prerender-manifest.json");
+const APP_HTML_DIR = join(ROOT, ".next", "server", "app");
 
 /** مسیرهایی که باید HTML آن‌ها در بیلد ساخته شود (نه در هر درخواست). */
 const REQUIRED_PRERENDERED = [
@@ -104,6 +105,89 @@ if (detailRoutes.length < MIN_DETAIL_ROUTES) {
 const revalidations = REQUIRED_PRERENDERED.map(
   (route) => manifest.routes?.[route]?.initialRevalidateSeconds ?? null,
 );
+
+// ---------------------------------------------------------------------------
+// دروازهٔ «H1 دیده می‌شود» (ADR-0042)
+// ---------------------------------------------------------------------------
+// رگرسیون واقعی: hero از `motion/react` استفاده می‌کرد و Next مقدار
+// `initial={{ opacity: 0 }}` را داخل HTML پخته‌شده می‌نوشت:
+//     <h1 style="opacity:0;transform:translateY(20px)">…</h1>
+// یعنی بزرگ‌ترین متن صفحه تا پایان hydration نامرئی بود. اندازه‌گیری CI روی
+// `/en`: Performance ۰٫۹۳ (بودجه ۰٫۹۵)، LCP ۱٫۴s در حالی که FCP ۰٫۶s بود.
+//
+// این بررسی همان فایل‌هایی را می‌خواند که **واقعاً به مرورگر می‌رسند**؛ اگر
+// روزی کسی دوباره محتوای اصلی را با انیمیشن JS پنهان کند، بیلد و استقرار
+// متوقف می‌شوند.
+
+const H1_PATTERN = /<h1\b[^>]*>/i;
+const HIDDEN_PATTERN = /opacity\s*:\s*0(?![\d.])|visibility\s*:\s*hidden|display\s*:\s*none/i;
+
+function collectHtmlFiles(dir) {
+  const found = [];
+  let entries;
+  try {
+    entries = readdirSync(dir, { withFileTypes: true });
+  } catch {
+    return found;
+  }
+  for (const entry of entries) {
+    const full = join(dir, entry.name);
+    if (entry.isDirectory()) found.push(...collectHtmlFiles(full));
+    else if (entry.name.endsWith(".html")) found.push(full);
+  }
+  return found;
+}
+
+const htmlFiles = collectHtmlFiles(APP_HTML_DIR);
+if (htmlFiles.length === 0) {
+  fail(
+    "هیچ HTML پخته‌شده‌ای در ‎.next/server/app پیدا نشد؛ بدون آن بررسی «H1 دیده می‌شود» معنا ندارد.",
+  );
+}
+
+const hiddenHeadings = [];
+for (const file of htmlFiles) {
+  const html = readFileSync(file, "utf8");
+  const match = H1_PATTERN.exec(html);
+  if (!match) continue;
+  if (HIDDEN_PATTERN.test(match[0])) {
+    hiddenHeadings.push({ file: relative(APP_HTML_DIR, file), tag: match[0] });
+  }
+}
+
+if (hiddenHeadings.length > 0) {
+  console.error("✗ این صفحه‌ها با <h1> نامرئی در بیلد ساخته شده‌اند:");
+  for (const item of hiddenHeadings) {
+    console.error(`   - ${item.file}`);
+    console.error(`     ${item.tag.slice(0, 160)}`);
+  }
+  console.error(
+    "\nعلت رایج: انیمیشن ورودی با `motion`/`initial={{ opacity: 0 }}` روی عنصر اصلی\n" +
+      "صفحه. مقدار اولیه در HTML پخته می‌شود و LCP تا پایان hydration عقب می‌افتد.\n" +
+      "راه‌حل: انیمیشن را با کلاس‌های CSS در globals.css بنویسید و برای عنصر اصلی\n" +
+      "فقط `transform` بگذارید (نه opacity). ر.ک. ADR-0042.\n",
+  );
+  process.exit(1);
+}
+
+// برای مسیرهای عمومی، وجود h1 اجباری است (سئو + ساختار صفحه).
+const missingH1 = [];
+for (const route of REQUIRED_PRERENDERED) {
+  const file = join(APP_HTML_DIR, `${route.replace(/^\//, "")}.html`);
+  let html;
+  try {
+    html = readFileSync(file, "utf8");
+  } catch {
+    continue; // نبودِ فایل در بررسی pre-render بالا دیده می‌شود
+  }
+  if (!H1_PATTERN.test(html)) missingH1.push(route);
+}
+
+if (missingH1.length > 0) {
+  fail(`این مسیرها هیچ <h1> ندارند: ${missingH1.join(", ")}`);
+}
+
+console.log(`✓ هیچ <h1> نامرئی در ${htmlFiles.length} صفحهٔ پخته‌شده نیست.`);
 
 console.log(`✓ ${REQUIRED_PRERENDERED.length} مسیر عمومی در بیلد pre-render شدند.`);
 console.log(

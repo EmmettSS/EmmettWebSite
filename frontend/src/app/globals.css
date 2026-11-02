@@ -483,3 +483,132 @@
   padding: 0.5em 0.75em;
   text-align: start;
 }
+
+/* ===========================================================================
+ * انیمیشن‌های ورودی «پارچهٔ اول» (hero) — CSS محض، بدون انتظار برای hydration
+ * ===========================================================================
+ *
+ * چرا این بخش وجود دارد (رگرسیون واقعی که بودجهٔ Lighthouse را شکست):
+ * نسخهٔ پیشین hero از `motion/react` استفاده می‌کرد و Next.js مقدار
+ * `initial={{ opacity: 0 }}` را به‌صورت **inline style در HTML پخته‌شده**
+ * می‌نویسد:
+ *
+ *     <h1 style="opacity:0;transform:translateY(20px)">We engineer…</h1>
+ *
+ * یعنی بزرگ‌ترین متن صفحه — همان عنصری که LCP را می‌سازد — تا زمانی که JS
+ * دانلود و hydrate شود و فید ۷۰۰ میلی‌ثانیه‌ای اجرا شود «دیده نمی‌شد».
+ * اندازه‌گیری CI: `/en` → Performance ۰٫۹۳ (بودجه ۰٫۹۵)،
+ * `largest-contentful-paint` وزن ۲۵، مقدار ۱٫۴ ثانیه؛ در حالی که FCP ۰٫۶ ثانیه
+ * بود. اختلاف ۰٫۸ ثانیه = انتظار برای hydration + تأخیر و مدت انیمیشن.
+ *
+ * قاعده‌ای که از این پس در این ریپو حاکم است (ADR-0042):
+ *   ۱) هیچ عنصری که می‌تواند کاندید LCP باشد از `opacity: 0` شروع نمی‌کند؛
+ *      عنصرِ اصلی hero فقط `transform` می‌گیرد، پس از نخستین رنگ‌آمیزی دیده
+ *      می‌شود و LCP به FCP گره می‌خورد.
+ *   ۲) انیمیشن ورودی hero با CSS اجرا می‌شود (هم‌زمان با parse شدن CSS)، نه
+ *      پس از hydration؛ پس کندی شبکهٔ JS هیچ‌وقت محتوا را پنهان نمی‌کند.
+ *   ۳) `prefers-reduced-motion` رعایت می‌شود.
+ *
+ * نگهبان: `npm run verify:rendering` هر HTML پخته‌شده‌ای را می‌خواند و اگر
+ * `<h1>` با `opacity:0` پیدا کند، بیلد/استقرار را متوقف می‌کند.
+ * =========================================================================== */
+
+@keyframes emmett-rise {
+  from {
+    transform: translateY(20px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes emmett-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes emmett-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes emmett-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes emmett-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(5px);
+  }
+}
+
+@keyframes emmett-dot {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* پایهٔ مشترک: مدت/تأخیر از متغیرهای CSS می‌آید تا در JSX خوانا بماند. */
+.hero-enter {
+  animation-duration: var(--hero-duration, 600ms);
+  animation-delay: var(--hero-delay, 0ms);
+  animation-timing-function: var(--hero-ease, cubic-bezier(0.16, 1, 0.3, 1));
+  animation-fill-mode: both;
+}
+
+.hero-enter--rise {
+  animation-name: emmett-rise;
+}
+
+.hero-enter--fade-up {
+  animation-name: emmett-fade-up;
+}
+
+.hero-enter--fade {
+  animation-name: emmett-fade;
+}
+
+.hero-enter--scale {
+  animation-name: emmett-scale-in;
+}
+
+.hero-bob {
+  animation: emmett-bob 1.5s ease-in-out infinite;
+}
+
+.hero-dot {
+  animation: emmett-dot 1.5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-enter,
+  .hero-bob,
+  .hero-dot {
+    animation: none;
+  }
+}

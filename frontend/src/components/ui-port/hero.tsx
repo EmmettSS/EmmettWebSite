@@ -1,9 +1,9 @@
 "use client";
 
-import { motion } from "motion/react";
 import nextDynamic from "next/dynamic";
 import { ArrowRight } from "lucide-react";
 import { useTranslations } from "next-intl";
+import type { CSSProperties } from "react";
 
 import { Link } from "@/i18n/navigation";
 
@@ -16,6 +16,26 @@ const NeuralNetwork3D = nextDynamic(
   () => import("./neural-network-3d").then((mod) => mod.NeuralNetwork3D),
   { ssr: false },
 );
+
+/**
+ * تایمینگ‌های ورودی — همه از `src/app/globals.css` می‌آیند (کلاس‌های `hero-*`).
+ *
+ * چرا دیگر `motion/react` نیست؟ (ADR-0042)
+ * `motion` مقدار `initial={{ opacity: 0 }}` را به‌صورت inline style در HTML
+ * پخته‌شده می‌نویسد. نتیجه: `<h1 style="opacity:0">` در HTML ارسالی، و LCP
+ * تا پایان hydration + فید ۷۰۰ms عقب می‌افتاد (اندازه‌گیری CI: `/en` →
+ * Performance ۰٫۹۳ با LCP ۱٫۴s). انیمیشن CSS هم‌زمان با parse اجرا می‌شود،
+ * پس کندی JS محتوا را پنهان نمی‌کند. متن اصلی (`h1`) عمداً **هیچ** انیمیشن
+ * opacity ندارد و فقط `transform` می‌گیرد.
+ */
+const HERO_TIMING = {
+  eyebrow: { "--hero-duration": "500ms" } as CSSProperties,
+  headline: { "--hero-duration": "700ms", "--hero-delay": "80ms" } as CSSProperties,
+  sub: { "--hero-duration": "600ms", "--hero-delay": "200ms" } as CSSProperties,
+  cta: { "--hero-duration": "500ms", "--hero-delay": "300ms" } as CSSProperties,
+  visual: { "--hero-duration": "1100ms", "--hero-delay": "50ms" } as CSSProperties,
+  scrollHint: { "--hero-duration": "500ms", "--hero-delay": "1400ms" } as CSSProperties,
+};
 
 export function Hero() {
   const t = useTranslations("ui.hero");
@@ -47,48 +67,44 @@ export function Hero() {
           {/* Left — Content */}
           <div className="flex flex-col justify-center space-y-9">
             {/* Eyebrow */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="flex items-center gap-3"
+            <div
+              className="hero-enter hero-enter--fade-up flex items-center gap-3"
+              style={HERO_TIMING.eyebrow}
             >
               <div className="w-6 h-px bg-primary" />
               <span className="text-[11px] font-mono tracking-[0.22em] uppercase text-primary">
                 {t("eyebrow")}
               </span>
-            </motion.div>
+            </div>
 
-            {/* Headline */}
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.08 }}
-              className="text-[clamp(2.8rem,7vw,6.5rem)] font-medium leading-[0.95] tracking-tight text-foreground"
+            {/*
+              Headline — کاندید LCP. عمداً فقط `transform` (بدون opacity) تا از
+              نخستین رنگ‌آمیزی دیده شود. اگر روزی کسی opacity اضافه کند،
+              `npm run verify:rendering` بیلد را متوقف می‌کند.
+            */}
+            <h1
+              className="hero-enter hero-enter--rise text-[clamp(2.8rem,7vw,6.5rem)] font-medium leading-[0.95] tracking-tight text-foreground"
+              style={HERO_TIMING.headline}
             >
               {t("line1")}
               <br />
               <span className="text-primary">{t("accent")}</span>
               <br />
               {t("line3")}
-            </motion.h1>
+            </h1>
 
             {/* Subheading */}
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-lg text-[rgba(243,250,246,0.62)] max-w-[44ch] leading-relaxed"
+            <p
+              className="hero-enter hero-enter--fade text-lg text-[rgba(243,250,246,0.62)] max-w-[44ch] leading-relaxed"
+              style={HERO_TIMING.sub}
             >
               {t("sub")}
-            </motion.p>
+            </p>
 
             {/* CTAs */}
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              className="flex flex-wrap gap-4"
+            <div
+              className="hero-enter hero-enter--fade-up flex flex-wrap gap-4"
+              style={HERO_TIMING.cta}
             >
               <Link
                 href="/projects"
@@ -103,15 +119,13 @@ export function Hero() {
               >
                 {t("start")}
               </Link>
-            </motion.div>
+            </div>
           </div>
 
           {/* Right — Neural Network */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1.1, delay: 0.05 }}
-            className="relative h-[460px] lg:h-[580px] hidden lg:block"
+          <div
+            className="hero-enter hero-enter--scale relative h-[460px] lg:h-[580px] hidden lg:block"
+            style={HERO_TIMING.visual}
           >
             <div className="absolute inset-0 rounded-2xl overflow-hidden border border-[rgba(31,174,110,0.1)] bg-[rgba(7,19,15,0.5)]">
               <NeuralNetwork3D />
@@ -128,33 +142,23 @@ export function Hero() {
                 {t("backend")}
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
 
       {/* Scroll indicator */}
-      <motion.div
+      <div
         aria-hidden
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.4 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+        className="hero-enter hero-enter--fade absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+        style={HERO_TIMING.scrollHint}
       >
-        <motion.div
-          animate={{ y: [0, 5, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-          className="w-5 h-8 rounded-full border border-[rgba(31,174,110,0.2)] flex items-start justify-center p-1.5"
-        >
-          <motion.div
-            animate={{ opacity: [0, 1, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-            className="w-0.5 h-2 rounded-full bg-[rgba(31,174,110,0.4)]"
-          />
-        </motion.div>
+        <div className="hero-bob w-5 h-8 rounded-full border border-[rgba(31,174,110,0.2)] flex items-start justify-center p-1.5">
+          <div className="hero-dot w-0.5 h-2 rounded-full bg-[rgba(31,174,110,0.4)]" />
+        </div>
         <span className="text-[10px] font-mono text-muted-on-dark tracking-widest uppercase">
           {t("scroll")}
         </span>
-      </motion.div>
+      </div>
     </section>
   );
 }
