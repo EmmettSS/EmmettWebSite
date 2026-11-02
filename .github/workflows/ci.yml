@@ -586,16 +586,22 @@ jobs:
         if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
         run: npx --yes @lhci/cli@0.15.1 autorun
 
+      # خلاصه باید **دلیل شکست** را بنویسد، نه فهرست فایل‌ها.
+      # تاریخچه: اجرای 41399449660 روی `main` در همین گام شکست خورد و تنها
+      # راه دیدن این‌که کدام URL/کدام بودجه شکسته، دانلود آرتیفکت ۵٫۷ مگابایتی
+      # بود. `lighthouse-summary.mjs` همان داده را به جدول تبدیل می‌کند و در
+      # صفحهٔ اجرا می‌نویسد (و هرگز خودش CI را نمی‌شکند).
       - name: Lighthouse summary
         if: always() && (github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch')
-        run: |
-          if [ -d .lighthouseci ]; then
-            {
-              echo '### Lighthouse CI'
-              echo ''
-              ls -1 .lighthouseci | sed 's/^/- /'
-            } >> "$GITHUB_STEP_SUMMARY"
-          fi
+        run: node .github/ci/lighthouse-summary.mjs .lighthouseci | tee -a "$GITHUB_STEP_SUMMARY"
+
+      # خلاصهٔ گام فقط در صفحهٔ وب دیده می‌شود و از API خوانده نمی‌شود. annotation
+      # از `GET /repos/{owner}/{repo}/check-runs/{id}/annotations` خواندنی است،
+      # پس هم آدم و هم عامل خودکار می‌فهمد کدام URL و کدام سنجه بودجه را شکسته.
+      # (تاریخچه: اجرای 41399449660 قرمز شد و هیچ annotation‌ای نداشت.)
+      - name: Lighthouse annotations
+        if: always() && (github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch')
+        run: node .github/ci/lighthouse-summary.mjs .lighthouseci --annotations
 
       - name: Upload Playwright report
         if: always()
@@ -729,3 +735,71 @@ jobs:
       - name: preflight_cpanel.sh باید قابل اجرا و خودتوضیح باشد
         run: |
           bash scripts/preflight_cpanel.sh --help | grep -q -- "--url"
+
+      # اسکریپت خلاصهٔ Lighthouse ادعا می‌کند «بودجه‌های شکسته» را از خروجی LHCI
+      # بیرون می‌کشد و هرگز خودش CI را نمی‌شکند. هر دو ادعا این‌جا آزموده می‌شود؛
+      # بدون این آزمون، ممکن است ماه‌ها بعد در بدترین لحظه (شکست قرمز) هم
+      # خالی برگردد و کسی نفهمد.
+      - name: lighthouse-summary.mjs باید سنجهٔ مقصر را پیدا کند
+        run: |
+          # قالب واقعی LHCI: گزارش‌های lhr-<ts>.json + assertion-results.json
+          # (نه manifest.json؛ این را از سورس @lhci/cli@0.15.1 تأیید کردیم).
+          fixture="$(mktemp -d)"
+          cat > "$fixture/lhr-1.json" <<'JSON'
+          {
+            "finalUrl": "http://127.0.0.1:3000/",
+            "categories": {
+              "performance": {"score": 0.99, "auditRefs": []},
+              "accessibility": {"score": 1, "auditRefs": []},
+              "best-practices": {"score": 0.93, "auditRefs": [{"id": "is-on-https", "weight": 5}, {"id": "errors-in-console", "weight": 1}, {"id": "csp-xss", "weight": 0}]},
+              "seo": {"score": 1, "auditRefs": []}
+            },
+            "audits": {
+              "is-on-https": {"score": 1, "title": "Uses HTTPS"},
+              "errors-in-console": {"score": 0, "title": "Browser errors were logged to the console", "displayValue": "2 errors"},
+              "csp-xss": {"score": 0, "title": "Ensure CSP is effective against XSS"}
+            }
+          }
+          JSON
+          cat > "$fixture/lhr-2.json" <<'JSON'
+          {
+            "finalUrl": "http://127.0.0.1:3000/",
+            "categories": {
+              "performance": {"score": 0.99, "auditRefs": []},
+              "accessibility": {"score": 1, "auditRefs": []},
+              "best-practices": {"score": 0.99, "auditRefs": [{"id": "is-on-https", "weight": 5}]},
+              "seo": {"score": 1, "auditRefs": []}
+            },
+            "audits": {"is-on-https": {"score": 1, "title": "Uses HTTPS"}}
+          }
+          JSON
+          cat > "$fixture/assertion-results.json" <<'JSON'
+          [{"url": "http://127.0.0.1:3000/", "auditId": "categories", "auditProperty": "best-practices", "expected": 0.95, "actual": 0.93, "passed": false, "level": "error"}]
+          JSON
+
+          node .github/ci/lighthouse-summary.mjs "$fixture" > "$fixture/summary.md"
+          cat "$fixture/summary.md"
+
+          # ۱) بدترین اجرا ملاک است: 0.93 (نه 0.99 اجرای دوم).
+          grep -q '\*\*0.93\*\*' "$fixture/summary.md"
+          # ۲) سنجهٔ مقصر با وزن واقعی‌اش نام برده می‌شود.
+          grep -q 'errors-in-console' "$fixture/summary.md"
+          grep -q 'Browser errors were logged' "$fixture/summary.md"
+          # ۳) سنجهٔ اطلاعاتی (weight=0) نباید به‌عنوان مقصر معرفی شود.
+          ! grep -q 'csp-xss' "$fixture/summary.md"
+          # ۴) بودجهٔ شکسته از assertion-results.json خوانده می‌شود.
+          grep -q 'best-practices' "$fixture/summary.md"
+          # ۵) نبودِ گزارش نباید اجرا را بشکند (گام تشخیصی هرگز CI را نمی‌شکند).
+          node .github/ci/lighthouse-summary.mjs "$fixture/empty" > /dev/null
+
+          # ۶) حالت annotation باید همان تشخیص را به قالب workflow command بدهد،
+          #    چون فقط annotation از API خواندنی است.
+          node .github/ci/lighthouse-summary.mjs "$fixture" --annotations > "$fixture/ann.txt"
+          cat "$fixture/ann.txt"
+          grep -q '^::error title=Lighthouse /::' "$fixture/ann.txt"
+          grep -q 'errors-in-console' "$fixture/ann.txt"
+          # ۷) اجرای سبز نباید هیچ annotation‌ای تولید کند.
+          mkdir -p "$fixture/green"
+          cp "$fixture/lhr-2.json" "$fixture/green/lhr-1.json"
+          node .github/ci/lighthouse-summary.mjs "$fixture/green" --annotations > "$fixture/ann-green.txt"
+          ! grep -q '::error' "$fixture/ann-green.txt"
