@@ -1,7 +1,7 @@
 import { getRequestConfig } from "next-intl/server";
 import { hasLocale } from "next-intl";
 
-import { getApiBaseUrl } from "@/lib/api/config";
+import { getApiBaseUrl, internalServiceHeaders } from "@/lib/api/config";
 import { getSafeErrorType, logUpstreamFailure } from "@/lib/api/upstream-logging";
 import { CACHE_TAGS } from "@/lib/cache-tags";
 import { mergeDatabaseMessages } from "./database-messages";
@@ -22,7 +22,9 @@ async function getMessages(locale: string): Promise<Record<string, unknown>> {
     const response = await fetch(
       `${getApiBaseUrl()}/site-content/translations/?locale=${encodeURIComponent(locale)}`,
       {
-        headers: { "Accept-Language": locale },
+        // ADR-0041: بدون این هدر، بارگذاری کپی سایت از CMS در سطل throttle
+        // ناشناسِ loopback می‌افتد و پس از ۱۰۰ رندر در ساعت ۴۲۹ می‌گیرد.
+        headers: { ...internalServiceHeaders(), "Accept-Language": locale },
         next: {
           revalidate: 60,
           tags: [locale === "en" ? CACHE_TAGS.siteCopyEn : CACHE_TAGS.siteCopyFa],

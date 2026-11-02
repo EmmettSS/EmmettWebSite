@@ -220,6 +220,18 @@ FRONTEND_REVALIDATE_SECRET = env("FRONTEND_REVALIDATE_SECRET", default="")
 FRONTEND_REVALIDATE_TIMEOUT_SECONDS = env.int("FRONTEND_REVALIDATE_TIMEOUT_SECONDS", default=2)
 
 # ---------------------------------------------------------------------------
+# Service-to-service authentication (ADR-0041)
+# ---------------------------------------------------------------------------
+# Next.js (Server Components / ISR / the same-origin proxy) calls this API from
+# the same machine. Every such call shares one loopback "anonymous" identity,
+# so the 100/hour anonymous throttle used to turn page rendering into silent
+# 429s (pages rendered empty). When this token matches the ``X-Internal-Token``
+# header, the *default* anonymous/user throttles are skipped (scoped user-action
+# throttles — contact, AI, auth, newsletter — are NOT bypassed).
+# Keep empty to disable the bypass; use a 50+ char random value in production.
+INTERNAL_API_TOKEN = env("INTERNAL_API_TOKEN", default="")
+
+# ---------------------------------------------------------------------------
 # CORS (فقط برای توسعهٔ محلی frontend جدا؛ در prod تنظیمات سخت‌گیرانه‌تر است)
 # ---------------------------------------------------------------------------
 CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[])

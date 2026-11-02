@@ -2,7 +2,7 @@ import createMiddleware from "next-intl/middleware";
 import { NextRequest, NextResponse } from "next/server";
 
 import { routing } from "@/i18n/routing";
-import { getSeoRedirects } from "@/lib/api/seo";
+import { getCachedSeoRedirects } from "@/lib/api/redirect-cache";
 import {
   buildRedirectMap,
   goneResponseHtml,
@@ -13,13 +13,32 @@ import { buildAlternateLinkHeader } from "@/lib/seo/site";
 
 const intlMiddleware = createMiddleware(routing);
 
-function createContentSecurityPolicy(nonce: string): string {
+/**
+ * سیاست امنیتی محتوا (CSP) — بدون nonce به‌ازای هر درخواست.
+ *
+ * تاریخچه (ADR-0041): نسخهٔ قبلی برای هر درخواست یک nonce تصادفی می‌ساخت و
+ * ``script-src 'nonce-…' 'strict-dynamic'`` می‌داد. هر nonce در CSP، در Next.js
+ * مستلزم آن است که صفحه **داینامیک** رندر شود؛ در نتیجه حتی صفحهٔ اصلی و بلاگ
+ * که فقط محتوای عمومی نشان می‌دهند هم هر بار کامل SSR می‌شدند و هیچ صفحه‌ای
+ * قابل pre-render/ISR نبود (خروجی ``next build`` برای ۲۵ مسیر «ƒ Dynamic»
+ * بود). هزینهٔ آن تصمیم، یک رندر کامل Node + چند فراخوانی Django برای هر
+ * بازدید بود.
+ *
+ * این فایل حالا سیاست ثابت می‌دهد تا صفحه‌های عمومی از کش HTML (ISR) سرو شوند.
+ * مصالحهٔ امنیتی صریح و مستندشده: ``script-src`` شامل ``'unsafe-inline'`` است.
+ * کاهش ریسک: (۱) هیچ اسکریپت مهمان/کاربری در HTML اولیه نیست — همهٔ HTML غنی
+ * از CMS پیش از رندر با ``sanitize-html`` و در بک‌اند با ``nh3`` پاک‌سازی
+ * می‌شود؛ (۲) ``object-src 'none'``، ``base-uri 'self'``، ``form-action 'self'``
+ * و ``default-src 'self'`` سرجایش است، پس تزریق اسکریپت **خارجی** همچنان بسته
+ * است؛ (۳) اگر در آینده Next.js اجازهٔ pre-render با nonce داد (PPR/Cache
+ * Components)، بازگشت به nonce فقط یک تغییر در همین فایل است.
+ */
+function createContentSecurityPolicy(): string {
   const isDevelopment = process.env.NODE_ENV === "development";
   const directives = [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDevelopment ? " 'unsafe-eval'" : ""}`,
-    `style-src 'self' 'nonce-${nonce}'`,
-    "style-src-attr 'unsafe-inline'",
+    `script-src 'self' 'unsafe-inline'${isDevelopment ? " 'unsafe-eval'" : ""}`,
+    "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob: https:",
     "font-src 'self' data:",
     `connect-src 'self'${isDevelopment ? " ws: wss:" : ""}`,
@@ -42,11 +61,13 @@ function localeFromPath(pathname: string): "fa" | "en" {
  * ریدایرکت‌های مدیریت‌شدهٔ ادمین (فاز ۷ — ADR-0031).
  *
  * پیش از روتینگ زبان اجرا می‌شود تا یک مسیر کهنه حتی اگر زبان هم نداشته باشد
- * سریع به مقصد برسد. نگاشت از ``/api/v1/seo/redirects/`` و کش‌شده است
- * (``revalidate`` ۳۰۰ ثانیه)، پس هزینهٔ هر درخواست یک جست‌وجوی Map است.
+ * سریع به مقصد برسد. داده از ``getCachedSeoRedirects`` می‌آید که یک کش
+ * درون‌حافظه‌ای با TTL دارد؛ پیش‌تر هر درخواست یک fetch به
+ * ``/api/v1/seo/redirects/`` می‌زد (کش دیتای Next در لایهٔ proxy فعال نیست)،
+ * یعنی یک رفت‌وبرگشت HTTP به Django پیش از تولید هر صفحه.
  */
 async function handleManagedRedirect(request: NextRequest): Promise<NextResponse | null> {
-  const redirects = await getSeoRedirects();
+  const redirects = await getCachedSeoRedirects();
   if (redirects.length === 0) return null;
 
   const match = resolveRedirect(request.nextUrl.pathname, buildRedirectMap(redirects));
@@ -70,20 +91,16 @@ async function handleManagedRedirect(request: NextRequest): Promise<NextResponse
 
 /**
  * Next.js 16 uses proxy.ts rather than middleware.ts. next-intl keeps locale
- * routing here, while a per-request CSP nonce protects the rendered pages.
+ * routing here; the CSP is a static policy (see the comment above).
  */
 export async function proxy(request: NextRequest): Promise<NextResponse> {
   const redirectResponse = await handleManagedRedirect(request);
   if (redirectResponse) return redirectResponse;
 
-  const nonce = btoa(crypto.randomUUID());
-  const contentSecurityPolicy = createContentSecurityPolicy(nonce);
+  const contentSecurityPolicy = createContentSecurityPolicy();
   const requestHeaders = new Headers(request.headers);
-  requestHeaders.set("x-nonce", nonce);
   requestHeaders.set("Content-Security-Policy", contentSecurityPolicy);
 
-  // next-intl forwards these request headers to the localized page; Next.js
-  // extracts the nonce from CSP and attaches it to framework-generated scripts.
   const requestWithCsp = new NextRequest(request, { headers: requestHeaders });
   const response = intlMiddleware(requestWithCsp);
   response.headers.set("Content-Security-Policy", contentSecurityPolicy);

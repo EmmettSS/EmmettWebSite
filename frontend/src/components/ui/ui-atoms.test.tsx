@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { Sparkles } from "lucide-react";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { JsonLd } from "@/components/seo/json-ld";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -8,10 +8,6 @@ import { Badge } from "@/components/ui/badge";
 import { Icon } from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-
-vi.mock("next/headers", () => ({
-  headers: () => Promise.resolve(new Headers({ "x-nonce": "test-nonce-123" })),
-}));
 
 describe("UI Atoms & SEO JsonLd Component", () => {
   it("renders Badge variants, Skeleton, Input, and Avatar", () => {
@@ -49,11 +45,11 @@ describe("UI Atoms & SEO JsonLd Component", () => {
     expect(screen.getByRole("img", { name: "AI Sparkles" })).toBeInTheDocument();
   });
 
-  it("renders JsonLd script with nonce and escapes < characters", async () => {
-    const nullResult = await JsonLd({ data: null });
-    expect(nullResult).toBeNull();
+  it("renders JsonLd without a nonce and escapes < characters (ADR-0041)", () => {
+    // JsonLd دیگر headers() نمی‌خواند؛ CSP ثابت است و صفحه‌ها می‌توانند استاتیک باشند.
+    expect(JsonLd({ data: null })).toBeNull();
 
-    const element = await JsonLd({
+    const element = JsonLd({
       data: {
         "@context": "https://schema.org",
         "@graph": [{ "@type": "WebSite", name: "Emmett <script>" }],
@@ -62,7 +58,7 @@ describe("UI Atoms & SEO JsonLd Component", () => {
     const { container } = render(element);
     const script = container.querySelector('script[type="application/ld+json"]');
     expect(script).toBeInTheDocument();
-    expect(script?.getAttribute("nonce")).toBe("test-nonce-123");
+    expect(script?.getAttribute("nonce")).toBeNull();
     expect(script?.innerHTML).toContain("\\u003cscript>");
   });
 });

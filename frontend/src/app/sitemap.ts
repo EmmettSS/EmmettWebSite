@@ -14,10 +14,11 @@ import { absoluteUrl, getPublicSiteUrl, languageAlternates } from "@/lib/seo/sit
  * مستقل، همه با ``x-default`` یکسان). مسیرهای noindex هرگز وارد نمی‌شوند چون
  * در بک‌اند از فهرست sitemap بیرون‌اند (``SEO_NOINDEX_PATHS``).
  */
-// در زمان build ممکن است بک‌اند در دسترس نباشد؛ ``force-dynamic`` باعث می‌شود
-// خروجی خالی در build کش نشود و هر درخواست از API (که خودش کش دارد) تازه
-// ساخته شود. هزینهٔ هر درخواست یک fetch کش‌شده + جست‌وجوی Map است.
-export const dynamic = "force-dynamic";
+// ISR به‌جای force-dynamic (ADR-0041): خروجی یک بار ساخته و تا ۱۵ دقیقه از کش
+// سرو می‌شود. ``force-dynamic`` یعنی هر crawl گوگل هم یک رندر کامل Node +
+// فراخوانی API بود. اگر بک‌اند هنگام build بالا نباشد، نسخهٔ بعدی در نخستین
+// revalidate با دادهٔ واقعی جایگزین می‌شود.
+export const revalidate = 900;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [entries, settings] = await Promise.all([getSitemapEntries(), getSeoSettingsOrDefaults()]);

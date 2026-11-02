@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { EnrollButton } from "@/components/organisms/enroll-button";
 import type { AppLocale } from "@/i18n/routing";
 import { getCourse } from "@/lib/api/server";
+import { courseDetailParams } from "@/lib/api/static-params";
 import { sanitizeRichHtml } from "@/lib/security/sanitize-rich-html";
 import { JsonLd } from "@/components/seo/json-ld";
 import { getSeoSettingsOrDefaults } from "@/lib/api/seo";
@@ -20,6 +21,17 @@ import {
   pageTitleClass,
   sectionTitleClass,
 } from "@/components/ui-port/page-frame";
+
+/**
+ * pre-render زمان بیلد برای صفحه‌های جزئیات (ADR-0041).
+ * فهرست slugها از API گرفته می‌شود؛ در نبود بک‌اند، آرایهٔ خالی و
+ * رندر در نخستین درخواست (dynamicParams پیش‌فرض). ر.ک. `lib/api/static-params`.
+ */
+export const revalidate = 60;
+
+export function generateStaticParams() {
+  return courseDetailParams();
+}
 
 interface PageParams {
   locale: string;

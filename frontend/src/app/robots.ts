@@ -13,10 +13,8 @@ import { getPublicSiteUrl, mergeNoindexPaths } from "@/lib/seo/site";
  * نکته: ``/advisor/results/*`` نتیجهٔ اختصاصی هر کاربر است؛ اگر ایندکس شود
  * هم محتوای کاربران بیرون می‌افتد و هم با ``noindex`` صفحه در تضاد است.
  */
-// در زمان build ممکن است بک‌اند در دسترس نباشد؛ ``force-dynamic`` باعث می‌شود
-// خروجی خالی در build کش نشود و هر درخواست از API (که خودش کش دارد) تازه
-// ساخته شود. هزینهٔ هر درخواست یک fetch کش‌شده + جست‌وجوی Map است.
-export const dynamic = "force-dynamic";
+// ISR به‌جای force-dynamic (ADR-0041) — همان دلیل sitemap.ts.
+export const revalidate = 900;
 
 export default async function robots(): Promise<MetadataRoute.Robots> {
   const settings = await getSeoSettingsOrDefaults();

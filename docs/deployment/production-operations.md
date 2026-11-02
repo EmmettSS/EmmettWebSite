@@ -33,6 +33,7 @@
 | `DJANGO_NUM_PROXIES` | تعداد hopهای proxy مورد اعتماد که provider تأیید می‌کند | default `1` را بدون بررسی CDN/Apache تغییر ندهید. `SECURE_PROXY_SSL_HEADER=('HTTP_X_FORWARDED_PROTO','https')` است؛ تشخیص زندهٔ `/api/v1/health/proxy/` فقط برای مدیر احراز هویت‌شده است. |
 | `FRONTEND_REVALIDATE_URL` | endpoint سروری Next که از بک‌اند قابل دسترسی است | در توپولوژی هدف مسیر `/api/revalidate` است؛ host/path و دسترسی داخلی را در حساب واقعی تأیید کنید. |
 | `FRONTEND_REVALIDATE_SECRET` | secret تصادفی مستقل، مشترک فقط با Node | عین همان مقدار را در متغیر server-side Node ثبت کنید؛ `NEXT_PUBLIC_` نکنید. اگر on-demand revalidation استفاده نمی‌شود، تنظیم/غیرفعال‌بودنش را جداگانه تأیید کنید. |
+| `INTERNAL_API_TOKEN` | توکن تصادفی ≥ ۳۲ کاراکتر (`secrets.token_urlsafe(50)`) | **الزامی.** همان مقدار باید در اپ Node و در `frontend/.env.local` باشد. بدون آن، فراخوانی‌های Server Component/ISR/پراکسی در سطل throttle ناشناس (`100/hour`) می‌افتند و صفحه‌ها با `429` **بی‌صدا خالی** می‌شوند؛ `deploy_backend.sh` و `deploy_frontend.sh` در این حالت متوقف می‌شوند. تغییر مقدار = Restart هر دو اپ. |
 | `DJANGO_MEDIA_ROOT` | مسیر پایدار، قابل‌نوشتن برای اپ و بیرون از document root | فقط اگر مسیر پیش‌فرض مناسب نیست تنظیم کنید. دسترسی عمومی media را با symlink و `.htaccess` تأییدشده مدیریت کنید؛ private uploads را عمومی نکنید. |
 | `MEDIA_MAX_IMAGE_SIZE_MB`, `MEDIA_MAX_DOCUMENT_SIZE_MB` | اعتبارسنجی فایل‌های مدل Media به‌ترتیب پیش‌فرض ۵ و ۱۰ MB دارد | این‌ها محدودیت اعتبارسنجی برنامه‌اند؛ سقف بدنهٔ درخواست در Apache/LiteSpeed/Passenger ممکن است جدا باشد. هر دو لایه و فایل واقعی نزدیک به حد مجاز را تست کنید. |
 | `BACKUP_DIR` | مسیر writable خارج از document root و ترجیحاً جدا از فایل‌های سرویس عمومی | پوشه باید فقط برای account/app قابل‌دسترسی باشد. مسیر نمونه را از layout واقعی هاست تعیین کنید. |
@@ -55,6 +56,7 @@
 | `NODE_ENV` | `production` |
 | `PUBLIC_SITE_URL` | URL canonical HTTPS نهایی، بدون slash پایانی؛ باید با Django یکسان باشد. |
 | `INTERNAL_API_URL` | base URL واقعی Django و prefix تأییدشده؛ `/backend` فقط زمانی که routing cPanel آن را ثابت کرده باشد. |
+| `INTERNAL_API_TOKEN` | همان مقدار ثبت‌شده در اپ Python؛ بدون `NEXT_PUBLIC_`. برای ISR و پراکسی در زمان اجرا ضروری است، نه فقط زمان build. |
 | `FRONTEND_REVALIDATE_SECRET` | همان secret مشترک با Django، بدون `NEXT_PUBLIC_`. |
 | `MEDIA_ROOT` | فقط اگر Next برای بهینه‌سازی تصویر به مسیر فیزیکی media نیاز دارد؛ مسیر private و واقعی همان سرور را تأیید کنید. |
 

@@ -5,15 +5,23 @@ import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
 /**
- * لودر آغازین — پورت ۱:۱ `UI/src/app/components/Loader.tsx` (فاز ۲).
+ * لودر آغازین — پورت بصری `UI/src/app/components/Loader.tsx` با بودجهٔ زمانی
+ * سخت‌گیرانه (ADR-0041).
  *
- * جریان نمایش مو‌به‌مو همان بستهٔ UI است: نوار پیشرفت هر ۲۵ms دو درصد جلو
- * می‌رود، ۳۰۰ms توقف و سپس محو شدن (exit با duration ۰.۴). تنها افزودهٔ این
- * نسخه، احترام به `prefers-reduced-motion` است — همان‌طور که قاعدهٔ سراسری
- * globals.css هم همهٔ انیمیشن‌ها را در این حالت خنثی می‌کند: پوشش با قاعدهٔ
- * CSS (`.ui-loader` در ui-theme.css) پنهان می‌شود و اینجا فقط تایمر شروع
- * نمی‌شود تا کاری بی‌دلیل اجرا نشود.
+ * چه چیزی عوض شد و چرا؟
+ * نسخهٔ قبلی تا رویداد ``window.load`` صبر می‌کرد. ``load`` یعنی «همهٔ تصاویر،
+ * فونت‌ها و chunkهای داینامیک دانلود شده‌اند» — روی موبایل/هاست اشتراکی این
+ * می‌تواند چند ثانیه طول بکشد، در حالی که HTML صفحه از قبل آماده و رندرشده
+ * است. نتیجه: پوشش تمام‌صفحه با نوار پیشرفت *ساختگی* روی محتوایی که حاضر است.
+ *
+ * رفتار جدید: حداکثر ۷۵۰ میلی‌ثانیه (۵۰۰ms پیشرفت + ۲۵۰ms محو شدن) و مستقل
+ * از شبکه. هیچ‌گاه منتظر ``load``، تصاویر یا chunkهای سه‌بعدی نمی‌ماند. اگر
+ * کاربر ``prefers-reduced-motion`` خواسته باشد، لودر اصلاً نمایش داده نمی‌شود.
  */
+const PROGRESS_STEP_MS = 20;
+const PROGRESS_STEP = 4;
+const HOLD_AFTER_COMPLETE_MS = 250;
+
 export function Loader() {
   const t = useTranslations("ui.loader");
   const brand = useTranslations("ui");
@@ -21,39 +29,23 @@ export function Loader() {
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      return;
-    }
-    // پیشرفت ظاهری سقف دارد (همان ۱٫۲۵ ثانیهٔ بستهٔ UI)، اما اگر بارگذاری
-    // واقعی صفحه زودتر تمام شده باشد، نگه‌داشتن پوشش تا پایان شمارندهٔ
-    // ساختگی فقط تأخیر است: با رویداد load بلافاصله کامل می‌شود. روی
-    // اتصال‌های کند همان رفتار قبلی (پایان شمارنده) حاکم است.
-    let finished = false;
+    // `prefers-reduced-motion` با قاعدهٔ CSS `.ui-loader` در ui-theme.css
+    // خنثی می‌شود (نمایش: none)؛ این‌جا فقط تایمر اجرا می‌شود تا حالت‌های
+    // غیر-reduced رفتار یکسان داشته باشند.
     let current = 0;
     let hideTimer: number | undefined;
     const interval = window.setInterval(() => {
-      current = Math.min(100, current + 2);
+      current = Math.min(100, current + PROGRESS_STEP);
       setProgress(current);
       if (current >= 100) {
-        finish();
+        window.clearInterval(interval);
+        hideTimer = window.setTimeout(() => setVisible(false), HOLD_AFTER_COMPLETE_MS);
       }
-    }, 25);
-    function finish() {
-      if (finished) return;
-      finished = true;
-      window.clearInterval(interval);
-      setProgress(100);
-      hideTimer = window.setTimeout(() => setVisible(false), 300);
-    }
-    if (document.readyState === "complete") {
-      finish();
-    } else {
-      window.addEventListener("load", finish, { once: true });
-    }
+    }, PROGRESS_STEP_MS);
+
     return () => {
       window.clearInterval(interval);
       window.clearTimeout(hideTimer);
-      window.removeEventListener("load", finish);
     };
   }, []);
 
@@ -63,7 +55,7 @@ export function Loader() {
         <motion.div
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.4 }}
+          transition={{ duration: 0.25 }}
           aria-hidden
           className="ui-loader fixed inset-0 z-50 flex items-center justify-center"
           style={{ background: "var(--deep-green-black)" }}

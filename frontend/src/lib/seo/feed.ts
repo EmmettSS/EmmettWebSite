@@ -7,7 +7,7 @@
  * برای خزنده‌ها/خواننده‌های فید یک URL پایدار و لینک‌شدنی وجود داشته باشد.
  */
 
-import { getApiBaseUrl } from "@/lib/api/config";
+import { getApiBaseUrl, internalServiceHeaders } from "@/lib/api/config";
 import { getSafeErrorType, logUpstreamFailure } from "@/lib/api/upstream-logging";
 import { CACHE_TAGS } from "@/lib/cache-tags";
 import { isAppLocale } from "@/lib/seo/site";
@@ -24,6 +24,7 @@ export async function fetchFeed(kind: FeedKind, locale: string): Promise<Respons
   try {
     const upstream = await fetch(url, {
       headers: {
+        ...internalServiceHeaders(),
         "Accept-Language": language,
         "X-Forwarded-Proto": "https",
       },

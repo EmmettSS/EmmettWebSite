@@ -48,24 +48,39 @@ test.describe("صفحهٔ سیستم طراحی", () => {
   test("سه توکن متن ملایم سه مقدار متمایز می‌دهند", async ({ page }) => {
     await page.goto("/design-system");
 
-    const readColor = async (token: string): Promise<string> =>
-      page
-        .locator(`[data-token="${token}"] span`)
-        .first()
-        .evaluate((element) => getComputedStyle(element).color);
+    // نکتهٔ مهم (اصلاح ۲۰۲۶-۱۰-۳۱): نسخهٔ قبلی این تست مقدار رنگ را با یک
+    // `evaluate` یک‌باره و **بدون retry** می‌خواند. در CI روی بیلد prerender
+    // شده این خواندن گاهی پیش از اعمال شیوه‌نامه/هیدریت شدن انجام می‌شد و
+    // رشتهٔ خالی یا رنگ ارثی برمی‌گشت (شکست تصادفی با پیام «Set size = 2»).
+    // هر دو assertion حالا از APIهای retry‌دار Playwright استفاده می‌کنند:
+    // `toHaveCSS` برای پایهٔ رنگ و `expect.poll` برای تمایز مقادیر.
+    const colorLocator = (token: string) => page.locator(`[data-token="${token}"] span`).first();
 
-    const onDark = await readColor("--muted-on-dark");
-    const onLight = await readColor("--muted-on-light");
-    const mutedForeground = await readColor("--muted-foreground");
+    const onDark = colorLocator("--muted-on-dark");
+    const onLight = colorLocator("--muted-on-light");
+    const mutedForeground = colorLocator("--muted-foreground");
 
     // آلفای دقیق به سریال‌سازی مرورگر وابسته است، پس فقط پایهٔ رنگ asserted
     // می‌شود و تمایز با مقایسهٔ خودِ رشته‌ها سنجیده می‌شود.
-    expect(onDark).toMatch(/^rgba\(243, 250, 246,/);
-    expect(onLight).toMatch(/^rgba\(16, 42, 32,/);
-    expect(
-      new Set([onDark, onLight, mutedForeground]).size,
-      "این سه توکن عمداً مقادیر متفاوت دارند (آلفای ۰٫۵۸، ۰٫۶۸ و ۰٫۵)؛ یکی‌شدنشان کنتراست متن را جابه‌جا می‌کند",
-    ).toBe(3);
+    await expect(onDark).toHaveCSS("color", /^rgba\(243, 250, 246,/);
+    await expect(onLight).toHaveCSS("color", /^rgba\(16, 42, 32,/);
+
+    await expect
+      .poll(
+        async () =>
+          new Set(
+            await Promise.all(
+              [onDark, onLight, mutedForeground].map((locator) =>
+                locator.evaluate((element) => getComputedStyle(element).color),
+              ),
+            ),
+          ).size,
+        {
+          message:
+            "این سه توکن عمداً مقادیر متفاوت دارند (آلفای ۰٫۵۸، ۰٫۶۸ و ۰٫۵)؛ یکی‌شدنشان کنتراست متن را جابه‌جا می‌کند",
+        },
+      )
+      .toBe(3);
   });
 
   test("مقدار زندهٔ همهٔ توکن‌ها پس از hydration از CSSOM پر می‌شود", async ({ page }) => {

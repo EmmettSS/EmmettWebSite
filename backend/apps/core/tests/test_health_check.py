@@ -28,6 +28,21 @@ class TestHealthCheckEndpoint:
         assert response.status_code != 401
         assert response.status_code != 403
 
+    def test_health_check_never_trips_the_anonymous_throttle(self) -> None:
+        """مانیتور uptime روزی ۱۴۴۰ بار صدا می‌زند؛ نباید به ۴۲۹ بخورد.
+
+        سقف ناشناس پیش‌فرض ۱۰۰/ساعت است. اگر این endpoint throttle شود، یک
+        مانیتور معمولی پس از ۱۰۰ دقیقه شروع می‌کند به دیدن ۴۲۹ و سایت سالم
+        را «خاموش» گزارش می‌کند؛ اسکریپت استقرار هم به همین دلیل بیلد را
+        متوقف می‌کرد.
+        """
+        client = APIClient()
+
+        statuses = {client.get("/api/v1/health/").status_code for _ in range(120)}
+
+        assert statuses == {200}
+        assert HealthCheckView.throttle_classes == []
+
     def test_health_check_returns_503_when_database_is_down(self) -> None:
         client = APIClient()
         with patch.object(HealthCheckView, "_check_database", return_value=False):

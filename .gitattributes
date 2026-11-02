@@ -1,0 +1,66 @@
+# =============================================================================
+# Normalization rules (repo-wide)
+# =============================================================================
+# Why this file exists:
+#   Until now the repository had NO .gitattributes and every text file was
+#   committed with CRLF line endings (Windows editor default). Consequences:
+#     - `npm run format:check` (Prettier `endOfLine: "lf"`) failed on 148 files
+#       → the `frontend-quality` CI job was red on `main`.
+#     - `bash -n scripts/*.sh` failed (`$'\r': command not found`,
+#       `set: pipefail: invalid option name`) → every deployment/backup script
+#       in `scripts/` and `backend/deploy/` was unusable on Linux/cPanel.
+#     - Python/shell shebangs broke (`/usr/bin/env python3\r`).
+#   These rules make Git store LF in the repository and check it out as LF on
+#   every platform, so the defects above cannot come back.
+#
+#   After changing this file run once:
+#     git add --renormalize . && git commit -m "chore: normalize line endings"
+# =============================================================================
+
+* text=auto eol=lf
+
+# Shell scripts must be LF *and* executable — a stray CR breaks `set -euo pipefail`.
+*.sh            text eol=lf
+*.bash          text eol=lf
+
+# Source / config / docs
+*.py            text eol=lf
+*.ts            text eol=lf
+*.tsx           text eol=lf
+*.js            text eol=lf
+*.mjs           text eol=lf
+*.cjs           text eol=lf
+*.json          text eol=lf
+*.md            text eol=lf
+*.css           text eol=lf
+*.html          text eol=lf
+*.yml           text eol=lf
+*.yaml          text eol=lf
+*.toml          text eol=lf
+*.ini           text eol=lf
+*.cfg           text eol=lf
+*.txt           text eol=lf
+*.example       text eol=lf
+*.po            text eol=lf
+*.pot           text eol=lf
+Dockerfile      text eol=lf
+Makefile        text eol=lf
+
+# Binary assets — never normalize, never diff as text.
+*.png           binary
+*.jpg           binary
+*.jpeg          binary
+*.gif           binary
+*.webp          binary
+*.avif          binary
+*.ico           binary
+*.woff          binary
+*.woff2         binary
+*.ttf           binary
+*.pdf           binary
+*.zip           binary
+*.gz            binary
+
+# Git internals
+.gitattributes  text eol=lf
+.gitignore      text eol=lf
