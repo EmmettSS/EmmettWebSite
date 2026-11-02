@@ -304,7 +304,7 @@ bash scripts/deploy_frontend.sh --install-deps
 | ۲ | حل `PUBLIC_SITE_URL` / `INTERNAL_API_URL` / `INTERNAL_API_TOKEN` از env یا `.env.local` و `backend/.env`؛ **توقف** اگر توکن خالی باشد | بیلد ۶۱ صفحه با ۴۲۹ می‌سازد و سایت خالی بالا می‌آید |
 | ۳ | انتظار تا `${INTERNAL_API_URL}/api/v1/health/` با کد `200` پاسخ دهد (تا `HEALTH_TIMEOUT_SECONDS`، پیش‌فرض ۹۰) | بیلد در حالی که Django خواب/خراب است |
 | ۴ | `npm ci` (در صورت نیاز) و تست نوشتن در `frontend/.next` | کش ISR در زمان اجرا نوشته نمی‌شود و هر بازدید یک رندر کامل است |
-| ۵ | `rm -rf .next && npm run build` و سپس `npm run verify:rendering` | رگرسیون ADR-0041: صفحه‌ای که در هر درخواست رندر می‌شود |
+| ۵ | `rm -rf .next && npm run build` و سپس `npm run verify:rendering` | رگرسیون ADR-0041 (صفحه‌ای که در هر درخواست رندر می‌شود) و رگرسیون ADR-0042 (`<h1>` نامرئی در HTML پخته‌شده که LCP را عقب می‌اندازد) |
 | ۶ | `touch frontend/tmp/restart.txt` + پیام قدم بعدی | فراموش‌شدن Restart اپ Node |
 
 گام ۳ درخواست را با هدر `X-Internal-Token` هم می‌فرستد تا اگر نسخهٔ قدیمی بک‌اند هنوز در حال اجراست، این پروب در سطل throttle ناشناس نیفتد.
