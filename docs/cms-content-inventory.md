@@ -67,7 +67,7 @@ Runtime overlay: `GET /api/v1/site-content/translations/?locale=` (namespace `si
 
 This inventory is complete enough to begin implementation when each row above is assigned to either (a) an existing database model/API to connect, (b) a typed CMS field/model/API to add, or (c) an intentional interface string to retain in translation files. Before Production content is populated, a content owner must approve all factual statements, statistics, customer/project claims, prices and legal links. No such approval is implied by this inventory.
 
-**v2 note:** the Phase 1 audit (`docs/audit/frontend-backend-gap-2026-11-06.md`) has assigned every open row above to a Phase 4 task (F4-001…F4-066). Owner sign-off on that audit is the gate for Phase 2 (admin rebuild) and subsequent phases.
+**v2 note:** the Phase 1 audit (`docs/audit/frontend-backend-gap-2026-11-06.md`) assigned every open row above to a Phase 4 task (F4-001…F4-066). **Owner sign-off was recorded on 2026-11-06** (audit §9, D-01…D-03 — AI surfaces become visible everywhere they are needed; open items closed per project judgment). The gate for Phase 2 (admin rebuild) is the Phase 2 prompt from the owner.
 
 ## 6. Display-level contract details (v1 preserved)
 
@@ -131,4 +131,4 @@ Before any production content population:
 7. FAQ rows exist for `/`, `/contact` and every `/services/<slug>` that should emit FAQPage JSON-LD; others simply render no FAQ block.
 8. Redirects needed by legacy URLs (`/feed`, `/products/pentestor`, …) exist as `Redirect` rows (301/302/410) with `hit_count` monitored, or as server-level rules — one source only after the migration.
 9. `noindex` verified for `/profile`, `/search`, `/advisor`, `/estimate`, `/advisor/results/*` at both Django header and route levels.
-10. Owner approval recorded for the Phase 1 audit (`docs/audit/frontend-backend-gap-2026-11-06.md`) — the standing gate before any later phase begins.
+10. Owner approval of the Phase 1 audit (`docs/audit/frontend-backend-gap-2026-11-06.md`) — **recorded 2026-11-06** (audit §9). Later phases proceed per owner prompts.
