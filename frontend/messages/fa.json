@@ -101,7 +101,13 @@
     "description": "آنچه می‌سازیم، چگونه می‌سازیم و چرا زیر فشار واقعی هم کار می‌کند.",
     "empty": "خدمتی یافت نشد.",
     "backToList": "بازگشت به خدمات",
-    "listHeading": "فهرست خدمات"
+    "listHeading": "فهرست خدمات",
+    "filterByCategory": "دسته‌بندی",
+    "allCategories": "همه",
+    "filterByFeatured": "ویژه",
+    "featuredOnly": "ویژه فقط",
+    "all": "همه",
+    "resultsCount": "{count} مورد"
   },
   "projects": {
     "title": "پروژه‌ها",
@@ -119,7 +125,8 @@
     "approach": "رویکرد",
     "result": "نتیجه",
     "technologyStack": "پشته‌ٔ فناوری",
-    "backToList": "بازگشت به پروژه‌ها"
+    "backToList": "بازگشت به پروژه‌ها",
+    "resultsCount": "{count} پروژه"
   },
   "academy": {
     "title": "آکادمی",
@@ -142,7 +149,11 @@
     "enrolled": "شما در این دوره ثبت‌نام کرده‌اید",
     "enrollRequiresLogin": "برای ثبت‌نام وارد شوید",
     "backToList": "بازگشت به آکادمی",
-    "rssFeed": "خوراک RSS دوره‌ها"
+    "rssFeed": "خوراک RSS دوره‌ها",
+    "allLevels": "همهٔ سطوح",
+    "filterByCategory": "دسته‌بندی",
+    "allCategories": "همه",
+    "resultsCount": "{count} دوره"
   },
   "blog": {
     "title": "کتابخانه",
@@ -161,7 +172,11 @@
     "rssFeed": "فید RSS",
     "backToList": "بازگشت به کتابخانه",
     "aiSummary": "خلاصهٔ ویرایش‌شده با هوش مصنوعی",
-    "aiSummaryReviewed": "این خلاصه پیش از نمایش توسط تیم تحریریه بازبینی شده است."
+    "aiSummaryReviewed": "این خلاصه پیش از نمایش توسط تیم تحریریه بازبینی شده است.",
+    "filterByCategory": "دسته‌بندی",
+    "allCategories": "همه",
+    "resultsCount": "{count} مقاله",
+    "allTags": "همه برچسب‌ها"
   },
   "team": {
     "title": "دربارهٔ ما",
@@ -216,7 +231,17 @@
     "noFavorites": "هنوز چیزی ذخیره نکرده‌اید.",
     "enrollmentsHeading": "دوره‌های من",
     "noEnrollments": "هنوز در دوره‌ای ثبت‌نام نکرده‌اید.",
-    "error": "مشکلی پیش آمد. لطفاً اطلاعات را بررسی کنید."
+    "error": "مشکلی پیش آمد. لطفاً اطلاعات را بررسی کنید.",
+    "profileHeading": "پروفایل",
+    "editProfile": "ویرایش",
+    "cancel": "انصراف",
+    "save": "ذخیره",
+    "updateSuccess": "پروفایل با موفقیت به‌روز شد.",
+    "phoneLabel": "تلفن",
+    "jobTitleLabel": "عنوان شغلی",
+    "companyLabel": "شرکت",
+    "bioLabel": "درباره",
+    "remove": "حذف"
   },
   "errors": {
     "notFoundTitle": "صفحه پیدا نشد",
@@ -268,7 +293,9 @@
     "startAgain": "ساخت ایده‌های تازه",
     "shareLink": "کپی پیوند اشتراک‌گذاری",
     "linkCopied": "پیوند کپی شد",
-    "linkCopyError": "کپی خودکار در دسترس نیست؛ پیوند صفحه را از نوار نشانی مرورگر کپی کنید."
+    "linkCopyError": "کپی خودکار در دسترس نیست؛ پیوند صفحه را از نوار نشانی مرورگر کپی کنید.",
+    "throttledError": "درخواست‌های زیادی ثبت کرده‌اید. لطفاً چند دقیقه بعد دوباره تلاش کنید.",
+    "serviceUnavailable": "سرویس هوش مصنوعی موقتاً در دسترس نیست. لطفاً بعداً دوباره تلاش کنید."
   },
   "ui": {
     "brand": "EMMETT",

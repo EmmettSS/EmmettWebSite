@@ -143,6 +143,15 @@ export const searchSite = (locale: string, query: string, clientIpHeader?: strin
     [CACHE_TAGS.search],
   );
 
+export const getCategories = (locale: string, scope?: string) =>
+  serverFetch<Paginated<Category>>(
+    `/taxonomy/categories/${scope ? `?scope=${encodeURIComponent(scope)}` : ""}`,
+    locale,
+  );
+
+export const getTags = (locale: string) =>
+  serverFetch<Paginated<Tag>>("/taxonomy/tags/", locale);
+
 export const getCatalogs = (locale: string, keys?: string[]) =>
   serverFetch<Catalog[]>(
     `/ai/catalogs/${keys?.length ? `?keys=${encodeURIComponent(keys.join(","))}` : ""}`,

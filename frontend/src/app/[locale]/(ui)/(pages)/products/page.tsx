@@ -11,6 +11,7 @@ import {
   CardDescription,
   CardMedia,
 } from "@/components/molecules/card";
+import { Pagination } from "@/components/molecules/pagination";
 import { getProjects } from "@/lib/api/server";
 import { getSeoSettingsOrDefaults } from "@/lib/api/seo";
 import { buildPageMetadata } from "@/lib/seo/metadata";
@@ -36,12 +37,23 @@ export async function generateMetadata({
   });
 }
 
-export default async function ProductsPage({ params }: { params: Promise<{ locale: string }> }) {
+export default async function ProductsPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const { locale } = await params;
+  const query = await searchParams;
   setRequestLocale(locale as AppLocale);
   const t = await getTranslations("projects");
 
-  const data = await getProjects(locale, "is_product=true");
+  const pageParam = typeof query.page === "string" ? query.page : undefined;
+  const queryString = new URLSearchParams({ is_product: "true" });
+  if (pageParam) queryString.set("page", pageParam);
+
+  const data = await getProjects(locale, queryString.toString());
   const products = data?.results ?? [];
 
   return (
@@ -54,30 +66,37 @@ export default async function ProductsPage({ params }: { params: Promise<{ local
       {products.length === 0 ? (
         <p className="mt-10 text-muted-foreground">{t("empty")}</p>
       ) : (
-        <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {products.map((project) => (
-            <Link key={project.public_id} href={`/projects/${project.slug}`} className="block">
-              <Card className="h-full overflow-hidden">
-                {project.cover_image_url ? (
-                  <CardMedia>
-                    <Image
-                      src={project.cover_image_url}
-                      alt=""
-                      fill
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                      className="aspect-video w-full object-cover"
-                    />
-                  </CardMedia>
-                ) : null}
-                <CardHeader>
-                  {project.year ? <Badge variant="technical">{project.year}</Badge> : null}
-                  <CardTitle>{project.title}</CardTitle>
-                  <CardDescription>{project.summary}</CardDescription>
-                </CardHeader>
-              </Card>
-            </Link>
-          ))}
-        </div>
+        <>
+          <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {products.map((project) => (
+              <Link key={project.public_id} href={`/projects/${project.slug}`} className="block">
+                <Card className="h-full overflow-hidden">
+                  {project.cover_image_url ? (
+                    <CardMedia>
+                      <Image
+                        src={project.cover_image_url}
+                        alt=""
+                        fill
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        className="aspect-video w-full object-cover"
+                      />
+                    </CardMedia>
+                  ) : null}
+                  <CardHeader>
+                    {project.year ? <Badge variant="technical">{project.year}</Badge> : null}
+                    <CardTitle>{project.title}</CardTitle>
+                    <CardDescription>{project.summary}</CardDescription>
+                  </CardHeader>
+                </Card>
+              </Link>
+            ))}
+          </div>
+          <Pagination
+            currentPage={data?.current_page ?? 1}
+            totalPages={data?.total_pages ?? 1}
+            basePath="/products"
+          />
+        </>
       )}
     </div>
   );

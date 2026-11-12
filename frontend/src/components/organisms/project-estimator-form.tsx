@@ -78,7 +78,13 @@ export function ProjectEstimatorForm({ catalogs }: ProjectEstimatorFormProps) {
       );
       setEstimate(response);
     } catch (exception) {
-      setError(exception instanceof ApiError ? exception.message : t("requestError"));
+      if (exception instanceof ApiError && exception.status === 429) {
+        setError(t("throttledError"));
+      } else if (exception instanceof ApiError && exception.status === 503) {
+        setError(t("serviceUnavailable"));
+      } else {
+        setError(exception instanceof ApiError ? exception.message : t("requestError"));
+      }
     } finally {
       setIsSubmitting(false);
     }

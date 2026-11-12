@@ -101,7 +101,13 @@
     "description": "What we build, how we build it, and why it holds up under pressure.",
     "empty": "No services found.",
     "backToList": "Back to services",
-    "listHeading": "All services"
+    "listHeading": "All services",
+    "filterByCategory": "Category",
+    "allCategories": "All",
+    "filterByFeatured": "Featured",
+    "featuredOnly": "Featured only",
+    "all": "All",
+    "resultsCount": "{count} results"
   },
   "projects": {
     "title": "Projects",
@@ -119,7 +125,8 @@
     "approach": "Approach",
     "result": "Result",
     "technologyStack": "Technology stack",
-    "backToList": "Back to projects"
+    "backToList": "Back to projects",
+    "resultsCount": "{count} projects"
   },
   "academy": {
     "title": "Academy",
@@ -142,7 +149,11 @@
     "enrolled": "You're enrolled in this course",
     "enrollRequiresLogin": "Sign in to enroll",
     "backToList": "Back to academy",
-    "rssFeed": "Courses RSS feed"
+    "rssFeed": "Courses RSS feed",
+    "allLevels": "All levels",
+    "filterByCategory": "Category",
+    "allCategories": "All",
+    "resultsCount": "{count} courses"
   },
   "blog": {
     "title": "Library",
@@ -161,7 +172,11 @@
     "rssFeed": "RSS feed",
     "backToList": "Back to library",
     "aiSummary": "AI-assisted summary",
-    "aiSummaryReviewed": "Reviewed by the editorial team before publication."
+    "aiSummaryReviewed": "Reviewed by the editorial team before publication.",
+    "filterByCategory": "Category",
+    "allCategories": "All",
+    "resultsCount": "{count} articles",
+    "allTags": "All tags"
   },
   "team": {
     "title": "About us",
@@ -216,7 +231,17 @@
     "noFavorites": "You haven't saved anything yet.",
     "enrollmentsHeading": "My courses",
     "noEnrollments": "You haven't enrolled in any course yet.",
-    "error": "Something went wrong. Please check your details."
+    "error": "Something went wrong. Please check your details.",
+    "profileHeading": "Profile",
+    "editProfile": "Edit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "updateSuccess": "Profile updated successfully.",
+    "phoneLabel": "Phone",
+    "jobTitleLabel": "Job title",
+    "companyLabel": "Company",
+    "bioLabel": "Bio",
+    "remove": "Remove"
   },
   "errors": {
     "notFoundTitle": "Page not found",
@@ -268,7 +293,9 @@
     "startAgain": "Generate new ideas",
     "shareLink": "Copy share link",
     "linkCopied": "Link copied",
-    "linkCopyError": "Automatic copying is unavailable. Copy the page URL from your browser address bar."
+    "linkCopyError": "Automatic copying is unavailable. Copy the page URL from your browser address bar.",
+    "throttledError": "Too many requests. Please try again in a few minutes.",
+    "serviceUnavailable": "AI service is temporarily unavailable. Please try again later."
   },
   "ui": {
     "brand": "EMMETT",

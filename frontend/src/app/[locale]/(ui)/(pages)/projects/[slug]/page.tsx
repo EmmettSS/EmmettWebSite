@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 
 import { Breadcrumb } from "@/components/molecules/breadcrumb";
 import { Badge } from "@/components/ui/badge";
+import { FavoriteButton } from "@/components/organisms/favorite-button";
 import type { AppLocale } from "@/i18n/routing";
 import { getProject } from "@/lib/api/server";
 import { projectDetailParams } from "@/lib/api/static-params";
@@ -133,6 +134,9 @@ export default async function ProjectDetailPage({ params }: { params: Promise<Pa
       />
 
       <header>
+        <div className="mb-3 flex justify-end">
+          <FavoriteButton contentType="project" publicId={project.public_id} />
+        </div>
         <h1 className={pageTitleClass}>{project.title}</h1>
         <p className={pageSummaryClass}>{project.summary}</p>
 

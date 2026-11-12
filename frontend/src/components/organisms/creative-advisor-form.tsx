@@ -69,7 +69,13 @@ export function CreativeAdvisorForm({ catalogs }: CreativeAdvisorFormProps) {
       );
       router.push(`/advisor/results/${result.share_token}`);
     } catch (exception) {
-      setError(exception instanceof ApiError ? exception.message : t("requestError"));
+      if (exception instanceof ApiError && exception.status === 429) {
+        setError(t("throttledError"));
+      } else if (exception instanceof ApiError && exception.status === 503) {
+        setError(t("serviceUnavailable"));
+      } else {
+        setError(exception instanceof ApiError ? exception.message : t("requestError"));
+      }
     } finally {
       setIsSubmitting(false);
     }
