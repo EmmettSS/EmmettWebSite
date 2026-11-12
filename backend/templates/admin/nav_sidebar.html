@@ -1,0 +1,22 @@
+{% load i18n static emmett_admin %}
+<button class="sticky toggle-nav-sidebar" id="toggle-nav-sidebar" type="button" aria-label="{% translate 'Toggle navigation' %}" aria-controls="nav-sidebar" aria-expanded="false"></button>
+<nav class="sticky" id="nav-sidebar" aria-label="{% translate 'Sidebar' %}">
+    <a class="emmett-nav__home" href="{% url 'admin:index' %}">
+        <span class="emmett-nav__icon" aria-hidden="true"><svg class="emmett-icon"><use href="{% static 'admin_theme/icons.svg' %}#icon-dashboard"></use></svg></span>
+        <span>{% translate "Dashboard" %}</span>
+    </a>
+    <label class="visually-hidden" for="nav-filter">{% translate "Filter navigation items" %}</label>
+    <input type="search" id="nav-filter" placeholder="{% translate 'Start typing to filter…' %}" autocomplete="off">
+    {% emmett_navigation_groups as navigation_groups %}
+    {% for group in navigation_groups %}
+        <section class="emmett-nav__section" aria-labelledby="emmett-nav-{{ group.key }}">
+            <h2 class="emmett-nav__section-title" id="emmett-nav-{{ group.key }}">
+                <span class="emmett-nav__icon" aria-hidden="true"><svg class="emmett-icon"><use href="{% static 'admin_theme/icons.svg' %}#icon-{{ group.icon }}"></use></svg></span>
+                {% if group.key == "content" %}{% translate "Content" %}{% elif group.key == "operations" %}{% translate "Operations" %}{% elif group.key == "administration" %}{% translate "Administration" %}{% else %}{% translate "Other" %}{% endif %}
+            </h2>
+            {% include "admin/app_list.html" with app_list=group.apps show_changelinks=False %}
+        </section>
+    {% empty %}
+        <p>{% translate "You don’t have permission to view or edit anything." %}</p>
+    {% endfor %}
+</nav>

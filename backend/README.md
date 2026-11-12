@@ -113,9 +113,8 @@ python manage.py spectacular --file /tmp/schema.yaml --fail-on-warn
 ## تست و کیفیت کد
 
 ```bash
-# لایهٔ تنظیماتِ CI برای اجرای تست‌ها **الزامی** است (ر.ک. ADR-0038). بدونِ آن هر تستی که
-# قالبِ ادمین را رندر می‌کند با `Missing staticfiles manifest entry` می‌شکند — ۲۹ تا ۳۴
-# شکستِ کاذب. این لایه فقط کلید `staticfiles` را به `StaticFilesStorage` ساده عوض می‌کند.
+# اجرای suite با لایهٔ تنظیمات CI (ADR-0038) آزمون‌ها را از collectstatic/مانیفست محصول جدا می‌کند.
+# این لایه فقط staticfiles را ساده می‌کند؛ storage پیش‌فرض فایل‌های کاربر دست‌نخورده می‌ماند.
 export PYTHONPATH=../.github/ci DJANGO_SETTINGS_MODULE=ci_test_settings
 
 pytest                                  # کل تست‌ها (pytest-django + factory-boy)
@@ -124,7 +123,7 @@ coverage run -m pytest -q && coverage report --fail-under=85   # پوشش؛ هم
 # مسیرِ پشتیبانی‌شده همان `coverage run` بالاست.
 ruff check apps config                  # لینت
 mypy apps config                        # type-check سخت‌گیرانه (strict)
-python manage.py check                  # System Checkها (E001–W013)
+python manage.py check                  # System Checkهای تنظیمات، Admin بومی و امنیت
 python manage.py check --deploy         # هشدارهای مخصوص production (۲FA/CSP/بکاپ/راز)
 python manage.py makemigrations --check --dry-run
 python scripts/i18n.py check            # یکسانی .po و تازگی .mo (ADR-0030)
@@ -151,9 +150,11 @@ python scripts/i18n.py check            # یکسانی .po و تازگی .mo (AD
   پسوند + بررسی سرنام (magic bytes) + سقف حجم روی `core.Media` — `ADR-0005`.
   هنگام دیپلوی production، `backend/deploy/media.htaccess.example` باید در
   `backend/media/.htaccess` کپی شود.
-- هدرهای امنیتی (فاز ۷): `core.middleware.SecurityHeadersMiddleware` برای پاسخ‌های
-  جنگو CSP دو‌سیاستی می‌سازد (API سخت، ادمین سازگار با Jazzmin) به‌همراه Referrer،
-  Permissions-Policy و COOP — `ADR-0033`. `X-Frame-Options`/`frame-ancestors` عمداً
+- هدرهای امنیتی: `core.middleware.SecurityHeadersMiddleware` برای پاسخ‌های
+  جنگو CSP دو‌سیاستی می‌سازد (API سخت؛ در Admin بومی، اسکریپت فقط از `'self'` و
+  style inline فقط برای ویجت‌های Django مجاز است) به‌همراه Referrer,
+  Permissions-Policy و COOP — مبانی `ADR-0033` و به‌روزرسانی Admin در `ADR-0043`.
+  `X-Frame-Options`/`frame-ancestors` عمداً
   در dev باز است تا پیش‌نمایش iframe کار کند؛ در production با `DJANGO_FRAME_ANCESTORS`
   تنظیم شود.
 - محافظت از ورود (فاز ۷): `core.security.LoginLockout` روی cache با پنجره/آستانه/مدت

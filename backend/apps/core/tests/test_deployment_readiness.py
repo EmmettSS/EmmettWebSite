@@ -332,11 +332,10 @@ def test_manage_py_reads_dotenv_settings_module_without_overriding_shell_env() -
             env_path.unlink(missing_ok=True)
 
 
-def test_non_strict_manifest_storage_handles_jazzmin_directory_static() -> None:
-    """استوریج پروداکشن نباید روی مسیر پوشه‌ای vendor/bootswatch کرش ValueError بدهد."""
+def test_non_strict_manifest_storage_falls_back_for_unmapped_paths() -> None:
     from apps.core.storage import NonStrictCompressedManifestStaticFilesStorage
 
     storage = NonStrictCompressedManifestStaticFilesStorage()
     assert storage.manifest_strict is False
-    url = storage.url("vendor/bootswatch")
-    assert url.endswith("/vendor/bootswatch")
+    url = storage.url("unmapped/file.txt")
+    assert url.endswith("/unmapped/file.txt")

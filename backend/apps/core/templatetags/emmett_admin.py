@@ -13,7 +13,8 @@
 from __future__ import annotations
 
 from datetime import date, datetime
-from typing import Any
+from math import isfinite
+from typing import Any, cast
 
 from django import template
 from django.template.context import Context
@@ -24,6 +25,22 @@ from apps.core.utils.dates import format_date
 from apps.core.utils.numerals import format_number
 
 register = template.Library()
+
+_NAVIGATION_GROUPS: tuple[tuple[str, str, frozenset[str]], ...] = (
+    ("content", "layers", frozenset({"services", "portfolio", "blog", "academy", "company", "taxonomy"})),
+    ("operations", "activity", frozenset({"leads", "ai_engine"})),
+    ("administration", "shield", frozenset({"accounts", "auth", "core"})),
+)
+
+_ICON_IDENTIFIERS = {
+    "users": "users",
+    "robot": "robot",
+    "handshake": "handshake",
+    "graduation": "graduation",
+    "trend": "trend",
+    "document": "document",
+    "chart": "chart",
+}
 
 
 @register.simple_tag(takes_context=True)
@@ -38,6 +55,41 @@ def emmett_dashboard(context: Context) -> DashboardData:
 
         get_logger(__name__).exception("admin_dashboard_render_failed")
         return DashboardData()
+
+
+@register.simple_tag(takes_context=True)
+def emmett_navigation_groups(context: Context) -> list[dict[str, Any]]:
+    available_apps = cast(list[dict[str, Any]], context.get("available_apps") or [])
+    remaining = list(available_apps)
+    groups: list[dict[str, Any]] = []
+
+    for key, icon, app_labels in _NAVIGATION_GROUPS:
+        group_apps = [app for app in remaining if str(app.get("app_label", "")) in app_labels]
+        if group_apps:
+            groups.append({"key": key, "icon": icon, "apps": group_apps})
+            remaining = [app for app in remaining if app not in group_apps]
+
+    if remaining:
+        groups.append({"key": "other", "icon": "dots", "apps": remaining})
+
+    return groups
+
+
+@register.filter
+def emmett_icon(value: Any) -> str:
+    return _ICON_IDENTIFIERS.get(str(value), "chart")
+
+
+@register.filter
+def emmett_chart_height(value: Any) -> str:
+    try:
+        percentage = float(value)
+    except (TypeError, ValueError):
+        percentage = 0.0
+    if not isfinite(percentage):
+        percentage = 0.0
+    bucket = max(0, min(10, round(percentage / 10)))
+    return f"emmett-chart__bar--height-{bucket}"
 
 
 @register.filter

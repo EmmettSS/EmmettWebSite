@@ -1,27 +1,4 @@
-"""System checks اختصاصی پنل ادمین — فاز ۶ (ADR-0027/0029).
-
-هدف: جلوگیری از رگرسیون‌هایی که فقط «در زمان اجرا و روی سرور» دیده می‌شوند و
-دیباگ آن‌ها گران است. Django این ماژول را خودکار بارگذاری می‌کند (قرارداد
-``<app>.checks``) و نتیجه در ``manage.py check``/``migrate`` دیده می‌شود.
-
-خطاهای تازه‌تر در ``emmett_admin`` با شناسه‌های زیر تعریف شده‌اند:
-
-- ``E001`` ترتیب اشتباه ``jazzmin``/``modeltranslation`` نسبت به ``admin``
-- ``E002`` نبود ``import_export``
-- ``E003`` تنظیم نبودن پوشهٔ قالب‌های پروژه/دارایی‌های استاتیک
-- ``E004`` نبود فایل‌های لازم تم/برند روی دیسک (خطای ``collectstatic``)
-- ``W005`` نبود فایل ترجمهٔ کامپایل‌شدهٔ فارسی (ادمین انگلیسی نمایش داده می‌شود)
-- ``W006`` روشن بودن CDN فونت گوگل در Jazzmin (نقض فونت self-hosted)
-- ``W007`` باقی‌ماندن ``PUBLIC_SITE_URL`` روی مقدار پیش‌فرض در production
-
-فاز ۷ (ADR-0033) این‌ها را اضافه کرد:
-
-- ``W008`` خاموش‌بودن CSP جنگو
-- ``W009`` (deploy) خاموش‌بودن اجبار ۲FA ادمین در production
-- ``W010`` (deploy) تنظیم‌نشدن کد تأیید Search Console
-- ``W011``/``W012`` (deploy) نبود/غیرقابل‌نوشتن‌بودن پوشهٔ پشتیبان‌گیری
-- ``W013`` (deploy) ضعیف/نمونه‌بودن ``SECRET_KEY``
-"""
+"""System checks برای پنل بومی Django Admin و دارایی‌های برند امیت."""
 
 from __future__ import annotations
 
@@ -32,27 +9,28 @@ from typing import Any, cast
 from django.conf import settings
 from django.core.checks import Error, Tags, Warning, register
 
-from apps.core.admin_theme import ADMIN_THEME_ASSETS
+from apps.core.admin_theme import ADMIN_THEME_ASSETS, ADMIN_THEME_TEMPLATES
 
 
 @register()
 def check_admin_theme_apps(*, app_configs: Any = None, **kwargs: Any) -> list[Error]:
-    """ترتیب اپ‌ها و حضور وابستگی‌های ادمین را بررسی می‌کند."""
+    """وجود و ترتیب وابستگی‌های پنل بومی را بررسی می‌کند."""
 
     errors: list[Error] = []
     apps = list(settings.INSTALLED_APPS)
-    hint = "ر.ک. ADR-0027 — ترتیب اپ‌ها در تنظیمات باید حفظ شود."
+    hint = "modeltranslation باید پیش از Django Admin باشد؛ بخش Admin از Django بومی استفاده می‌کند."
 
     def index_of(name: str) -> int | None:
         return apps.index(name) if name in apps else None
 
     admin_index = index_of("django.contrib.admin")
     modeltranslation_index = index_of("modeltranslation")
-    jazzmin_index = index_of("jazzmin")
-    import_export_index = index_of("import_export")
+
+    if admin_index is None:
+        errors.append(Error("اپ «django.contrib.admin» نصب نیست.", id="emmett_admin.E001", hint=hint))
 
     if modeltranslation_index is None:
-        errors.append(Error("مدل‌ترنسلیشن نصب نیست.", id="emmett_admin.E001", hint=hint))
+        errors.append(Error("اپ «modeltranslation» نصب نیست.", id="emmett_admin.E001", hint=hint))
     elif admin_index is not None and modeltranslation_index > admin_index:
         errors.append(
             Error(
@@ -62,18 +40,16 @@ def check_admin_theme_apps(*, app_configs: Any = None, **kwargs: Any) -> list[Er
             )
         )
 
-    if jazzmin_index is None:
-        errors.append(Error("اپ «jazzmin» (تم ادمین) نصب نیست.", id="emmett_admin.E001", hint=hint))
-    elif admin_index is not None and jazzmin_index > admin_index:
+    if "jazzmin" in apps:
         errors.append(
             Error(
-                "«jazzmin» باید پیش از «django.contrib.admin» در INSTALLED_APPS بیاید.",
-                id="emmett_admin.E001",
+                "اپ قدیمی «jazzmin» نباید در INSTALLED_APPS باشد؛ پنل باید از Django Admin بومی استفاده کند.",
+                id="emmett_admin.E005",
                 hint=hint,
             )
         )
 
-    if import_export_index is None:
+    if "import_export" not in apps:
         errors.append(
             Error(
                 "اپ «import_export» نصب نیست (صادرات/واردات ادمین — ADR-0029).",
@@ -99,7 +75,7 @@ def check_admin_theme_paths(*, app_configs: Any = None, **kwargs: Any) -> list[E
             Error(
                 "پوشهٔ «backend/templates» در TEMPLATES['DIRS'] تنظیم نشده است.",
                 id="emmett_admin.E003",
-                hint="قالب‌های سفارشی ادمین (base_site/index) از این مسیر بارگذاری می‌شوند.",
+                hint="قالب‌های سفارشی ادمین از این مسیر بارگذاری می‌شوند.",
             )
         )
 
@@ -109,7 +85,7 @@ def check_admin_theme_paths(*, app_configs: Any = None, **kwargs: Any) -> list[E
             Error(
                 "پوشهٔ «backend/static» در STATICFILES_DIRS تنظیم نشده است.",
                 id="emmett_admin.E003",
-                hint="دارایی‌های برند/تم ادمین از این مسیر سرو می‌شوند (ADR-0027).",
+                hint="دارایی‌های برند/پوستهٔ بومی ادمین از این مسیر سرو می‌شوند (ADR-0043).",
             )
         )
 
@@ -163,19 +139,24 @@ def check_fa_translations_compiled(*, app_configs: object = None, **kwargs: obje
 
 
 @register()
-def check_jazzmin_font_cdn(*, app_configs: object = None, **kwargs: object) -> list[Warning]:
-    """فونت گوگل CDN نباید فعال باشد (قانون ۶/ADR-0018: بدون وابستگی CDN خارجی)."""
+def check_admin_theme_templates(*, app_configs: object = None, **kwargs: object) -> list[Error]:
+    """وجود قالب‌های ضروری پوستهٔ بومی را بررسی می‌کند."""
 
-    jazzmin_settings = getattr(settings, "JAZZMIN_SETTINGS", {}) or {}
-    if jazzmin_settings.get("use_google_fonts_cdn", False):
-        return [
-            Warning(
-                "JAZZMIN_SETTINGS['use_google_fonts_cdn'] روشن است؛ فونت باید self-hosted باشد.",
-                id="emmett_admin.W006",
-                hint="این مقدار را False بگذارید — ADR-0018/ADR-0027.",
-            )
-        ]
-    return []
+    templates_dir = Path(settings.BASE_DIR) / "templates"
+    missing = [
+        f"{name}: {relative_path}"
+        for name, relative_path in ADMIN_THEME_TEMPLATES.items()
+        if not (templates_dir / relative_path).is_file()
+    ]
+    if not missing:
+        return []
+    return [
+        Error(
+            "قالب‌های ضروری پنل بومی یافت نشدند: " + ", ".join(missing),
+            id="emmett_admin.E006",
+            hint="قالب‌های اعلام‌شده در apps.core.admin_theme.ADMIN_THEME_TEMPLATES را نگه دارید.",
+        )
+    ]
 
 
 @register(Tags.security, deploy=True)

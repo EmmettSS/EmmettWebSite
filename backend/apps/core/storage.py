@@ -1,4 +1,4 @@
-"""نگه‌داشت فایل‌های استاتیک پروداکشن سازگار با WhiteNoise و Jazzmin."""
+"""ذخیره‌سازی استاتیک فشرده با بازگشت برای مسیرهای خارج از مانیفست."""
 
 from __future__ import annotations
 
@@ -8,14 +8,7 @@ from whitenoise.storage import CompressedManifestStaticFilesStorage  # type: ign
 class NonStrictCompressedManifestStaticFilesStorage(
     CompressedManifestStaticFilesStorage  # type: ignore[misc]
 ):
-    """فشرده‌سازی و نام‌گذاری هش‌دار WhiteNoise با بازگشت ایمن روی مسیر پوشه.
-
-    قالب پایهٔ ``django-jazzmin`` عبارت ``{% static "vendor/bootswatch" %}`` را روی
-    یک پوشه فراخوانی می‌کند و ``collectstatic`` پوشه‌ها را در ``staticfiles.json``
-    ثبت نمی‌کند؛ در ``stored_name`` فایل‌های واقعی همچنان نام هش‌شدهٔ مانیفست را
-    می‌گیرند و مسیرهای پوشه‌ای یا مانیفست‌نشده بدون کرش ``ValueError``/``OSError``
-    به مسیر تمیز اصلی بازمی‌گردند.
-    """
+    """نام‌گذاری هش‌دار WhiteNoise با بازگشت ایمن روی مسیرهای مانیفست‌نشده."""
 
     manifest_strict = False
 

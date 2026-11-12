@@ -23,11 +23,10 @@ disable_error_code = ["django-manager-missing"]
 module = "*.migrations.*"
 ignore_errors = true
 
-# django-jazzmin و django-import-export (فاز ۶ — ADR-0028/ADR-0029) هیچ
-# ``py.typed``/stub ندارند. تنها جایی که مستقیماً از کلاس‌هایشان ارث‌بری می‌کنیم
-# با ``# type: ignore[misc]`` علامت‌گذاری شده تا محدودیت صریح و قابل‌ردیابی باشد.
+# django-import-export (فاز ۶ — ADR-0029) stub ندارد. تنها جاهایی که مستقیماً
+# از کلاس‌هایش ارث‌بری می‌کنیم با ``# type: ignore[misc]`` علامت‌گذاری شده‌اند.
 [[tool.mypy.overrides]]
-module = ["import_export.*", "jazzmin.*"]
+module = ["import_export.*"]
 ignore_missing_imports = true
 
 # django-otp و qrcode (فاز ۷ — ADR-0032) هم ``py.typed`` ندارند. مصرف آن‌ها

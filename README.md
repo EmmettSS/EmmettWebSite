@@ -40,9 +40,12 @@
 اعداد با `make bench` تولید می‌شوند و در `docs/audit/2026-10-31-deep-audit.fa.md` روش کامل
 اندازه‌گیری آمده است.
 
-وضعیت CI این شاخه: **هر شش جاب سبز** (`backend-quality`، `backend-test`،
-`frontend-quality`، `frontend-test-build`، `security-scan`، `e2e-and-lighthouse`) — اجرای
-`41239783610`. پیش از این تغییر، هفت اجرای پیاپی (شامل `main`) قرمز بود.
+آخرین اجرای ثبت‌شدهٔ GitHub CI پیش از مهاجرت Admin، هر شش جاب را سبز کرده بود
+(`backend-quality`، `backend-test`، `frontend-quality`، `frontend-test-build`,
+`security-scan`، `e2e-and-lighthouse`) — اجرای `41239783610`. تغییرات مهاجرت
+۲۰۲۶-۱۱-۱۲ هنوز در GitHub Actions اجرا نشده‌اند؛ نتایج گیت‌های محلی در
+[`گزارش راستی‌آزمایی Admin بومی`](docs/audit/2026-11-12-phase-0/08-native-admin-verification.fa.md)
+آمده‌اند.
 
 گزارش کامل با روش اندازه‌گیری و دستورهای بازتولید:
 [`docs/audit/2026-10-31-deep-audit.fa.md`](docs/audit/2026-10-31-deep-audit.fa.md) —
@@ -63,7 +66,7 @@
 4. **موتور مرکزی هوش مصنوعی (`ai_engine`):**
    - مشاور ایده‌پرداز (تولید حداکثر ۳ ایدهٔ نرم‌افزاری فقط از روی گزینه‌های بستهٔ کاتالوگ بدون دریافت متن آزاد)، لینک اشتراک با توکن هش‌شده و قابل‌لغو، تخمین‌گر قطعی حداقل روز کاری (بدون قیمت عددی)، خلاصه‌ساز مقاله با تأیید ادمین، و Guardrail فرهنگی ایرانی.
 5. **پنل مدیریت سطح SaaS:**
-   - پوستهٔ سفارشی Jazzmin با لایهٔ RTL اختصاصی، داشبورد مدیریتی KPI با نمودارهای SVG، گردش‌کار انتشار گروهی، بازگردانی نرم‌حذف، صادرات/واردات دو مرحله‌ای CSV/TSV/JSON (محافظت‌شده در برابر Formula Injection) و احراز هویت دو مرحله‌ای (2FA TOTP + کدهای بازیابی).
+   - Django Admin بومی با قالب و دارایی‌های برندشدهٔ Emmett، پشتیبانی RTL/LTR و طراحی واکنش‌گرا؛ داشبورد KPI با نمودارهای SVG، گردش‌کار انتشار گروهی، بازگردانی نرم‌حذف، صادرات/واردات دو مرحله‌ای CSV/TSV/JSON (محافظت‌شده در برابر Formula Injection) و احراز هویت دو مرحله‌ای (2FA TOTP + کدهای بازیابی). پوستهٔ بومی در `ADR-0043` ثبت شده است.
 6. **سئو، کارایی و امنیت سطح پروداکشن:**
    - `sitemap.xml` و `robots.txt` پویا، ۶ اسکیمای JSON-LD، تصاویر OpenGraph پویا (۱۲۰۰×۶۳۰)، فیدهای RSS بلاگ و آکادمی، ریدایرکت‌های `301/302/410` از ادمین، هدر CSP دو‌سیاستی، قفل ورود ضد brute-force (`429`) و دستور پشتیبان‌گیری `manage.py backup_db`.
 
@@ -140,7 +143,8 @@ ruff check . && ruff format --check . && black --check .
 mypy apps config
 bandit -c pyproject.toml -r apps config -ll
 python scripts/i18n.py check
-PYTHONPATH=../.github/ci DJANGO_SETTINGS_MODULE=ci_test_settings coverage run -m pytest -q && coverage report --fail-under=85 -m   # لایهٔ تنظیماتِ CI استوریج را به `StaticFilesStorage` ساده سوییچ می‌کند؛ در تنظیمات پایه نیز `NonStrictCompressedManifestStaticFilesStorage` فعال است تا هم اجرای مستقیم `pytest` و هم رندر قالب‌های دایرکتوری‌محور Jazzmin در پروداکشن بدون خطای manifest کار کند
+# شیم CI فقط storage کلید staticfiles را ساده می‌کند؛ storage فایل‌های کاربر و storage فشرده/هش‌شدهٔ محصول دست‌نخورده می‌مانند.
+PYTHONPATH=../.github/ci DJANGO_SETTINGS_MODULE=ci_test_settings coverage run -m pytest -q && coverage report --fail-under=85 -m
 
 # تست و کیفیت فرانت‌اند
 cd ../frontend

@@ -49,10 +49,9 @@ def hash_identifier(value: str) -> str:
 def build_csp_policy(*, is_admin: bool = False) -> str:
     """سیاست CSP را از تنظیمات می‌سازد.
 
-    سیاست برای API/عمومی سخت‌گیرانه است (``default-src 'none'``) و برای صفحهٔ
-    ادمین کمی بازتر: قالب‌های Jazzmin استایل/اسکریپت درون‌خطی دارند، پس
-    ``'unsafe-inline'`` فقط در همان مسیر و فقط برای style/script مجاز می‌شود
-    (اسکریپت خارجی همچنان محدود به ``'self'`` است).
+    سیاست برای API/عمومی سخت‌گیرانه است (``default-src 'none'``) و برای پنل
+    بومی فقط استایل inline مورد نیاز ویجت‌های Django مجاز می‌شود؛ اجرای اسکریپت
+    همچنان فقط از منبع هم‌مبدأ پذیرفته می‌شود.
     """
 
     img_src = ["'self'", "data:", "blob:", *list(settings.CSP_EXTRA_IMG_SRC)]
@@ -73,7 +72,7 @@ def build_csp_policy(*, is_admin: bool = False) -> str:
     if is_admin:
         directives += [
             "style-src 'self' 'unsafe-inline'",
-            "script-src 'self' 'unsafe-inline'",
+            "script-src 'self'",
             "connect-src 'self'",
         ]
     else:

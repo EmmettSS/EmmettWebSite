@@ -2,33 +2,35 @@
 {% load i18n %}
 
 {% block twofa_content %}
-    <dl class="row mb-4">
-        <dt class="col-sm-4">{% translate "Status" %}</dt>
-        <dd class="col-sm-8">
+    <dl class="emmett-status-list">
+        <dt>{% translate "Status" %}</dt>
+        <dd>
             {% if confirmed %}
-                <span class="badge text-bg-success">{% translate "Active" %}</span>
+                <span class="emmett-pill emmett-pill--published">{% translate "Active" %}</span>
             {% else %}
-                <span class="badge text-bg-warning">{% translate "Not configured" %}</span>
+                <span class="emmett-pill emmett-pill--pending">{% translate "Not configured" %}</span>
             {% endif %}
         </dd>
-        <dt class="col-sm-4">{% translate "Required by policy" %}</dt>
-        <dd class="col-sm-8">{% if required %}{% translate "Yes" %}{% else %}{% translate "No (optional)" %}{% endif %}</dd>
-        <dt class="col-sm-4">{% translate "Recovery codes left" %}</dt>
-        <dd class="col-sm-8">{{ recovery_count }}</dd>
+        <dt>{% translate "Required by policy" %}</dt>
+        <dd>{% if required %}{% translate "Yes" %}{% else %}{% translate "No (optional)" %}{% endif %}</dd>
+        <dt>{% translate "Recovery codes left" %}</dt>
+        <dd>{{ recovery_count }}</dd>
     </dl>
 
     {% if confirmed %}
-        <form method="post" class="d-inline">
-            {% csrf_token %}
-            <input type="hidden" name="action" value="regenerate">
-            <button type="submit" class="btn btn-outline-primary">{% translate "Generate new recovery codes" %}</button>
-        </form>
-        <form method="post" class="d-inline">
-            {% csrf_token %}
-            <input type="hidden" name="action" value="disable">
-            <button type="submit" class="btn btn-outline-danger">{% translate "Disable two-factor authentication" %}</button>
-        </form>
+        <div class="emmett-auth-actions">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="regenerate">
+                <button type="submit" class="button">{% translate "Generate new recovery codes" %}</button>
+            </form>
+            <form method="post" data-emmett-confirm="{% translate 'Disable two-factor authentication for this account?' %}">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="disable">
+                <button type="submit" class="button emmett-danger-button">{% translate "Disable two-factor authentication" %}</button>
+            </form>
+        </div>
     {% else %}
-        <a class="btn btn-primary" href="{% url 'admin-2fa-setup' %}?next={{ next|urlencode }}">{% translate "Set up now" %}</a>
+        <a class="button default" href="{% url 'admin-2fa-setup' %}?next={{ next|urlencode }}">{% translate "Set up now" %}</a>
     {% endif %}
 {% endblock %}

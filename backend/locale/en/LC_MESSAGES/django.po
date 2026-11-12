@@ -20,8 +20,8 @@ msgid "name"
 msgstr ""
 
 #: apps/academy/models.py:27 apps/academy/models.py:49
-#: apps/academy/models.py:82 apps/blog/models.py:18 apps/core/models.py:467
-#: apps/portfolio/models.py:25 apps/services/models.py:17
+#: apps/academy/models.py:82 apps/blog/models.py:18 apps/core/models.py:459
+#: apps/portfolio/models.py:33 apps/services/models.py:17
 msgid "title"
 msgstr ""
 
@@ -39,13 +39,13 @@ msgid "Instructors"
 msgstr ""
 
 #: apps/academy/models.py:50 apps/blog/models.py:19
-#: apps/portfolio/models.py:26 apps/services/models.py:18
+#: apps/portfolio/models.py:34 apps/services/models.py:18
 #: apps/taxonomy/models.py:24 apps/taxonomy/models.py:44
 msgid "slug"
 msgstr ""
 
 #: apps/academy/models.py:51 apps/academy/models.py:83
-#: apps/ai_engine/models.py:303 apps/portfolio/models.py:27
+#: apps/ai_engine/models.py:303 apps/portfolio/models.py:35
 #: apps/services/models.py:19
 msgid "summary"
 msgstr ""
@@ -62,15 +62,15 @@ msgstr ""
 msgid "duration (hours)"
 msgstr ""
 
-#: apps/academy/models.py:64 apps/company/models.py:57
-#: apps/portfolio/models.py:49 apps/services/models.py:30
+#: apps/academy/models.py:64 apps/company/models.py:59
+#: apps/portfolio/models.py:57 apps/services/models.py:30
 msgid "is featured"
 msgstr ""
 
 #: apps/academy/models.py:65 apps/academy/models.py:87
 #: apps/ai_engine/models.py:24 apps/ai_engine/models.py:56
-#: apps/company/models.py:31 apps/company/models.py:58 apps/core/models.py:570
-#: apps/portfolio/models.py:50 apps/services/models.py:29
+#: apps/company/models.py:31 apps/company/models.py:60 apps/core/models.py:598
+#: apps/portfolio/models.py:58 apps/services/models.py:29
 msgid "order"
 msgstr ""
 
@@ -78,7 +78,7 @@ msgstr ""
 msgid "Course"
 msgstr ""
 
-#: apps/academy/models.py:69 apps/core/dashboard.py:470
+#: apps/academy/models.py:69 apps/core/dashboard.py:468
 msgid "Courses"
 msgstr ""
 
@@ -107,7 +107,7 @@ msgid "Lessons"
 msgstr ""
 
 #: apps/academy/models.py:129 apps/ai_engine/models.py:181
-#: apps/blog/models.py:66 apps/core/models.py:229 apps/leads/models.py:118
+#: apps/blog/models.py:64 apps/core/models.py:228 apps/leads/models.py:118
 msgid "status"
 msgstr ""
 
@@ -147,8 +147,8 @@ msgstr ""
 msgid "قابل‌مشاهده بدون نیاز به ورود/خرید."
 msgstr "Visible without signing in or purchasing."
 
-#: apps/academy/models.py:116 apps/ai_engine/admin.py:304
-#: apps/core/dashboard.py:401
+#: apps/academy/models.py:116 apps/ai_engine/admin.py:296
+#: apps/core/dashboard.py:399 templates/admin/twofa/status.html:9
 msgid "Active"
 msgstr ""
 
@@ -185,12 +185,12 @@ msgstr ""
 msgid "phone verified"
 msgstr ""
 
-#: apps/accounts/models.py:83 apps/core/models.py:79 apps/core/models.py:141
+#: apps/accounts/models.py:83 apps/core/models.py:80 apps/core/models.py:142
 msgid "created at"
 msgstr ""
 
-#: apps/accounts/models.py:84 apps/core/models.py:80 apps/core/models.py:142
-#: apps/core/models.py:353 apps/core/models.py:471
+#: apps/accounts/models.py:84 apps/core/models.py:81 apps/core/models.py:143
+#: apps/core/models.py:349 apps/core/models.py:463
 msgid "updated at"
 msgstr ""
 
@@ -198,7 +198,7 @@ msgstr ""
 msgid "User"
 msgstr ""
 
-#: apps/accounts/models.py:93 apps/core/dashboard.py:361
+#: apps/accounts/models.py:93 apps/core/dashboard.py:359
 msgid "Users"
 msgstr ""
 
@@ -298,7 +298,7 @@ msgstr ""
 msgid "option key"
 msgstr ""
 
-#: apps/ai_engine/models.py:57 apps/core/models.py:171
+#: apps/ai_engine/models.py:57 apps/core/models.py:170
 msgid "metadata"
 msgstr ""
 
@@ -316,7 +316,7 @@ msgstr ""
 
 #: apps/ai_engine/models.py:102 apps/ai_engine/models.py:180
 #: apps/ai_engine/models.py:216 apps/ai_engine/models.py:302
-#: apps/core/models.py:342 apps/core/models.py:466
+#: apps/core/models.py:338 apps/core/models.py:458
 msgid "locale"
 msgstr ""
 
@@ -572,12 +572,12 @@ msgstr ""
 msgid "Blocked"
 msgstr ""
 
-#: apps/ai_engine/models.py:290 apps/core/models.py:224
+#: apps/ai_engine/models.py:290 apps/core/models.py:223
 msgid "Draft"
 msgstr ""
 
 #: apps/ai_engine/models.py:291 apps/blog/models.py:54
-#: apps/core/dashboard.py:424
+#: apps/core/dashboard.py:422
 msgid "Approved"
 msgstr ""
 
@@ -614,19 +614,19 @@ msgstr ""
 msgid "Blog Post"
 msgstr ""
 
-#: apps/blog/models.py:36 apps/core/dashboard.py:469
+#: apps/blog/models.py:36 apps/core/dashboard.py:467
 msgid "Blog Posts"
 msgstr ""
 
-#: apps/blog/models.py:64 apps/core/models.py:468
+#: apps/blog/models.py:62 apps/core/models.py:460
 msgid "body"
 msgstr ""
 
-#: apps/blog/admin.py:85 apps/blog/models.py:70
+#: apps/blog/admin.py:85 apps/blog/models.py:68
 msgid "Comment"
 msgstr ""
 
-#: apps/blog/models.py:71
+#: apps/blog/models.py:69
 msgid "Comments"
 msgstr ""
 
@@ -642,7 +642,7 @@ msgstr ""
 msgid "role title"
 msgstr ""
 
-#: apps/company/models.py:30 apps/core/models.py:375
+#: apps/company/models.py:30 apps/core/models.py:369
 msgid "social links"
 msgstr ""
 
@@ -654,27 +654,27 @@ msgstr ""
 msgid "Team Members"
 msgstr ""
 
-#: apps/company/models.py:43
+#: apps/company/models.py:45
 msgid "author name"
 msgstr ""
 
-#: apps/company/models.py:44
+#: apps/company/models.py:46
 msgid "author role"
 msgstr ""
 
-#: apps/company/models.py:45
+#: apps/company/models.py:47
 msgid "author company"
 msgstr ""
 
-#: apps/company/models.py:49
+#: apps/company/models.py:51
 msgid "quote"
 msgstr ""
 
-#: apps/company/models.py:61
+#: apps/company/models.py:63
 msgid "Testimonial"
 msgstr ""
 
-#: apps/company/models.py:62
+#: apps/company/models.py:64
 msgid "Testimonials"
 msgstr ""
 
@@ -682,210 +682,210 @@ msgstr ""
 msgid "Core"
 msgstr ""
 
-#: apps/core/models.py:81
+#: apps/core/models.py:82
 msgid "is active"
 msgstr ""
 
-#: apps/core/models.py:82
+#: apps/core/models.py:83
 msgid "deleted at"
 msgstr ""
 
-#: apps/core/models.py:165
+#: apps/core/models.py:166
 msgid "action"
 msgstr ""
 
-#: apps/core/models.py:172 apps/leads/models.py:56
+#: apps/core/models.py:171 apps/leads/models.py:56
 msgid "IP address"
 msgstr ""
 
-#: apps/core/models.py:173 apps/leads/models.py:57
+#: apps/core/models.py:172 apps/leads/models.py:57
 msgid "user agent"
 msgstr ""
 
-#: apps/core/models.py:176
+#: apps/core/models.py:175
 msgid "Audit Log"
 msgstr ""
 
-#: apps/core/models.py:177
+#: apps/core/models.py:176
 msgid "Audit Logs"
 msgstr ""
 
-#: apps/core/models.py:231
+#: apps/core/models.py:230
 msgid "published at"
 msgstr ""
 
-#: apps/core/models.py:249
+#: apps/core/models.py:248
 msgid "meta title"
 msgstr ""
 
-#: apps/core/models.py:250
+#: apps/core/models.py:249
 msgid "meta description"
 msgstr ""
 
-#: apps/core/models.py:260
+#: apps/core/models.py:259
 msgid "canonical path"
 msgstr ""
 
-#: apps/core/models.py:291
+#: apps/core/models.py:288
 msgid "file"
 msgstr ""
 
-#: apps/core/models.py:293
+#: apps/core/models.py:289
 msgid "media type"
 msgstr ""
 
-#: apps/core/models.py:294
+#: apps/core/models.py:290
 msgid "alt text"
 msgstr ""
 
-#: apps/core/models.py:295
+#: apps/core/models.py:291
 msgid "caption"
 msgstr ""
 
-#: apps/core/models.py:296
+#: apps/core/models.py:292
 msgid "width"
 msgstr ""
 
-#: apps/core/models.py:297
+#: apps/core/models.py:293
 msgid "height"
 msgstr ""
 
-#: apps/core/models.py:298
+#: apps/core/models.py:294
 msgid "file size (bytes)"
 msgstr ""
 
-#: apps/core/models.py:299
+#: apps/core/models.py:295
 msgid "MIME type"
 msgstr ""
 
-#: apps/core/models.py:300
+#: apps/core/models.py:296
 msgid "checksum (sha256)"
 msgstr ""
 
-#: apps/academy/admin.py:83 apps/blog/admin.py:57 apps/core/models.py:311
-#: apps/core/models.py:312 apps/portfolio/admin.py:63
+#: apps/academy/admin.py:83 apps/blog/admin.py:57 apps/core/models.py:307
+#: apps/core/models.py:308 apps/portfolio/admin.py:63
 msgid "Media"
 msgstr ""
 
-#: apps/core/models.py:340
+#: apps/core/models.py:336
 msgid "namespace"
 msgstr ""
 
-#: apps/core/models.py:341
+#: apps/core/models.py:337
 msgid "key"
 msgstr ""
 
-#: apps/core/models.py:343
+#: apps/core/models.py:339
 msgid "value"
 msgstr ""
 
-#: apps/core/models.py:344
+#: apps/core/models.py:340
 msgid "is HTML"
 msgstr ""
 
-#: apps/core/models.py:356
+#: apps/core/models.py:352
 msgid "Translation"
 msgstr ""
 
-#: apps/core/models.py:357
+#: apps/core/models.py:353
 msgid "Translations"
 msgstr ""
 
-#: apps/core/models.py:371
+#: apps/core/models.py:365
 msgid "site name"
 msgstr ""
 
-#: apps/core/models.py:372
+#: apps/core/models.py:366
 msgid "default locale"
 msgstr ""
 
-#: apps/core/models.py:373
+#: apps/core/models.py:367
 msgid "contact email"
 msgstr ""
 
-#: apps/core/models.py:374
+#: apps/core/models.py:368
 msgid "contact phone"
 msgstr ""
 
-#: apps/core/models.py:376
+#: apps/core/models.py:370
 msgid "maintenance mode"
 msgstr ""
 
-#: apps/core/models.py:428 apps/core/models.py:429
+#: apps/core/models.py:420 apps/core/models.py:421
 msgid "Site Settings"
 msgstr ""
 
-#: apps/core/models.py:463
+#: apps/core/models.py:455
 msgid "content type"
 msgstr ""
 
-#: apps/core/models.py:464
+#: apps/core/models.py:456
 msgid "object id"
 msgstr ""
 
-#: apps/core/models.py:465
+#: apps/core/models.py:457
 msgid "public id"
 msgstr ""
 
-#: apps/core/models.py:469
+#: apps/core/models.py:461
 msgid "URL path"
 msgstr ""
 
-#: apps/core/models.py:470
+#: apps/core/models.py:462
 msgid "category label"
 msgstr ""
 
-#: apps/core/models.py:474
+#: apps/core/models.py:466
 msgid "Search Index Entry"
 msgstr ""
 
-#: apps/core/models.py:475
+#: apps/core/models.py:467
 msgid "Search Index Entries"
 msgstr ""
 
-#: apps/core/models.py:158
+#: apps/core/models.py:159
 msgid "actor"
 msgstr ""
 
-#: apps/core/models.py:163
+#: apps/core/models.py:164
 msgid "کاربری که عملیات را انجام داده؛ خالی یعنی سیستم/کاربر مهمان."
 msgstr "User who performed the action; empty means system or guest."
 
-#: apps/core/models.py:225
+#: apps/core/models.py:224
 msgid "Published"
 msgstr ""
 
-#: apps/core/models.py:226
+#: apps/core/models.py:225
 msgid "Archived"
 msgstr ""
 
-#: apps/core/models.py:253
+#: apps/core/models.py:252
 msgid "OG image"
 msgstr ""
 
-#: apps/core/models.py:264
+#: apps/core/models.py:263
 msgid ""
 "در صورت خالی بودن، مسیر پیش‌فرض صفحه به‌عنوان canonical استفاده می‌شود."
 msgstr ""
 "When left empty, the page's default path is used as the canonical URL."
 
-#: apps/core/models.py:286
+#: apps/core/models.py:284
 msgid "Image"
 msgstr ""
 
-#: apps/core/models.py:287
+#: apps/core/models.py:285
 msgid "Document"
 msgstr ""
 
-#: apps/core/models.py:288
+#: apps/core/models.py:286
 msgid "Video"
 msgstr ""
 
-#: apps/core/models.py:303
+#: apps/core/models.py:299
 msgid "uploaded by"
 msgstr ""
 
-#: apps/core/models.py:347
+#: apps/core/models.py:343
 msgid "updated by"
 msgstr ""
 
@@ -897,7 +897,7 @@ msgstr "The file content does not match the declared extension."
 msgid "حجم فایل بیش از حد مجاز (%(max)s مگابایت) است."
 msgstr "File size exceeds the allowed limit (%(max)s MB)."
 
-#: apps/core/dashboard.py:384 apps/leads/apps.py:9 apps/leads/models.py:125
+#: apps/core/dashboard.py:382 apps/leads/apps.py:9 apps/leads/models.py:125
 msgid "Leads"
 msgstr ""
 
@@ -921,7 +921,7 @@ msgstr ""
 msgid "consent given"
 msgstr ""
 
-#: apps/core/admin.py:250 apps/leads/models.py:60
+#: apps/core/admin.py:261 apps/leads/models.py:60
 msgid "Contact"
 msgstr ""
 
@@ -985,28 +985,28 @@ msgstr ""
 msgid "timeline"
 msgstr ""
 
-#: apps/core/dashboard.py:450 apps/leads/models.py:85
+#: apps/core/dashboard.py:448 apps/leads/models.py:85
 msgid "New"
 msgstr ""
 
-#: apps/core/dashboard.py:451 apps/leads/models.py:86
+#: apps/core/dashboard.py:449 apps/leads/models.py:86
 msgid "Contacted"
 msgstr ""
 
-#: apps/core/dashboard.py:452 apps/leads/models.py:87
+#: apps/core/dashboard.py:450 apps/leads/models.py:87
 msgid "Qualified"
 msgstr ""
 
-#: apps/core/dashboard.py:453 apps/leads/models.py:88
+#: apps/core/dashboard.py:451 apps/leads/models.py:88
 msgid "Proposal"
 msgstr ""
 
-#: apps/core/dashboard.py:389 apps/core/dashboard.py:454
+#: apps/core/dashboard.py:387 apps/core/dashboard.py:452
 #: apps/leads/models.py:89
 msgid "Won"
 msgstr ""
 
-#: apps/core/dashboard.py:455 apps/leads/models.py:90
+#: apps/core/dashboard.py:453 apps/leads/models.py:90
 msgid "Lost"
 msgstr ""
 
@@ -1018,76 +1018,76 @@ msgstr ""
 msgid "Portfolio"
 msgstr ""
 
-#: apps/portfolio/models.py:28
+#: apps/portfolio/models.py:36
 msgid "client name"
 msgstr ""
 
-#: apps/portfolio/models.py:42
+#: apps/portfolio/models.py:50
 msgid "year"
 msgstr ""
 
-#: apps/portfolio/models.py:44
+#: apps/portfolio/models.py:52
 msgid "is product"
 msgstr ""
 
-#: apps/portfolio/models.py:53
+#: apps/portfolio/models.py:61
 msgid "Project"
 msgstr ""
 
-#: apps/core/dashboard.py:468 apps/portfolio/models.py:54
+#: apps/core/dashboard.py:466 apps/portfolio/models.py:62
 msgid "Projects"
 msgstr ""
 
-#: apps/portfolio/models.py:63
+#: apps/portfolio/models.py:71
 msgid "challenge (Markdown)"
 msgstr ""
 
-#: apps/portfolio/models.py:65
+#: apps/portfolio/models.py:73
 msgid "approach (Markdown)"
 msgstr ""
 
-#: apps/portfolio/models.py:67
+#: apps/portfolio/models.py:75
 msgid "architecture notes (Markdown)"
 msgstr ""
 
-#: apps/portfolio/models.py:69
+#: apps/portfolio/models.py:77
 msgid "technology stack"
 msgstr ""
 
-#: apps/portfolio/models.py:70
+#: apps/portfolio/models.py:78
 msgid "implementation notes (Markdown)"
 msgstr ""
 
-#: apps/portfolio/models.py:72
+#: apps/portfolio/models.py:80
 msgid "result (Markdown)"
 msgstr ""
 
-#: apps/portfolio/models.py:74
+#: apps/portfolio/models.py:82
 msgid "metrics"
 msgstr ""
 
-#: apps/portfolio/models.py:77
+#: apps/portfolio/models.py:85
 msgid "Case Study"
 msgstr ""
 
-#: apps/portfolio/models.py:78
+#: apps/portfolio/models.py:86
 msgid "Case Studies"
 msgstr ""
 
-#: apps/portfolio/models.py:33
+#: apps/portfolio/models.py:41
 msgid "برای فیلتر «صنعت»."
 msgstr "Used to filter by industry."
 
-#: apps/portfolio/models.py:36
+#: apps/portfolio/models.py:44
 msgid "برای فیلتر «تکنولوژی»."
 msgstr "Used to filter by technology."
 
-#: apps/portfolio/models.py:47
+#: apps/portfolio/models.py:55
 msgid ""
 "مثلاً Pentestor/CRM — محصولات داخلی که به شکل Project نمایش داده می‌شوند."
 msgstr "For example Pentestor/CRM — in-house products surfaced as projects."
 
-#: apps/core/dashboard.py:467 apps/services/apps.py:9
+#: apps/core/dashboard.py:465 apps/services/apps.py:9
 #: apps/services/models.py:34
 msgid "Services"
 msgstr ""
@@ -1145,12 +1145,12 @@ msgstr ""
 msgid "Categories and ordering"
 msgstr ""
 
-#: apps/academy/admin.py:85 apps/ai_engine/admin.py:167 apps/blog/admin.py:59
+#: apps/academy/admin.py:85 apps/ai_engine/admin.py:165 apps/blog/admin.py:59
 #: apps/portfolio/admin.py:68 apps/services/admin.py:32
 msgid "Publication"
 msgstr ""
 
-#: apps/academy/admin.py:86 apps/blog/admin.py:60 apps/core/admin.py:252
+#: apps/academy/admin.py:86 apps/blog/admin.py:60 apps/core/admin.py:263
 #: apps/portfolio/admin.py:69 apps/services/admin.py:33
 msgid "SEO"
 msgstr ""
@@ -1160,8 +1160,8 @@ msgstr ""
 msgid "Technical details"
 msgstr ""
 
-#: apps/academy/admin.py:120 apps/ai_engine/admin.py:373
-#: apps/leads/admin.py:84
+#: apps/academy/admin.py:120 apps/ai_engine/admin.py:363
+#: apps/leads/admin.py:84 templates/admin/twofa/status.html:6
 msgid "Status"
 msgstr ""
 
@@ -1185,7 +1185,7 @@ msgstr ""
 msgid "Full name"
 msgstr ""
 
-#: apps/accounts/admin.py:152
+#: apps/accounts/admin.py:155
 msgid "Biography"
 msgstr ""
 
@@ -1193,71 +1193,71 @@ msgstr ""
 msgid "Options"
 msgstr ""
 
-#: apps/ai_engine/admin.py:166
+#: apps/ai_engine/admin.py:164
 msgid "Prompt"
 msgstr ""
 
-#: apps/ai_engine/admin.py:175
+#: apps/ai_engine/admin.py:171
 msgid "Active version"
 msgstr ""
 
-#: apps/ai_engine/admin.py:194
+#: apps/ai_engine/admin.py:190
 msgid "Archive superseded versions of the same feature and locale"
 msgstr ""
 
-#: apps/ai_engine/admin.py:235
+#: apps/ai_engine/admin.py:231
 msgid "Descriptions"
 msgstr ""
 
-#: apps/ai_engine/admin.py:236
+#: apps/ai_engine/admin.py:232
 msgid "Configuration"
 msgstr ""
 
-#: apps/ai_engine/admin.py:302
+#: apps/ai_engine/admin.py:294
 msgid "Public share"
 msgstr ""
 
-#: apps/ai_engine/admin.py:306
+#: apps/ai_engine/admin.py:298
 msgid "Revoke public share links for selected suggestions"
 msgstr ""
 
-#: apps/ai_engine/admin.py:377
+#: apps/ai_engine/admin.py:367
 msgid "Approve selected summaries for public display"
 msgstr ""
 
-#: apps/ai_engine/admin.py:397
+#: apps/ai_engine/admin.py:385
 msgid "Reject selected summaries"
 msgstr ""
 
-#: apps/ai_engine/admin.py:220
+#: apps/ai_engine/admin.py:216
 msgid "Archived %(count)s superseded prompt version(s)."
 msgstr ""
 
-#: apps/ai_engine/admin.py:304
+#: apps/ai_engine/admin.py:296
 msgid "Revoked"
 msgstr ""
 
-#: apps/ai_engine/admin.py:310
+#: apps/ai_engine/admin.py:302
 msgid "Nothing to revoke: no active share link was selected."
 msgstr ""
 
-#: apps/ai_engine/admin.py:319
+#: apps/ai_engine/admin.py:310
 msgid "Revoked %(count)s share link(s)."
 msgstr ""
 
-#: apps/ai_engine/admin.py:381
+#: apps/ai_engine/admin.py:371
 msgid "Nothing to approve: selected summaries are stale."
 msgstr ""
 
-#: apps/ai_engine/admin.py:394
+#: apps/ai_engine/admin.py:383
 msgid "Approved %(count)s summarie(s)."
 msgstr ""
 
-#: apps/ai_engine/admin.py:401
+#: apps/ai_engine/admin.py:389
 msgid "Nothing to reject: no summary was selected."
 msgstr ""
 
-#: apps/ai_engine/admin.py:414
+#: apps/ai_engine/admin.py:401
 msgid "Rejected %(count)s summarie(s)."
 msgstr ""
 
@@ -1297,23 +1297,23 @@ msgstr ""
 msgid "Quote"
 msgstr ""
 
-#: apps/core/admin.py:112
+#: apps/core/admin.py:113
 msgid "Change summary"
 msgstr ""
 
-#: apps/core/admin.py:179
+#: apps/core/admin.py:178
 msgid "Value"
 msgstr ""
 
-#: apps/core/admin.py:194
+#: apps/core/admin.py:207
 msgid "Create the missing language row for selected entries"
 msgstr ""
 
-#: apps/core/admin.py:230
+#: apps/core/admin.py:241
 msgid "All selected entries already exist in both languages."
 msgstr ""
 
-#: apps/core/admin.py:226
+#: apps/core/admin.py:237
 msgid "Created %(count)s translation row(s)."
 msgstr ""
 
@@ -1325,40 +1325,40 @@ msgstr ""
 msgid "No related items"
 msgstr ""
 
-#: apps/core/admin_filters.py:61
+#: apps/core/admin_filters.py:59
 msgid "translation completeness"
 msgstr ""
 
-#: apps/core/admin_filters.py:68
+#: apps/core/admin_filters.py:64
 msgid "Missing Persian (fa)"
 msgstr ""
 
-#: apps/core/admin_filters.py:69
+#: apps/core/admin_filters.py:65
 msgid "Missing English (en)"
 msgstr ""
 
-#: apps/core/admin_filters.py:70
+#: apps/core/admin_filters.py:66
 msgid "Registered in both languages"
 msgstr ""
 
-#: apps/core/admin_mixins.py:226
+#: apps/core/admin_mixins.py:222
 msgid "record state"
 msgstr ""
 
-#: apps/core/admin_mixins.py:117 apps/core/tests/test_i18n_tooling.py:148
-#: apps/core/tests/test_i18n_tooling.py:154
+#: apps/core/admin_mixins.py:118 apps/core/tests/test_i18n_tooling.py:198
+#: apps/core/tests/test_i18n_tooling.py:204
 msgid "Publish selected content"
 msgstr ""
 
-#: apps/core/admin_mixins.py:150
+#: apps/core/admin_mixins.py:151
 msgid "Return selected content to draft"
 msgstr ""
 
-#: apps/core/admin_mixins.py:174
+#: apps/core/admin_mixins.py:171
 msgid "Archive selected content"
 msgstr ""
 
-#: apps/core/admin_mixins.py:196
+#: apps/core/admin_mixins.py:191
 msgid "Publication status"
 msgstr ""
 
@@ -1366,43 +1366,43 @@ msgstr ""
 msgid "Restore selected records"
 msgstr ""
 
-#: apps/core/admin_mixins.py:284
+#: apps/core/admin_mixins.py:285
 msgid "Deleted?"
 msgstr ""
 
-#: apps/core/admin_mixins.py:129
+#: apps/core/admin_mixins.py:130
 msgid "Nothing to do: the selected items are already published."
 msgstr ""
 
-#: apps/core/admin_mixins.py:146
+#: apps/core/admin_mixins.py:147
 msgid "Published %(count)s item(s)."
 msgstr ""
 
-#: apps/core/admin_mixins.py:158
+#: apps/core/admin_mixins.py:157
 msgid "Nothing to do: the selected items are already drafts."
 msgstr ""
 
-#: apps/core/admin_mixins.py:170
+#: apps/core/admin_mixins.py:167
 msgid "Returned %(count)s item(s) to draft."
 msgstr ""
 
-#: apps/core/admin_mixins.py:182
+#: apps/core/admin_mixins.py:177
 msgid "Nothing to do: the selected items are already archived."
 msgstr ""
 
-#: apps/core/admin_mixins.py:192
+#: apps/core/admin_mixins.py:187
 msgid "Archived %(count)s item(s)."
 msgstr ""
 
-#: apps/core/admin_mixins.py:234
+#: apps/core/admin_mixins.py:228
 msgid "Active only"
 msgstr ""
 
-#: apps/core/admin_mixins.py:235
+#: apps/core/admin_mixins.py:229
 msgid "Soft-deleted only"
 msgstr ""
 
-#: apps/core/admin_mixins.py:236
+#: apps/core/admin_mixins.py:230
 msgid "All records"
 msgstr ""
 
@@ -1410,137 +1410,137 @@ msgstr ""
 msgid "Nothing to restore: no soft-deleted item was selected."
 msgstr ""
 
-#: apps/core/admin_mixins.py:280
+#: apps/core/admin_mixins.py:281
 msgid "Restored %(count)s record(s)."
 msgstr ""
 
-#: apps/core/admin_theme.py:39
+#: apps/core/admin_theme.py:51
 msgid "Emmett Group admin"
 msgstr ""
 
-#: apps/core/admin_theme.py:40 config/settings/base.py:305
+#: apps/core/admin_theme.py:52
 msgid "Emmett Admin"
 msgstr ""
 
-#: apps/core/admin_theme.py:41 apps/core/tests/test_i18n_tooling.py:147
-#: apps/core/tests/test_i18n_tooling.py:153 config/settings/base.py:319
-#: templates/admin/index.html:7
+#: apps/core/admin_theme.py:53 apps/core/tests/test_i18n_tooling.py:197
+#: apps/core/tests/test_i18n_tooling.py:203 templates/admin/index.html:7
+#: templates/admin/nav_sidebar.html:6
 msgid "Dashboard"
 msgstr ""
 
-#: apps/core/dashboard.py:319
+#: apps/core/dashboard.py:317
 msgid "Added"
 msgstr ""
 
-#: apps/core/dashboard.py:320 apps/core/dashboard.py:325
+#: apps/core/dashboard.py:318 apps/core/dashboard.py:323
 msgid "Changed"
 msgstr ""
 
-#: apps/core/dashboard.py:321
+#: apps/core/dashboard.py:319
 msgid "Deleted"
 msgstr ""
 
-#: apps/core/dashboard.py:434
+#: apps/core/dashboard.py:432
 msgid "AI requests per week"
 msgstr ""
 
-#: apps/core/dashboard.py:440
+#: apps/core/dashboard.py:438
 msgid "New contacts per week"
 msgstr ""
 
-#: apps/core/dashboard.py:369
+#: apps/core/dashboard.py:367
 msgid "View users"
 msgstr ""
 
-#: apps/core/dashboard.py:372
+#: apps/core/dashboard.py:370
 msgid "AI requests"
 msgstr ""
 
-#: apps/core/dashboard.py:381
+#: apps/core/dashboard.py:379
 msgid "View AI audit"
 msgstr ""
 
-#: apps/core/dashboard.py:393
+#: apps/core/dashboard.py:391
 msgid "View pipeline"
 msgstr ""
 
-#: apps/core/dashboard.py:396
+#: apps/core/dashboard.py:394
 msgid "Academy enrollments"
 msgstr ""
 
-#: apps/core/dashboard.py:405
+#: apps/core/dashboard.py:403
 msgid "View enrollments"
 msgstr ""
 
-#: apps/core/dashboard.py:408
+#: apps/core/dashboard.py:406
 msgid "Sales signals (30 days)"
 msgstr ""
 
-#: apps/core/dashboard.py:417
+#: apps/core/dashboard.py:415
 msgid "View contacts"
 msgstr ""
 
-#: apps/core/dashboard.py:420
+#: apps/core/dashboard.py:418
 msgid "Pending AI summaries"
 msgstr ""
 
-#: apps/core/dashboard.py:428
+#: apps/core/dashboard.py:426
 msgid "Review summaries"
 msgstr ""
 
-#: apps/core/dashboard.py:414
+#: apps/core/dashboard.py:412
 msgid "No financial model exists in this phase."
 msgstr ""
 
-#: apps/core/dashboard.py:365
+#: apps/core/dashboard.py:363
 msgid "Staff"
 msgstr ""
 
-#: apps/core/dashboard.py:366
+#: apps/core/dashboard.py:364
 msgid "New (30 days)"
 msgstr ""
 
-#: apps/core/dashboard.py:376
+#: apps/core/dashboard.py:374
 msgid "Last 30 days"
 msgstr ""
 
-#: apps/core/dashboard.py:377
+#: apps/core/dashboard.py:375
 msgid "Blocked by guardrail"
 msgstr ""
 
-#: apps/core/dashboard.py:378
+#: apps/core/dashboard.py:376
 msgid "Cache hit rate"
 msgstr ""
 
-#: apps/core/dashboard.py:388
+#: apps/core/dashboard.py:386
 msgid "Leads in pipeline"
 msgstr ""
 
-#: apps/core/dashboard.py:390
+#: apps/core/dashboard.py:388
 msgid "Conversion"
 msgstr ""
 
-#: apps/core/dashboard.py:400
+#: apps/core/dashboard.py:398
 msgid "Published courses"
 msgstr ""
 
-#: apps/core/dashboard.py:402
+#: apps/core/dashboard.py:400
 msgid "Average progress"
 msgstr ""
 
-#: apps/core/dashboard.py:412
+#: apps/core/dashboard.py:410
 msgid "New enrollments"
 msgstr ""
 
-#: apps/core/dashboard.py:413
+#: apps/core/dashboard.py:411
 msgid "New contacts"
 msgstr ""
 
-#: apps/core/dashboard.py:425
+#: apps/core/dashboard.py:423
 msgid "Newsletter subscribers"
 msgstr ""
 
-#: apps/core/dashboard.py:480
+#: apps/core/dashboard.py:476
 msgid "System"
 msgstr ""
 
@@ -1556,19 +1556,15 @@ msgstr ""
 msgid "Name"
 msgstr ""
 
-#: config/settings/base.py:306
-msgid "Emmett Group"
-msgstr ""
-
-#: config/settings/base.py:313
+#: templates/admin/login.html:24
 msgid "Sign in to the Emmett admin panel"
 msgstr ""
 
-#: config/settings/base.py:321
+#: templates/admin/base_site.html:21
 msgid "View public site"
 msgstr ""
 
-#: config/settings/base.py:327
+#: templates/admin/base_site.html:22
 msgid "Change password"
 msgstr ""
 
@@ -1576,51 +1572,51 @@ msgstr ""
 msgid "Statistics are cached briefly; reload to refresh."
 msgstr ""
 
-#: templates/admin/index.html:66
+#: templates/admin/index.html:68
 msgid "Sales pipeline (leads)"
 msgstr ""
 
-#: templates/admin/index.html:81
+#: templates/admin/index.html:83
 msgid "Content by publication status"
 msgstr ""
 
-#: templates/admin/index.html:93
+#: templates/admin/index.html:95
 msgid "Order: draft · published · archived"
 msgstr ""
 
-#: templates/admin/index.html:98
+#: templates/admin/index.html:100
 msgid "Latest sensitive actions (audit log)"
 msgstr ""
 
-#: templates/admin/index.html:107
+#: templates/admin/index.html:109
 msgid "No audit events yet."
 msgstr ""
 
-#: templates/admin/index.html:111
+#: templates/admin/index.html:113
 msgid "View full audit log"
 msgstr ""
 
-#: templates/admin/index.html:116
+#: templates/admin/index.html:118
 msgid "My recent changes"
 msgstr ""
 
-#: templates/admin/index.html:125
+#: templates/admin/index.html:127
 msgid "No admin changes yet."
 msgstr ""
 
-#: templates/admin/index.html:129
+#: templates/admin/index.html:131
 msgid "View admin activity log"
 msgstr ""
 
-#: templates/admin/index.html:135
+#: templates/admin/index.html:137
 msgid "All sections"
 msgstr ""
 
-#: templates/admin/index.html:145
+#: templates/admin/app_list.html:28 templates/admin/index.html:147
 msgid "Add"
 msgstr ""
 
-#: templates/admin/index.html:152
+#: templates/admin/index.html:154
 msgid "You do not have permission to view any section."
 msgstr ""
 
@@ -1628,11 +1624,12 @@ msgstr ""
 msgid "Welcome, %(name)s"
 msgstr ""
 
-#: templates/admin/index.html:76
+#: templates/admin/index.html:78
 msgid "Conversion rate (Won / all leads): %(rate)s%"
 msgstr ""
 
-#: apps/core/tests/test_i18n_tooling.py:149
+#: apps/core/tests/test_i18n_tooling.py:199
+#: templates/admin/import_export/export.html:10
 msgid "Export"
 msgstr ""
 
@@ -1640,240 +1637,240 @@ msgstr ""
 msgid "2FA"
 msgstr ""
 
-#: apps/accounts/admin.py:99
+#: apps/accounts/admin.py:102
 msgid "Disable two-factor authentication (support reset)"
 msgstr ""
 
-#: apps/accounts/admin.py:120
+#: apps/accounts/admin.py:123
 msgid "Clear login lockout"
 msgstr ""
 
-#: apps/accounts/admin.py:116
+#: apps/accounts/admin.py:119
 msgid "Disabled two-factor authentication for %(count)s user(s)."
 msgstr ""
 
-#: apps/accounts/admin.py:131
+#: apps/accounts/admin.py:134
 msgid "Cleared login lockout for %(count)s user(s)."
 msgstr ""
 
-#: apps/accounts/twofa_views.py:103
+#: apps/accounts/twofa_views.py:137
 msgid "Two-factor authentication is now active."
 msgstr ""
 
-#: apps/accounts/twofa_views.py:72
+#: apps/accounts/twofa_views.py:103
 msgid "Two-factor authentication setup"
 msgstr ""
 
-#: apps/accounts/twofa_views.py:89
+#: apps/accounts/twofa_views.py:123
 msgid "No pending enrollment was found. Start again."
 msgstr ""
 
-#: apps/accounts/twofa_views.py:92
+#: apps/accounts/twofa_views.py:126
 msgid "That code is not valid. Check your authenticator app and try again."
 msgstr ""
 
-#: apps/accounts/twofa_views.py:125
+#: apps/accounts/twofa_views.py:163
 msgid "Two-factor authentication"
 msgstr ""
 
-#: apps/accounts/twofa_views.py:137
+#: apps/accounts/twofa_views.py:178
 msgid "Too many invalid codes. Wait a few minutes and try again."
 msgstr ""
 
-#: apps/accounts/twofa_views.py:156
+#: apps/accounts/twofa_views.py:197
 msgid "That recovery code is not valid."
 msgstr ""
 
-#: apps/accounts/twofa_views.py:190
+#: apps/accounts/twofa_views.py:235 templates/admin/base_site.html:23
 msgid "Two-factor authentication status"
 msgstr ""
 
-#: apps/accounts/twofa_views.py:213
+#: apps/accounts/twofa_views.py:261
 msgid "Two-factor authentication was disabled for your account."
 msgstr ""
 
-#: apps/accounts/twofa_views.py:220
+#: apps/accounts/twofa_views.py:268
 msgid "New recovery codes were generated."
 msgstr ""
 
-#: apps/accounts/twofa_views.py:240
+#: apps/accounts/twofa_views.py:292
 msgid "Recovery codes"
 msgstr ""
 
-#: apps/accounts/twofa_views.py:166
+#: apps/accounts/twofa_views.py:207
 msgid "That code is not valid. %(count)s attempt(s) left."
 msgstr ""
 
-#: apps/accounts/twofa_views.py:205
+#: apps/accounts/twofa_views.py:253
 msgid "Verify a code before disabling two-factor authentication."
 msgstr ""
 
-#: apps/accounts/twofa_views.py:151
+#: apps/accounts/twofa_views.py:192
 msgid "Recovery code accepted. %(count)s code(s) left."
 msgstr ""
 
-#: apps/core/admin.py:267
+#: apps/core/admin.py:278
 msgid "Organization (structured data)"
 msgstr ""
 
-#: apps/core/admin.py:313
+#: apps/core/admin.py:324
 msgid "Activate selected redirects"
 msgstr ""
 
-#: apps/core/admin.py:318
+#: apps/core/admin.py:329
 msgid "Deactivate selected redirects"
 msgstr ""
 
-#: apps/core/admin.py:323
+#: apps/core/admin.py:334
 msgid "Reset hit counters"
 msgstr ""
 
-#: apps/core/admin.py:361
+#: apps/core/admin.py:374
 msgid "Question"
 msgstr ""
 
-#: apps/core/admin.py:261
+#: apps/core/admin.py:272
 msgid ""
 "Defaults used by the public site when a page has no SEO values of its own."
 msgstr ""
 
-#: apps/core/admin.py:275
+#: apps/core/admin.py:286
 msgid "Used by the Organization JSON-LD block on the home page."
 msgstr ""
 
-#: apps/core/admin.py:334
+#: apps/core/admin.py:345
 msgid "Updated %(count)s redirect(s)."
 msgstr ""
 
-#: apps/core/middleware.py:81
+#: apps/core/middleware.py:87
 msgid ""
 "Too many failed sign-in attempts. Try again in about %(minutes)s minute(s)."
 msgstr ""
 
-#: apps/core/models.py:382
+#: apps/core/models.py:376
 msgid "default meta title"
 msgstr ""
 
-#: apps/core/models.py:389
+#: apps/core/models.py:383
 msgid "default meta description"
 msgstr ""
 
-#: apps/core/models.py:396
+#: apps/core/models.py:390
 msgid "Google Search Console verification code"
 msgstr ""
 
-#: apps/core/models.py:403
+#: apps/core/models.py:397
 msgid "Twitter/X handle"
 msgstr ""
 
-#: apps/core/models.py:406
+#: apps/core/models.py:400
 msgid "legal organization name"
 msgstr ""
 
-#: apps/core/models.py:409
+#: apps/core/models.py:402
 msgid "organization address"
 msgstr ""
 
-#: apps/core/models.py:412
+#: apps/core/models.py:404
 msgid "organization same-as URLs"
 msgstr ""
 
-#: apps/core/models.py:490
+#: apps/core/models.py:482
 msgid "301 — Permanent"
 msgstr ""
 
-#: apps/core/models.py:491
+#: apps/core/models.py:483
 msgid "302 — Temporary"
 msgstr ""
 
-#: apps/core/models.py:492
+#: apps/core/models.py:484
 msgid "410 — Removed permanently"
 msgstr ""
 
-#: apps/core/models.py:502
+#: apps/core/models.py:522
 msgid "from path"
 msgstr ""
 
-#: apps/core/models.py:504
+#: apps/core/models.py:524
 msgid "target"
 msgstr ""
 
-#: apps/core/models.py:511
+#: apps/core/models.py:531
 msgid "status code"
 msgstr ""
 
-#: apps/core/models.py:513
+#: apps/core/models.py:533
 msgid "hit count"
 msgstr ""
 
-#: apps/core/models.py:514
+#: apps/core/models.py:534
 msgid "note"
 msgstr ""
 
-#: apps/core/models.py:517
+#: apps/core/models.py:537
 msgid "Redirect"
 msgstr ""
 
-#: apps/core/models.py:518
+#: apps/core/models.py:538
 msgid "Redirects"
 msgstr ""
 
-#: apps/core/models.py:567
+#: apps/core/models.py:595
 msgid "page path"
 msgstr ""
 
-#: apps/core/models.py:568
+#: apps/core/models.py:596
 msgid "question"
 msgstr ""
 
-#: apps/core/models.py:569
+#: apps/core/models.py:597
 msgid "answer"
 msgstr ""
 
-#: apps/core/models.py:573
+#: apps/core/models.py:601
 msgid "FAQ item"
 msgstr ""
 
-#: apps/core/models.py:574
+#: apps/core/models.py:602
 msgid "FAQ items"
 msgstr ""
 
-#: apps/core/models.py:386
+#: apps/core/models.py:380
 msgid "Used for pages without their own SEO title."
 msgstr ""
 
-#: apps/core/models.py:393
+#: apps/core/models.py:387
 msgid ""
 "Aim for 120–160 characters; longer text is truncated by search engines."
 msgstr ""
 
-#: apps/core/models.py:400
+#: apps/core/models.py:394
 msgid "Content value of the google-site-verification meta tag."
 msgstr ""
 
-#: apps/core/models.py:403
+#: apps/core/models.py:397
 msgid "Example: @emmett"
 msgstr ""
 
-#: apps/core/models.py:415
+#: apps/core/models.py:407
 msgid "Public profile URLs used in JSON-LD, e.g. LinkedIn or GitHub."
 msgstr ""
 
-#: apps/core/models.py:419
+#: apps/core/models.py:411
 msgid "default Open Graph image"
 msgstr ""
 
-#: apps/core/models.py:424
+#: apps/core/models.py:416
 msgid ""
 "Used by social cards when a page has no image of its own (1200×630 "
 "recommended)."
 msgstr ""
 
-#: apps/core/models.py:508
+#: apps/core/models.py:528
 msgid "Relative path (e.g. /services/web/) or an absolute https:// URL."
 msgstr ""
 
-#: apps/core/models.py:536
+#: apps/core/models.py:569
 msgid "A redirect with this status code needs a target."
 msgstr ""
 
@@ -1886,3 +1883,246 @@ msgid ""
 "Paste the verification code here after adding the property in Search "
 "Console."
 msgstr ""
+
+#: templates/410.html:6 templates/410.html:26
+msgid "Page removed"
+msgstr ""
+
+#: templates/410.html:28
+msgid ""
+"This page has been permanently removed. The address will not come back, so "
+"please update your bookmarks."
+msgstr ""
+
+#: templates/410.html:30
+msgid "Back to home"
+msgstr ""
+
+#: templates/admin/app_list.html:11
+msgid "Model name"
+msgstr ""
+
+#: templates/admin/app_list.html:12
+msgid "Add link"
+msgstr ""
+
+#: templates/admin/app_list.html:13
+msgid "Change or view list link"
+msgstr ""
+
+#: templates/admin/app_list.html:34
+msgid "View"
+msgstr ""
+
+#: templates/admin/app_list.html:36
+msgid "Change"
+msgstr ""
+
+#: templates/admin/app_list.html:49 templates/admin/nav_sidebar.html:20
+msgid "You don’t have permission to view or edit anything."
+msgstr ""
+
+#: templates/admin/base_site.html:26
+msgid "Log out"
+msgstr ""
+
+#: templates/admin/import_export/export.html:28
+msgid "This exporter will export the following fields:"
+msgstr ""
+
+#: templates/admin/import_export/export.html:32
+msgid "Select all"
+msgstr ""
+
+#: templates/admin/import_export/export.html:52
+msgid "Submit"
+msgstr ""
+
+#: templates/admin/import_export/export.html:17
+msgid "Export %(len)s selected item."
+msgid_plural "Export %(len)s selected items."
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/admin/includes/emmett_language_switcher.html:6
+#: templates/admin/includes/emmett_language_switcher.html:7
+msgid "Language"
+msgstr ""
+
+#: templates/admin/includes/emmett_language_switcher.html:11
+msgid "Apply"
+msgstr ""
+
+#: templates/admin/login.html:4
+msgid "Error:"
+msgstr ""
+
+#: templates/admin/login.html:25
+msgid "Use your staff account to access the management workspace."
+msgstr ""
+
+#: templates/admin/login.html:63
+msgid "Forgotten your login credentials?"
+msgstr ""
+
+#: templates/admin/login.html:67
+msgid "Log in"
+msgstr ""
+
+#: templates/admin/login.html:70
+msgid "Protected access for authorized staff."
+msgstr ""
+
+#: templates/admin/login.html:29
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/admin/login.html:41
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this"
+" page. Would you like to login to a different account?"
+msgstr ""
+
+#: templates/admin/nav_sidebar.html:2
+msgid "Toggle navigation"
+msgstr ""
+
+#: templates/admin/nav_sidebar.html:3
+msgid "Sidebar"
+msgstr ""
+
+#: templates/admin/nav_sidebar.html:8
+msgid "Filter navigation items"
+msgstr ""
+
+#: templates/admin/nav_sidebar.html:9
+msgid "Start typing to filter…"
+msgstr ""
+
+#: templates/admin/nav_sidebar.html:15
+msgid "Content"
+msgstr ""
+
+#: templates/admin/nav_sidebar.html:15
+msgid "Operations"
+msgstr ""
+
+#: templates/admin/nav_sidebar.html:15
+msgid "Administration"
+msgstr ""
+
+#: templates/admin/nav_sidebar.html:15
+msgid "Other"
+msgstr ""
+
+#: templates/admin/twofa/_base.html:7
+msgid "Home"
+msgstr ""
+
+#: templates/admin/twofa/recovery.html:7
+msgid ""
+"These codes are shown only once. Store them in a safe place; each code works"
+" a single time."
+msgstr ""
+
+#: templates/admin/twofa/recovery.html:14
+msgid ""
+"No new codes to display. You can generate a fresh set from the status page."
+msgstr ""
+
+#: templates/admin/twofa/recovery.html:19
+msgid "Back to dashboard"
+msgstr ""
+
+#: templates/admin/twofa/recovery.html:18
+msgid "One recovery code left."
+msgid_plural "%(counter)s recovery codes left."
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/admin/twofa/setup.html:5
+msgid ""
+"Scan the QR code with an authenticator app, then enter the 6-digit code to "
+"confirm."
+msgstr ""
+
+#: templates/admin/twofa/setup.html:9
+msgid "TOTP QR code"
+msgstr ""
+
+#: templates/admin/twofa/setup.html:12
+msgid "Cannot scan? Enter this key manually:"
+msgstr ""
+
+#: templates/admin/twofa/setup.html:14
+msgid "Issuer"
+msgstr ""
+
+#: templates/admin/twofa/setup.html:22 templates/admin/twofa/verify.html:13
+msgid "6-digit code"
+msgstr ""
+
+#: templates/admin/twofa/setup.html:26
+msgid "Activate two-factor authentication"
+msgstr ""
+
+#: templates/admin/twofa/status.html:11
+msgid "Not configured"
+msgstr ""
+
+#: templates/admin/twofa/status.html:14
+msgid "Required by policy"
+msgstr ""
+
+#: templates/admin/twofa/status.html:15
+msgid "Yes"
+msgstr ""
+
+#: templates/admin/twofa/status.html:15
+msgid "No (optional)"
+msgstr ""
+
+#: templates/admin/twofa/status.html:16
+msgid "Recovery codes left"
+msgstr ""
+
+#: templates/admin/twofa/status.html:25
+msgid "Generate new recovery codes"
+msgstr ""
+
+#: templates/admin/twofa/status.html:27
+msgid "Disable two-factor authentication for this account?"
+msgstr ""
+
+#: templates/admin/twofa/status.html:30
+msgid "Disable two-factor authentication"
+msgstr ""
+
+#: templates/admin/twofa/status.html:34
+msgid "Set up now"
+msgstr ""
+
+#: templates/admin/twofa/verify.html:5
+msgid ""
+"Enter the 6-digit code from your authenticator app to finish signing in."
+msgstr ""
+
+#: templates/admin/twofa/verify.html:17
+msgid "Verify"
+msgstr ""
+
+#: templates/admin/twofa/verify.html:27
+msgid "Or use a recovery code"
+msgstr ""
+
+#: templates/admin/twofa/verify.html:30
+msgid "Use recovery code"
+msgstr ""
+
+#: templates/admin/twofa/verify.html:7
+msgid "One attempt left before a short lockout."
+msgid_plural "%(counter)s attempts left before a short lockout."
+msgstr[0] ""
+msgstr[1] ""

@@ -1,7 +1,7 @@
 """Viewهای ۲FA ادمین (راه‌اندازی/تأیید/بازیابی) — فاز ۷، ADR-0033.
 
 این‌ها viewهای Django (نه DRF) هستند چون بخشی از جریان مرورگری ادمین‌اند و
-قالب‌های Jazzmin را رندر می‌کنند. ورود به آن‌ها نیازمند ``is_staff`` است.
+قالب‌های اختصاصی پنل بومی امیت را رندر می‌کنند. ورود به آن‌ها نیازمند ``is_staff`` است.
 """
 
 from __future__ import annotations
@@ -10,7 +10,7 @@ from typing import Any, cast
 from urllib.parse import urlencode
 
 from django.conf import settings
-from django.contrib import messages
+from django.contrib import admin, messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import redirect_to_login
 from django.http import HttpRequest, HttpResponse
@@ -69,6 +69,12 @@ def _staff_required(request: HttpRequest) -> HttpResponse | None:
     return None
 
 
+def _admin_template_context(request: HttpRequest, context: dict[str, Any]) -> dict[str, Any]:
+    admin_context = admin.site.each_context(request)
+    admin_context.update({"available_apps": [], "is_nav_sidebar_enabled": False})
+    return {**admin_context, **context}
+
+
 class TwoFactorSetupView(LoginRequiredMixin, View):
     """راه‌اندازی دستگاه TOTP: نمایش QR/کلید و تأیید با یک کد معتبر."""
 
@@ -91,15 +97,18 @@ class TwoFactorSetupView(LoginRequiredMixin, View):
         return render(
             request,
             self.template_name,
-            {
-                "title": _("Two-factor authentication setup"),
-                "device": device,
-                "qr_data_uri": twofa.enrollment_qr_data_uri(device),
-                "secret_key": twofa.manual_secret(device),
-                "otpauth_url": device.config_url,
-                "issuer": twofa.issuer_name(),
-                "next": _safe_next(request),
-            },
+            _admin_template_context(
+                request,
+                {
+                    "title": _("Two-factor authentication setup"),
+                    "device": device,
+                    "qr_data_uri": twofa.enrollment_qr_data_uri(device),
+                    "secret_key": twofa.manual_secret(device),
+                    "otpauth_url": device.config_url,
+                    "issuer": twofa.issuer_name(),
+                    "next": _safe_next(request),
+                },
+            ),
         )
 
     def post(self, request: HttpRequest) -> HttpResponse:
@@ -148,12 +157,15 @@ class TwoFactorVerifyView(LoginRequiredMixin, View):
         return render(
             request,
             self.template_name,
-            {
-                "title": _("Two-factor authentication"),
-                "attempts_left": twofa.otp_attempts_left(user),
-                "next": _safe_next(request),
-                "recovery_enabled": twofa.recovery_code_count(user) > 0,
-            },
+            _admin_template_context(
+                request,
+                {
+                    "title": _("Two-factor authentication"),
+                    "attempts_left": twofa.otp_attempts_left(user),
+                    "next": _safe_next(request),
+                    "recovery_enabled": twofa.recovery_code_count(user) > 0,
+                },
+            ),
         )
 
     def post(self, request: HttpRequest) -> HttpResponse:
@@ -217,14 +229,17 @@ class TwoFactorStatusView(LoginRequiredMixin, View):
         return render(
             request,
             self.template_name,
-            {
-                "title": _("Two-factor authentication status"),
-                "device": device,
-                "confirmed": bool(device and device.confirmed),
-                "required": bool(settings.ADMIN_2FA_REQUIRED),
-                "recovery_count": twofa.recovery_code_count(user),
-                "next": _safe_next(request),
-            },
+            _admin_template_context(
+                request,
+                {
+                    "title": _("Two-factor authentication status"),
+                    "device": device,
+                    "confirmed": bool(device and device.confirmed),
+                    "required": bool(settings.ADMIN_2FA_REQUIRED),
+                    "recovery_count": twofa.recovery_code_count(user),
+                    "next": _safe_next(request),
+                },
+            ),
         )
 
     def post(self, request: HttpRequest) -> HttpResponse:
@@ -271,12 +286,15 @@ class TwoFactorRecoveryView(LoginRequiredMixin, View):
         return render(
             request,
             self.template_name,
-            {
-                "title": _("Recovery codes"),
-                "codes": codes or [],
-                "remaining": twofa.recovery_code_count(user),
-                "next": _safe_next(request),
-            },
+            _admin_template_context(
+                request,
+                {
+                    "title": _("Recovery codes"),
+                    "codes": codes or [],
+                    "remaining": twofa.recovery_code_count(user),
+                    "next": _safe_next(request),
+                },
+            ),
         )
 
 

@@ -52,7 +52,9 @@ class SecurityHeadersMiddleware:
                 if settings.CSP_REPORT_ONLY
                 else "Content-Security-Policy"
             )
-            response[header] = build_csp_policy(is_admin=request.path.startswith("/admin/"))
+            admin_path = request.path_info.rstrip("/")
+            is_admin_path = admin_path == "/admin" or admin_path.startswith("/admin/")
+            response[header] = build_csp_policy(is_admin=is_admin_path)
 
         response.setdefault("Referrer-Policy", settings.SECURITY_REFERRER_POLICY)
         response.setdefault("Permissions-Policy", settings.SECURITY_PERMISSIONS_POLICY)
@@ -94,7 +96,7 @@ class AdminLoginLockoutMiddleware:
 
     @staticmethod
     def _is_admin_login(request: HttpRequest) -> bool:
-        return request.path.rstrip("/").endswith("/admin/login")
+        return request.path_info.rstrip("/").endswith("/admin/login")
 
 
 def _log_login_blocked(*, request: HttpRequest, email: str, retry_after: int) -> None:
@@ -133,9 +135,11 @@ class AdminTwoFactorMiddleware:
 
     @staticmethod
     def _should_enforce(request: HttpRequest) -> bool:
-        if not settings.ADMIN_2FA_REQUIRED or not request.path.startswith("/admin"):
+        path = request.path_info
+        is_admin_path = path == "/admin" or path.startswith("/admin/")
+        if not settings.ADMIN_2FA_REQUIRED or not is_admin_path:
             return False
-        if request.path.startswith(_2FA_EXEMPT_PREFIXES):
+        if path.startswith(_2FA_EXEMPT_PREFIXES):
             return False
         user = getattr(request, "user", None)
         if user is None or not getattr(user, "is_authenticated", False) or not user.is_staff:

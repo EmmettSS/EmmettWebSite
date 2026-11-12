@@ -2,14 +2,14 @@
 
 > **Document Type:** Unified Single-File Technical Reference (English)  
 > **Persian Counterpart:** [`docs/TECHNICAL_DOCUMENTATION.fa.md`](./TECHNICAL_DOCUMENTATION.fa.md)  
-> **Scope:** System Architecture, Data Model, Rendering Model (ADR-0041), Summary of All 41 ADRs, Complete REST API Reference (`/api/v1/`), SaaS Admin Panel Guide, Step-by-Step cPanel Shared Hosting Deployment Guide, and Quality Gates / CI-CD Pipeline.
+> **Scope:** System Architecture, Data Model, Rendering Model (ADR-0041), Summary of All 43 ADRs, Complete REST API Reference (`/api/v1/`), Native Django Admin Guide, Step-by-Step cPanel Shared Hosting Deployment Guide, and Quality Gates / CI-CD Pipeline.
 
 ---
 
 ## Table of Contents
 
 1. [Section 1: System Architecture & Data Model](#section-1-system-architecture--data-model)
-2. [Section 2: Architecture Decision Records Index (ADR-0001 to ADR-0041)](#section-2-architecture-decision-records-index-adr-0001-to-adr-0041)
+2. [Section 2: Architecture Decision Records Index (ADR-0001 to ADR-0043)](#section-2-architecture-decision-records-index-adr-0001-to-adr-0043)
 3. [Section 3: Complete REST API Documentation (`/api/v1/`)](#section-3-complete-rest-api-documentation-apiv1)
 4. [Section 4: SaaS Admin Panel Guide](#section-4-saas-admin-panel-guide)
 5. [Section 5: Step-by-Step cPanel Shared Hosting Deployment Guide](#section-5-step-by-step-cpanel-shared-hosting-deployment-guide)
@@ -53,7 +53,7 @@ The Emmett corporate platform is engineered as a **Monorepo** combining a server
 │   Directory: frontend/             │ ◀───────────────────────── │   Directory: backend/              │
 │   - Persian default at root (/)    │   Server-to-Server + Proxy │   - 11 Modular Monolith apps       │
 │   - English at /en                 │                            │   - Centralized ai_engine gateway  │
-│   - SEO, JSON-LD, OG, Sitemap/RSS  │                            │   - SaaS Admin (Jazzmin + RTL)     │
+│   - SEO, JSON-LD, OG, Sitemap/RSS  │                            │   - Native Django Admin (Emmett)   │
 └────────────────────────────────────┘                            └─────────────────┬──────────────────┘
                                                                                     │
                                                                       ┌─────────────┴─────────────┐
@@ -126,9 +126,9 @@ and fails if any of the 14 required content routes is not prerendered. Re-introd
 
 ---
 
-## Section 2: Architecture Decision Records Index (ADR-0001 to ADR-0041)
+## Section 2: Architecture Decision Records Index (ADR-0001 to ADR-0043)
 
-All 41 ADRs are stored in `docs/adr/`. **The complete, authoritative index — including known dead references and amendment notes — is [`adr/README.md`](./adr/README.md).** The table below summarises each *decision*; it is not the existence list:
+All 43 ADRs are stored in `docs/adr/`. **The complete, authoritative index — including known dead references and amendment notes — is [`adr/README.md`](./adr/README.md).** The table below summarises each *decision*; it is not the existence list:
 
 | ADR | Title | Summary of Decision |
 |---|---|---|
@@ -158,7 +158,7 @@ All 41 ADRs are stored in `docs/adr/`. **The complete, authoritative index — i
 | **ADR-0024** | Kavenegar SMS Notification Adapter | Lightweight REST adapter over `requests` with configurable email fallback |
 | **ADR-0025** | User Profile, Favorites & Moderation | Authenticated course enrollment, generic favorites, and pre-publication comment moderation |
 | **ADR-0026** | AI Engine Implementation & Advisor | Creative Advisor (up to 3 concepts), revocable hashed share tokens, deterministic estimator, and blog summaries |
-| **ADR-0027** | Custom Admin Theme & Scoped RTL | Jazzmin themed with Emmett brand tokens, self-hosted Vazirmatn font, and 106 scoped `html[dir="rtl"]` rules |
+| **ADR-0027** | Custom Admin Theme & Scoped RTL | Historical branding/RTL decision; its Jazzmin UI choice is superseded by the native Django Admin in ADR-0043 |
 | **ADR-0028** | Admin KPI Dashboard & Workflow | Cached KPI dashboard with inline SVG charts and bulk publish/draft/archive/restore actions |
 | **ADR-0029** | Admin Export & Import Strategy | `django-import-export` (CSV/TSV/JSON) with two-step preview, natural keys, and CSV formula injection escaping |
 | **ADR-0030** | i18n Tooling & Translation Management | Pure-Python `scripts/i18n.py` (`ast` + `polib`) and admin translation completeness filters |
@@ -173,6 +173,8 @@ All 41 ADRs are stored in `docs/adr/`. **The complete, authoritative index — i
 | **ADR-0039** | Design Token Standard & Raw-Colour Ratchet | Tokens become mandatory over raw literals: two existing tokens wired up, four category palette tokens and two muted-text tokens added, plus the two-way `hardcoded-colors.test.ts` regression guard (amendment note: `adr/README.md`) |
 | **ADR-0040** | Product Detail Canonical Is `/projects/{slug}` | The canonical product-detail path is `/projects/{slug}`, not `/products/{slug}`; a module-level `projectDetailPath()` feeds canonical, breadcrumb and JSON-LD from one source, and `/products/pentestor` now 308-redirects to it |
 | **ADR-0041** | Content-Page Rendering Model & Internal Service Auth | Public content pages are prerendered at build time and refreshed by ISR (`revalidate` from `serverFetch`); `connection()`/`headers()` were removed from the root layout and `JsonLd`, CSP moved from per-response nonces to a static policy, `proxy.ts` no longer fetches the backend per request (60 s in-memory cache), and server-to-server calls bypass the anonymous throttle via `X-Internal-Token`; regression guard: `npm run verify:rendering` |
+| **ADR-0042** | CSS-First Hero Entrance & Visible LCP | Hero content animates with CSS; the main `<h1>` never starts at `opacity: 0` and build verification checks rendered HTML |
+| **ADR-0043** | Native Django Admin Migration | Branded Emmett templates with RTL/LTR, preserved registry/workflows/permissions/2FA/import-export/audit, same-origin `script-src 'self'`, and a six-width browser audit |
 
 ---
 
@@ -293,8 +295,10 @@ All 41 ADRs are stored in `docs/adr/`. **The complete, authoritative index — i
 ### 4.1. Access, Roles, Theme & Scoped RTL
 
 - **URL:** `/admin/`
-- **Language & Direction:** Switch between **Persian (`fa`, RTL default)** and **English (`en`, LTR)** via the top bar language selector (`/i18n/setlang/`). The custom `emmett-rtl.css` stylesheet (106 rules scoped under `html[dir="rtl"]`) loads exclusively when the active locale is Persian (`ADR-0027`).
-- **Self-Hosted Assets:** All fonts (Vazirmatn `woff2`) and brand icons are served locally without external CDNs.
+- **Language & Direction:** Switch between **Persian (`fa`, RTL)** and **English (`en`, LTR)** in the Admin language control. `emmett-rtl.css` loads only for the Persian locale.
+- **Native Branded Theme:** Django Admin uses the Emmett templates under `backend/templates/admin/` (`base_site`, `index`, `login`, navigation, and 2FA) rather than Jazzmin (`ADR-0043`). Vazirmatn fonts, icons, and modeltranslation's jQuery UI are self-hosted; no external CDN is required.
+- **CSP:** Admin scripts are limited to same-origin (`script-src 'self'`) with no inline script; inline styles remain allowed for Django's native widgets.
+- **Responsive Audit:** Login, dashboard, service list/form, and 2FA status are browser-checked in both directions at 320, 390, 768, 1024, 1440, and 1920 px.
 
 ### 4.2. KPI Dashboard (`/admin/`)
 
@@ -337,7 +341,7 @@ The admin index page renders a cached operational dashboard (`ADMIN_DASHBOARD_CA
 ### 4.6. Admin Two-Factor Authentication (2FA) & System Checks
 
 - **Admin 2FA (`ADR-0033`):** Enforced in production via `ADMIN_2FA_REQUIRED=True`. Staff enroll at `/admin/2fa/setup` using an offline inline `data:` SVG QR code or Base32 secret, verify at `/admin/2fa/verify` (rate-limited with lockout after 5 failed attempts), and receive 8 one-time recovery codes at `/admin/2fa/recovery`.
-- **Django System Checks (`emmett_admin.E001`–`W013`):** Run `python manage.py check` (and `python manage.py check --deploy --settings=config.settings.production`) to verify Jazzmin ordering, static assets, `.mo` freshness, `PUBLIC_SITE_URL`, CSP, 2FA enforcement, Search Console verification code, writable `BACKUP_DIR`, and `SECRET_KEY` entropy.
+- **Django System Checks (`emmett_admin.E001`–`E006`, `W005`, `W007`–`W013`):** Run `python manage.py check` (and `python manage.py check --deploy --settings=config.settings.production`) to verify native Admin/modeltranslation ordering, required packages, static assets/templates, absence of the legacy Jazzmin app, compiled Persian messages, `PUBLIC_SITE_URL`, CSP, 2FA enforcement, Search Console verification code, writable `BACKUP_DIR`, and `SECRET_KEY` entropy.
 
 ### 4.7. Admin SEO, Redirects & FAQ Management
 
@@ -478,7 +482,7 @@ python manage.py check
 python manage.py makemigrations --check --dry-run
 python manage.py spectacular --file /tmp/schema.yaml --validate --fail-on-warn
 PYTHONPATH=../.github/ci DJANGO_SETTINGS_MODULE=ci_test_settings coverage run -m pytest -q && coverage report --fail-under=85 -m
-    # CI settings shim switches test static storage to plain `StaticFilesStorage`; base settings configure `NonStrictCompressedManifestStaticFilesStorage` so both direct `pytest` runs and production Jazzmin admin pages render cleanly
+    # CI-only settings use plain `StaticFilesStorage` so template tests need no collected manifest; product settings retain `NonStrictCompressedManifestStaticFilesStorage` for native Admin assets
 
 # Frontend Quality, Unit Coverage (≥ 85%), Build & E2E
 cd ../frontend

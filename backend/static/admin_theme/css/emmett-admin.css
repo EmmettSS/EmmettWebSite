@@ -1,25 +1,3 @@
-/* ==========================================================================
-   Emmett Admin Theme — فاز ۶ (ADR-0027)
-   --------------------------------------------------------------------------
-   این فایل تنها لایهٔ «برند» روی Jazzmin/AdminLTE/Bootstrap است:
-   1) فونت خوداستقرار Vazirmatn (self-hosted — ADR-0018، بدون CDN)
-   2) توکن‌های رنگ/شعاع/فونت برند (هم‌سان با توکن‌های فرانت‌اند، ADR-0017)
-   3) نگاشت توکن‌ها به متغیرهای Bootstrap 5 / AdminLTE 4
-   4) کامپوننت‌های اختصاصی داشبورد ادمین (کارت KPI، نمودار میله‌ای CSS، برچسب وضعیت)
-   5) رفع باگ‌های کوچک چیدمان (لوگو، جدول، فیلتر، فرم)
-
-   قانون RTL در این پروژه: «مدیریت در سطح کامپوننت، نه CSS hack». به همین دلیل
-   تمام قواعد راست‌چین‌سازی در فایل جداگانهٔ emmett-rtl.css و با اسکوپ
-   html[dir="rtl"] نگه‌داری می‌شوند تا این فایل کاملاً جهت‌مستقل (direction-agnostic)
-   بماند و LTR انگلیسی هیچ‌گاه تحت تأثیر قرار نگیرد.
-   ========================================================================== */
-
-/* --------------------------------------------------------------------------
-   ۱) فونت Vazirmatn — خوداستقرار با unicode-range دقیق هر subset
-   (فایل‌ها از @fontsource/vazirmatn@5.3.0؛ مجوز SIL OFL 1.1 در
-   fonts/LICENSE-Vazirmatn-OFL.txt). با unicode-range، مرورگر فقط subset لازم
-   را دانلود می‌کند: کاربر فارسی فقط arabic را، محتوای لاتین فقط latin را.
-   -------------------------------------------------------------------------- */
 @font-face {
   font-family: "Vazirmatn";
   font-style: normal;
@@ -81,7 +59,7 @@
   font-display: swap;
   src: url("../fonts/vazirmatn-latin-600-normal.woff2") format("woff2");
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
-    U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+FEFF, U+FFFD;
 }
 @font-face {
   font-family: "Vazirmatn";
@@ -90,292 +68,1114 @@
   font-display: swap;
   src: url("../fonts/vazirmatn-latin-700-normal.woff2") format("woff2");
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
-    U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+FEFF, U+FFFD;
 }
 
-/* --------------------------------------------------------------------------
-   ۲) توکن‌های برند امیت (هم‌سان با frontend/src/app/globals.css — ADR-0017)
-   -------------------------------------------------------------------------- */
 :root {
   --emmett-indigo: #5b62e0;
-  --emmett-indigo-strong: #4046c8;
+  --emmett-indigo-strong: #4148c6;
   --emmett-indigo-soft: #ececfa;
   --emmett-emerald: #1fae6e;
   --emmett-emerald-soft: #e4f6ee;
   --emmett-obsidian: #0b0c0e;
   --emmett-graphite: #131417;
   --emmett-slate: #1a1c20;
-  --emmett-warm-white: #f6f4f0;
   --emmett-ivory: #efebe4;
-  --emmett-soft-gray: #e7e5e1;
-  --emmett-hairline-light: #dad7d1;
-  --emmett-hairline-dark: #2e3034;
-  --emmett-amber: #b8860b;
+  --emmett-warm-white: #f6f4f0;
+  --emmett-hairline-light: #dedbd5;
+  --emmett-hairline-dark: #303238;
   --emmett-amber-soft: #fdf3dd;
-  --emmett-danger: #b3433d;
   --emmett-danger-soft: #fbeceb;
-  --emmett-muted-blue: #4c6e91;
   --emmett-font-family: "Vazirmatn", ui-sans-serif, system-ui, "Segoe UI", Tahoma, sans-serif;
-  --emmett-radius-sm: 0.25rem;
-  --emmett-radius-md: 0.5rem;
+  --emmett-radius-sm: 0.4rem;
+  --emmett-radius-md: 0.7rem;
   --emmett-radius-lg: 1rem;
-  --emmett-sidebar-width: 272px;
+  --emmett-shadow: 0 14px 36px rgb(11 12 14 / 7%);
+  --emmett-sidebar-width: 17.25rem;
 }
 
-/* نگاشت به Bootstrap 5 (متغیرهای CSS رسمی) — تنها منبع حقیقت رنگ‌ها */
 :root,
-[data-bs-theme="light"] {
-  --bs-primary: var(--emmett-indigo);
-  --bs-primary-rgb: 91, 98, 224;
-  --bs-link-color: var(--emmett-indigo);
-  --bs-link-color-rgb: 91, 98, 224;
-  --bs-link-hover-color: var(--emmett-indigo-strong);
-  --bs-body-font-family: var(--emmett-font-family);
-  --bs-body-bg: var(--emmett-warm-white);
-  --bs-body-color: #16171a;
-  --bs-secondary-bg: var(--emmett-soft-gray);
-  --bs-border-color: var(--emmett-hairline-light);
-  --bs-border-radius: var(--emmett-radius-md);
-  --bs-border-radius-sm: var(--emmett-radius-sm);
-  --bs-border-radius-lg: var(--emmett-radius-lg);
-  --bs-focus-ring-color: rgb(91 98 224 / 35%);
+html[data-theme="light"] {
+  color-scheme: light;
+  --primary: var(--emmett-indigo);
+  --secondary: #27292e;
+  --accent: #7d83ef;
+  --primary-fg: #fff;
+  --body-fg: #222329;
+  --body-bg: var(--emmett-warm-white);
+  --body-quiet-color: #6f717b;
+  --body-medium-color: #4a4c55;
+  --body-loud-color: #101116;
+  --header-color: #f4f3f1;
+  --header-branding-color: #f4f3f1;
+  --header-bg: var(--emmett-obsidian);
+  --header-link-color: #f4f3f1;
+  --breadcrumbs-fg: #666873;
+  --breadcrumbs-link-fg: #4148c6;
+  --breadcrumbs-bg: transparent;
+  --link-fg: #444ac8;
+  --link-hover-color: #292e9c;
+  --link-selected-fg: #2f35ad;
+  --hairline-color: var(--emmett-hairline-light);
+  --border-color: #cfccc6;
+  --error-fg: #a93634;
+  --message-success-bg: #e4f6ee;
+  --message-warning-bg: #fdf3dd;
+  --message-error-bg: #fbeceb;
+  --darkened-bg: #efede8;
+  --selected-bg: #e9e8f8;
+  --selected-row: #eeefff;
+  --button-fg: #fff;
+  --button-bg: #33363c;
+  --button-hover-bg: #202227;
+  --default-button-bg: var(--emmett-indigo);
+  --default-button-hover-bg: var(--emmett-indigo-strong);
+  --close-button-bg: #6c7078;
+  --close-button-hover-bg: #4a4d54;
+  --delete-button-bg: #ae403a;
+  --delete-button-hover-bg: #8c302c;
+  --object-tools-fg: #fff;
+  --object-tools-bg: #303238;
+  --object-tools-hover-bg: #111216;
 }
 
-[data-bs-theme="dark"] {
-  --bs-primary: #8189f0;
-  --bs-primary-rgb: 129, 137, 240;
-  --bs-link-color: #9aa1f5;
-  --bs-body-font-family: var(--emmett-font-family);
-  --bs-body-bg: var(--emmett-obsidian);
-  --bs-body-color: #f2f1ee;
-  --bs-secondary-bg: var(--emmett-slate);
-  --bs-border-color: var(--emmett-hairline-dark);
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --primary: #8188f2;
+  --secondary: #e0e0e4;
+  --accent: #8a91f6;
+  --primary-fg: #101116;
+  --body-fg: #ececf0;
+  --body-bg: #121317;
+  --body-quiet-color: #a3a4ad;
+  --body-medium-color: #c7c8ce;
+  --body-loud-color: #fff;
+  --header-color: #f4f3f1;
+  --header-branding-color: #f4f3f1;
+  --header-bg: var(--emmett-obsidian);
+  --header-link-color: #f4f3f1;
+  --breadcrumbs-fg: #a4a5ae;
+  --breadcrumbs-link-fg: #a3a8ff;
+  --breadcrumbs-bg: transparent;
+  --link-fg: #a3a8ff;
+  --link-hover-color: #c6c9ff;
+  --link-selected-fg: #b7bcff;
+  --hairline-color: var(--emmett-hairline-dark);
+  --border-color: #41434a;
+  --error-fg: #ff8983;
+  --message-success-bg: #173b2a;
+  --message-warning-bg: #453715;
+  --message-error-bg: #482321;
+  --darkened-bg: #1b1d22;
+  --selected-bg: #303146;
+  --selected-row: #292b41;
+  --button-fg: #fff;
+  --button-bg: #34363c;
+  --button-hover-bg: #474a52;
+  --default-button-bg: var(--emmett-indigo);
+  --default-button-hover-bg: #484ecb;
+  --close-button-bg: #595c64;
+  --close-button-hover-bg: #73767e;
+  --delete-button-bg: #a53e39;
+  --delete-button-hover-bg: #c6554f;
+  --object-tools-fg: #fff;
+  --object-tools-bg: #32343a;
+  --object-tools-hover-bg: #4a4c53;
+}
+
+@media (prefers-color-scheme: dark) {
+  html[data-theme="auto"] {
+    color-scheme: dark;
+    --primary: #8188f2;
+    --secondary: #e0e0e4;
+    --accent: #8a91f6;
+    --primary-fg: #101116;
+    --body-fg: #ececf0;
+    --body-bg: #121317;
+    --body-quiet-color: #a3a4ad;
+    --body-medium-color: #c7c8ce;
+    --body-loud-color: #fff;
+    --header-color: #f4f3f1;
+    --header-branding-color: #f4f3f1;
+    --header-bg: var(--emmett-obsidian);
+    --header-link-color: #f4f3f1;
+    --breadcrumbs-fg: #a4a5ae;
+    --breadcrumbs-link-fg: #a3a8ff;
+    --breadcrumbs-bg: transparent;
+    --link-fg: #a3a8ff;
+    --link-hover-color: #c6c9ff;
+    --link-selected-fg: #b7bcff;
+    --hairline-color: var(--emmett-hairline-dark);
+    --border-color: #41434a;
+    --error-fg: #ff8983;
+    --message-success-bg: #173b2a;
+    --message-warning-bg: #453715;
+    --message-error-bg: #482321;
+    --darkened-bg: #1b1d22;
+    --selected-bg: #303146;
+    --selected-row: #292b41;
+    --button-fg: #fff;
+    --button-bg: #34363c;
+    --button-hover-bg: #474a52;
+    --default-button-bg: var(--emmett-indigo);
+    --default-button-hover-bg: #484ecb;
+    --close-button-bg: #595c64;
+    --close-button-hover-bg: #73767e;
+    --delete-button-bg: #a53e39;
+    --delete-button-hover-bg: #c6554f;
+    --object-tools-fg: #fff;
+    --object-tools-bg: #32343a;
+    --object-tools-hover-bg: #4a4c53;
+  }
 }
 
 html,
 body {
+  min-width: 0;
   font-family: var(--emmett-font-family);
 }
 
 body {
+  min-height: 100%;
+  background: var(--body-bg);
+  color: var(--body-fg);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
-/* --------------------------------------------------------------------------
-   ۳) پوستهٔ ادمین (AdminLTE 4): سایدبار تیرهٔ برند + هدر روشن
-   -------------------------------------------------------------------------- */
-.app-sidebar {
-  /* سایدبار همیشه تیره (انتخاب طراحی: کنتراست و حس SaaS) — مستقل از تم. */
-  background-color: var(--emmett-obsidian);
-  --lte-sidebar-color: rgb(242 241 238 / 78%);
-  --lte-sidebar-hover-bg: rgb(91 98 224 / 18%);
-  --lte-sidebar-hover-color: #fff;
-  --lte-sidebar-menu-active-bg: rgb(91 98 224 / 26%);
-  --lte-sidebar-menu-active-color: #fff;
-  --lte-sidebar-active-color: #fff;
-  --lte-sidebar-submenu-color: rgb(242 241 238 / 62%);
-  --lte-sidebar-submenu-hover-color: #fff;
-  --lte-sidebar-submenu-hover-bg: rgb(91 98 224 / 14%);
-  --lte-sidebar-submenu-active-color: #fff;
-  --lte-sidebar-submenu-active-bg: rgb(91 98 224 / 22%);
-  --lte-sidebar-header-color: rgb(242 241 238 / 45%);
-  border-inline-end: 1px solid var(--emmett-hairline-dark);
+#container {
+  width: 100%;
+  min-width: 0;
+  min-height: 100%;
+  height: auto;
 }
 
-.app-sidebar .nav-link.active,
-.app-sidebar .nav-link:hover {
-  border-radius: var(--emmett-radius-md);
+#header {
+  position: relative;
+  z-index: 30;
+  min-height: 4.5rem;
+  padding: 0.8rem clamp(1rem, 2.6vw, 2.5rem);
+  gap: 1.5rem;
+  background: var(--emmett-obsidian);
+  box-shadow: 0 1px 0 rgb(255 255 255 / 7%);
 }
 
-.app-sidebar .nav-link.active {
-  box-shadow: inset 3px 0 0 var(--emmett-emerald);
+#branding {
+  min-width: 0;
+  align-items: center;
 }
 
-.app-header {
-  background-color: #fff;
-  box-shadow: 0 1px 0 rgb(11 12 14 / 4%);
-}
-
-[data-bs-theme="dark"] .app-header {
-  background-color: var(--emmett-slate);
-}
-
-/* نشان‌نوشت برند: هم در سایدبار و هم در صفحهٔ ورود */
-.brand-link .emmett-brand-logo,
-.app-sidebar .brand-image {
-  max-height: 40px;
-  width: auto;
-  border-radius: var(--emmett-radius-sm);
-}
-
-.brand-link {
-  border-bottom: 1px solid rgb(255 255 255 / 8%);
-}
-
-.app-footer {
-  background-color: transparent;
-  color: var(--bs-secondary-color);
-}
-
-/* دکمه‌ها و فرم‌ها */
-.btn {
-  border-radius: var(--emmett-radius-md);
+#site-name {
+  margin: 0;
+  font-size: 0.9rem;
   font-weight: 500;
+  letter-spacing: 0;
 }
 
-.btn-primary {
-  --bs-btn-bg: var(--emmett-indigo);
-  --bs-btn-border-color: var(--emmett-indigo);
-  --bs-btn-hover-bg: var(--emmett-indigo-strong);
-  --bs-btn-hover-border-color: var(--emmett-indigo-strong);
-  --bs-btn-active-bg: var(--emmett-indigo-strong);
-  --bs-btn-active-border-color: var(--emmett-indigo-strong);
-  --bs-btn-disabled-bg: var(--emmett-indigo);
-  --bs-btn-disabled-border-color: var(--emmett-indigo);
+#site-name a:link,
+#site-name a:visited,
+#branding a:hover {
+  color: #f4f3f1;
+  text-decoration: none;
 }
 
-.btn-success {
-  --bs-btn-bg: var(--emmett-emerald);
-  --bs-btn-border-color: var(--emmett-emerald);
-  --bs-btn-hover-bg: #178c58;
-  --bs-btn-hover-border-color: #178c58;
+.emmett-brand {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.8rem;
 }
 
-.form-control:focus,
-.form-select:focus {
-  border-color: var(--emmett-indigo);
-  box-shadow: 0 0 0 0.2rem rgb(91 98 224 / 22%);
+.emmett-brand__logo {
+  display: block;
+  width: clamp(6rem, 9vw, 8.5rem);
+  max-height: 2.8rem;
+  object-fit: contain;
+  object-position: start center;
 }
 
-/* کارت‌ها، مودال‌ها، هدرها */
-.card {
-  border-radius: var(--emmett-radius-lg);
-  border-color: var(--bs-border-color);
-  box-shadow: 0 1px 2px rgb(11 12 14 / 4%);
-}
-
-.card-title,
-h1, h2, h3, h4, h5 {
-  font-weight: 600;
-}
-
-h1.h3,
-.app-content-header h3 {
-  font-size: 1.35rem;
-  letter-spacing: -0.01em;
-}
-
-/* جدول‌ها و فیلترها */
-#result_list thead th {
-  background-color: var(--emmett-ivory);
-  font-weight: 600;
+.emmett-brand__name {
+  color: rgb(244 243 241 / 76%);
+  font-size: 0.78rem;
+  font-weight: 500;
   white-space: nowrap;
 }
 
-[data-bs-theme="dark"] #result_list thead th {
-  background-color: var(--emmett-graphite);
+#user-tools {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.55rem 1rem;
+  margin: 0;
+  padding: 0;
+  color: rgb(244 243 241 / 75%);
+  font-size: 0.78rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-align: start;
+  text-transform: none;
 }
 
+#user-tools a,
+#logout-form button {
+  min-height: 2.35rem;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 0.15rem;
+  border: 0;
+  border-radius: var(--emmett-radius-sm);
+  background: transparent;
+  color: #f4f3f1;
+  font: inherit;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+#user-tools a:hover,
+#user-tools a:focus-visible,
+#logout-form button:hover {
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 0.25rem;
+}
+
+#logout-form {
+  display: inline-flex;
+  margin: 0;
+}
+
+#logout-form button {
+  cursor: pointer;
+}
+
+.emmett-header-tools {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.45rem;
+}
+
+.emmett-header-tools .theme-toggle {
+  display: inline-flex;
+  width: 2.35rem;
+  height: 2.35rem;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  border: 1px solid rgb(255 255 255 / 23%);
+  border-radius: var(--emmett-radius-sm);
+}
+
+.emmett-header-tools .theme-toggle svg {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.emmett-language-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0;
+}
+
+.emmett-language-switcher label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.emmett-language-switcher select {
+  width: auto;
+  min-width: 5.1rem;
+  height: 2.25rem;
+  padding: 0.25rem;
+  padding-inline: 0.55rem 1.8rem;
+  border: 1px solid rgb(255 255 255 / 23%);
+  border-radius: var(--emmett-radius-sm);
+  background-color: #191a1e;
+  color: #f4f3f1;
+  font: inherit;
+}
+
+.emmett-language-switcher button {
+  min-height: 2.25rem;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid rgb(255 255 255 / 23%);
+  border-radius: var(--emmett-radius-sm);
+  background: transparent;
+  color: #f4f3f1;
+  font: inherit;
+  cursor: pointer;
+}
+
+#toggle-nav-sidebar {
+  z-index: 35;
+  width: 2.5rem;
+  min-width: 2.5rem;
+  height: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  margin: 1rem 0.6rem;
+  border: 1px solid var(--emmett-hairline-dark);
+  border-radius: var(--emmett-radius-sm);
+  background: var(--emmett-obsidian);
+  color: #f3f2f0;
+  font-size: 1.2rem;
+  box-shadow: 0 3px 10px rgb(11 12 14 / 16%);
+}
+
+#toggle-nav-sidebar::before {
+  content: "☰";
+  font-family: var(--emmett-font-family);
+  font-size: 1rem;
+}
+
+.main.shifted #toggle-nav-sidebar::before {
+  content: "×";
+  font-size: 1.5rem;
+}
+
+#nav-sidebar {
+  z-index: 25;
+  flex: 0 0 var(--emmett-sidebar-width);
+  width: var(--emmett-sidebar-width);
+  max-width: var(--emmett-sidebar-width);
+  padding: 1rem 0.85rem 1.5rem;
+  border: 0;
+  border-inline-end: 1px solid var(--emmett-hairline-dark);
+  background: var(--emmett-graphite);
+  color: #f2f1ee;
+  box-sizing: border-box;
+  scrollbar-color: #55575e var(--emmett-graphite);
+}
+
+#nav-sidebar .emmett-nav__home {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin: 0 0 0.85rem;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid rgb(255 255 255 / 8%);
+  border-radius: var(--emmett-radius-md);
+  background: rgb(255 255 255 / 4%);
+  color: #f5f4f2;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+#nav-sidebar .emmett-nav__home:hover,
+#nav-sidebar .emmett-nav__home:focus-visible {
+  border-color: rgb(129 136 242 / 55%);
+  background: rgb(91 98 224 / 15%);
+  color: #fff;
+}
+
+.emmett-icon {
+  display: inline-block;
+  flex: 0 0 auto;
+  width: 1.1rem;
+  height: 1.1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.emmett-nav__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.55rem;
+  height: 1.55rem;
+  border-radius: 0.45rem;
+  background: rgb(91 98 224 / 19%);
+  color: #aab0ff;
+}
+
+#nav-sidebar #nav-filter {
+  width: 100%;
+  min-height: 2.65rem;
+  margin: 0 0 1rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid rgb(255 255 255 / 12%);
+  border-radius: var(--emmett-radius-sm);
+  background: #0f1013;
+  color: #f2f1ee;
+  font: inherit;
+  box-sizing: border-box;
+}
+
+#nav-sidebar #nav-filter::placeholder {
+  color: rgb(242 241 238 / 48%);
+}
+
+#nav-sidebar #nav-filter:focus {
+  border-color: #8a91f6;
+  outline: 2px solid rgb(138 145 246 / 25%);
+  outline-offset: 1px;
+}
+
+.emmett-nav__section {
+  margin-block: 1.1rem;
+}
+
+.emmett-nav__section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0 0 0.45rem;
+  padding: 0 0.45rem;
+  color: rgb(242 241 238 / 52%);
+  font-size: 0.69rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+#nav-sidebar .module {
+  margin: 0 0 0.45rem;
+  border: 0;
+  background: transparent;
+}
+
+#nav-sidebar .module h3 {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #f2f1ee;
+  font-size: 0.76rem;
+  font-weight: 600;
+  text-align: start;
+}
+
+#nav-sidebar .module .emmett-app__title {
+  display: block;
+  padding: 0.45rem 0.5rem 0.3rem;
+  color: #f2f1ee;
+  text-decoration: none;
+}
+
+#nav-sidebar .module .emmett-app__title:hover,
+#nav-sidebar .module .emmett-app__title:focus-visible {
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 0.2rem;
+}
+
+#nav-sidebar .module table {
+  width: 100%;
+  border: 0;
+  border-collapse: collapse;
+}
+
+#nav-sidebar .module caption {
+  padding: 0.45rem 0.5rem 0.3rem;
+  border: 0;
+  background: transparent;
+  color: #f2f1ee;
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-align: start;
+  text-transform: none;
+}
+
+#nav-sidebar .module caption a.section {
+  color: #f2f1ee;
+}
+
+#nav-sidebar .module th,
+#nav-sidebar .module td {
+  padding: 0.05rem 0;
+  border: 0;
+  white-space: normal;
+}
+
+#nav-sidebar .module th[scope="row"] a {
+  display: block;
+  padding: 0.43rem 0.65rem;
+  border-radius: 0.45rem;
+  color: rgb(242 241 238 / 72%);
+  font-size: 0.79rem;
+  line-height: 1.35;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+#nav-sidebar .module th[scope="row"] a:hover,
+#nav-sidebar .module th[scope="row"] a:focus-visible {
+  background: rgb(255 255 255 / 7%);
+  color: #fff;
+}
+
+#nav-sidebar .module .current-model {
+  background: transparent;
+}
+
+#nav-sidebar .module .current-model th[scope="row"] a,
+#nav-sidebar .module .current-model th[scope="row"] a[aria-current="page"] {
+  background: rgb(91 98 224 / 25%);
+  box-shadow: inset 3px 0 0 var(--emmett-emerald);
+  color: #fff;
+}
+
+#nav-sidebar .module .addlink,
+#nav-sidebar .module .viewlink,
+#nav-sidebar .module .changelink {
+  min-width: 1.4rem;
+  width: 1.4rem;
+  height: 1.5rem;
+  padding: 0;
+  overflow: hidden;
+  font-size: 0;
+  background-position: center;
+  opacity: 0.6;
+}
+
+#nav-sidebar .module .addlink:hover,
+#nav-sidebar .module .viewlink:hover,
+#nav-sidebar .module .changelink:hover {
+  opacity: 1;
+}
+
+.breadcrumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: center;
+  min-height: 2.8rem;
+  padding: 0.65rem clamp(1rem, 2.6vw, 2.5rem);
+  border-block-end: 1px solid var(--hairline-color);
+  background: var(--body-bg);
+  color: var(--body-quiet-color);
+  font-size: 0.78rem;
+  text-align: start;
+}
+
+.breadcrumbs a {
+  color: var(--link-fg);
+}
+
+.main > .content {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: none !important;
+  overflow-x: clip;
+}
+
+#content {
+  width: auto;
+  max-width: 100%;
+  padding: clamp(1rem, 2.5vw, 2rem) clamp(1rem, 2.6vw, 2.5rem);
+  box-sizing: border-box;
+}
+
+#content-main {
+  float: none;
+  min-width: 0;
+  width: 100%;
+}
+
+#content h1 {
+  margin: 0 0 1.25rem;
+  color: var(--body-loud-color);
+  font-size: clamp(1.35rem, 2vw, 1.9rem);
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -0.025em;
+}
+
+#content h2,
+#content h3,
+#content h4 {
+  color: var(--body-fg);
+  font-family: var(--emmett-font-family);
+}
+
+#footer {
+  min-height: 1rem;
+  background: var(--body-bg);
+}
+
+#content a:focus-visible,
+#content button:focus-visible,
+#content input:focus-visible,
+#content select:focus-visible,
+#content textarea:focus-visible,
+#header a:focus-visible,
+#header button:focus-visible,
+#header select:focus-visible,
+#nav-sidebar a:focus-visible,
+#nav-sidebar input:focus-visible,
+#toggle-nav-sidebar:focus-visible {
+  outline: 2px solid var(--emmett-emerald);
+  outline-offset: 2px;
+}
+
+input:not([type="checkbox"]):not([type="radio"]),
+select,
+textarea {
+  max-width: 100%;
+  border: 1px solid var(--border-color);
+  border-radius: var(--emmett-radius-sm);
+  background-color: var(--body-bg);
+  color: var(--body-fg);
+  font-family: var(--emmett-font-family);
+  box-sizing: border-box;
+}
+
+input:not([type="checkbox"]):not([type="radio"]):focus,
+select:focus,
+textarea:focus,
+.vTextField:focus {
+  border-color: var(--emmett-indigo);
+  outline: 2px solid rgb(91 98 224 / 20%);
+  outline-offset: 1px;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--emmett-indigo);
+}
+
+.button,
+input[type="submit"],
+input[type="button"],
+.submit-row input,
+.submit-row a,
+a.button {
+  min-height: 2.45rem;
+  padding: 0.55rem 0.9rem;
+  border: 1px solid transparent;
+  border-radius: var(--emmett-radius-sm);
+  background: var(--button-bg);
+  color: var(--button-fg);
+  font-family: var(--emmett-font-family);
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.35;
+  cursor: pointer;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+.button.default,
+input[type="submit"].default,
+.submit-row input.default {
+  background: var(--emmett-indigo);
+  color: #fff;
+}
+
+.button:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover,
+a.button:hover {
+  filter: brightness(1.08);
+  color: #fff;
+  text-decoration: none;
+}
+
+input[type="submit"][disabled],
+button[disabled] {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.submit-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: center;
+  padding: 1rem;
+  border: 1px solid var(--hairline-color);
+  border-radius: var(--emmett-radius-md);
+  background: var(--body-bg);
+  text-align: start;
+}
+
+.submit-row .deletelink-box {
+  margin-inline-start: auto;
+}
+
+.submit-row a.deletelink,
+.delete-confirmation form input[type="submit"] {
+  background: var(--delete-button-bg);
+  color: #fff;
+}
+
+.object-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  float: none;
+  margin: 0 0 1rem;
+  padding: 0;
+  position: static;
+  list-style: none;
+}
+
+.object-tools li {
+  float: none;
+  height: auto;
+  margin: 0;
+}
+
+.object-tools a:link,
+.object-tools a:visited {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.25rem;
+  padding: 0.48rem 0.85rem;
+  border: 1px solid var(--hairline-color);
+  border-radius: var(--emmett-radius-sm);
+  background: var(--body-bg);
+  color: var(--body-fg);
+  font-size: 0.79rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.module,
+#content-related {
+  border: 1px solid var(--hairline-color);
+  border-radius: var(--emmett-radius-md);
+  background: var(--body-bg);
+  box-shadow: 0 4px 18px rgb(11 12 14 / 3%);
+  overflow: hidden;
+}
+
+.module h2,
+.module caption,
+.inline-group h2 {
+  padding: 0.8rem 1rem;
+  border-block-end: 1px solid var(--hairline-color);
+  background: var(--darkened-bg);
+  color: var(--body-fg);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: start;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.module table,
+#change-history table {
+  width: 100%;
+  max-width: 100%;
+}
+
+.module table th,
+.module table td,
+#change-history table th,
+#change-history table td {
+  padding: 0.7rem 0.85rem;
+}
+
+.module table thead th,
+#result_list thead th {
+  background: var(--darkened-bg);
+  color: var(--body-quiet-color);
+  font-weight: 600;
+}
+
+.module table tbody tr:hover,
 #result_list tbody tr:hover {
-  background-color: rgb(91 98 224 / 5%);
+  background: rgb(91 98 224 / 5%);
+}
+
+#result_list {
+  min-width: 100%;
+  width: max-content;
+  max-width: none;
+}
+
+#result_list th,
+#result_list td {
+  vertical-align: middle;
+}
+
+#result_list thead th,
+#result_list tbody th {
+  white-space: nowrap;
+}
+
+#changelist,
+#changelist-form,
+#content-main,
+#content-related,
+#content {
+  min-width: 0;
+}
+
+#changelist .results,
+#changelist .results table,
+#change-history,
+.import-preview,
+.selector {
+  max-width: 100%;
+}
+
+#changelist .results,
+#change-history,
+.import-preview {
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+}
+
+#changelist .actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.8rem;
+  border: 1px solid var(--hairline-color);
+  border-radius: var(--emmett-radius-sm);
+  background: var(--darkened-bg);
+}
+
+#changelist .actions label {
+  padding: 0;
+  color: var(--body-quiet-color);
+}
+
+#changelist .actions select {
+  width: auto;
+  min-width: 10rem;
+}
+
+#changelist .actions .button {
+  min-height: 2.25rem;
+  border: 0;
+  background: var(--emmett-indigo);
+  color: #fff;
+}
+
+#changelist #toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border: 1px solid var(--hairline-color);
+  border-radius: var(--emmett-radius-sm);
+  background: var(--body-bg);
+}
+
+#searchbar {
+  min-width: min(100%, 18rem);
+}
+
+#changelist-filter {
+  max-width: 100%;
+  border: 1px solid var(--hairline-color);
+  border-radius: var(--emmett-radius-sm);
+  background: var(--body-bg);
+  overflow-wrap: anywhere;
 }
 
 #changelist-filter h2 {
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--bs-secondary-color);
+  padding: 0.85rem 1rem;
+  background: var(--darkened-bg);
+  color: var(--body-fg);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: 0;
 }
 
-.select2-container--default .select2-selection--multiple .select2-selection__choice {
-  background-color: var(--emmett-indigo-soft);
-  border-color: var(--emmett-indigo);
-  color: #16171a;
+#changelist-filter h3 {
+  margin: 0.7rem 0.75rem 0.3rem;
+  color: var(--body-quiet-color);
+  font-size: 0.72rem;
 }
 
-.select2-container--default .select2-results__option--highlighted {
-  background-color: var(--emmett-indigo) !important;
+#changelist-filter ul {
+  margin: 0 0 0.65rem;
+  padding: 0;
+  list-style: none;
 }
 
-/* --------------------------------------------------------------------------
-   ۴) داشبورد اختصاصی امیت (templates/admin/index.html + core/dashboard.py)
-   -------------------------------------------------------------------------- */
+#changelist-filter li {
+  padding: 0.32rem 0.8rem;
+  list-style: none;
+}
+
+#changelist-filter li.selected {
+  border-inline-start: 3px solid var(--emmett-indigo);
+  background: var(--selected-bg);
+}
+
+.paginator {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+  padding: 0.8rem 0;
+  color: var(--body-quiet-color);
+}
+
+.paginator a:link,
+.paginator a:visited {
+  padding: 0.25rem 0.55rem;
+  border-radius: 0.35rem;
+  background: var(--darkened-bg);
+  color: var(--link-fg);
+}
+
+.paginator .this-page {
+  padding: 0.25rem 0.55rem;
+  border-radius: 0.35rem;
+  background: var(--emmett-indigo);
+  color: #fff;
+}
+
+.aligned .form-row {
+  padding: 0.9rem 1rem;
+  border-block-end: 1px solid var(--hairline-color);
+}
+
+.aligned label,
+.aligned .form-row label {
+  color: var(--body-quiet-color);
+  font-weight: 600;
+}
+
+.form-row.errors,
+.errors input,
+.errors select,
+.errors textarea {
+  border-color: var(--error-fg);
+}
+
+.help,
+.helptext,
+p.help {
+  color: var(--body-quiet-color);
+  font-size: 0.76rem;
+  line-height: 1.6;
+}
+
+.errornote,
+ul.errorlist {
+  border-radius: var(--emmett-radius-sm);
+  color: var(--error-fg);
+}
+
+ul.errorlist li {
+  padding: 0.2rem 0;
+  list-style: none;
+}
+
+ul.messagelist {
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+ul.messagelist li {
+  margin: 0 0 0.65rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--hairline-color);
+  border-radius: var(--emmett-radius-sm);
+  background: var(--message-success-bg);
+  color: var(--body-fg);
+}
+
+ul.messagelist li.warning {
+  background: var(--message-warning-bg);
+}
+
+ul.messagelist li.error {
+  background: var(--message-error-bg);
+}
+
 .emmett-dashboard {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-  margin-bottom: 1.5rem;
+  width: 100%;
+  margin-block-end: 1.5rem;
 }
 
 .emmett-dashboard__header {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
-  align-items: center;
+  gap: 0.5rem 1rem;
+  align-items: baseline;
   justify-content: space-between;
 }
 
 .emmett-dashboard__greeting {
   margin: 0;
-  font-size: 1.15rem;
+  color: var(--body-loud-color);
+  font-size: 1rem;
   font-weight: 600;
 }
 
 .emmett-dashboard__hint {
   margin: 0;
-  color: var(--bs-secondary-color);
-  font-size: 0.85rem;
+  color: var(--body-quiet-color);
+  font-size: 0.78rem;
 }
 
 .emmett-kpi-grid {
   display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 0.9rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
 }
 
 .emmett-kpi {
   display: flex;
+  min-width: 0;
+  min-height: 9.5rem;
   flex-direction: column;
-  gap: 0.5rem;
-  padding: 1rem 1.1rem;
-  background-color: var(--bs-body-bg);
-  border: 1px solid var(--bs-border-color);
+  gap: 0.55rem;
+  padding: 1.05rem 1.15rem;
+  border: 1px solid var(--hairline-color);
   border-radius: var(--emmett-radius-lg);
-  box-shadow: 0 1px 2px rgb(11 12 14 / 4%);
-  block-size: 100%;
+  background: var(--body-bg);
+  box-shadow: var(--emmett-shadow);
 }
 
 .emmett-kpi__head {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  color: var(--bs-secondary-color);
-  font-size: 0.85rem;
-  font-weight: 500;
+  gap: 0.55rem;
+  color: var(--body-quiet-color);
+  font-size: 0.78rem;
+  font-weight: 600;
 }
 
 .emmett-kpi__icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  border-radius: var(--emmett-radius-md);
-  background-color: var(--emmett-indigo-soft);
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 0.65rem;
+  background: var(--emmett-indigo-soft);
   color: var(--emmett-indigo-strong);
 }
 
-[data-bs-theme="dark"] .emmett-kpi__icon {
-  background-color: rgb(91 98 224 / 22%);
-  color: #aab0f7;
-}
-
 .emmett-kpi__value {
-  font-size: 1.75rem;
+  color: var(--body-loud-color);
+  font-size: clamp(1.5rem, 3vw, 2rem);
   font-weight: 700;
   line-height: 1.2;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
+  overflow-wrap: anywhere;
 }
 
 .emmett-kpi__hints {
@@ -384,74 +1184,107 @@ h1.h3,
   gap: 0.35rem 0.75rem;
   margin: 0;
   padding: 0;
+  color: var(--body-quiet-color);
+  font-size: 0.75rem;
   list-style: none;
-  font-size: 0.8rem;
-  color: var(--bs-secondary-color);
 }
 
 .emmett-kpi__link {
-  font-size: 0.8rem;
-  font-weight: 500;
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 0.35rem;
+  margin-block-start: auto;
+  color: var(--link-fg);
+  font-size: 0.77rem;
+  font-weight: 600;
   text-decoration: none;
+}
+
+.emmett-kpi__link:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.2rem;
+}
+
+.emmett-kpi__link .emmett-icon {
+  width: 0.95rem;
+  height: 0.95rem;
 }
 
 .emmett-panel-grid {
   display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 0.9rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 21rem), 1fr));
 }
 
 .emmett-panel {
+  min-width: 0;
   padding: 1rem 1.1rem;
-  background-color: var(--bs-body-bg);
-  border: 1px solid var(--bs-border-color);
+  border: 1px solid var(--hairline-color);
   border-radius: var(--emmett-radius-lg);
+  background: var(--body-bg);
+  box-shadow: var(--emmett-shadow);
+  overflow-wrap: anywhere;
 }
 
 .emmett-panel__title {
   margin: 0 0 0.85rem;
-  font-size: 0.95rem;
-  font-weight: 600;
+  color: var(--body-loud-color);
+  font-size: 0.92rem;
+  font-weight: 700;
 }
 
-/* نمودار میله‌ای خالص CSS — بدون JS و بدون CDN (الزام فاز ۶ برای حذف گوگل‌چارت) */
 .emmett-chart {
   display: flex;
+  height: 8.5rem;
   align-items: flex-end;
   gap: 0.4rem;
-  height: 132px;
-  padding-block-start: 0.5rem;
+  padding-block: 0.65rem 0;
+  border-block-end: 1px solid var(--hairline-color);
 }
 
 .emmett-chart__bar {
   position: relative;
   flex: 1 1 0;
-  min-width: 8px;
-  border-radius: var(--emmett-radius-sm) var(--emmett-radius-sm) 0 0;
-  background-color: var(--emmett-indigo);
-  transition: opacity 0.15s ease-in-out;
+  min-width: 0.45rem;
+  border-radius: 0.35rem 0.35rem 0 0;
+  background: linear-gradient(180deg, #8188f2 0%, var(--emmett-indigo) 100%);
+  transition: filter 0.15s ease;
 }
 
 .emmett-chart__bar--accent {
-  background-color: var(--emmett-emerald);
+  background: linear-gradient(180deg, #49c98e 0%, var(--emmett-emerald) 100%);
 }
 
 .emmett-chart__bar:hover {
-  opacity: 0.8;
+  filter: brightness(1.12);
 }
+
+.emmett-chart__bar--height-0 { height: 0; }
+.emmett-chart__bar--height-1 { height: 10%; }
+.emmett-chart__bar--height-2 { height: 20%; }
+.emmett-chart__bar--height-3 { height: 30%; }
+.emmett-chart__bar--height-4 { height: 40%; }
+.emmett-chart__bar--height-5 { height: 50%; }
+.emmett-chart__bar--height-6 { height: 60%; }
+.emmett-chart__bar--height-7 { height: 70%; }
+.emmett-chart__bar--height-8 { height: 80%; }
+.emmett-chart__bar--height-9 { height: 90%; }
+.emmett-chart__bar--height-10 { height: 100%; }
 
 .emmett-chart__labels {
   display: flex;
   gap: 0.4rem;
-  margin-top: 0.4rem;
-  font-size: 0.7rem;
-  color: var(--bs-secondary-color);
+  margin-block-start: 0.45rem;
+  color: var(--body-quiet-color);
+  font-size: 0.68rem;
 }
 
 .emmett-chart__labels span {
   flex: 1 1 0;
-  text-align: center;
+  min-width: 0;
   overflow: hidden;
+  text-align: center;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -463,41 +1296,90 @@ h1.h3,
   margin: 0;
   padding: 0;
   list-style: none;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
 }
 
-.emmett-legend__dot {
-  display: inline-block;
-  width: 0.6rem;
-  height: 0.6rem;
-  margin-inline-end: 0.35rem;
-  border-radius: 50%;
-  background-color: var(--emmett-indigo);
+.emmett-legend li {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
 }
 
 .emmett-activity {
   margin: 0;
   padding: 0;
   list-style: none;
-  font-size: 0.85rem;
+  font-size: 0.78rem;
 }
 
 .emmett-activity li {
   display: flex;
-  gap: 0.5rem;
-  align-items: baseline;
-  padding-block: 0.4rem;
-  border-bottom: 1px solid var(--bs-border-color);
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: 0.45rem 0.65rem;
+  align-items: center;
+  padding-block: 0.5rem;
+  border-block-end: 1px solid var(--hairline-color);
 }
 
 .emmett-activity li:last-child {
-  border-bottom: none;
+  border-block-end: 0;
 }
 
 .emmett-activity time {
-  color: var(--bs-secondary-color);
-  font-size: 0.75rem;
+  margin-inline-start: auto;
+  color: var(--body-quiet-color);
+  font-size: 0.71rem;
   white-space: nowrap;
+}
+
+.emmett-pill {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  padding: 0.12rem 0.55rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.emmett-pill--published,
+.emmett-pill--approved,
+.emmett-pill--won,
+.emmett-pill--completed {
+  background: var(--emmett-emerald-soft);
+  color: #14734a;
+}
+
+.emmett-pill--draft,
+.emmett-pill--pending,
+.emmett-pill--new,
+.emmett-pill--contacted {
+  background: var(--emmett-amber-soft);
+  color: #765707;
+}
+
+.emmett-pill--archived,
+.emmett-pill--lost,
+.emmett-pill--cancelled,
+.emmett-pill--rejected {
+  background: var(--emmett-danger-soft);
+  color: #8c322d;
+}
+
+.emmett-pill--qualified,
+.emmett-pill--proposal,
+.emmett-pill--active {
+  background: var(--emmett-indigo-soft);
+  color: var(--emmett-indigo-strong);
+}
+
+.emmett-pill--deleted {
+  background: var(--darkened-bg);
+  color: var(--body-quiet-color);
 }
 
 .emmett-quick-links {
@@ -511,135 +1393,545 @@ h1.h3,
 
 .emmett-quick-links a {
   display: inline-flex;
-  gap: 0.35rem;
   align-items: center;
-  padding: 0.35rem 0.7rem;
-  border: 1px solid var(--bs-border-color);
+  gap: 0.4rem;
+  min-height: 2.25rem;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid var(--hairline-color);
   border-radius: 999px;
-  font-size: 0.8rem;
+  color: var(--body-fg);
+  font-size: 0.76rem;
   text-decoration: none;
 }
 
 .emmett-quick-links a:hover {
   border-color: var(--emmett-indigo);
-  background-color: var(--emmett-indigo-soft);
+  background: var(--selected-bg);
 }
 
-/* --------------------------------------------------------------------------
-   ۵) برچسب‌های وضعیت محتوا (core/admin_mixins.py::status_badge)
-   -------------------------------------------------------------------------- */
-.emmett-pill {
+.emmett-app-list {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+}
+
+.emmett-app-list > div {
+  min-width: 0;
+  padding: 0.9rem;
+  border: 1px solid var(--hairline-color);
+  border-radius: var(--emmett-radius-md);
+  background: var(--body-bg);
+}
+
+.emmett-app-list .emmett-panel__title {
+  margin-block-end: 0.5rem;
+}
+
+.emmett-app-list .emmett-activity li {
+  align-items: flex-start;
+}
+
+.emmett-ltr {
+  direction: ltr;
+  text-align: left;
+  unicode-bidi: isolate;
+}
+
+.emmett-auth-page #content {
+  width: auto;
+  max-width: 100%;
+}
+
+.emmett-auth-shell {
+  width: min(100%, 60rem);
+  margin-inline: auto;
+}
+
+.emmett-2fa-card {
+  width: min(100%, 54rem);
+  margin-inline: auto;
+  padding: clamp(1rem, 2.6vw, 2rem);
+  border: 1px solid var(--hairline-color);
+  border-radius: var(--emmett-radius-lg);
+  background: var(--body-bg);
+  box-shadow: var(--emmett-shadow);
+}
+
+.emmett-2fa-card__title {
+  margin: 0 0 1.25rem;
+  padding-block-end: 1rem;
+  border-block-end: 1px solid var(--hairline-color);
+}
+
+#content .emmett-2fa-card__title h1 {
+  margin: 0;
+  color: var(--body-loud-color);
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.emmett-2fa-card__content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.emmett-2fa-card__content > p {
+  margin: 0;
+  line-height: 1.7;
+}
+
+.emmett-2fa-grid {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  align-items: start;
+}
+
+.emmett-qr {
+  display: block;
+  width: min(100%, 15rem);
+  height: auto;
+  margin-inline: auto;
+  padding: 0.75rem;
+  border: 1px solid var(--hairline-color);
+  border-radius: var(--emmett-radius-md);
+  background: #fff;
+}
+
+.emmett-secret {
   display: inline-block;
-  padding: 0.15rem 0.6rem;
-  border-radius: 999px;
-  font-size: 0.75rem;
+  max-width: 100%;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--hairline-color);
+  border-radius: var(--emmett-radius-sm);
+  background: var(--darkened-bg);
+  font-family: var(--font-family-monospace);
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+
+.emmett-auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  max-width: 34rem;
+}
+
+.emmett-auth-form label {
+  color: var(--body-quiet-color);
   font-weight: 600;
-  line-height: 1.6;
-  white-space: nowrap;
 }
 
-.emmett-pill--published,
-.emmett-pill--approved,
-.emmett-pill--won,
-.emmett-pill--completed {
-  background-color: var(--emmett-emerald-soft);
-  color: #14734a;
+.emmett-auth-form input:not([type="checkbox"]):not([type="radio"]) {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.65rem 0.75rem;
 }
 
-.emmett-pill--draft,
-.emmett-pill--pending,
-.emmett-pill--new,
-.emmett-pill--contacted {
-  background-color: var(--emmett-amber-soft);
-  color: #7a5a06;
+.emmett-auth-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
 }
 
-.emmett-pill--archived,
-.emmett-pill--lost,
-.emmett-pill--cancelled,
-.emmett-pill--rejected {
-  background-color: var(--emmett-danger-soft);
-  color: #8c322d;
+.emmett-auth-actions form {
+  margin: 0;
 }
 
-.emmett-pill--qualified,
-.emmett-pill--proposal,
-.emmett-pill--active {
-  background-color: var(--emmett-indigo-soft);
-  color: var(--emmett-indigo-strong);
+.emmett-auth-form button {
+  align-self: flex-start;
 }
 
-.emmett-pill--deleted {
-  background-color: #e9e9e9;
-  color: #555;
+.emmett-danger-button {
+  background: var(--delete-button-bg) !important;
+  color: #fff !important;
 }
 
-[data-bs-theme="dark"] .emmett-pill {
-  background-color: rgb(255 255 255 / 12%);
-  color: #f2f1ee;
+.emmett-status-list {
+  display: grid;
+  gap: 0.75rem 1.25rem;
+  grid-template-columns: minmax(8rem, 0.6fr) minmax(0, 1.4fr);
+  margin: 0;
 }
 
-/* --------------------------------------------------------------------------
-   ۶) صفحهٔ ورود (registration/base.html از Jazzmin)
-   -------------------------------------------------------------------------- */
-.login-page,
-.register-page {
+.emmett-status-list dt,
+.emmett-status-list dd {
+  margin: 0;
+  padding-block: 0.45rem;
+  border-block-end: 1px solid var(--hairline-color);
+}
+
+.emmett-status-list dt {
+  color: var(--body-quiet-color);
+  font-weight: 600;
+}
+
+.emmett-recovery-list {
+  display: grid;
+  gap: 0.55rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.emmett-recovery-list li {
+  padding: 0.75rem;
+  border: 1px solid var(--hairline-color);
+  border-radius: var(--emmett-radius-sm);
+  background: var(--darkened-bg);
+  direction: ltr;
+  font-family: var(--font-family-monospace);
+  user-select: all;
+}
+
+.emmett-alert {
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--hairline-color);
+  border-inline-start: 4px solid var(--emmett-indigo);
+  border-radius: var(--emmett-radius-sm);
+  background: var(--darkened-bg);
+}
+
+.emmett-alert--warning {
+  border-inline-start-color: #cf9b2b;
+  background: var(--message-warning-bg);
+}
+
+.emmett-login #header {
+  border-block-end: 1px solid rgb(255 255 255 / 9%);
+}
+
+.emmett-login .main {
+  display: block;
+  min-height: calc(100vh - 5rem);
   background:
-    radial-gradient(1200px 520px at 15% -10%, rgb(91 98 224 / 32%), transparent),
-    radial-gradient(900px 420px at 100% 110%, rgb(31 174 110 / 22%), transparent),
+    radial-gradient(52rem 30rem at 14% 0%, rgb(91 98 224 / 28%), transparent 68%),
+    radial-gradient(42rem 27rem at 100% 100%, rgb(31 174 110 / 19%), transparent 70%),
     var(--emmett-obsidian);
 }
 
-.login-box .card,
-.register-box .card {
-  border: 1px solid rgb(255 255 255 / 8%);
-  background-color: rgb(19 20 23 / 92%);
-  color: #f2f1ee;
-  backdrop-filter: blur(6px);
+.emmett-login .content {
+  max-width: none;
+  min-height: calc(100vh - 5rem);
+  padding: clamp(1rem, 4vw, 3rem);
 }
 
-.login-logo img,
-.register-logo img {
-  max-height: 72px;
-  width: auto;
+.emmett-login #content {
+  display: grid;
+  width: 100%;
+  min-height: calc(100vh - 11rem);
+  place-items: center;
+  padding: 0;
 }
 
-.login-card-body,
-.register-card-body {
-  color: #f2f1ee;
+.emmett-login #content-main {
+  float: none;
+  width: min(100%, 28rem);
+  margin-inline: auto;
 }
 
-.login-box .form-control {
-  background-color: rgb(255 255 255 / 6%);
-  border-color: rgb(255 255 255 / 14%);
-  color: #f2f1ee;
+.emmett-login-card {
+  padding: clamp(1.4rem, 4vw, 2.35rem);
+  border: 1px solid rgb(255 255 255 / 12%);
+  border-radius: 1.25rem;
+  background: rgb(20 21 25 / 96%);
+  box-shadow: 0 24px 70px rgb(0 0 0 / 38%);
+  color: #f4f3f1;
 }
 
-.login-box .form-control::placeholder {
-  color: rgb(242 241 238 / 45%);
+.emmett-login-card__logo {
+  display: block;
+  width: min(13rem, 70%);
+  max-height: 4.5rem;
+  margin: 0 auto 1.6rem;
+  object-fit: contain;
 }
 
-/* --------------------------------------------------------------------------
-   ۷) دسترس‌پذیری و چاپ
-   -------------------------------------------------------------------------- */
-a:focus-visible,
-.btn:focus-visible,
-.nav-link:focus-visible {
-  outline: 2px solid var(--emmett-emerald);
-  outline-offset: 2px;
+#content .emmett-login-card__title {
+  margin: 0 0 0.45rem;
+  color: #fff;
+  font-size: 1.35rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.emmett-login-card__description {
+  margin: 0 0 1.4rem;
+  color: rgb(244 243 241 / 65%);
+  font-size: 0.82rem;
+  text-align: center;
+}
+
+.emmett-login-card .form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0;
+  margin-block: 0 1rem;
+  border: 0;
+}
+
+.emmett-login-card label {
+  color: rgb(244 243 241 / 76%);
+  font-weight: 600;
+}
+
+.emmett-login-card input:not([type="checkbox"]):not([type="radio"]) {
+  width: 100%;
+  min-height: 2.9rem;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid rgb(255 255 255 / 17%);
+  border-radius: var(--emmett-radius-sm);
+  background: #101115;
+  color: #f4f3f1;
+}
+
+.emmett-login-card input::placeholder {
+  color: rgb(244 243 241 / 43%);
+}
+
+.emmett-login-card .submit-row {
+  display: block;
+  padding: 0;
+  margin-block-start: 1.15rem;
+  border: 0;
+  background: transparent;
+}
+
+.emmett-login-card .submit-row input[type="submit"] {
+  width: 100%;
+  min-height: 2.9rem;
+  border: 0;
+  background: var(--emmett-indigo);
+  color: #fff;
+  font-size: 0.9rem;
+}
+
+.emmett-login-card .password-reset-link {
+  margin-block-start: 0.7rem;
+  text-align: center;
+}
+
+.emmett-login-card .password-reset-link a {
+  color: #b5baff;
+  font-size: 0.78rem;
+}
+
+.emmett-login-card .errornote,
+.emmett-login-card .errorlist {
+  color: #ffaaa5;
+}
+
+.emmett-login-card__footer {
+  margin: 1.25rem 0 0;
+  color: rgb(244 243 241 / 48%);
+  font-size: 0.72rem;
+  text-align: center;
+}
+
+@media (max-width: 1024px) {
+  #content-related {
+    width: 100%;
+    margin: 1rem 0 0;
+  }
+
+  .colMS,
+  .colSM {
+    margin: 0;
+  }
+}
+
+@media (max-width: 767px) {
+  /* Keep the fixed off-canvas drawer from widening the document on mobile. */
+  html,
+  body {
+    overflow-x: clip;
+  }
+
+  #header {
+    min-height: 4.25rem;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.45rem 0.8rem;
+    padding: 0.7rem 1rem;
+    padding-inline-end: 4rem;
+  }
+
+  #branding {
+    flex: 1 1 auto;
+    min-height: 2.8rem;
+  }
+
+  .emmett-brand__logo {
+    width: 6.5rem;
+    max-height: 2.4rem;
+  }
+
+  .emmett-brand__name {
+    display: none;
+  }
+
+  #user-tools {
+    flex: 1 1 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.3rem 0.8rem;
+    font-size: 0.73rem;
+  }
+
+  .emmett-header-tools {
+    flex: 1 1 auto;
+    flex-wrap: wrap;
+  }
+
+  #user-tools a,
+  #logout-form button {
+    min-height: 2rem;
+    padding: 0.25rem 0.05rem;
+  }
+
+  #toggle-nav-sidebar {
+    display: flex !important;
+    position: fixed;
+    inset-block-start: 0.85rem;
+    inset-inline-end: 0.85rem;
+    margin: 0;
+  }
+
+  #nav-sidebar {
+    display: block !important;
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 45;
+    width: min(84vw, 20rem);
+    max-width: min(84vw, 20rem);
+    max-height: 100dvh;
+    margin: 0 !important;
+    border-inline-end: 1px solid var(--emmett-hairline-dark);
+    border-radius: 0;
+    box-shadow: 0 20px 60px rgb(0 0 0 / 36%);
+    transform: translateX(-105%);
+    transition: transform 0.2s ease, visibility 0.2s ease;
+    visibility: hidden;
+    overflow-y: auto;
+  }
+
+  html[dir="rtl"] #nav-sidebar {
+    inset: 0 0 0 auto;
+    border-inline-end: 0;
+    border-inline-start: 1px solid var(--emmett-hairline-dark);
+    transform: translateX(105%);
+  }
+
+  .main > #nav-sidebar {
+    visibility: hidden;
+  }
+
+  .main.shifted > #nav-sidebar {
+    transform: translateX(0);
+    visibility: visible;
+  }
+
+  .main.shifted::before {
+    position: fixed;
+    z-index: 28;
+    inset: 0;
+    background: rgb(4 5 7 / 62%);
+    content: "";
+  }
+
+  .main > .content,
+  .main > #nav-sidebar + .content,
+  .main.shifted > #nav-sidebar + .content {
+    width: 100%;
+    max-width: 100% !important;
+  }
+
+  #content {
+    padding: 1.1rem 1rem 1.5rem;
+  }
+
+  .emmett-2fa-grid {
+    grid-template-columns: 1fr;
+  }
+
+  #changelist .filtered {
+    display: flex;
+    flex-direction: column;
+  }
+
+  #changelist-filter {
+    float: none;
+    width: 100%;
+    margin: 0 0 1rem;
+  }
+
+  .object-tools {
+    margin-block-start: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .emmett-dashboard__header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .emmett-kpi-grid,
+  .emmett-panel-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .emmett-panel {
+    padding: 0.9rem;
+  }
+
+  .emmett-status-list {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.25rem;
+  }
+
+  .emmett-status-list dd {
+    padding-block-start: 0;
+  }
+
+  .emmett-login .content {
+    padding: 1rem;
+  }
+
+  .emmett-login-card {
+    padding: 1.25rem;
+  }
+
+  .emmett-language-switcher select {
+    min-width: 4.6rem;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .emmett-chart__bar,
-  .btn {
-    transition: none;
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
   }
 }
 
 @media print {
-  .app-sidebar,
-  .app-header,
-  .app-footer {
+  #header,
+  #nav-sidebar,
+  #toggle-nav-sidebar,
+  .breadcrumbs,
+  #footer {
     display: none !important;
+  }
+
+  .main > .content {
+    max-width: 100% !important;
   }
 }
