@@ -89,6 +89,19 @@ class TestCsvExport:
         data.update({name: "on" for name in form.fields if name.startswith("serviceresource_")})
         return data
 
+    def test_export_form_works_without_inline_script_handlers(self, client: Client) -> None:
+        client.force_login(_staff("view_service"))
+
+        response = client.get(reverse("admin:services_service_export"))
+
+        assert response.status_code == 200
+        content = response.content.decode()
+        assert "data-emmett-select-toggle" in content
+        assert "onchange=" not in content
+        assert "onSelectToggleChange(event)" not in content
+        assert "script-src 'self'" in response["Content-Security-Policy"]
+        assert "script-src 'self' 'unsafe-inline'" not in response["Content-Security-Policy"]
+
     def test_export_view_returns_csv_with_bilingual_columns(self, client: Client) -> None:
         actor = _staff("view_service")
         service = cast(

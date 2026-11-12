@@ -63,6 +63,36 @@ class TestDeviceHelpers:
 
         device = TOTPDevice.objects.get(user=user)
         assert twofa.manual_secret(device) in body
+        assert "emmett-2fa-card" in body
+        assert "emmett-qr" in body
+        assert "form-control" not in body
+        assert "list-group" not in body
+
+    def test_two_factor_views_render_with_the_native_admin_theme(self, client: Client) -> None:
+        user = superuser()
+        TOTPDevice.objects.create(user=user, name="default", confirmed=True)
+        codes = twofa.regenerate_recovery_codes(user)
+        client.force_login(user)
+
+        status = client.get(reverse("admin-2fa-status"))
+        verify = client.get(reverse("admin-2fa-verify"))
+        session = client.session
+        session["recovery_codes"] = codes
+        session.save()
+        recovery = client.get(reverse("admin-2fa-recovery"))
+
+        assert status.status_code == 200
+        assert verify.status_code == 200
+        assert recovery.status_code == 200
+        assert "emmett-status-list" in status.content.decode()
+        assert "emmett-auth-form" in verify.content.decode()
+        assert "emmett-recovery-list" in recovery.content.decode()
+        for response in (status, verify, recovery):
+            content = response.content.decode()
+            assert "form-control" not in content
+            assert 'class="btn' not in content
+            assert 'class="card' not in content
+        assert codes[0] in recovery.content.decode()
 
     def test_has_confirmed_device_only_after_confirmation(self) -> None:
         user = superuser()

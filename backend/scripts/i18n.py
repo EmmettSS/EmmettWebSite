@@ -146,11 +146,11 @@ def extract_from_python(path: Path, *, root: Path) -> ExtractionResult:
 
 
 _TEMPLATE_TRANS_RE: Final[re.Pattern[str]] = re.compile(
-    r"""\{%\s*trans\s+(?P<quote>["'])(?P<msgid>.*?)(?<!\\)(?P=quote)[^%]*?%\}""",
+    r"""\{%\s*(?:trans|translate)\b\s+(?P<quote>["'])(?P<msgid>.*?)(?<!\\)(?P=quote)[^%]*?%\}""",
     re.DOTALL,
 )
 _TEMPLATE_BLOCK_RE: Final[re.Pattern[str]] = re.compile(
-    r"""\{%\s*blocktrans\b(?P<options>.*?)%\}(?P<body>.*?)\{%\s*endblocktrans\s*%\}""",
+    r"""\{%\s*(?:blocktrans|blocktranslate)\b(?P<options>.*?)%\}(?P<body>.*?)\{%\s*end(?:blocktrans|blocktranslate)\s*%\}""",
     re.DOTALL,
 )
 _TEMPLATE_VAR_RE: Final[re.Pattern[str]] = re.compile(r"\{\{\s*(?P<expr>[^{}]+?)\s*\}\}")
@@ -262,10 +262,17 @@ def load_or_create_po(path: Path, *, locale: str) -> polib.POFile:
 def sync_po(pofile: polib.POFile, messages: dict[str, Message]) -> dict[str, int]:
     """ادغام پیام‌های استخراج‌شده در فایل .po (حفظ ترجمه‌های موجود)."""
 
-    existing = {entry.msgid: entry for entry in pofile if entry.msgid}
+    existing = {entry.msgid: entry for entry in pofile if entry.msgid and not entry.obsolete}
+    obsolete = {entry.msgid: entry for entry in pofile.obsolete_entries() if entry.msgid}
     added = 0
     for msgid, message in messages.items():
         entry = existing.get(msgid)
+        if entry is None and msgid in obsolete:
+            # Revive a previously obsolete entry in place so its translations,
+            # comments, and metadata are not lost when a string returns.
+            entry = obsolete.pop(msgid)
+            entry.obsolete = False
+            existing[msgid] = entry
         occurrences = [(path, lineno) for path, lineno in message.locations]
         if entry is None:
             entry = polib.POEntry(msgid=msgid, msgstr="", occurrences=occurrences)
@@ -273,6 +280,7 @@ def sync_po(pofile: polib.POFile, messages: dict[str, Message]) -> dict[str, int
                 entry.msgid_plural = message.plural_msgid
                 entry.msgstr_plural = {"0": "", "1": ""}
             pofile.append(entry)
+            existing[msgid] = entry
             added += 1
         else:
             entry.occurrences = occurrences
@@ -281,14 +289,15 @@ def sync_po(pofile: polib.POFile, messages: dict[str, Message]) -> dict[str, int
                 entry.msgstr_plural = {"0": "", "1": ""}
 
     removed = 0
-    for entry in list(pofile):
-        if entry.msgid and entry.msgid not in messages and entry not in pofile.obsolete_entries():
+    for entry in pofile:
+        if entry.msgid and not entry.obsolete and entry.msgid not in messages:
+            # Keeping the entry (with `#~`) follows gettext conventions and lets
+            # a later extraction revive it without discarding its translation.
             entry.obsolete = True
-            pofile.obsolete_entries().append(entry)
-            pofile.remove(entry)
             removed += 1
 
-    return {"added": added, "obsolete": removed, "total": len([e for e in pofile if e.msgid])}
+    total = sum(1 for entry in pofile if entry.msgid and not entry.obsolete)
+    return {"added": added, "obsolete": removed, "total": total}
 
 
 def compile_po(pofile: polib.POFile, destination: Path) -> int:
@@ -306,7 +315,9 @@ def command_extract(root: Path, locales: Sequence[str]) -> int:
         pofile = load_or_create_po(path, locale=locale)
         stats = sync_po(pofile, messages)
         pofile.save(str(path))
-        untranslated = len([entry for entry in pofile if entry.msgid and not entry.translated()])
+        untranslated = len(
+            [entry for entry in pofile if entry.msgid and not entry.obsolete and not entry.translated()]
+        )
         print(
             f"  [{locale}] {path.relative_to(root)} → افزوده {stats['added']}، "
             f"منسوخ {stats['obsolete']}، کل {stats['total']}، ترجمه‌نشده {untranslated}"
@@ -335,7 +346,7 @@ def command_check(root: Path, locales: Sequence[str]) -> int:
             problems.append(f"[{locale}] فایل ترجمه وجود ندارد: {path.relative_to(root)}")
             continue
         pofile = polib.pofile(str(path))
-        entries = {entry.msgid: entry for entry in pofile if entry.msgid}
+        entries = {entry.msgid: entry for entry in pofile if entry.msgid and not entry.obsolete}
 
         missing = sorted(set(messages) - set(entries))
         if missing:
@@ -381,7 +392,7 @@ def command_stats(root: Path, locales: Sequence[str]) -> int:
             print(f"  [{locale}] .po ندارد")
             continue
         pofile = polib.pofile(str(path))
-        entries = [entry for entry in pofile if entry.msgid]
+        entries = [entry for entry in pofile if entry.msgid and not entry.obsolete]
         translated = [entry for entry in entries if entry.translated()]
         ratio = (len(translated) / len(entries) * 100) if entries else 0.0
         print(f"  [{locale}] {len(translated)}/{len(entries)} = {ratio:.1f}%")

@@ -1,0 +1,74 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block title %}{% if form.errors %}{% translate "Error:" %} {% endif %}{{ title }} | {{ site_title|default:_('Emmett Admin') }}{% endblock %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'admin/css/login.css' %}">
+    {{ form.media }}
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} login emmett-login{% endblock %}
+{% block usertools %}{% endblock %}
+{% block nav-global %}{% include "admin/includes/emmett_language_switcher.html" %}{% endblock %}
+{% block nav-sidebar %}{% endblock %}
+{% block content_title %}{% endblock %}
+{% block nav-breadcrumbs %}{% endblock %}
+
+{% block content %}
+    <div class="emmett-login-shell">
+        <div id="content-main">
+            <section class="emmett-login-card" aria-labelledby="emmett-login-title">
+                <img class="emmett-login-card__logo" src="{% static 'brand/emmett-wordmark.png' %}" alt="Emmett">
+                <h1 class="emmett-login-card__title" id="emmett-login-title">{% translate "Sign in to the Emmett admin panel" %}</h1>
+                <p class="emmett-login-card__description">{% translate "Use your staff account to access the management workspace." %}</p>
+
+                {% if form.errors and not form.non_field_errors %}
+                    <p class="errornote" role="alert">
+                        {% blocktranslate count counter=form.errors.items|length %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktranslate %}
+                    </p>
+                {% endif %}
+
+                {% if form.non_field_errors %}
+                    {% for error in form.non_field_errors %}
+                        <p class="errornote" role="alert">{{ error }}</p>
+                    {% endfor %}
+                {% endif %}
+
+                {% if user.is_authenticated %}
+                    <p class="errornote" role="alert">
+                        {% blocktranslate trimmed %}
+                            You are authenticated as {{ username }}, but are not authorized to access this page. Would you like to login to a different account?
+                        {% endblocktranslate %}
+                    </p>
+                {% endif %}
+
+                <form action="{{ app_path }}" method="post" id="login-form" autocomplete="on">
+                    {% csrf_token %}
+                    <div class="form-row">
+                        {{ form.username.errors }}
+                        <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
+                        {{ form.username }}
+                    </div>
+                    <div class="form-row">
+                        {{ form.password.errors }}
+                        <label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
+                        {{ form.password }}
+                        <input type="hidden" name="next" value="{{ next }}">
+                    </div>
+                    {% url 'admin_password_reset' as password_reset_url %}
+                    {% if password_reset_url %}
+                        <div class="password-reset-link">
+                            <a href="{{ password_reset_url }}">{% translate "Forgotten your login credentials?" %}</a>
+                        </div>
+                    {% endif %}
+                    <div class="submit-row">
+                        <input type="submit" value="{% translate 'Log in' %}" class="default">
+                    </div>
+                </form>
+                <p class="emmett-login-card__footer">{% translate "Protected access for authorized staff." %}</p>
+            </section>
+        </div>
+    </div>
+{% endblock %}

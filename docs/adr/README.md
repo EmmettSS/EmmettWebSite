@@ -37,9 +37,9 @@ ADRها **مصون (immutable)**‌اند. یک ADR ثبتِ تصمیمی است
 
 ---
 
-## فهرست کامل — ۴۲ ADR
+## فهرست کامل — ۴۳ ADR
 
-`ADR-0001` تا `ADR-0042`. ستون «تاریخ / فاز» هرچه را خودِ ADR نوشته بازتاب
+`ADR-0001` تا `ADR-0043`. ستون «تاریخ / فاز» هرچه را خودِ ADR نوشته بازتاب
 می‌دهد؛ `—` یعنی آن ADR اصلاً فیلد تاریخ ندارد (ببینید بخش «ناهمگونی‌های ثبت‌شده»).
 
 | شماره | عنوان | وضعیت | تاریخ / فاز | یادداشت |
@@ -70,13 +70,13 @@ ADRها **مصون (immutable)**‌اند. یک ADR ثبتِ تصمیمی است
 | [`0024`](0024-sms-notification-adapter.md) | Adapter اعلان پیامکی (Kavenegar) با backend Mock برای dev/test | پذیرفته‌شده | — | — |
 | [`0025`](0025-user-profile-favorites-comment-moderation.md) | دامنهٔ پروفایل کاربر (علاقه‌مندی‌ها/تاریخچه) و مدیریت (moderation) کامنت | پذیرفته‌شده | — | — |
 | [`0026`](0026-ai-engine-implementation-and-creative-advisor.md) | پیاده‌سازی `ai_engine`، مشاور ایده‌پرداز و قابلیت‌های AI | پذیرفته‌شده | 2026-10-05 | — |
-| [`0027`](0027-admin-theme-and-rtl.md) | تم اختصاصی ادمین، برند امیت و لایهٔ RTL | پذیرفته‌شده | 2026-10-05 | — |
-| [`0028`](0028-admin-dashboard-and-workflow.md) | داشبورد KPI، گردش‌کار انتشار و قابلیت‌های عملیاتی ادمین | پذیرفته‌شده | 2026-10-05 | — |
+| [`0027`](0027-admin-theme-and-rtl.md) | تم اختصاصی ادمین، برند امیت و لایهٔ RTL | پذیرفته‌شده (UI جازمین در ADR-0043 superseded شد) | 2026-10-05 | تصمیم تاریخی؛ رابط کاربری کنونی در ADR-0043 |
+| [`0028`](0028-admin-dashboard-and-workflow.md) | داشبورد KPI، گردش‌کار انتشار و قابلیت‌های عملیاتی ادمین | پذیرفته‌شده (منطق کسب‌وکار برقرار) | 2026-10-05 | پوستهٔ Jazzmin با قالب بومی جایگزین شد؛ KPI/workflow حفظ شدند |
 | [`0029`](0029-export-import-strategy.md) | صادرات/واردات داده با `django-import-export` | پذیرفته‌شده | 2026-10-05 | — |
 | [`0030`](0030-i18n-tooling-and-translation-management.md) | ابزار i18n پروژه و مدیریت ترجمه در ادمین | پذیرفته‌شده | 2026-10-05 | — |
 | [`0031`](0031-seo-rendering-and-managed-urls.md) | معماری SEO — رندر در Next.js، دادهٔ ادمین از Django، دامنه از env | پذیرفته‌شده | 2026-10-05 | — |
 | [`0032`](0032-performance-budget-and-asset-strategy.md) | بودجهٔ کارایی — LHCI جانشین، تصویر مدرن، فونت خودمیزبان، سقف کوئری | پذیرفته‌شده | 2026-10-05 | ⚠ ارجاعِ مرده — ببینید بخشِ «ارجاع‌های مرده» |
-| [`0033`](0033-security-hardening-2fa-backup-secrets.md) | سخت‌سازی امنیتی — CSP، ۲FA ادمین، قفل ورود، بکاپ و مدیریت راز | پذیرفته‌شده | 2026-10-05 | — |
+| [`0033`](0033-security-hardening-2fa-backup-secrets.md) | سخت‌سازی امنیتی — CSP، ۲FA ادمین، قفل ورود، بکاپ و مدیریت راز | پذیرفته‌شده | 2026-10-05 | سیاست CSP پنل Admin در ADR-0043 سخت‌گیرانه‌تر شد؛ API بدون تغییر |
 | [`0034`](0034-ci-cd-quality-gates-and-precommit.md) | دروازه‌های کیفیت کد، Pre-commit، پوشش تست ≥ ۸۵٪ و پایپ‌لاین GitHub Actions | پذیرفته‌شده | 2026-10-06 | — |
 | [`0035`](0035-cpanel-deployment-topology.md) | توپولوژی و معماری استقرار روی هاست اشتراکی ایرانی cPanel | پذیرفته‌شده | 2026-10-06 | — |
 | [`0036`](0036-deployment-readiness-and-runbooks.md) | بستهٔ نهایی آمادگی استقرار (Deployment Readiness)، قفل کامل وابستگی‌ها و اسکریپت‌های عملیاتی cPanel | تصویب‌شده (فاز 9) | 2026-10-06 | — |
@@ -86,6 +86,7 @@ ADRها **مصون (immutable)**‌اند. یک ADR ثبتِ تصمیمی است
 | [`0040`](0040-product-detail-canonical-is-projects-slug.md) | مرجعیت canonical صفحهٔ جزئیات محصول — `/projects/{slug}` نه `/products/{slug}` | پذیرفته‌شده | 2026-10-20 | — |
 | [`0041`](0041-content-pages-prerender-isr-and-internal-service-auth.md) | رندر استاتیک/ISR صفحه‌های محتوایی، حذف fetch در proxy و احراز هویت سرویس داخلی | پذیرفته‌شده | 2026-10-31 | بازرسی عمیق؛ گزارش در `docs/audit/2026-10-31-deep-audit.fa.md` |
 | [`0042`](0042-hero-entrance-animation-css-not-js.md) | انیمیشن ورودی hero با CSS (نه JS) و ممنوعیت شروع محتوا از `opacity: 0` | پذیرفته‌شده | 2026-11-02 | پس از شکست گیت Lighthouse روی `main`؛ LCP ۱٫۴s → هم‌تراز FCP |
+| [`0043`](0043-native-django-admin-migration.md) | جایگزینی Jazzmin با Django Admin بومی، برند Emmett، RTL/LTR و CSP هم‌مبدأ | پذیرفته‌شده | 2026-11-12 | مهاجرت درخواست‌شدهٔ پنل؛ داشبورد/permissions/2FA/import-export/audit حفظ شدند |
 
 ---
 
@@ -113,6 +114,18 @@ ADRها **مصون (immutable)**‌اند. یک ADR ثبتِ تصمیمی است
 مواردی که **تصمیم** در آن‌ها معتبر است ولی یک **جزئیاتِ پیاده‌سازی** در متنشان
 دیگر دقیق نیست.
 
+### `ADR-0027`, `ADR-0028` و `ADR-0033` — مهاجرت به Admin بومی (`ADR-0043`)
+
+بدنهٔ این ADRها مصون مانده است؛ تصمیم Jazzmin در `ADR-0027` تاریخی بود و رابط آن
+با درخواست مهاجرت به Django Admin بومی در `ADR-0043` جایگزین شد. منطق داشبورد،
+گردش‌کار انتشار، مجوزها، import/export، `AuditLog` و 2FA در `ADR-0028`/`ADR-0033`
+حفظ شده‌اند؛ فقط پوسته/قالب‌ها عوض شده‌اند. سیاست CSP ادمین نیز دیگر برای
+اسکریپت‌های inline لازم نیست: `script-src 'self'` است، در حالی که `style-src`
+به‌دلیل ویجت‌های استاندارد Django هنوز inline style را می‌پذیرد. CSP مسیر API
+تغییری نکرده است. شواهد رگرسیون در
+[`docs/audit/2026-11-12-phase-0/08-native-admin-verification.fa.md`](../audit/2026-11-12-phase-0/08-native-admin-verification.fa.md)
+ثبت شده است.
+
 ### `ADR-0039` — گارد رنگ خام اکنون سه الگو دارد نه دو
 
 بدنهٔ ADR می‌گوید شمارش «با دو الگوی «هگز سه تا هشت رقمی» و «`rgba(`»» انجام
@@ -135,7 +148,7 @@ ADRها **مصون (immutable)**‌اند. یک ADR ثبتِ تصمیمی است
 
 ### `ADR-0038` — کلاس ذخیره‌ساز استاتیک در تنظیمات پایه به `NonStrictCompressedManifestStaticFilesStorage` ارتقا یافت
 
-بدنهٔ `ADR-0038` توضیح می‌دهد که در تنظیمات پایه `CompressedManifestStaticFilesStorage` فعال بوده و بدون شیم `.github/ci/ci_test_settings.py` قالب‌های Jazzmin به دلیل `{% static "vendor/bootswatch" %}` روی مسیر پوشه‌ای با `ValueError` شکست می‌خوردند. در **بستهٔ ۸ (آمادگی نهایی پیش از دیپلوی)**، کلاس `apps.core.storage.NonStrictCompressedManifestStaticFilesStorage` جایگزین آن در `config/settings/base.py` شد تا در پروداکشن واقعی نیز صفحات `/admin/*` پس از `collectstatic` بدون خطای `500` و با حفظ کامل فایل‌های هش‌شده رندر شوند؛ شیم `ci_test_settings.py` نیز برای اجرای سریع تست‌های CI بدون تغییر حفظ شده است.
+بدنهٔ `ADR-0038` در زمان ثبت، شیم `.github/ci/ci_test_settings.py` را workaround نیاز Jazzmin به مسیر پوشه‌ای معرفی می‌کرد. تصمیمِ همان ADR دربارهٔ جداسازی تنظیمات تست از محصول برقرار است، اما آن علت با مهاجرت به Admin بومی دیگر صدق نمی‌کند. اکنون شیم فقط storage کلید `staticfiles` را برای رندر قالب‌ها بدون `collectstatic` ساده می‌کند؛ storage فایل‌های کاربر و storage هش‌شدهٔ محصول دست‌نخورده‌اند. توضیح تازه در خود فایل شیم و ابتدای `.github/workflows/ci.yml` ثبت شده است.
 
 ### `ADR-0031` و `docs/cms-cache-contract.md` — tag و وب‌هوک revalidate تا ۲۰۲۶-۱۰-۳۱ هیچ صفحه‌ای را تازه نمی‌کرد
 
@@ -183,7 +196,7 @@ ADRها **مصون (immutable)**‌اند. یک ADR ثبتِ تصمیمی است
   برنمی‌دارد. اگر روزی مالک اجازهٔ ویرایشِ بدنه را بدهد، این نخستین موردِ
   بی‌خطر برای اصلاح است: معنایش «تگ/ویژگی» است.
 - **عنوانِ ADRها با `# ADR-NNNN:` شروع می‌شود** و نامِ فایل با `NNNN-slug.md`؛
-  این قرارداد در همهٔ ۴۲ فایل رعایت شده است. ✅
+  این قرارداد در همهٔ ۴۳ فایل رعایت شده است. ✅
 
 ---
 

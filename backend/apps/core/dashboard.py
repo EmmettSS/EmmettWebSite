@@ -72,7 +72,7 @@ class Kpi:
 
     label: str
     value: int | float
-    icon: str = "fas fa-chart-simple"
+    icon: str = "chart"
     hints: tuple[str, ...] = ()
     url: str | None = None
     link_label: str = ""
@@ -358,7 +358,7 @@ def build_dashboard(request: Any = None) -> DashboardData:
         Kpi(
             label=str(_("Users")),
             value=int(users["total"]),
-            icon="fas fa-users",
+            icon="users",
             hints=(
                 f"{_('Staff')}: {_format_number(int(users['staff']), locale)}",
                 f"{_('New (30 days)')}: {_format_number(int(users['new_30d']), locale)}",
@@ -369,7 +369,7 @@ def build_dashboard(request: Any = None) -> DashboardData:
         Kpi(
             label=str(_("AI requests")),
             value=total_ai,
-            icon="fas fa-robot",
+            icon="robot",
             hints=(
                 f"{_('Last 30 days')}: {_format_number(int(ai_requests['last_30d']), locale)}",
                 f"{_('Blocked by guardrail')}: {_format_number(int(ai_requests['blocked']), locale)}",
@@ -381,7 +381,7 @@ def build_dashboard(request: Any = None) -> DashboardData:
         Kpi(
             label=str(_("Leads")),
             value=int(contacts["total"]),
-            icon="fas fa-handshake",
+            icon="handshake",
             hints=(
                 f"{_('Leads in pipeline')}: {_format_number(total_leads, locale)}",
                 f"{_('Won')}: {_format_number(int(leads['won']), locale)}",
@@ -393,7 +393,7 @@ def build_dashboard(request: Any = None) -> DashboardData:
         Kpi(
             label=str(_("Academy enrollments")),
             value=int(enrollments["total"]),
-            icon="fas fa-graduation-cap",
+            icon="graduation",
             hints=(
                 f"{_('Published courses')}: {_format_number(int(courses['published']), locale)}",
                 f"{_('Active')}: {_format_number(int(enrollments['active']), locale)}",
@@ -405,7 +405,7 @@ def build_dashboard(request: Any = None) -> DashboardData:
         Kpi(
             label=str(_("Sales signals (30 days)")),
             value=int(enrollments["last_30d"]) + int(contacts["last_30d"]),
-            icon="fas fa-chart-line",
+            icon="trend",
             hints=(
                 f"{_('New enrollments')}: {_format_number(int(enrollments['last_30d']), locale)}",
                 f"{_('New contacts')}: {_format_number(int(contacts['last_30d']), locale)}",
@@ -417,7 +417,7 @@ def build_dashboard(request: Any = None) -> DashboardData:
         Kpi(
             label=str(_("Pending AI summaries")),
             value=int(artifacts["pending"]),
-            icon="fas fa-file-signature",
+            icon="document",
             hints=(
                 f"{_('Approved')}: {_format_number(int(artifacts['approved']), locale)}",
                 f"{_('Newsletter subscribers')}: {_format_number(int(newsletter['confirmed']), locale)}",

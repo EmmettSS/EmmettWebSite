@@ -11,7 +11,7 @@
   داده‌ها از inclusion tag «emmett_dashboard» می‌آید (apps/core/dashboard.py)
   که با کش کوتاه‌مدت و تعداد کوئری محدود ساخته می‌شود (قانون ۱۵).
 {% endcomment %}
-{% load i18n emmett_admin %}
+{% load i18n static emmett_admin %}
 
 {% block bodyclass %}{{ block.super }} emmett-dashboard-page{% endblock %}
 
@@ -35,7 +35,9 @@
             {% for kpi in dashboard.kpis %}
                 <article class="emmett-kpi">
                     <div class="emmett-kpi__head">
-                        <span class="emmett-kpi__icon" aria-hidden="true"><i class="{{ kpi.icon }}"></i></span>
+                        <span class="emmett-kpi__icon" aria-hidden="true">
+                            <svg class="emmett-icon"><use href="{% static 'admin_theme/icons.svg' %}#icon-{{ kpi.icon|emmett_icon }}"></use></svg>
+                        </span>
                         <span>{{ kpi.label }}</span>
                     </div>
                     <div class="emmett-kpi__value">{{ kpi.value|emmett_number }}</div>
@@ -48,7 +50,7 @@
                     {% endif %}
                     {% if kpi.url %}
                         <a class="emmett-kpi__link" href="{{ kpi.url }}">
-                            {{ kpi.link_label }} <i class="fas fa-arrow-left" aria-hidden="true"></i>
+                            {{ kpi.link_label }} <svg class="emmett-icon" aria-hidden="true"><use href="{% static 'admin_theme/icons.svg' %}#icon-arrow"></use></svg>
                         </a>
                     {% endif %}
                 </article>
@@ -59,10 +61,10 @@
             {% for chart in dashboard.charts %}
                 <section class="emmett-panel" aria-labelledby="emmett-chart-{{ forloop.counter }}">
                     <h2 class="emmett-panel__title" id="emmett-chart-{{ forloop.counter }}">{{ chart.title }}</h2>
-                    <div class="emmett-chart" role="img" aria-label="{{ chart.title }}">
+                    <div class="emmett-chart" role="group" aria-labelledby="emmett-chart-{{ forloop.counter }}">
                         {% for point in chart.points %}
-                            <div class="emmett-chart__bar{% if chart.accent %} emmett-chart__bar--accent{% endif %}"
-                                 style="height: {{ point.percent }}%"
+                            <div class="emmett-chart__bar {{ point.percent|emmett_chart_height }}{% if chart.accent %} emmett-chart__bar--accent{% endif %}"
+                                 role="img"
                                  title="{{ point.label }}: {{ point.value|emmett_number }}"
                                  aria-label="{{ point.label }}: {{ point.value|emmett_number }}"></div>
                         {% endfor %}
@@ -83,7 +85,7 @@
                         </li>
                     {% endfor %}
                 </ul>
-                <p class="emmett-dashboard__hint mt-3 mb-0">
+                <p class="emmett-dashboard__hint">
                     {% blocktrans with rate=dashboard.conversion_rate|emmett_number %}Conversion rate (Won / all leads): {{ rate }}%{% endblocktrans %}
                 </p>
             </section>
@@ -100,7 +102,7 @@
                         </li>
                     {% endfor %}
                 </ul>
-                <p class="emmett-dashboard__hint mt-2 mb-0">
+                <p class="emmett-dashboard__hint">
                     {% trans "Order: draft · published · archived" %}
                 </p>
             </section>
@@ -119,7 +121,7 @@
                     {% endfor %}
                 </ul>
                 <a class="emmett-kpi__link" href="{% url 'admin:core_auditlog_changelist' %}">
-                    {% trans "View full audit log" %} <i class="fas fa-arrow-left" aria-hidden="true"></i>
+                    {% trans "View full audit log" %} <svg class="emmett-icon" aria-hidden="true"><use href="{% static 'admin_theme/icons.svg' %}#icon-arrow"></use></svg>
                 </a>
             </section>
 
@@ -137,14 +139,14 @@
                     {% endfor %}
                 </ul>
                 <a class="emmett-kpi__link" href="{% url 'admin:admin_logentry_changelist' %}">
-                    {% trans "View admin activity log" %} <i class="fas fa-arrow-left" aria-hidden="true"></i>
+                    {% trans "View admin activity log" %} <svg class="emmett-icon" aria-hidden="true"><use href="{% static 'admin_theme/icons.svg' %}#icon-arrow"></use></svg>
                 </a>
             </section>
         </div>
 
         <section class="emmett-panel" aria-labelledby="emmett-apps-title">
             <h2 class="emmett-panel__title" id="emmett-apps-title">{% trans "All sections" %}</h2>
-            <div class="emmett-panel-grid">
+            <div class="emmett-app-list">
                 {% for app in app_list %}
                     <div>
                         <h3 class="emmett-panel__title">{{ app.name }}</h3>
@@ -153,7 +155,7 @@
                                 <li>
                                     {% if model.admin_url %}<a href="{{ model.admin_url }}">{{ model.name }}</a>{% else %}<span>{{ model.name }}</span>{% endif %}
                                     {% if model.add_url %}
-                                        <a class="emmett-kpi__link ms-auto" href="{{ model.add_url }}">{% trans "Add" %}</a>
+                                        <a class="emmett-kpi__link" href="{{ model.add_url }}">{% trans "Add" %}</a>
                                     {% endif %}
                                 </li>
                             {% endfor %}

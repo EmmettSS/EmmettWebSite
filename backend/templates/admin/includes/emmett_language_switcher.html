@@ -1,0 +1,14 @@
+{% load i18n %}
+<div class="emmett-header-tools">
+    <form class="emmett-language-switcher" action="{% url 'set_language' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <label for="emmett-language">{% translate "Language" %}</label>
+        <select id="emmett-language" name="language" aria-label="{% translate 'Language' %}">
+            <option value="fa"{% if LANGUAGE_CODE == "fa" %} selected{% endif %}>فارسی</option>
+            <option value="en"{% if LANGUAGE_CODE == "en" %} selected{% endif %}>English</option>
+        </select>
+        <button type="submit">{% translate "Apply" %}</button>
+    </form>
+    {% include "admin/color_theme_toggle.html" %}
+</div>

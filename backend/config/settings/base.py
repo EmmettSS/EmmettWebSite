@@ -9,7 +9,6 @@ from __future__ import annotations
 from pathlib import Path
 
 import environ
-from django.utils.translation import gettext_lazy as _
 from import_export.formats import base_formats
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -69,8 +68,7 @@ LOCAL_APPS = [
 # اجرا می‌شود)، ``TranslationAdmin`` با خطای «The model ... is not registered
 # for translation» شکست می‌خورد — چون ``modeltranslation`` هنوز registry خودش
 # را از ``translation.py`` هر اپ پر نکرده است. ر.ک. مستندات django-modeltranslation.
-# «jazzmin» (تم ادمین — ADR-0027) نیز باید پیش از ``django.contrib.admin`` بیاید.
-INSTALLED_APPS = ["modeltranslation", "jazzmin"] + DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+INSTALLED_APPS = ["modeltranslation"] + DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 AUTH_USER_MODEL = "accounts.User"
 
@@ -115,9 +113,7 @@ FORCE_SCRIPT_NAME = f"/{_script_prefix}" if _script_prefix else None
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        # پوشهٔ قالب‌های پروژه (فاز ۶ — ادمین سفارشی). قالب‌های این پوشه بر
-        # قالب‌های اپ‌ها (از جمله jazzmin) اولویت دارند — همان مکانیزم رسمی
-        # overload قالب در Django.
+        # قالب‌های این پوشه بر قالب‌های اپ‌ها اولویت دارند — قرارداد رسمی Django.
         "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
@@ -167,11 +163,16 @@ MODELTRANSLATION_FALLBACK_LANGUAGES = ("fa", "en")
 # ---------------------------------------------------------------------------
 STATIC_URL = "/static/"
 STATIC_ROOT = Path(env("DJANGO_STATIC_ROOT", default=str(BASE_DIR / "staticfiles")))
-# دارایی‌های استاتیک خودِ پروژه (برند، تم ادمین، فونت) — خارج از پوشهٔ اپ‌ها
-# (فاز ۶، ADR-0027). در production با ``collectstatic`` در ``STATIC_ROOT``
-# جمع می‌شوند و با WhiteNoise یا مستقیم توسط Apache سرو می‌شوند.
+# دارایی‌های استاتیک خودِ پروژه (برند، تم بومی ادمین، فونت) — خارج از پوشهٔ اپ‌ها
+# (مهاجرت به پوستهٔ بومی، ADR-0043). در production با ``collectstatic`` در
+# ``STATIC_ROOT`` جمع می‌شوند و با WhiteNoise یا مستقیم توسط Apache سرو می‌شوند.
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATICFILES_STORAGE = "apps.core.storage.NonStrictCompressedManifestStaticFilesStorage"
+# ``modeltranslation.TabbedTranslationAdmin`` defaults to Google-hosted jQuery
+# and jQuery UI URLs. Keep its optional translation tabs compatible with the
+# self-only Admin CSP by using Django's bundled jQuery and a self-hosted jQuery UI.
+JQUERY_URL = "admin/js/vendor/jquery/jquery.min.js"
+JQUERY_UI_URL = "admin_theme/js/vendor/jquery-ui-1.13.3.min.js"
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
@@ -335,150 +336,8 @@ SPECTACULAR_SETTINGS = {
     },
 }
 
-# ---------------------------------------------------------------------------
-# Admin theme — Jazzmin (فاز ۶، ADR-0027)
-# ---------------------------------------------------------------------------
-# تصمیم‌ها: تم «AdminLTE 4 / Bootstrap 5» با برند امیت؛ فونت‌ها self-hosted
-# (ADR-0018) پس CDN گوگل خاموش است؛ RTL با لایهٔ اختصاصی
-# ``static/admin_theme/css/emmett-rtl.css`` مدیریت می‌شود (نه CSS hack داخل قالب).
-
-# آدرس سایت عمومی برای «مشاهدهٔ سایت» در ادمین و لینک‌های راهنما.
 PUBLIC_SITE_URL = env("PUBLIC_SITE_URL", default="http://localhost:3000")
-# مدت اعتبار کش آمار داشبورد ادمین (ثانیه) — صفر یعنی بدون کش.
 ADMIN_DASHBOARD_CACHE_SECONDS = env.int("ADMIN_DASHBOARD_CACHE_SECONDS", default=120)
-JAZZMIN_SETTINGS: dict[str, object] = {
-    "site_title": _("Emmett Admin"),
-    "site_header": _("Emmett Group"),
-    "site_brand": "",  # نشان‌نوشت (wordmark) به‌تنهایی نام برند را دارد
-    "site_logo": "brand/emmett-wordmark.png",
-    "login_logo": "brand/emmett-wordmark.png",
-    "login_logo_dark": "brand/emmett-wordmark.png",
-    "site_icon": "brand/emmett-favicon.ico",
-    "site_logo_classes": "emmett-brand-logo",
-    "welcome_sign": _("Sign in to the Emmett admin panel"),
-    "copyright": "Emmett Group",
-    "search_model": None,
-    "user_avatar": None,
-    # دسترسی سریع به سایت عمومی (فرانت‌اند) از نوار بالا.
-    "topmenu_links": [
-        {"name": _("Dashboard"), "url": "admin:index", "permissions": ["auth.view_user"]},
-        {
-            "name": _("View public site"),
-            "url": PUBLIC_SITE_URL,
-            "new_window": True,
-        },
-    ],
-    "usermenu_links": [
-        {"name": _("Change password"), "url": "admin:password_change", "icon": "fas fa-key"},
-    ],
-    "show_sidebar": True,
-    "navigation_expanded": False,
-    "hide_apps": [],
-    "hide_models": [],
-    "order_with_respect_to": [
-        "core",
-        "accounts",
-        "leads",
-        "ai_engine",
-        "services",
-        "portfolio",
-        "blog",
-        "academy",
-        "company",
-        "taxonomy",
-        "auth",
-    ],
-    "custom_links": {},
-    "icons": {
-        "core": "fas fa-sliders-h",
-        "core.sitesettings": "fas fa-globe",
-        "core.translation": "fas fa-language",
-        "core.media": "fas fa-photo-video",
-        "core.auditlog": "fas fa-clipboard-list",
-        "core.searchindexentry": "fas fa-search",
-        "accounts": "fas fa-users-cog",
-        "accounts.user": "fas fa-user-shield",
-        "accounts.profile": "fas fa-id-card",
-        "accounts.favorite": "fas fa-star",
-        "leads": "fas fa-filter",
-        "leads.contact": "fas fa-envelope-open-text",
-        "leads.lead": "fas fa-handshake",
-        "leads.newsletter": "fas fa-paper-plane",
-        "ai_engine": "fas fa-robot",
-        "ai_engine.catalog": "fas fa-list-ul",
-        "ai_engine.catalogoption": "fas fa-list",
-        "ai_engine.prompttemplate": "fas fa-terminal",
-        "ai_engine.guardrailrule": "fas fa-shield-alt",
-        "ai_engine.estimationrule": "fas fa-stopwatch",
-        "ai_engine.airequest": "fas fa-history",
-        "ai_engine.aisuggestion": "fas fa-lightbulb",
-        "ai_engine.aiconcept": "fas fa-project-diagram",
-        "ai_engine.aicontentartifact": "fas fa-file-signature",
-        "services": "fas fa-cubes",
-        "services.service": "fas fa-cube",
-        "portfolio": "fas fa-briefcase",
-        "portfolio.project": "fas fa-diagram-project",
-        "portfolio.casestudy": "fas fa-book-open",
-        "blog": "fas fa-newspaper",
-        "blog.blogpost": "fas fa-file-alt",
-        "blog.comment": "fas fa-comments",
-        "academy": "fas fa-graduation-cap",
-        "academy.course": "fas fa-chalkboard-teacher",
-        "academy.lesson": "fas fa-book-reader",
-        "academy.enrollment": "fas fa-user-graduate",
-        "academy.instructor": "fas fa-user-tie",
-        "company": "fas fa-building",
-        "company.teammember": "fas fa-user-friends",
-        "company.testimonial": "fas fa-quote-right",
-        "taxonomy": "fas fa-tags",
-        "taxonomy.category": "fas fa-folder-tree",
-        "taxonomy.tag": "fas fa-hashtag",
-        "auth": "fas fa-lock",
-        "auth.group": "fas fa-user-lock",
-        "admin.logentry": "fas fa-clipboard-check",
-    },
-    "default_icon_parents": "fas fa-chevron-circle-down",
-    "default_icon_children": "fas fa-circle",
-    "related_modal_active": True,
-    "custom_css": "admin_theme/css/emmett-admin.css",
-    "custom_js": "admin_theme/js/emmett-admin.js",
-    "use_google_fonts_cdn": False,  # فونت self-hosted — ADR-0018/0027
-    "show_ui_builder": False,
-    "show_theme_chooser": False,
-    "changeform_format": "horizontal_tabs",
-    "changeform_format_overrides": {
-        "core.sitesettings": "single",
-        "core.translation": "single",
-        "core.media": "single",
-    },
-    "language_chooser": True,
-}
-
-JAZZMIN_UI_TWEAKS: dict[str, object] = {
-    "brand_colour": False,
-    "accent": "accent-primary",
-    "navbar": "navbar-white navbar-light",
-    "no_navbar_border": True,
-    "navbar_fixed": True,
-    "layout_boxed": False,
-    "footer_fixed": False,
-    "sidebar_fixed": True,
-    "sidebar": "sidebar-dark-primary",
-    "sidebar_nav_compact_style": False,
-    "sidebar_nav_legacy_style": False,
-    "sidebar_nav_flat_style": True,
-    "sidebar_nav_child_indent": True,
-    "theme": "default",
-    "default_theme_mode": env("ADMIN_DEFAULT_THEME_MODE", default="light"),
-    "button_classes": {
-        "primary": "btn-primary",
-        "secondary": "btn-secondary",
-        "info": "btn-info",
-        "warning": "btn-warning",
-        "danger": "btn-danger",
-        "success": "btn-success",
-    },
-}
 
 # ---------------------------------------------------------------------------
 # صادرات/واردات داده (فاز ۶، ADR-0029) — django-import-export

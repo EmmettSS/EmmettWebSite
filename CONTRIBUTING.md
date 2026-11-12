@@ -150,12 +150,11 @@ backend/.venv/bin/pre-commit run --all-files
       PYTHONPATH=../.github/ci DJANGO_SETTINGS_MODULE=ci_test_settings coverage run -m pytest -q && coverage report --fail-under=85
       ```
 
-      لایهٔ تنظیماتِ CI (‏`.github/ci/ci_test_settings.py`، موضوع `ADR-0038`) کلید
-      `staticfiles` را برای سرعت تست به `StaticFilesStorage` ساده تغییر می‌دهد. در تنظیمات پایه
-      نیز از بستهٔ آمادگی نهایی دیپلوی (بستهٔ ۸)، `NonStrictCompressedManifestStaticFilesStorage`
-      جایگزین `CompressedManifestStaticFilesStorage` خام شده است تا فراخوانی‌های پوشه‌محور قالب
-      Jazzmin (`{% static "vendor/bootswatch" %}`) هم در پروداکشن واقعی و هم در اجرای مستقیم
-      `pytest` بدون `ValueError: Missing staticfiles manifest entry` و با حفظ کامل فایل‌های هش‌شده کار کند.
+      لایهٔ تنظیمات CI (‏`.github/ci/ci_test_settings.py`، `ADR-0038`) کلید
+      `staticfiles` را برای رندر قالب‌ها بدون `collectstatic` به `StaticFilesStorage` ساده تغییر می‌دهد؛
+      کلید `default` (فایل‌های کاربر) دست‌نخورده می‌ماند. تنظیمات محصول همچنان از
+      `NonStrictCompressedManifestStaticFilesStorage` برای فایل‌های فشرده/هش‌شده و بازگشت امن
+      به مسیر اصلی در نبود مدخل مانیفست استفاده می‌کند؛ این رفتار مستقل از پوستهٔ Admin است.
 - [ ] تست‌های فرانت‌اند (`npm run test:coverage`) و `npm run build` سبز هستند. توجه: گیت ۸۵٪ فقط `src/lib` و `src/components/{ui,molecules,organisms,seo}` را می‌سنجد و `src/app/**`، `ui-port/**`، `src/i18n/**` و `src/proxy.ts` خارج از آن‌اند (بند ۶.۴ مستندات فنی) — با این حال کد تازه در هر مسیری که باشد باید تست داشته باشد.
 - [ ] رنگ‌ها از توکن می‌آیند: `hardcoded-colors.test.ts` سبز است و شمار لیترال‌های رنگ هیچ فایلی افزایش نیافته.
 - [ ] در صورت تغییر ترجمه، `python scripts/i18n.py check` سبز است و کلیدهای `messages/fa.json` و `messages/en.json` متقارن‌اند.
@@ -222,11 +221,10 @@ Decision record: `docs/adr/0039-design-token-standard-and-hardcoded-color-ratche
       ```
 
       The CI settings shim (`.github/ci/ci_test_settings.py`, `ADR-0038`) switches
-      `staticfiles` to plain `StaticFilesStorage` for fast CI execution. Since Package 8
-      (Pre-Launch Deployment Readiness), base settings also configure
-      `NonStrictCompressedManifestStaticFilesStorage` so Jazzmin's directory-level
-      `{% static "vendor/bootswatch" %}` lookup succeeds cleanly both in production after
-      `collectstatic` and under direct `pytest` runs while keeping full asset hashing intact.
+      `staticfiles` to plain `StaticFilesStorage` so template tests need no `collectstatic`;
+      the `default` user-media backend is unchanged. Product settings retain
+      `NonStrictCompressedManifestStaticFilesStorage` for compressed/hashed assets and a safe
+      fallback when a path is absent from the manifest; this behavior is independent of Admin's theme.
 - [ ] Frontend tests (`npm run test:coverage`) and `npm run build` are green. Note the 85% gate measures only `src/lib` and `src/components/{ui,molecules,organisms,seo}`, not `src/app/**` or the `ui-port` shell.
 - [ ] Colors come from tokens: `hardcoded-colors.test.ts` is green and no file's raw-color count has increased.
 - [ ] If translations changed, `python scripts/i18n.py check` is green and the `messages/fa.json` and `messages/en.json` key trees are symmetric.

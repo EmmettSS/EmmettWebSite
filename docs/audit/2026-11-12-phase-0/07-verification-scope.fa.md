@@ -88,3 +88,11 @@ HTML فشرده حدود 13.5KB و JS اولیه حدود 265–275KB gzip در 
 ## ۶. آمادگی دیپلوی
 
 خط مبنا از نظر گیت‌های محلی PASSED است، اما آمادهٔ دیپلوی production نیست تا وقتی MySQL 8، cPanel/Passenger واقعی، providerهای خارجی و preflight هاست تأیید نشوند. هیچ دیپلوی یا ری‌استارت production در این فاز انجام نشد.
+
+## ۷. پیگیری و بستن معیارهای Admin بومی
+
+یافته‌های جدول‌های این سند، snapshot پیش از مهاجرت‌اند و به‌عنوان سابقه دست‌نخورده
+می‌مانند. نتیجهٔ جایگزینی Jazzmin، اصلاح ADM-01 تا ADM-06، شواهد responsive/CSP،
+خلاصهٔ تمام گیت‌ها و محدودیت‌های باقی‌مانده در
+[`08-native-admin-verification.fa.md`](./08-native-admin-verification.fa.md)
+ثبت شده است. محدودیت deploy واقعی (MySQL 8 و cPanel/Passenger) همچنان برقرار است.

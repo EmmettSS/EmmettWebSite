@@ -60,14 +60,43 @@ class TestSecurityHeaders:
         assert response["Cross-Origin-Opener-Policy"] == "same-origin"
         assert response["X-Content-Type-Options"] == "nosniff"
 
-    def test_admin_response_gets_inline_friendly_policy(self, client: Client) -> None:
+    def test_admin_response_keeps_inline_styles_but_blocks_inline_scripts(self, client: Client) -> None:
         response = client.get(ADMIN_LOGIN_URL)
 
         csp = response["Content-Security-Policy"]
         assert csp.startswith("default-src 'self'")
-        # Jazzmin استایل/اسکریپت درون‌خطی دارد؛ این استثنا فقط برای ادمین است.
         assert "style-src 'self' 'unsafe-inline'" in csp
-        assert "script-src 'self' 'unsafe-inline'" in csp
+        assert "script-src 'self'" in csp
+        assert "script-src 'self' 'unsafe-inline'" not in csp
+
+    def test_mounted_admin_paths_are_classified_by_path_info(self, settings: Any) -> None:
+        from django.http import HttpResponse
+        from django.test import RequestFactory
+
+        from apps.core.middleware import (
+            AdminLoginLockoutMiddleware,
+            AdminTwoFactorMiddleware,
+            SecurityHeadersMiddleware,
+        )
+
+        settings.ADMIN_2FA_REQUIRED = True
+        request = RequestFactory().get("/admin/", SCRIPT_NAME="/backend")
+        request.user = type(
+            "StaffUser",
+            (),
+            {"is_authenticated": True, "is_staff": True, "is_verified": lambda self: False},
+        )()
+
+        assert request.path == "/backend/admin/"
+        assert request.path_info == "/admin/"
+        assert AdminTwoFactorMiddleware._should_enforce(request)
+
+        response = SecurityHeadersMiddleware(lambda _request: HttpResponse("ok"))(request)
+        assert response["Content-Security-Policy"].startswith("default-src 'self'")
+
+        login_request = RequestFactory().post("/admin/login/", SCRIPT_NAME="/backend")
+        assert login_request.path_info == "/admin/login/"
+        assert AdminLoginLockoutMiddleware._is_admin_login(login_request)
 
     def test_report_only_mode_uses_the_other_header(self, client: Client, settings: Any) -> None:
         settings.CSP_REPORT_ONLY = True

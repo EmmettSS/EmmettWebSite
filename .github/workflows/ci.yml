@@ -17,16 +17,15 @@
 # دو نکتهٔ طراحی که عمداً این‌جا هستند:
 #
 # ۱) تست‌های بک‌اند با یک لایهٔ تنظیمات مخصوص CI اجرا می‌شوند
-#    (`.github/ci/ci_test_settings.py`) که فقط کلید `staticfiles` را از
-#    `CompressedManifestStaticFilesStorage` به `StaticFilesStorage` ساده
-#    تغییر می‌دهد. دلیل: قالب‌های Jazzmin عبارت `{% static "vendor/bootswatch" %}`
-#    را روی یک **پوشه** صدا می‌زنند و مانیفست آن را ثبت نمی‌کند، پس بدون این
-#    لایه ۳۵ تست ادمین با `ValueError: Missing staticfiles manifest entry`
-#    قرمز می‌شوند. هیچ فایل `backend/` تغییر نکرده است (ADR-0037 بند ۳-۵).
+#    (`.github/ci/ci_test_settings.py`) که فقط کلید `staticfiles` را برای
+#    رندر templateها بدون collectstatic/مانیفست به `StaticFilesStorage` ساده
+#    تغییر می‌دهد. کلید `default` (ذخیره‌سازی فایل‌های کاربر) دست‌نخورده است؛
+#    این انتخاب فقط در جاب تست اعمال می‌شود و storage فشردهٔ محیط محصول را
+#    تغییر نمی‌دهد (ADR-0038).
 #
-# ۲) گیت `npm audit` کل درخت وابستگی را بررسی می‌کند. قفل فعلی با
-#    `npm audit --audit-level=high` پاک است؛ اگر advisory جدیدی وارد هر یک از
-#    وابستگی‌های production یا development شود، جاب امنیتی شکست می‌خورد.
+# ۲) گیت `npm audit` کل درخت وابستگی را بررسی می‌کند. `--audit-level=high`
+#    اکنون سبز است (هیچ advisory با شدت high/critical نیست)؛ ۸ مورد moderate
+#    در زنجیرهٔ ESLint/TypeScript گزارش می‌شوند و زیر آستانهٔ شکست‌اند.
 # =============================================================================
 
 name: CI
@@ -500,9 +499,13 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       # پایگاه‌دادهٔ demo همان داده‌ای است که تست‌ها رویش assertion می‌نویسند
-      # (خدمات/پروژه‌ها/محصول‌ها/پست‌ها/دوره‌ها + کاربر ادمین).
+      # (خدمات/پروژه‌ها/محصول‌ها/پست‌ها/دوره‌ها + کاربر ادمین). رمز فقط
+      # برای دیتابیس یک‌بارمصرف همین run ساخته می‌شود تا E2E پنل Admin را هم
+      # با همان حساب seedشده بررسی کند؛ این مقدار راز/دسترسی production نیست.
       - name: Prepare SQLite database and seed demo data
         working-directory: backend
+        env:
+          DEMO_ADMIN_PASSWORD: ci-admin-${{ github.run_id }}-${{ github.run_attempt }}
         run: |
           python manage.py migrate --noinput
           python manage.py seed_demo_data
@@ -551,6 +554,9 @@ jobs:
 
       - name: Playwright E2E
         working-directory: frontend
+        env:
+          DJANGO_ADMIN_BASE_URL: http://127.0.0.1:8000
+          DEMO_ADMIN_PASSWORD: ci-admin-${{ github.run_id }}-${{ github.run_attempt }}
         run: |
           set -o pipefail
           npx playwright test 2>&1 | tee "${RUNNER_TEMP}/playwright.log"

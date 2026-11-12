@@ -245,12 +245,7 @@ class TestDashboardPage:
         assert "کش می‌شود" in content  # ترجمهٔ فارسی از .mo
 
     def test_english_locale_renders_ltr_labels(self, client: Client, settings: Any) -> None:
-        """زبان انگلیسی از طریق کوکی زبان (زبان‌گزین Jazzmin) فعال می‌شود.
-
-        پروژه عمداً پیشوند زبان روی مسیر ادمین ندارد (``/admin/`` ثابت است)؛
-        تغییر زبان در پنل با کوکی ``django_language`` انجام می‌شود — همان
-        کاری که دکمهٔ زبان در نوار بالای Jazzmin می‌کند.
-        """
+        """زبان انگلیسی در مسیر ثابت ادمین با کوکی زبان فعال می‌شود."""
 
         client.force_login(_staff())
         client.cookies[settings.LANGUAGE_COOKIE_NAME] = "en"
@@ -277,6 +272,14 @@ class TestDashboardTemplateTag:
         response = client.get(reverse("admin:index"))
         assert response.status_code == 200
         assert "emmett-kpi" in response.content.decode()
+
+    def test_chart_height_filter_returns_bounded_static_classes(self) -> None:
+        from apps.core.templatetags.emmett_admin import emmett_chart_height
+
+        assert emmett_chart_height(0) == "emmett-chart__bar--height-0"
+        assert emmett_chart_height(55) == "emmett-chart__bar--height-6"
+        assert emmett_chart_height(1000) == "emmett-chart__bar--height-10"
+        assert emmett_chart_height("invalid") == "emmett-chart__bar--height-0"
 
     def test_tag_returns_safe_empty_payload_on_failure(self, monkeypatch: Any) -> None:
         from django.template import Context

@@ -2,7 +2,7 @@
 
 **وضعیت سند:** مرجع معماری و مدل دادهٔ مصوب فاز ۱؛ پیاده‌سازی در فازهای بعد طبق ADRها تکمیل شده است.
 **ورودی این سند:** `DISCOVERY.md` (تصمیمات بنیادین فاز ۰) + پاسخ‌های مالک محصول به سؤالات فاز ۱
-**خروجی اولیه:** این فایل + ERD (بخش ۴) + ۱۰ ADR در `docs/adr/` (این شمار، خروجیِ *همان فاز* است؛ امروز ۴۰ ADR وجود دارد و فهرست کامل و معتبرشان در [`docs/adr/README.md`](docs/adr/README.md) است)
+**خروجی اولیه:** این فایل + ERD (بخش ۴) + ۱۰ ADR در `docs/adr/` (این شمار، خروجیِ *همان فاز* است؛ اکنون ۴۳ ADR وجود دارد و فهرست کامل و معتبرشان در [`docs/adr/README.md`](docs/adr/README.md) است)
 **یادداشت وضعیت:** این سند طراحی اولیه را نگه می‌دارد؛ تغییرات پذیرفته‌شدهٔ بعدی، از جمله scope نهایی AI، در `ADR-0026` و `CHANGELOG.md` ثبت شده‌اند.
 
 ---
@@ -471,7 +471,7 @@ erDiagram
 
 ## ۱۰. ADRهای مرتبط با این سند
 
-> **فهرست کامل و معتبر هر ۴۱ ADR — با وضعیت، ارجاع‌های مردهٔ شناخته‌شده و
+> **فهرست کامل و معتبر هر ۴۳ ADR — با وضعیت، ارجاع‌های مردهٔ شناخته‌شده و
 > یادداشت‌های اصلاحی — در [`docs/adr/README.md`](docs/adr/README.md) است.**
 > این بخش عمداً آن فهرست را تکرار نمی‌کند؛ فقط ADRهایی را می‌آورد که خروجیِ
 > مستقیمِ این سندِ فاز ۱ یا موضوعِ بخش‌های بعدی‌اش‌اند. دلیلش همان چیزی است که
@@ -525,7 +525,7 @@ erDiagram
 
 ```
 ادمین (فارسی پیش‌فرض / انگلیسی)
-├── تم و برند: jazzmin + static/admin_theme/{css,js,fonts}  → ADR-0027
+├── پوستهٔ بومی Emmett: templates/admin/ + static/admin_theme/{css,js,fonts}  → ADR-0043
 ├── داشبورد: templates/admin/index.html + apps/core/dashboard.py (کش‌شده، SVG درون‌خطی)
 ├── گردش‌کار: apps/core/admin_mixins.py (PublishWorkflow / SoftDelete / ExportFormats)  → ADR-0028
 ├── ترجمه: core.Translation + TranslationCompletenessFilter + scripts/i18n.py  → ADR-0030

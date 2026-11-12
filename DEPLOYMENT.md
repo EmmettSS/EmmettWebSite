@@ -80,10 +80,10 @@
 
 ## ۲. وابستگی‌های Pin شده (`backend/requirements.txt`)
 
-در فایل `backend/requirements.txt` تمام **۴۱ پکیج پروداکشن** (شامل ۲۱ پکیج مستقیم سطح اول و ۲۰ زیر-وابستگی زمان اجرا) با عملگر دقیق `==` قفل شده‌اند (`ADR-0010` و `ADR-0036`):
+در فایل `backend/requirements.txt` تمام **۴۰ پکیج پروداکشن** (شامل ۲۰ پکیج مستقیم سطح اول و ۲۰ زیر-وابستگی زمان اجرا) با عملگر دقیق `==` قفل شده‌اند (`ADR-0010` و `ADR-0036`):
 - **چارچوب و API:** `Django==5.2.17`, `djangorestframework==3.18.1`, `drf-spectacular==0.30.0`, `django-filter==26.2`, `django-cors-headers==4.9.0`
 - **تنظیمات و دیتابیس:** `django-environ==0.14.0`, `PyMySQL==1.2.3` (درایور خالص پایتون بدون نیاز به کامپایلر C و `libmysqlclient-dev` روی هاست اشتراکی)
-- **پنل ادمین، تبادل داده و 2FA:** `django-jazzmin==3.0.5`, `django-import-export==4.4.1`, `django-otp==1.7.3`, `qrcode==8.2`
+- **پنل ادمین، تبادل داده و 2FA:** Django Admin بومی در خود Django ارائه می‌شود؛ `django-import-export==4.4.1`, `django-otp==1.7.3`, `qrcode==8.2` (قالب و دارایی‌های پوستهٔ Emmett خودمیزبان‌اند؛ `ADR-0043`).
 - **بومی‌سازی، محتوا و امنیت:** `django-modeltranslation==0.20.6`, `polib==1.2.0` (کامپایل و ممیزی کاتالوگ‌های `.po`/`.mo` در اسکریپت استقرار)، `jdatetime==6.1.0`, `Markdown==3.9`, `nh3==0.3.7`, `Pillow==12.3.0`, `whitenoise==6.12.0`, `structlog==26.1.0`, `django-structlog==10.1.0`, `requests==2.32.5`
 - **زیر-وابستگی‌های قفل‌شده:** `asgiref==3.12.1`, `sqlparse==0.6.0`, `tablib==3.10.0`, `PyYAML==6.0.3`, `jsonschema==4.26.0`, `urllib3==2.8.0` و سایر زیر-وابستگی‌ها.
 
@@ -395,7 +395,7 @@ bash scripts/restore_backup.sh --media backend/backups/media-20261022-033000.tar
 
 - [ ] **گواهی SSL:** در cPanel بخش **SSL/TLS Status** گواهی AutoSSL برای `emmett.ir` و `www.emmett.ir` سبز و فعال است.
 - [ ] **Environment Variables اپ‌ها:** متغیرهای runtime در Python App و Node App ثبت شده‌اند؛ `DJANGO_FORCE_SCRIPT_NAME=/backend` با mount واقعی برابر است و `FRONTEND_REVALIDATE_SECRET` در هر دو اپ یکسان است. اگر برای CLI/Cron فایل `backend/.env` لازم است، فقط روی سرور، خارج از Git و با مجوز `600` نگهداری می‌شود.
-- [ ] **بررسی امنیتی خودکار جنگو:** اجرای `python manage.py check --deploy` هیچ خطا یا هشداری (`emmett_admin.E001` تا `W013`) برنمی‌گرداند.
+- [ ] **بررسی امنیتی خودکار جنگو:** اجرای `python manage.py check --deploy` هیچ خطا یا هشدار مسدودکننده‌ای (`emmett_admin.E001`–`E006`, `W005`, `W007`–`W013`) برنمی‌گرداند.
 - [ ] **پیش‌پرواز سبز:** `bash scripts/preflight_cpanel.sh --url https://emmett.ir` با کد خروج `0` تمام می‌شود (بخش ۳.۵.۱). این تنها گامی است که ثابت می‌کند HTML سایتِ بالا آمده محتوای واقعی دارد.
 - [ ] **ترجمه‌های دوزبانه:** خروجی `python scripts/i18n.py check` سبز است.
 - [ ] **احراز هویت دو مرحله‌ای ادمین (2FA):** حساب Superuser وارد `/backend/admin/` شده، کد QR صفحهٔ `/backend/admin/2fa/setup` را در اپ Authenticator اسکن کرده و ۸ کد بازیابی یک‌بارمصرف (`/backend/admin/2fa/recovery`) را در مدیر رمز عبور امن ذخیره کرده است.

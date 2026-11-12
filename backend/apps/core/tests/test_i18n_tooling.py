@@ -5,7 +5,8 @@
 تست‌ها همان قرارداد را قفل می‌کنند:
 
 - استخراج از پایتون با ``ast`` (f-string = خطای صریح، نه نادیده‌گرفتن).
-- استخراج از قالب‌های Django (``trans``/``blocktrans`` با placeholder).
+- استخراج از قالب‌های Django (``trans``/``translate`` و
+  ``blocktrans``/``blocktranslate`` با placeholder).
 - پوشش کامل: هیچ msgid کدی بدون مدخل در ``.po`` نماند و همهٔ ردیف‌های فارسی
   ترجمه داشته باشند، و پیام‌های فارسی‌نویس معادل انگلیسی داشته باشند.
 - کامپایل ``.mo`` و اثبات عملی ترجمه در زمان اجرا.
@@ -18,7 +19,7 @@ from pathlib import Path
 import polib
 import pytest
 from django.utils import translation
-from django.utils.translation import gettext
+from django.utils.translation import gettext, ngettext
 
 from apps.core.utils.numerals import format_number
 from scripts import i18n
@@ -65,6 +66,24 @@ class TestTemplateExtraction:
 
         assert set(i18n.extract_from_template(template, root=tmp_path).messages) == {"Dashboard"}
 
+    def test_translate_alias_is_extracted(self, tmp_path: Path) -> None:
+        template = tmp_path / "page.html"
+        template.write_text(
+            '{% load i18n %}<a>{% translate "View public site" %}</a>',
+            encoding="utf-8",
+        )
+
+        assert set(i18n.extract_from_template(template, root=tmp_path).messages) == {"View public site"}
+
+    def test_blocktranslate_alias_becomes_percent_placeholder(self, tmp_path: Path) -> None:
+        template = tmp_path / "welcome.html"
+        template.write_text(
+            "{% blocktranslate with name=user.email %}Welcome, {{ name }}{% endblocktranslate %}",
+            encoding="utf-8",
+        )
+
+        assert set(i18n.extract_from_template(template, root=tmp_path).messages) == {"Welcome, %(name)s"}
+
     def test_blocktrans_becomes_percent_placeholder(self, tmp_path: Path) -> None:
         template = tmp_path / "welcome.html"
         template.write_text(
@@ -88,11 +107,28 @@ class TestTemplateExtraction:
     def test_commented_out_strings_are_ignored(self, tmp_path: Path) -> None:
         template = tmp_path / "commented.html"
         template.write_text(
-            '{% comment %}{% trans "Hidden" %}{% endcomment %}{# {% trans "Also hidden" %} #}',
+            '{% comment %}{% trans "Hidden" %}{% endcomment %}{# {% translate "Also hidden" %} #}',
             encoding="utf-8",
         )
 
         assert i18n.extract_from_template(template, root=tmp_path).messages == {}
+
+
+class TestCatalogSynchronization:
+    def test_obsolete_entry_is_retained_and_revived_with_its_translation(self) -> None:
+        pofile = polib.POFile()
+        pofile.append(polib.POEntry(msgid="Old label", msgstr="برچسب قدیمی"))
+
+        first = i18n.sync_po(pofile, {})
+
+        assert first == {"added": 0, "obsolete": 1, "total": 0}
+        assert pofile.obsolete_entries()[0].msgstr == "برچسب قدیمی"
+
+        second = i18n.sync_po(pofile, {"Old label": i18n.Message(msgid="Old label")})
+
+        assert second == {"added": 0, "obsolete": 0, "total": 1}
+        assert len(pofile.obsolete_entries()) == 0
+        assert pofile[0].msgstr == "برچسب قدیمی"
 
 
 class TestRealProjectCoverage:
@@ -163,6 +199,21 @@ class TestRuntimeTranslation:
         with translation.override("en"):
             assert gettext("Dashboard") == "Dashboard"
             assert gettext("Publish selected content") == "Publish selected content"
+
+    def test_native_admin_template_strings_are_translated(self) -> None:
+        with translation.override("fa"):
+            assert gettext("Sign in to the Emmett admin panel") == "ورود به پنل مدیریت امیت"
+            assert gettext("View public site") == "مشاهدهٔ سایت عمومی"
+            assert gettext("Toggle navigation") == "باز و بسته‌کردن ناوبری"
+            assert gettext("Activate two-factor authentication") == "فعال‌سازی احراز هویت دومرحله‌ای"
+            assert (
+                ngettext("One recovery code left.", "%(counter)s recovery codes left.", 1)
+                == "یک کد بازیابی باقی مانده است."
+            )
+            assert (
+                ngettext("One recovery code left.", "%(counter)s recovery codes left.", 4)
+                == "%(counter)s کد بازیابی باقی مانده است."
+            )
 
     def test_numbers_follow_locale(self) -> None:
         # قرارداد پروژه (ADR-0004): جداکنندهٔ هزارگان یکسان، فقط ارقام متفاوت.

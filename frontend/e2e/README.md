@@ -2,7 +2,7 @@
 
 این پوشه تست‌های سطح مرورگر (End-to-End) را نگه می‌دارد؛ از فاز ۴ آغاز شد
 (ر.ک. [ADR-0023](../../docs/adr/0023-e2e-testing-playwright.md)) و در فازهای ۵، ۷ و ۸
-و بسته‌های بازسازی گسترش یافت. **اندازهٔ کنونی سوئیت: ۶۰ تست در ۹ فایل**
+و بسته‌های بازسازی گسترش یافت. **اندازهٔ کنونی سوئیت: ۷۲ تست در ۱۰ فایل**
 (خروجیِ `npx playwright test --list`، که بدون نیاز به مرورگر شمارِ قطعی می‌دهد). این تست‌ها با
 Vitest (`frontend/src/**/*.test.tsx`) جایگزین نمی‌شوند — Vitest برای تست
 واحد/کامپوننت می‌ماند، Playwright فقط برای جریان‌های کامل کاربر در مرورگر
@@ -15,6 +15,9 @@ E2E به یک بک‌اند Django **در حال اجرا و seed‌شده** ن�
 - فرم تماس، ورود/ثبت‌نام، ثبت‌نام دوره و ثبت نظر واقعاً به `/api/v1/...`
   درخواست می‌زنند (از طریق پراکسی `src/app/api/[...path]/route.ts`).
 - جست‌وجوی سراسری به FTS واقعی بک‌اند (نه داده‌ی mock) وابسته است.
+- آزمون Admin مستقیم به `/admin/` روی Django می‌رود و برای ورود به حساب
+  demo به `DEMO_ADMIN_PASSWORD` یکسان هنگام seed و اجرای Playwright نیاز دارد؛
+  اگر این متغیر تنظیم نشده باشد، فقط همان ۱۲ آزمون Admin به‌صورت شفاف skip می‌شوند.
 - صفحات در هر درخواست SSR می‌شوند تا nonce یکتای CSP از `src/proxy.ts` به
   اسکریپت‌های Next تزریق شود؛ backend لازم نیست هنگام `next build` در دسترس
   باشد، اما باید پیش از اجرای E2E بالا و seed شده باشد.
@@ -26,6 +29,8 @@ E2E به یک بک‌اند Django **در حال اجرا و seed‌شده** ن�
 cd backend
 source .venv/bin/activate
 export DJANGO_SETTINGS_MODULE=config.settings.dev
+export DEMO_ADMIN_PASSWORD="$(python -c 'import secrets; print(secrets.token_urlsafe(24))')"
+printf '%s' "$DEMO_ADMIN_PASSWORD" > /tmp/emmett-e2e-admin-password
 python manage.py migrate
 python manage.py seed_demo_data
 python manage.py runserver 0.0.0.0:8000
@@ -35,7 +40,9 @@ cd frontend
 npx playwright install chromium
 
 # ۳) تست‌ها را اجرا کنید — این دستور خودش next build && next start را هم اجرا می‌کند
+export DEMO_ADMIN_PASSWORD="$(cat /tmp/emmett-e2e-admin-password)"
 INTERNAL_API_URL=http://127.0.0.1:8000 npm run test:e2e
+rm -f /tmp/emmett-e2e-admin-password
 ```
 
 برای حالت تعاملی توسعه (مشاهدهٔ هر قدم در UI Playwright):
@@ -54,6 +61,7 @@ npm run test:e2e:ui
 - `ai-and-seo.spec.ts` **(۹ تست)** — سه دسته: مشاور ایده‌پرداز و تخمین‌گر پروژه (فاز ۵)، ‏SEO و فیدهای RSS و دادهٔ ساخت‌یافتهٔ JSON-LD (فاز ۷)، و canonical محصولات (`ADR-0040`) شامل خودارجاعیِ صفحهٔ جزئیات، لینکِ فهرست محصولات به `/projects/{slug}` و ۴۰۴ بودنِ `/projects/crm`.
 - `ui-port.spec.ts` **(۱۲ تست)** — (فاز ۸ پورت، ADR-0037) قرارداد رفتاری پوستهٔ پورت‌شده: خانه و بخش‌های زنده، صفحهٔ `/products/crm` (عنوان، زیرعنوان، canonical مستقل) و ریدایرکت دائمیِ `/products/pentestor` به صفحهٔ واقعی‌اش `/projects/pentestor` (ADR-0040 بند ۵، گزینهٔ ۱)، پالت ⌘K (بازشدن با `Ctrl/⌘K`، فیلتر فهرست داخلی صفحات، ناوبری، Escape، جاگیری در عرض ۳۲۰)، کشوی موبایل به‌صورت دیالوگ با بازگرداندن فوکوس، و پنهان‌شدن لودر با `prefers-reduced-motion`. توجه: پالت هنوز فقط فهرست داخلی صفحات را فیلتر می‌کند؛ اتصال به جست‌وجوی API خارج از فاز ۸ است و جست‌وجوی واقعی صفحهٔ `/search` است.
 - `responsive.spec.ts` **(۱۶ تست)** — (فاز ۸ پورت، ADR-0037) بازبینی زندهٔ ۸ عرض مرزی ۳۲۰/۳۹۰/۶۴۰/۷۶۸/۱۰۲۴/۱۲۸۰/۱۴۴۰/۱۹۲۰ روی خانه و `/services`: نبود اسکرول افقی، حالت درست ناوبری (همبرگر زیر `lg`، دسکتاپ از `lg`)، و اسکرین‌شات پیوست‌شده به گزارش برای بازبینی چشمی.
+- `admin-responsive.spec.ts` **(۱۲ تست)** — (فاز ۱ Admin بومی) ورود واقعی Django و بررسی login، داشبورد، فهرست/فرم خدمت و وضعیت 2FA در ۳۲۰/۳۹۰/۷۶۸/۱۰۲۴/۱۴۴۰/۱۹۲۰ برای هر دو زبان؛ نبود سرریز، CSP با `script-src 'self'` و منابع CSS/JS هم‌مبدأ را می‌سنجد و نماها را به گزارش پیوست می‌کند.
 - `design-system.spec.ts` **(۳ تست)** — (بستهٔ ۲ توکن‌ها، ADR-0039) صفحهٔ `/design-system`: رنگ‌شدن واقعی شش توکن پالت نگاشت‌شده در مرورگر (اگر نگاشتی در `@theme inline` حذف شود جعبه بی‌رنگ می‌ماند و این تست می‌شکند)، تمایز سه توکن متن ملایم، و پرشدن مقدار زندهٔ همهٔ توکن‌ها از CSSOM پس از hydration. فقط در پروژهٔ `fa` اجرا می‌شود.
 
 ## خروجی تشخیصی و اجرای بدون دانلود مرورگر

@@ -2,35 +2,33 @@
 {% load i18n %}
 
 {% block twofa_content %}
-    <p>
-        {% translate "Enter the 6-digit code from your authenticator app to finish signing in." %}
-    </p>
-    <p class="text-muted small">
+    <p>{% translate "Enter the 6-digit code from your authenticator app to finish signing in." %}</p>
+    <p class="emmett-dashboard__hint">
         {% blocktranslate count counter=attempts_left %}One attempt left before a short lockout.{% plural %}{{ counter }} attempts left before a short lockout.{% endblocktranslate %}
     </p>
 
-    <form method="post" class="mt-3" autocomplete="off">
+    <form method="post" class="emmett-auth-form" autocomplete="off">
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ next }}">
-        <div class="mb-3">
-            <label class="form-label" for="id_token">{% translate "6-digit code" %}</label>
-            <input class="form-control" id="id_token" name="token" inputmode="numeric" autocomplete="one-time-code"
-                   maxlength="8" required autofocus>
+        <label for="id_token">{% translate "6-digit code" %}</label>
+        <input id="id_token" name="token" type="text" inputmode="numeric" autocomplete="one-time-code"
+               pattern="[0-9\s]*" maxlength="8" required autofocus>
+        <div class="emmett-auth-actions">
+            <button type="submit" class="button default">{% translate "Verify" %}</button>
         </div>
-        <button type="submit" class="btn btn-primary">{% translate "Verify" %}</button>
     </form>
 
     {% if recovery_enabled %}
         <hr>
-        <form method="post" autocomplete="off">
+        <form method="post" class="emmett-auth-form" autocomplete="off">
             {% csrf_token %}
             <input type="hidden" name="next" value="{{ next }}">
             <input type="hidden" name="use_recovery_code" value="1">
-            <div class="mb-3">
-                <label class="form-label" for="id_recovery_code">{% translate "Or use a recovery code" %}</label>
-                <input class="form-control" id="id_recovery_code" name="recovery_code" autocomplete="off" required>
+            <label for="id_recovery_code">{% translate "Or use a recovery code" %}</label>
+            <input id="id_recovery_code" name="recovery_code" type="text" autocomplete="off" required>
+            <div class="emmett-auth-actions">
+                <button type="submit" class="button">{% translate "Use recovery code" %}</button>
             </div>
-            <button type="submit" class="btn btn-outline-secondary">{% translate "Use recovery code" %}</button>
         </form>
     {% endif %}
 {% endblock %}

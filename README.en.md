@@ -29,7 +29,7 @@ This repository is the production **Monorepo** for the bilingual (Persian/Englis
 - **Emerald / Obsidian Design System:** Self-hosted typography (`Vazirmatn`, `Inter`, `JetBrains Mono`), Dark/Light theme support, WCAG AA accessibility, and live `/design-system` showcase.
 - **Full Content, Academy & Product Suite:** Services, Portfolio with 7-section Case Studies, the flagship `Pentestor` product at `/projects/pentestor` (with a permanent `308` redirect from `/products/pentestor` per `ADR-0040`) plus a "coming soon" page for `CRM`, which is not in the database yet, Academy Courses with student enrollment, Library (Blog) with auto-generated TOC & moderated comments, and ranked Full-Text Search.
 - **Centralized AI Engine (`ai_engine`):** Closed-enum Creative Advisor (up to 3 concepts with revocable share tokens), deterministic minimum working-day Project Estimator (no monetary price), admin-reviewed Blog Summaries, and Iranian cultural guardrails.
-- **SaaS-Grade Admin Panel:** Custom Jazzmin theme with scoped RTL, cached KPI dashboard with 8-week SVG trend charts, bulk publication & soft-delete restore workflows, two-step CSV/TSV/JSON import/export with Formula Injection protection, and mandatory TOTP 2FA with recovery codes.
+- **SaaS-Grade Admin Panel:** Native Django Admin with Emmett-branded, self-hosted templates and assets, responsive RTL/LTR support, cached KPI dashboard with 8-week SVG trend charts, bulk publication & soft-delete restore workflows, two-step CSV/TSV/JSON import/export with Formula Injection protection, and mandatory TOTP 2FA with recovery codes (`ADR-0043`).
 - **Technical SEO & Security Hardening:** Dynamic `sitemap.xml`, `robots.txt`, 6 JSON-LD schema types, dynamic `1200×630` OpenGraph images, RSS 2.0 feeds, admin-managed `301/302/410` redirects, dual-policy CSP, brute-force login lockout (`429`), and automated `backup_db` management command.
 
 ---
@@ -95,7 +95,8 @@ ruff check . && ruff format --check . && black --check .
 mypy apps config
 bandit -c pyproject.toml -r apps config -ll
 python scripts/i18n.py check
-PYTHONPATH=../.github/ci DJANGO_SETTINGS_MODULE=ci_test_settings coverage run -m pytest -q && coverage report --fail-under=85 -m   # The CI settings shim switches `staticfiles` to plain `StaticFilesStorage`; base settings use `NonStrictCompressedManifestStaticFilesStorage` so both direct `pytest` runs and Jazzmin directory-level `{% static %}` lookups in production succeed cleanly
+# The CI shim simplifies only the `staticfiles` backend; user-media storage and the product's compressed/hashed static storage remain unchanged.
+PYTHONPATH=../.github/ci DJANGO_SETTINGS_MODULE=ci_test_settings coverage run -m pytest -q && coverage report --fail-under=85 -m
 
 # Frontend quality & test suite
 cd ../frontend
