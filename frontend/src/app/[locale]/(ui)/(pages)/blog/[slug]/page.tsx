@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { Breadcrumb } from "@/components/molecules/breadcrumb";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "@/i18n/navigation";
+import { FavoriteButton } from "@/components/organisms/favorite-button";
 import { CommentForm } from "@/components/organisms/comment-form";
 import type { AppLocale } from "@/i18n/routing";
 import { getBlogPost } from "@/lib/api/server";
@@ -115,6 +116,9 @@ export default async function BlogPostPage({ params }: { params: Promise<PagePar
       />
 
       <header>
+        <div className="mb-3 flex justify-end">
+          <FavoriteButton contentType="blog_post" publicId={post.public_id} />
+        </div>
         <h1 className={pageTitleClass}>{post.title}</h1>
         <p className="mt-3 flex flex-wrap items-center gap-x-2 text-sm text-muted-foreground">
           {post.author_name ? <span>{post.author_name}</span> : null}

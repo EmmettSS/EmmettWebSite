@@ -288,3 +288,17 @@ export interface ProjectEstimateResponse {
   delivery_scope_label: string;
   minimum_working_days: number | null;
 }
+
+export interface TaxonomyCategory {
+  public_id: string;
+  name: string;
+  slug: string;
+  scope: string;
+  parent: string | null;
+}
+
+export interface TaxonomyTag {
+  id: number;
+  name: string;
+  slug: string;
+}

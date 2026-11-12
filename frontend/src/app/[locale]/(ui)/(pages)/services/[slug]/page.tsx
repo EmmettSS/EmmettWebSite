@@ -11,6 +11,7 @@ import { sanitizeRichHtml } from "@/lib/security/sanitize-rich-html";
 import { getSeoSettingsOrDefaults } from "@/lib/api/seo";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import { getPublicSiteUrl, toAppLocale } from "@/lib/seo/site";
+import { FavoriteButton } from "@/components/organisms/favorite-button";
 import { JsonLd } from "@/components/seo/json-ld";
 import { getFaqForPath } from "@/lib/api/seo";
 import { breadcrumbJsonLd, faqJsonLd, serviceJsonLd } from "@/lib/seo/json-ld";
@@ -86,6 +87,9 @@ export default async function ServiceDetailPage({ params }: { params: Promise<Pa
       />
 
       <header>
+        <div className="mb-3 flex justify-end">
+          <FavoriteButton contentType="service" publicId={service.public_id} />
+        </div>
         <h1 className={pageTitleClass}>{service.title}</h1>
         <p className={pageSummaryClass}>{service.summary}</p>
 

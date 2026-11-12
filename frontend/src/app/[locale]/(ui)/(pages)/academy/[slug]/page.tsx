@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { Breadcrumb } from "@/components/molecules/breadcrumb";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { FavoriteButton } from "@/components/organisms/favorite-button";
 import { EnrollButton } from "@/components/organisms/enroll-button";
 import type { AppLocale } from "@/i18n/routing";
 import { getCourse } from "@/lib/api/server";
@@ -100,6 +101,9 @@ export default async function CourseDetailPage({ params }: { params: Promise<Pag
       />
 
       <header>
+        <div className="mb-3 flex justify-end">
+          <FavoriteButton contentType="course" publicId={course.public_id} />
+        </div>
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant="technical">{t(`levels.${course.level}`)}</Badge>
           {course.duration_hours ? (

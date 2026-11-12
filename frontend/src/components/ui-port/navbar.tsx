@@ -27,6 +27,12 @@ const navLinks = [
   { key: "about", href: "/about" },
 ] as const;
 
+const secondaryNavLinks = [
+  { key: "advisor", href: "/advisor" },
+  { key: "estimate", href: "/estimate" },
+  { key: "account", href: "/profile" },
+] as const;
+
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
@@ -125,6 +131,23 @@ export function Navbar() {
             ))}
           </div>
 
+          {/* Right - desktop secondary nav */}
+          <div className="hidden lg:flex items-center gap-3">
+            {secondaryNavLinks.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`text-xs font-medium transition-colors ${
+                  isActive(item.href)
+                    ? "text-foreground"
+                    : "text-muted-on-dark hover:text-foreground"
+                }`}
+              >
+                {t(item.key)}
+              </Link>
+            ))}
+          </div>
+
           {/* Right */}
           <div className="flex items-center gap-3 flex-shrink-0">
             <UiLocaleSwitch />
@@ -203,6 +226,19 @@ export function Navbar() {
         >
           <div className="px-6 py-8 space-y-0.5">
             {navLinks.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setIsOpen(false)}
+                className={`flex items-center justify-between h-14 border-b border-[rgba(31,174,110,0.08)] text-lg transition-colors ${
+                  isActive(item.href) ? "text-foreground" : "text-[rgba(243,250,246,0.48)]"
+                }`}
+              >
+                {t(item.key)}
+                <ChevronRight className="w-4 h-4 opacity-20 rtl:-scale-x-100" />
+              </Link>
+            ))}
+            {secondaryNavLinks.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
