@@ -4,6 +4,7 @@ import { ProductsSection } from "./products-section";
 import { ProjectsSection } from "./projects-section";
 import { LibrarySection } from "./library-section";
 import { AcademySection } from "./academy-section";
+import { AiStudioSection } from "./ai-studio-section";
 import { ContactSection } from "./contact-section";
 import { Footer } from "./footer";
 import type { HomeContent } from "./home-data";
@@ -28,6 +29,9 @@ export function Home({ content }: { content: HomeContent }) {
 
       {/* 6 — Academy: Build your way into deeper knowledge */}
       <AcademySection courses={content.courses} />
+
+      {/* 7 — AI Product Studio: Advisor + Estimator — discoverability + SEO */}
+      <AiStudioSection />
 
       {/* Contact CTA */}
       <ContactSection />

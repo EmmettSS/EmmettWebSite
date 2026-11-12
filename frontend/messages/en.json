@@ -503,6 +503,27 @@
               "href": "/blog"
             }
           ]
+        },
+        {
+          "header": "Tools",
+          "links": [
+            {
+              "label": "Creative advisor",
+              "href": "/advisor"
+            },
+            {
+              "label": "Project estimator",
+              "href": "/estimate"
+            },
+            {
+              "label": "Search",
+              "href": "/search"
+            },
+            {
+              "label": "Account",
+              "href": "/profile"
+            }
+          ]
         }
       ]
     },
@@ -514,6 +535,36 @@
       "pentestorSubtitle": "AI-powered security engineering",
       "crmTitle": "CRM",
       "crmSubtitle": "Business systems engineered around real workflows"
+    },
+    "aiStudio": {
+      "eyebrow": "Product studio · 07",
+      "title": "From idea to timeline,",
+      "titleAccent": "with Emmett's assistant.",
+      "lead": "Two interactive tools for a measured start — choose only structured options; no free text is ever sent to the model.",
+      "privacyNote": "Only closed catalog choices are used to generate ideas — your privacy is preserved.",
+      "advisorEyebrow": "Tool 1 · Advisor",
+      "advisorTitle": "Creative advisor",
+      "advisorLead": "Pick role, business size, budget and goals to get 3 preliminary software concepts with solution area, complexity and minimum timeline.",
+      "advisorCta": "Generate concepts",
+      "estimatorEyebrow": "Tool 2 · Estimator",
+      "estimatorTitle": "Project estimator",
+      "estimatorLead": "Choose the first-release scope (MVP to full product) to see an optimistic minimum in working days — no price.",
+      "estimatorCta": "Estimate timeline",
+      "bullets": {
+        "advisor": [
+          "No price",
+          "Up to 3 ideas",
+          "Shareable token"
+        ],
+        "estimator": [
+          "Deterministic",
+          "No LLM call",
+          "Based on EstimationRule"
+        ]
+      },
+      "alsoSee": "Also see:",
+      "searchLink": "Global search",
+      "contactLink": "Request human review"
     }
   }
 }
