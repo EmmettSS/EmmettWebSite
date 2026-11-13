@@ -38,9 +38,11 @@ export function FilterBar({ label, paramName, options, allLabel }: FilterBarProp
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <span className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
-        {label}
-      </span>
+      {label ? (
+        <span className="text-xs font-medium uppercase tracking-widest text-muted-on-dark">
+          {label}
+        </span>
+      ) : null}
       <div className="flex flex-wrap gap-1.5">
         <button
           type="button"
@@ -48,7 +50,7 @@ export function FilterBar({ label, paramName, options, allLabel }: FilterBarProp
           className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
             !activeValue
               ? "border-primary bg-primary text-primary-foreground"
-              : "border-border bg-transparent text-muted-foreground hover:border-primary hover:text-foreground"
+              : "border-border bg-transparent text-muted-on-dark hover:border-primary hover:text-foreground"
           }`}
         >
           {allLabel}
@@ -61,7 +63,7 @@ export function FilterBar({ label, paramName, options, allLabel }: FilterBarProp
             className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
               activeValue === option.value
                 ? "border-primary bg-primary text-primary-foreground"
-                : "border-border bg-transparent text-muted-foreground hover:border-primary hover:text-foreground"
+                : "border-border bg-transparent text-muted-on-dark hover:border-primary hover:text-foreground"
             }`}
           >
             {option.label}
@@ -111,7 +113,7 @@ export function SearchInputFilter({ placeholder, label }: SearchInputFilterProps
           if (event.key === "Enter") handleChange(event.currentTarget.value);
         }}
         onBlur={(event) => {
-          if (event.currentTarget.value !== value) handleChange(event.currentTarget.value);
+          if (event.currentTarget.value.trim() !== value) handleChange(event.currentTarget.value);
         }}
         className="h-9 w-56 rounded-md border border-input bg-transparent px-3 text-sm text-foreground placeholder:text-muted-foreground focus-visible:border-primary focus-visible:outline-none"
       />

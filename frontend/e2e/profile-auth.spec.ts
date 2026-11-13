@@ -12,7 +12,15 @@ test.describe("ثبت‌نام، ورود و پروفایل", () => {
   }) => {
     const uniqueEmail = `e2e-profile-${Date.now()}@example.com`;
 
+    await page.goto("/services/web-development");
+    await expect(page.getByRole("button", { name: "ذخیره" })).toHaveCount(0);
+
     await page.goto("/profile");
+    await page.getByLabel("ایمیل").fill("nobody-invalid@example.com");
+    await page.getByLabel("رمز عبور").fill("WrongPass123!");
+    await page.locator("form").getByRole("button", { name: "ورود" }).click();
+    await expect(page.getByRole("alert")).toBeVisible({ timeout: 10_000 });
+
     // دکمه‌های تب («ورود»/«ایجاد حساب») بیرون از <form> هستند، اما متن دکمهٔ
     // ارسال فرم هم همان برچسب را دارد؛ برای رفع ابهام، کلیک روی تب را به
     // ناحیهٔ بیرون از فرم محدود می‌کنیم.
@@ -29,6 +37,30 @@ test.describe("ثبت‌نام، ورود و پروفایل", () => {
     await expect(page.getByText(/خوش آمدید/)).toBeVisible({ timeout: 10_000 });
     await expect(page.getByText("هنوز در دوره‌ای ثبت‌نام نکرده‌اید.")).toBeVisible();
 
+    await page.getByRole("button", { name: "ویرایش" }).click();
+    await page.getByLabel("عنوان شغلی").fill("مهندس نرم‌افزار");
+    await page.getByLabel("شرکت").fill("امیت");
+    await page.getByRole("button", { name: "ذخیره" }).click();
+    await expect(page.getByRole("status")).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText("مهندس نرم‌افزار · امیت")).toBeVisible();
+
+    await page.goto("/services/web-development");
+    const saveButton = page.getByRole("button", { name: "ذخیره" });
+    await expect(saveButton).toBeVisible({ timeout: 10_000 });
+    await saveButton.click();
+    await expect(page.getByRole("button", { name: "ذخیره‌شده" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+      { timeout: 10_000 },
+    );
+
+    await page.reload();
+    await expect(page.getByRole("button", { name: "ذخیره‌شده" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+      { timeout: 10_000 },
+    );
+
     // حالا با سشن واردشده به صفحهٔ دوره برویم و ثبت‌نام کنیم.
     await page.goto("/academy/python-for-beginners");
     const enrollButton = page.getByRole("button", { name: "ثبت‌نام در این دوره" });
@@ -43,6 +75,11 @@ test.describe("ثبت‌نام، ورود و پروفایل", () => {
     // بازگشت به پروفایل باید دورهٔ تازه ثبت‌نام‌شده را نشان دهد.
     await page.goto("/profile");
     await expect(page.getByText("پایتون برای مبتدیان")).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText("توسعهٔ وب‌سایت")).toBeVisible();
+    await page.getByRole("button", { name: "حذف" }).click();
+    await expect(page.getByText("هنوز چیزی ذخیره نکرده‌اید.")).toBeVisible({
+      timeout: 10_000,
+    });
 
     // با همین سشن واردشده، ثبت نظر زیر یک پست بلاگ باید ممکن باشد.
     await page.goto("/blog/intro-to-web-security");

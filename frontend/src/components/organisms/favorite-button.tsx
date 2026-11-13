@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Heart } from "lucide-react";
 
@@ -19,41 +19,37 @@ export function FavoriteButton({ contentType, publicId }: FavoriteButtonProps) {
   const [status, setStatus] = useState<Status>("checking");
   const [favoriteId, setFavoriteId] = useState<number | null>(null);
 
-  const check = useCallback(async () => {
-    try {
-      await getMe();
-      const data = await getFavorites();
-      const found = data.results.find(
-        (fav) =>
-          fav.content_type_label === contentType ||
-          fav.content_type_label.includes(contentType),
-      );
-      // Backend returns favorites without content_type key; fallback: target_title match is not reliable.
-      // Instead we search by matching request via trying to find by querying favorites that were added.
-      // Since API does not return public_id, we store favoriteId only when we create.
-      // For existing favorites we cannot reliably match; show generic state.
-      // We use a heuristic: if any favorite exists we treat as not_favorited unless we just created.
-      // Better: attempt to detect via separate endpoint is not available, so we keep simple.
-      // We will track favoriteId after creation; on mount we cannot know, so default to not_favorited.
-      // To improve, we fetch and try to infer via target_title is not workable.
-      // So we simply show not_favorited initially; server will error on duplicate? Actually backend update_or_create returns 201 regardless.
-      void found;
-      setStatus("not_favorited");
-    } catch (error) {
-      const isGuest = error instanceof ApiError && (error.status === 401 || error.status === 403);
-      setStatus(isGuest ? "guest" : "not_favorited");
-    }
-  }, [contentType]);
-
   useEffect(() => {
-    void check();
-  }, [check]);
+    let cancelled = false;
 
-  // Second attempt: precise check via iterating and trying to match by fetching each? Not available.
-  // So we implement toggle based on favoriteId we own.
+    async function run() {
+      try {
+        await getMe();
+        const data = await getFavorites();
+        if (cancelled) return;
+        const found = data.results.find((fav) => fav.target_public_id === publicId);
+        if (found) {
+          setFavoriteId(found.id);
+          setStatus("favorited");
+        } else {
+          setFavoriteId(null);
+          setStatus("not_favorited");
+        }
+      } catch (error) {
+        if (cancelled) return;
+        const isGuest = error instanceof ApiError && (error.status === 401 || error.status === 403);
+        setStatus(isGuest ? "guest" : "not_favorited");
+      }
+    }
+
+    void run();
+    return () => {
+      cancelled = true;
+    };
+  }, [publicId]);
 
   async function handleToggle() {
-    if (status === "guest" || status === "checking") return;
+    if (status === "guest" || status === "checking" || status === "submitting") return;
     setStatus("submitting");
     try {
       if (favoriteId !== null) {
@@ -68,7 +64,7 @@ export function FavoriteButton({ contentType, publicId }: FavoriteButtonProps) {
     } catch (error) {
       const isGuest = error instanceof ApiError && (error.status === 401 || error.status === 403);
       if (isGuest) setStatus("guest");
-      else setStatus(favoriteId ? "favorited" : "not_favorited");
+      else setStatus(favoriteId !== null ? "favorited" : "not_favorited");
     }
   }
 
@@ -85,23 +81,20 @@ export function FavoriteButton({ contentType, publicId }: FavoriteButtonProps) {
   }
 
   const isFavorited = status === "favorited";
+  const label = isFavorited ? t("savedItem") : t("saveItem");
 
   return (
     <Button
-      variant={isFavorited ? "secondary" : "secondary"}
+      variant="secondary"
       size="sm"
       onClick={() => void handleToggle()}
       disabled={status === "submitting"}
       aria-pressed={isFavorited}
+      aria-label={label}
       className={isFavorited ? "border-primary text-primary" : ""}
     >
-      <Heart
-        className={`size-4 ${isFavorited ? "fill-primary text-primary" : ""}`}
-        aria-hidden
-      />
-      <span className="ms-1 hidden sm:inline">
-        {isFavorited ? "ذخیره شده" : "ذخیره"}
-      </span>
+      <Heart className={`size-4 ${isFavorited ? "fill-primary text-primary" : ""}`} aria-hidden />
+      <span className="ms-1 hidden sm:inline">{label}</span>
     </Button>
   );
 }

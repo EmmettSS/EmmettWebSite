@@ -12,7 +12,7 @@ import {
 import type { AppLocale } from "@/i18n/routing";
 import { getBlogPosts, getCourses, getProjects, getServices } from "@/lib/api/server";
 import { getFaqForPath, getSeoSettingsOrDefaults } from "@/lib/api/seo";
-import { faqJsonLd } from "@/lib/seo/json-ld";
+import { faqJsonLd, type JsonLdGraph } from "@/lib/seo/json-ld";
 import { getPublicSiteUrl } from "@/lib/seo/site";
 
 /**
@@ -44,7 +44,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const localePrefix = locale === "fa" ? "" : `/${locale}`;
   const advisorUrl = `${siteUrl}${localePrefix}/advisor`;
   const estimateUrl = `${siteUrl}${localePrefix}/estimate`;
-  const aiToolsJsonLd = {
+  const aiToolsJsonLd: JsonLdGraph = {
     "@context": "https://schema.org",
     "@graph": [
       {

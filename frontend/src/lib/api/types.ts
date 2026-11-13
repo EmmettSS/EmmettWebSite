@@ -224,6 +224,8 @@ export interface Favorite {
   content_type_label: string;
   object_id: number;
   target_title: string | null;
+  target_public_id?: string | null;
+  target_slug?: string | null;
   created_at: string;
 }
 
@@ -287,18 +289,4 @@ export interface ProjectEstimateResponse {
   delivery_scope: string;
   delivery_scope_label: string;
   minimum_working_days: number | null;
-}
-
-export interface TaxonomyCategory {
-  public_id: string;
-  name: string;
-  slug: string;
-  scope: string;
-  parent: string | null;
-}
-
-export interface TaxonomyTag {
-  id: number;
-  name: string;
-  slug: string;
 }

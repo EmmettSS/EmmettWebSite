@@ -207,3 +207,14 @@ export const globalSearch = (query: string, locale: string) =>
   clientFetch<SearchResponse>(
     `/search/?q=${encodeURIComponent(query)}&locale=${encodeURIComponent(locale)}`,
   );
+
+export const fetchCatalogPage = <T>(
+  endpointPath: string,
+  query: string,
+  locale: string,
+  signal?: AbortSignal,
+) =>
+  clientFetch<Paginated<T>>(`${endpointPath}${query ? `?${query}` : ""}`, {
+    signal,
+    headers: { "Accept-Language": locale },
+  });

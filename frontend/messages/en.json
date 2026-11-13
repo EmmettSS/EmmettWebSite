@@ -13,7 +13,9 @@
     "loading": "Loading…",
     "readMore": "Read more",
     "viewAll": "View all",
-    "contentUnavailable": "Content is temporarily unavailable."
+    "contentUnavailable": "Content is temporarily unavailable.",
+    "saveItem": "Save",
+    "savedItem": "Saved"
   },
   "nav": {
     "home": "Home",
@@ -92,6 +94,7 @@
     "requiredError": "This field is required."
   },
   "pagination": {
+    "label": "Pagination",
     "previous": "Previous",
     "next": "Next",
     "pageOf": "Page {current} of {total}"
@@ -551,16 +554,8 @@
       "estimatorLead": "Choose the first-release scope (MVP to full product) to see an optimistic minimum in working days — no price.",
       "estimatorCta": "Estimate timeline",
       "bullets": {
-        "advisor": [
-          "No price",
-          "Up to 3 ideas",
-          "Shareable token"
-        ],
-        "estimator": [
-          "Deterministic",
-          "No LLM call",
-          "Based on EstimationRule"
-        ]
+        "advisor": ["No price", "Up to 3 ideas", "Shareable token"],
+        "estimator": ["Deterministic", "No LLM call", "Based on EstimationRule"]
       },
       "alsoSee": "Also see:",
       "searchLink": "Global search",

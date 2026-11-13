@@ -39,7 +39,7 @@ export function Pagination({ currentPage, totalPages, basePath, searchParams }: 
 
   return (
     <nav
-      aria-label="pagination"
+      aria-label={t("label")}
       className="mt-10 flex flex-wrap items-center justify-between gap-4 border-t border-border pt-6"
     >
       <p className="text-sm text-muted-foreground">
