@@ -9,6 +9,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
@@ -56,6 +57,7 @@ class RegisterView(APIView):
 
     @extend_schema(request=RegisterSerializer, responses={201: MeSerializer})
     def post(self, request: Request) -> Response:
+        SessionAuthentication().enforce_csrf(request)
         serializer = RegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
@@ -76,6 +78,7 @@ class LoginView(APIView):
 
     @extend_schema(request=LoginSerializer, responses={200: MeSerializer})
     def post(self, request: Request) -> Response:
+        SessionAuthentication().enforce_csrf(request)
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data["email"]

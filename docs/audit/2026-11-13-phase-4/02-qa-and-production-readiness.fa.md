@@ -15,7 +15,7 @@
 | ۴ | Migration Consistency | `python manage.py makemigrations --check --dry-run` | `PASSED` | `No changes detected` (صفر migration جدید یا ناسازگار) |
 | ۵ | Gettext i18n | `python scripts/i18n.py check` | `PASSED` | کاتالوگ‌های `.po` و `.mo` کامل و همگام |
 | ۶ | OpenAPI Schema | `python manage.py spectacular --validate --fail-on-warn --file /tmp/openapi.yml` | `PASSED` | اسکیمای OpenAPI 3 معتبر با صفر اخطار |
-| ۷ | Backend Unit & Integration | `PYTHONPATH=../.github/ci:. DJANGO_SETTINGS_MODULE=ci_test_settings coverage run -m pytest --create-db -q && coverage report --fail-under=85` | `PASSED` | `577 passed`؛ پوشش کل `94%` (`6098` دستور، آستانهٔ مجاز `85%`) |
+| ۷ | Backend Unit & Integration | `PYTHONPATH=../.github/ci:. DJANGO_SETTINGS_MODULE=ci_test_settings coverage run -m pytest --create-db -q && coverage report --fail-under=85` | `PASSED` | `579 passed`؛ پوشش کل `94%` (`6101` دستور، آستانهٔ مجاز `85%`) |
 | ۸ | Production Deploy Check | `DJANGO_SETTINGS_MODULE=config.settings.production ... python manage.py check --deploy --fail-level WARNING` | `PASSED` | `System check identified no issues (0 silenced).` |
 | ۹ | Production Staticfiles | `DJANGO_SETTINGS_MODULE=config.settings.production ... python manage.py collectstatic --noinput --clear` | `PASSED` | ۱۸۹ فایل کپی و ۵۱۷ خروجی فشرده/مانیفست WhiteNoise ساخته شد |
 | ۱۰ | SAST & Secret Scan | `python3 scripts/check_secrets.py && bandit -ll -q -r apps config` | `PASSED` | ۶۳۰ فایل اسکن‌شده بدون راز؛ صفر یافتهٔ Medium/High در Bandit |

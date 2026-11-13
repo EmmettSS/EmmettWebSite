@@ -71,6 +71,25 @@ class TestRegisterView:
         user = User.objects.get(email="autoprofile@example.com")
         assert Profile.objects.filter(user=user).exists()
 
+    def test_register_enforces_csrf_and_accepts_valid_token(self) -> None:
+        client = APIClient(enforce_csrf_checks=True)
+        missing = client.post(
+            "/api/v1/auth/register/",
+            {"email": "csrf-reg@example.com", "password": "Str0ngP@ssword!"},
+            format="json",
+        )
+        assert missing.status_code == 403
+
+        csrf_response = client.get("/api/v1/auth/csrf/")
+        token = csrf_response.cookies["csrftoken"].value
+        accepted = client.post(
+            "/api/v1/auth/register/",
+            {"email": "csrf-reg@example.com", "password": "Str0ngP@ssword!"},
+            format="json",
+            HTTP_X_CSRFTOKEN=token,
+        )
+        assert accepted.status_code == 201
+
 
 class TestLoginView:
     def test_valid_credentials_logs_in(self) -> None:
@@ -82,6 +101,27 @@ class TestLoginView:
         assert response.status_code == 200
         assert response.data["email"] == "login@example.com"
         assert AuditLog.objects.filter(action="auth.login_succeeded").exists()
+
+    def test_login_enforces_csrf_and_accepts_valid_token(self) -> None:
+        UserFactory(email="csrf-login@example.com", password="Str0ngP@ssword!")
+        client = APIClient(enforce_csrf_checks=True)
+        missing = client.post(
+            "/api/v1/auth/login/",
+            {"email": "csrf-login@example.com", "password": "Str0ngP@ssword!"},
+            format="json",
+        )
+        assert missing.status_code == 403
+        assert not AuditLog.objects.filter(action="auth.login_succeeded").exists()
+
+        csrf_response = client.get("/api/v1/auth/csrf/")
+        token = csrf_response.cookies["csrftoken"].value
+        accepted = client.post(
+            "/api/v1/auth/login/",
+            {"email": "csrf-login@example.com", "password": "Str0ngP@ssword!"},
+            format="json",
+            HTTP_X_CSRFTOKEN=token,
+        )
+        assert accepted.status_code == 200
 
     def test_invalid_password_returns_401(self) -> None:
         UserFactory(email="login2@example.com", password="Str0ngP@ssword!")
