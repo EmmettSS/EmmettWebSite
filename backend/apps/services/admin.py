@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
+from modeltranslation.admin import TranslationAdmin
 
 from apps.core.admin_mixins import (
     EmmettImportExportAdmin,
@@ -16,7 +17,9 @@ from apps.services.resources import ServiceResource
 
 
 @admin.register(Service)
-class ServiceAdmin(PublishWorkflowMixin, SoftDeleteAdminMixin, EmmettImportExportAdmin):
+class ServiceAdmin(
+    TranslationAdmin[Service], PublishWorkflowMixin, SoftDeleteAdminMixin, EmmettImportExportAdmin
+):
     resource_class = ServiceResource
     list_display = ("title", "status_badge", "is_featured", "order", "published_at", "updated_at")
     list_display_links = ("title",)

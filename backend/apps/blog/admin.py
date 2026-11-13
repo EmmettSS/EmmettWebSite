@@ -12,6 +12,7 @@ from typing import Any
 from django.contrib import admin
 from django.http import HttpRequest
 from django.utils.translation import gettext_lazy as _
+from modeltranslation.admin import TranslationAdmin
 
 from apps.blog.models import BlogPost, Comment
 from apps.blog.resources import BlogPostResource, CommentResource
@@ -27,7 +28,9 @@ from apps.core.models import log_action
 
 
 @admin.register(BlogPost)
-class BlogPostAdmin(PublishWorkflowMixin, SoftDeleteAdminMixin, EmmettImportExportAdmin):
+class BlogPostAdmin(
+    TranslationAdmin[BlogPost], PublishWorkflowMixin, SoftDeleteAdminMixin, EmmettImportExportAdmin
+):
     resource_class = BlogPostResource
     list_display = (
         "title",

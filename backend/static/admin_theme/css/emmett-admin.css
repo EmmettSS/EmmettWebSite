@@ -94,6 +94,11 @@
   --emmett-sidebar-width: 17.25rem;
 }
 
+html,
+html[data-theme] {
+  --font-family-primary: var(--emmett-font-family);
+}
+
 :root,
 html[data-theme="light"] {
   color-scheme: light;
@@ -433,14 +438,24 @@ body {
 }
 
 #toggle-nav-sidebar::before {
-  content: "☰";
-  font-family: var(--emmett-font-family);
-  font-size: 1rem;
+  content: "";
+  display: block;
+  width: 1.05rem;
+  height: 2px;
+  border-radius: 1px;
+  background: currentColor;
+  box-shadow: 0 -5px 0 currentColor, 0 5px 0 currentColor;
 }
 
 .main.shifted #toggle-nav-sidebar::before {
   content: "×";
+  width: auto;
+  height: auto;
+  background: transparent;
+  box-shadow: none;
+  font-family: var(--emmett-font-family);
   font-size: 1.5rem;
+  line-height: 1;
 }
 
 #nav-sidebar {
@@ -593,6 +608,14 @@ body {
 
 #nav-sidebar .module caption a.section {
   color: #f2f1ee;
+}
+
+#nav-sidebar .module table,
+#nav-sidebar .module tbody tr,
+#nav-sidebar .module tbody tr:hover,
+#nav-sidebar .module th,
+#nav-sidebar .module td {
+  background: transparent;
 }
 
 #nav-sidebar .module th,
@@ -868,6 +891,22 @@ button[disabled] {
   text-align: start;
   text-transform: none;
   letter-spacing: 0;
+}
+
+fieldset .fieldset-heading,
+fieldset .inline-heading,
+:not(.inline-related) .collapse summary {
+  padding: 0.8rem 1rem;
+  border: 0;
+  border-block-end: 1px solid var(--hairline-color);
+  background: var(--darkened-bg);
+  color: var(--body-fg);
+}
+
+.collapse summary .fieldset-heading {
+  padding: 0;
+  border: 0;
+  background: transparent;
 }
 
 .module table,
@@ -1189,6 +1228,10 @@ ul.messagelist li.error {
   list-style: none;
 }
 
+.emmett-kpi__hints li {
+  list-style: none;
+}
+
 .emmett-kpi__link {
   display: inline-flex;
   width: fit-content;
@@ -1260,7 +1303,7 @@ ul.messagelist li.error {
   filter: brightness(1.12);
 }
 
-.emmett-chart__bar--height-0 { height: 0; }
+.emmett-chart__bar--height-0 { height: 3px; opacity: 0.28; }
 .emmett-chart__bar--height-1 { height: 10%; }
 .emmett-chart__bar--height-2 { height: 20%; }
 .emmett-chart__bar--height-3 { height: 30%; }
@@ -1600,7 +1643,23 @@ ul.messagelist li.error {
   background: var(--message-warning-bg);
 }
 
+body.emmett-login {
+  background: var(--emmett-obsidian);
+}
+
+.emmett-login #container {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  min-height: 100vh;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
 .emmett-login #header {
+  justify-content: space-between;
   border-block-end: 1px solid rgb(255 255 255 / 9%);
 }
 
@@ -1799,6 +1858,7 @@ ul.messagelist li.error {
     display: flex !important;
     position: fixed;
     inset-block-start: 0.85rem;
+    inset-inline-start: auto;
     inset-inline-end: 0.85rem;
     margin: 0;
   }

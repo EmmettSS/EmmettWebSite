@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
-from modeltranslation.admin import TranslationTabularInline
+from modeltranslation.admin import TranslationAdmin, TranslationTabularInline
 
 from apps.academy.models import Course, Enrollment, Instructor, Lesson
 from apps.academy.resources import (
@@ -39,7 +39,7 @@ class LessonInline(TranslationTabularInline[Lesson, Course]):
 
 
 @admin.register(Instructor)
-class InstructorAdmin(SoftDeleteAdminMixin, EmmettImportExportAdmin):
+class InstructorAdmin(TranslationAdmin[Instructor], SoftDeleteAdminMixin, EmmettImportExportAdmin):
     resource_class = InstructorResource
     list_display = ("name", "title", "user", "updated_at")
     list_filter = (RecordStateFilter,)
@@ -49,7 +49,9 @@ class InstructorAdmin(SoftDeleteAdminMixin, EmmettImportExportAdmin):
 
 
 @admin.register(Course)
-class CourseAdmin(PublishWorkflowMixin, SoftDeleteAdminMixin, EmmettImportExportAdmin):
+class CourseAdmin(
+    TranslationAdmin[Course], PublishWorkflowMixin, SoftDeleteAdminMixin, EmmettImportExportAdmin
+):
     resource_class = CourseResource
     list_display = (
         "title",
@@ -95,7 +97,7 @@ class CourseAdmin(PublishWorkflowMixin, SoftDeleteAdminMixin, EmmettImportExport
 
 
 @admin.register(Lesson)
-class LessonAdmin(SoftDeleteAdminMixin, EmmettImportExportAdmin):
+class LessonAdmin(TranslationAdmin[Lesson], SoftDeleteAdminMixin, EmmettImportExportAdmin):
     resource_class = LessonResource
     list_display = ("title", "course", "order", "duration_minutes", "is_preview")
     list_filter = ("course", "is_preview", RecordStateFilter)
