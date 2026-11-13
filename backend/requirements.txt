@@ -7,7 +7,7 @@
 
 # --- Core framework ---
 Django==5.2.17                     # فریم‌ورک اصلی — ADR-0011 (LTS تا ۲۰۲۸)
-djangorestframework==3.18.1        # لایهٔ API — هستهٔ مأموریت پروژه
+djangorestframework==3.18.2        # لایهٔ API — هستهٔ مأموریت پروژه
 
 # --- API schema / docs ---
 drf-spectacular==0.30.0            # تولید خودکار OpenAPI schema — قانون ۸
@@ -31,7 +31,7 @@ whitenoise==6.12.0
 PyMySQL==1.2.3
 
 # --- پردازش تصویر برای مدل Media ---
-Pillow==12.3.0
+Pillow==13.0.0
 
 # --- تبادل دادهٔ ادمین (فاز ۶ — ADR-0029) ---
 django-import-export==4.4.1
@@ -55,7 +55,7 @@ nh3==0.3.7
 polib==1.2.0
 
 # --- کلاینت HTTP برای آداپتور پیامک کاوه‌نگار و درگاه هوش مصنوعی (ADR-0024، ADR-0026) ---
-requests==2.32.5
+requests==2.33.0
 
 # ===========================================================================
 # ۲) زیر-وابستگی‌های زمان اجرا (Pinned Transitive Runtime Dependencies — ADR-0036)

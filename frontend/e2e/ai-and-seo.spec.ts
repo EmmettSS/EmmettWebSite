@@ -16,6 +16,10 @@ test.describe("مشاور ایده‌پرداز و تخمین‌گر هوشمن�
       "href",
       "/estimate",
     );
+
+    await page.locator('input[name="goals"]').first().check();
+    await page.getByRole("button", { name: "ساخت ایده‌های اولیه" }).click();
+    await expect(page.getByRole("alert")).toBeVisible({ timeout: 10_000 });
   });
 
   test("تخمین‌گر پروژه حداقل روز کاری را بدون قیمت عددی محاسبه و نمایش می‌دهد", async ({
@@ -65,10 +69,12 @@ test.describe("SEO، فیدهای RSS و دادهٔ ساخت‌یافته (فا�
 
   test("صفحهٔ اصلی دارای اسکریپت JSON-LD سازمان و وب‌سایت است", async ({ page }) => {
     await page.goto("/");
-    const jsonLd = await page.locator('script[type="application/ld+json"]').first().textContent();
-    expect(jsonLd).toBeTruthy();
-    expect(jsonLd).toContain("Organization");
-    expect(jsonLd).toContain("WebSite");
+    const jsonLdBlocks = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const combined = jsonLdBlocks.join("\n");
+    expect(combined).toContain("Organization");
+    expect(combined).toContain("WebSite");
+    expect(combined).toContain("SoftwareApplication");
+    await expect(page.locator("#ai-studio")).toBeVisible();
   });
 });
 

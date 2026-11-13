@@ -35,19 +35,24 @@ export function AiStudioSection() {
     <section
       id="ai-studio"
       aria-labelledby="ai-studio-heading"
-      className="relative overflow-hidden py-28 lg:py-36"
-      style={{ background: "var(--deep-green-black)" }}
+      className="relative overflow-hidden bg-deep-green-black py-28 lg:py-36"
     >
       {/* پس‌زمینه: گرادینت زمردی ملایم + شبکه */}
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.04]"
         style={{
           backgroundImage:
-            "linear-gradient(to right, rgba(31,174,110,0.6) 1px, transparent 1px), linear-gradient(to bottom, rgba(31,174,110,0.6) 1px, transparent 1px)",
+            "linear-gradient(to right, color-mix(in srgb, var(--primary) 60%, transparent) 1px, transparent 1px), linear-gradient(to bottom, color-mix(in srgb, var(--primary) 60%, transparent) 1px, transparent 1px)",
           backgroundSize: "3.5rem 3.5rem",
         }}
       />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_10%,rgba(31,174,110,0.08)_0%,transparent_65%)]" />
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          backgroundImage:
+            "radial-gradient(ellipse 70% 60% at 50% 10%, color-mix(in srgb, var(--primary) 8%, transparent) 0%, transparent 65%)",
+        }}
+      />
 
       <div className="relative z-10 mx-auto max-w-[1440px] px-6 lg:px-12">
         {/* Header */}
@@ -93,7 +98,7 @@ export function AiStudioSection() {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ delay: 0.14 }}
-            className="mx-auto mt-3 flex items-center justify-center gap-2 text-xs leading-5 text-[rgba(243,250,246,0.45)]"
+            className="mx-auto mt-3 flex items-center justify-center gap-2 text-xs leading-5 text-muted-on-dark"
           >
             <Sparkles aria-hidden className="size-3 text-primary" />
             {t("privacyNote")}
@@ -111,13 +116,13 @@ export function AiStudioSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.07 }}
-                className="group relative flex flex-col overflow-hidden rounded-2xl border border-[rgba(31,174,110,0.14)] bg-[rgba(244,250,247,0.03)] p-7 text-start backdrop-blur-sm transition-colors hover:border-[rgba(31,174,110,0.28)] hover:bg-[rgba(31,174,110,0.06)] lg:p-8"
+                className="group relative flex flex-col overflow-hidden rounded-2xl border border-primary/14 bg-foreground/[0.03] p-7 text-start backdrop-blur-sm transition-colors hover:border-primary/28 hover:bg-primary/6 lg:p-8"
               >
                 <div className="flex items-center gap-3">
-                  <span className="inline-flex size-10 items-center justify-center rounded-xl border border-[rgba(31,174,110,0.18)] bg-[rgba(31,174,110,0.09)] text-primary">
+                  <span className="inline-flex size-10 items-center justify-center rounded-xl border border-border bg-primary/9 text-primary">
                     <Icon aria-hidden className="size-5" />
                   </span>
-                  <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[rgba(243,250,246,0.5)]">
+                  <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-on-dark">
                     {card.eyebrow}
                   </span>
                 </div>
@@ -125,7 +130,7 @@ export function AiStudioSection() {
                 <h3 className="mt-5 text-xl font-semibold tracking-tight text-foreground">
                   <Link
                     href={card.href}
-                    className="after:absolute after:inset-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--deep-green-black)]"
+                    className="after:absolute after:inset-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-deep-green-black"
                   >
                     {card.title}
                   </Link>
@@ -137,7 +142,7 @@ export function AiStudioSection() {
                     ? (t.raw(`bullets.${card.id}` as never) as string[]).map((bullet) => (
                         <li
                           key={bullet}
-                          className="rounded-full border border-[rgba(31,174,110,0.14)] bg-[rgba(31,174,110,0.06)] px-3 py-1 font-mono text-[10px] tracking-widest text-[rgba(243,250,246,0.65)]"
+                          className="rounded-full border border-primary/14 bg-primary/6 px-3 py-1 font-mono text-[10px] tracking-widest text-foreground/75"
                         >
                           {bullet}
                         </li>
@@ -165,18 +170,16 @@ export function AiStudioSection() {
           transition={{ delay: 0.18 }}
           className="mx-auto mt-10 flex flex-wrap items-center justify-center gap-3 text-xs"
         >
-          <span className="font-mono tracking-widest text-[rgba(243,250,246,0.35)]">
-            {t("alsoSee")}
-          </span>
+          <span className="font-mono tracking-widest text-muted-on-dark">{t("alsoSee")}</span>
           <Link
             href="/search"
-            className="rounded-full border border-[rgba(243,250,246,0.14)] px-3 py-1 text-[rgba(243,250,246,0.6)] hover:border-primary hover:text-foreground"
+            className="rounded-full border border-foreground/14 px-3 py-1 text-foreground/70 hover:border-primary hover:text-foreground"
           >
             {t("searchLink")}
           </Link>
           <Link
             href="/contact"
-            className="rounded-full border border-[rgba(243,250,246,0.14)] px-3 py-1 text-[rgba(243,250,246,0.6)] hover:border-primary hover:text-foreground"
+            className="rounded-full border border-foreground/14 px-3 py-1 text-foreground/70 hover:border-primary hover:text-foreground"
           >
             {t("contactLink")}
           </Link>

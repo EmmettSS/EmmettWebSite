@@ -98,7 +98,7 @@ export function Navbar() {
         }`}
         style={{ height: 64 }}
       >
-        <div className="max-w-[1440px] mx-auto px-6 lg:px-12 h-full flex items-center justify-between gap-6">
+        <div className="max-w-[1440px] mx-auto px-6 xl:px-12 h-full flex items-center justify-between gap-4 xl:gap-6">
           {/* Wordmark */}
           <Link href="/" className="flex items-center gap-2 flex-shrink-0">
             <span className="font-mono text-base tracking-[0.2em] text-foreground font-semibold">
@@ -110,7 +110,7 @@ export function Navbar() {
           </Link>
 
           {/* Desktop nav */}
-          <div className="hidden lg:flex items-center gap-7 flex-1 justify-center">
+          <div className="hidden lg:flex items-center gap-4 xl:gap-7 flex-1 justify-center whitespace-nowrap">
             {navLinks.map((item) => (
               <Link
                 key={item.href}
@@ -132,12 +132,14 @@ export function Navbar() {
           </div>
 
           {/* Right - desktop secondary nav */}
-          <div className="hidden lg:flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-3 whitespace-nowrap">
             {secondaryNavLinks.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 className={`text-xs font-medium transition-colors ${
+                  item.key !== "account" ? "hidden xl:inline " : ""
+                }${
                   isActive(item.href)
                     ? "text-foreground"
                     : "text-muted-on-dark hover:text-foreground"
@@ -243,8 +245,8 @@ export function Navbar() {
                 key={item.href}
                 href={item.href}
                 onClick={() => setIsOpen(false)}
-                className={`flex items-center justify-between h-14 border-b border-[rgba(31,174,110,0.08)] text-lg transition-colors ${
-                  isActive(item.href) ? "text-foreground" : "text-[rgba(243,250,246,0.48)]"
+                className={`flex items-center justify-between h-14 border-b border-primary/8 text-lg transition-colors ${
+                  isActive(item.href) ? "text-foreground" : "text-foreground/48"
                 }`}
               >
                 {t(item.key)}

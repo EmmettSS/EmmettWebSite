@@ -6,6 +6,7 @@ import type {
   BlogPostDetail,
   BlogPostListItem,
   Catalog,
+  Category,
   CourseDetail,
   CourseListItem,
   Paginated,
@@ -14,6 +15,7 @@ import type {
   SearchResponse,
   ServiceDetail,
   ServiceListItem,
+  Tag,
   TeamMember,
   Testimonial,
 } from "./types";
@@ -143,14 +145,30 @@ export const searchSite = (locale: string, query: string, clientIpHeader?: strin
     [CACHE_TAGS.search],
   );
 
+const SCOPE_CACHE_TAG: Record<string, string> = {
+  service: CACHE_TAGS.services,
+  portfolio: CACHE_TAGS.projects,
+  blog: CACHE_TAGS.blog,
+  academy: CACHE_TAGS.academy,
+};
+
+const ALL_TAXONOMY_TAGS = [
+  CACHE_TAGS.services,
+  CACHE_TAGS.projects,
+  CACHE_TAGS.blog,
+  CACHE_TAGS.academy,
+] as const;
+
 export const getCategories = (locale: string, scope?: string) =>
   serverFetch<Paginated<Category>>(
     `/taxonomy/categories/${scope ? `?scope=${encodeURIComponent(scope)}` : ""}`,
     locale,
+    undefined,
+    scope && SCOPE_CACHE_TAG[scope] ? [SCOPE_CACHE_TAG[scope]] : ALL_TAXONOMY_TAGS,
   );
 
 export const getTags = (locale: string) =>
-  serverFetch<Paginated<Tag>>("/taxonomy/tags/", locale);
+  serverFetch<Paginated<Tag>>("/taxonomy/tags/", locale, undefined, ALL_TAXONOMY_TAGS);
 
 export const getCatalogs = (locale: string, keys?: string[]) =>
   serverFetch<Catalog[]>(

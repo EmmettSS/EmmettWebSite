@@ -38,6 +38,19 @@ test.describe("خدمات", () => {
     await expect(page).toHaveURL(/\/services\/[a-z0-9-]+$/);
     await expect(page.locator("h1")).toBeVisible();
   });
+
+  test("فیلتر دسته‌بندی خدمات نتایج را از API به‌روز می‌کند و حالت خالی را نشان می‌دهد", async ({
+    page,
+  }) => {
+    await page.goto("/services");
+    await page.getByRole("button", { name: "امنیت" }).click();
+    await expect(page).toHaveURL(/\/services\?category=security$/);
+    await expect(page.locator('a[href="/services/penetration-testing"]')).toBeVisible();
+    await expect(page.locator('a[href="/services/web-development"]')).toHaveCount(0);
+
+    await page.goto("/services?category=no-such-category");
+    await expect(page.getByText("خدمتی یافت نشد.")).toBeVisible({ timeout: 10_000 });
+  });
 });
 
 test.describe("پروژه‌ها و محصولات", () => {

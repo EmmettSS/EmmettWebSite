@@ -248,7 +248,9 @@ export function ProfileView() {
     <div className="flex flex-col gap-10">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <p className="text-lg font-medium text-foreground">{t("welcome", { name: displayName })}</p>
+          <p className="text-lg font-medium text-foreground">
+            {t("welcome", { name: displayName })}
+          </p>
           <p className="mt-1 text-sm text-muted-foreground">{me.email}</p>
           {me.profile.job_title || me.profile.company_name ? (
             <p className="text-sm text-muted-foreground">
@@ -262,7 +264,10 @@ export function ProfileView() {
       </div>
 
       {profileSuccess ? (
-        <p role="status" className="rounded-lg border border-emerald-500/20 bg-emerald-500/10 p-3 text-sm text-emerald-700">
+        <p
+          role="status"
+          className="rounded-lg border border-primary/25 bg-primary/10 p-3 text-sm text-primary"
+        >
           {t("updateSuccess")}
         </p>
       ) : null}

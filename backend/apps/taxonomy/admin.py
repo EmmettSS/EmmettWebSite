@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from django.contrib import admin
+from modeltranslation.admin import TranslationAdmin
 
 from apps.core.admin_mixins import (
     EmmettImportExportAdmin,
@@ -14,7 +15,7 @@ from apps.taxonomy.resources import CategoryResource, TagResource
 
 
 @admin.register(Category)
-class CategoryAdmin(SoftDeleteAdminMixin, EmmettImportExportAdmin):
+class CategoryAdmin(TranslationAdmin[Category], SoftDeleteAdminMixin, EmmettImportExportAdmin):
     resource_class = CategoryResource
     list_display = ("name", "scope", "parent", "slug", "is_active")
     list_display_links = ("name",)
@@ -26,7 +27,7 @@ class CategoryAdmin(SoftDeleteAdminMixin, EmmettImportExportAdmin):
 
 
 @admin.register(Tag)
-class TagAdmin(SoftDeleteAdminMixin, EmmettImportExportAdmin):
+class TagAdmin(TranslationAdmin[Tag], SoftDeleteAdminMixin, EmmettImportExportAdmin):
     resource_class = TagResource
     list_display = ("name", "slug", "is_active")
     list_display_links = ("name",)

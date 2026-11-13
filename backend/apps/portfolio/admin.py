@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
-from modeltranslation.admin import TranslationStackedInline
+from modeltranslation.admin import TranslationAdmin, TranslationStackedInline
 
 from apps.core.admin_mixins import (
     EmmettImportExportAdmin,
@@ -30,7 +30,9 @@ class CaseStudyInline(TranslationStackedInline[CaseStudy, Project]):
 
 
 @admin.register(Project)
-class ProjectAdmin(PublishWorkflowMixin, SoftDeleteAdminMixin, EmmettImportExportAdmin):
+class ProjectAdmin(
+    TranslationAdmin[Project], PublishWorkflowMixin, SoftDeleteAdminMixin, EmmettImportExportAdmin
+):
     resource_class = ProjectResource
     list_display = (
         "title",
@@ -75,7 +77,7 @@ class ProjectAdmin(PublishWorkflowMixin, SoftDeleteAdminMixin, EmmettImportExpor
 
 
 @admin.register(CaseStudy)
-class CaseStudyAdmin(SoftDeleteAdminMixin, EmmettImportExportAdmin):
+class CaseStudyAdmin(TranslationAdmin[CaseStudy], SoftDeleteAdminMixin, EmmettImportExportAdmin):
     """ادمین مستقل مطالعهٔ موردی (برای جست‌وجو/صادرات مستقیم؛ ویرایش اصلی در اینلاین پروژه)."""
 
     resource_class = CaseStudyResource

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
+from modeltranslation.admin import TranslationAdmin
 
 from apps.company.models import TeamMember, Testimonial
 from apps.company.resources import TeamMemberResource, TestimonialResource
@@ -15,7 +16,7 @@ from apps.core.admin_mixins import (
 
 
 @admin.register(TeamMember)
-class TeamMemberAdmin(SoftDeleteAdminMixin, EmmettImportExportAdmin):
+class TeamMemberAdmin(TranslationAdmin[TeamMember], SoftDeleteAdminMixin, EmmettImportExportAdmin):
     resource_class = TeamMemberResource
     list_display = ("full_name", "role_title", "order", "is_active", "user")
     list_display_links = ("full_name",)
@@ -33,7 +34,7 @@ class TeamMemberAdmin(SoftDeleteAdminMixin, EmmettImportExportAdmin):
 
 
 @admin.register(Testimonial)
-class TestimonialAdmin(SoftDeleteAdminMixin, EmmettImportExportAdmin):
+class TestimonialAdmin(TranslationAdmin[Testimonial], SoftDeleteAdminMixin, EmmettImportExportAdmin):
     resource_class = TestimonialResource
     list_display = ("author_name", "author_company", "is_featured", "order", "related_project")
     list_display_links = ("author_name",)
