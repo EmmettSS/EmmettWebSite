@@ -172,10 +172,34 @@ class TestFavorites:
             format="json",
         )
         assert add_response.status_code == 201
+        assert add_response.data["content_type_label"] == "service"
+        assert add_response.data["target_public_id"] == str(service.public_id)
+        assert add_response.data["target_slug"] == service.slug
 
         list_response = client.get("/api/v1/auth/favorites/")
         assert list_response.status_code == 200
         assert len(list_response.data["results"]) == 1
+        assert list_response.data["results"][0]["target_public_id"] == str(service.public_id)
+        assert list_response.data["results"][0]["target_slug"] == service.slug
+
+        service.delete()
+        deleted_list_response = client.get("/api/v1/auth/favorites/")
+        assert deleted_list_response.status_code == 200
+        assert deleted_list_response.data["results"][0]["target_title"] is None
+        assert deleted_list_response.data["results"][0]["target_public_id"] is None
+        assert deleted_list_response.data["results"][0]["target_slug"] is None
+
+    def test_add_favorite_for_unpublished_object_returns_404(self) -> None:
+        user = cast(User, UserFactory())
+        draft_service = cast(Service, ServiceFactory(status="draft"))
+        client = APIClient()
+        client.force_authenticate(user=user)
+        response = client.post(
+            "/api/v1/auth/favorites/add/",
+            {"content_type": "service", "public_id": str(draft_service.public_id)},
+            format="json",
+        )
+        assert response.status_code == 404
 
     def test_add_favorite_for_unknown_object_returns_404(self) -> None:
         import uuid

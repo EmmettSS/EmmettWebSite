@@ -98,11 +98,43 @@ class FavoriteCreateSerializer(serializers.Serializer[dict[str, Any]]):
 class FavoriteSerializer(serializers.ModelSerializer[Favorite]):
     content_type_label = serializers.CharField(source="content_type.model", read_only=True)
     target_title = serializers.SerializerMethodField()
+    target_public_id = serializers.SerializerMethodField()
+    target_slug = serializers.SerializerMethodField()
 
     class Meta:
         model = Favorite
-        fields = ("id", "content_type_label", "object_id", "target_title", "created_at")
+        fields = (
+            "id",
+            "content_type_label",
+            "object_id",
+            "target_title",
+            "target_public_id",
+            "target_slug",
+            "created_at",
+        )
+
+    @staticmethod
+    def _visible_target(obj: Favorite) -> object | None:
+        target: object | None = obj.target
+        if target is None:
+            return None
+        if not getattr(target, "is_active", True) or getattr(target, "deleted_at", None) is not None:
+            return None
+        status_value = getattr(target, "status", None)
+        if status_value is not None and status_value != "published":
+            return None
+        return target
 
     def get_target_title(self, obj: Favorite) -> str | None:
-        target = obj.target
+        target = self._visible_target(obj)
         return str(getattr(target, "title", None)) if target is not None else None
+
+    def get_target_public_id(self, obj: Favorite) -> str | None:
+        target = self._visible_target(obj)
+        public_id = getattr(target, "public_id", None) if target is not None else None
+        return str(public_id) if public_id is not None else None
+
+    def get_target_slug(self, obj: Favorite) -> str | None:
+        target = self._visible_target(obj)
+        slug = getattr(target, "slug", None) if target is not None else None
+        return str(slug) if slug is not None else None

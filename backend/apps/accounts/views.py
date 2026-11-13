@@ -195,7 +195,10 @@ class FavoriteCreateView(APIView):
         serializer.is_valid(raise_exception=True)
         model_label = _FAVORITABLE_MODELS[serializer.validated_data["content_type"]]
         model = django_apps.get_model(model_label)
-        target = model.objects.filter(public_id=serializer.validated_data["public_id"]).first()
+        lookup_filters: dict[str, object] = {"public_id": serializer.validated_data["public_id"]}
+        if any(field.name == "status" for field in model._meta.fields):
+            lookup_filters["status"] = "published"
+        target = model.objects.filter(**lookup_filters).first()
         if target is None:
             return Response({"detail": "محتوای موردنظر پیدا نشد."}, status=status.HTTP_404_NOT_FOUND)
 
